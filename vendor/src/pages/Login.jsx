@@ -1,141 +1,288 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import {
+  Store,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  LogIn,
+  Loader2,
+  Shield,
+  TrendingUp,
+  Package,
+  BarChart3,
+  Smartphone
+} from 'lucide-react'
 
 const Login = () => {
-  const [email, setEmail] = useState('')
+  const [emailOrMobile, setEmailOrMobile] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Vendor login attempt:', { email, password })
-    // Add your login logic here
-    // On successful login:
-    navigate('/home')
+    setError('')
+    setLoading(true)
+
+    try {
+      const response = await fetch('http://localhost:5000/api/vendor-auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          emailOrMobile: emailOrMobile.trim(),
+          password: password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        localStorage.setItem('vendorData', JSON.stringify(data.vendorData))
+        navigate('/home')
+      } else {
+        setError(data.message || 'Login failed. Please check your credentials.')
+      }
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-emerald-900 via-teal-800 to-green-900 flex items-center justify-center py-12 px-4 relative overflow-hidden'>
-      {/* Decorative Background Elements */}
+    <div className='min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden'>
+      {/* Animated Background Elements */}
       <div className='absolute inset-0 overflow-hidden'>
-        <div className='absolute top-20 right-20 w-96 h-96 bg-green-500 opacity-10 rounded-full blur-3xl'></div>
-        <div className='absolute bottom-20 left-20 w-80 h-80 bg-teal-500 opacity-10 rounded-full blur-3xl'></div>
+        <div className='absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob'></div>
+        <div className='absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000'></div>
+        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000'></div>
       </div>
 
-      <div className='max-w-md w-full relative z-10'>
-        {/* Header */}
-        <div className='text-center mb-8'>
-          <div className='inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-400 to-teal-400 rounded-2xl mb-4 shadow-lg'>
-            <svg className='w-10 h-10 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' />
-            </svg>
+      {/* Main Container */}
+      <div className='relative w-full max-w-6xl grid lg:grid-cols-2 gap-0 bg-white rounded-3xl shadow-2xl overflow-hidden'>
+        {/* Left Side - Branding */}
+        <div className='bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-12 lg:p-16 text-white relative overflow-hidden hidden lg:block'>
+          {/* Decorative Pattern */}
+          <div className='absolute inset-0 opacity-10'>
+            <div className='absolute top-0 right-0 w-64 h-64 bg-white rounded-full -mr-32 -mt-32'></div>
+            <div className='absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full -ml-48 -mb-48'></div>
           </div>
-          <h1 className='text-4xl font-black text-white mb-2'>Vendor Portal</h1>
-          <p className='text-gray-300'>Sign in to manage your store</p>
+
+          {/* Content */}
+          <div className='relative z-10 h-full flex flex-col justify-between'>
+            {/* Logo & Title */}
+            <div>
+              <div className='flex items-center gap-3 mb-12'>
+                <div className='w-12 h-12 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/30'>
+                  <Store className='w-7 h-7' />
+                </div>
+                <h1 className='text-3xl font-bold'>ABCD Vendor Hub</h1>
+              </div>
+
+              <h2 className='text-5xl font-extrabold leading-tight mb-6'>
+                Power Your<br />
+                <span className='text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-pink-200'>
+                  Business Growth
+                </span>
+              </h2>
+
+              <p className='text-lg text-purple-100 mb-12 leading-relaxed'>
+                Manage your inventory, track sales in real-time, and reach thousands of customers with our powerful vendor platform.
+              </p>
+            </div>
+
+            {/* Features */}
+            <div className='space-y-6'>
+              <div className='flex items-start gap-4'>
+                <div className='w-12 h-12 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <TrendingUp className='w-6 h-6' />
+                </div>
+                <div>
+                  <h3 className='font-semibold text-lg mb-1'>Real-Time Analytics</h3>
+                  <p className='text-purple-200 text-sm'>Track your sales and performance metrics instantly</p>
+                </div>
+              </div>
+
+              <div className='flex items-start gap-4'>
+                <div className='w-12 h-12 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <Package className='w-6 h-6' />
+                </div>
+                <div>
+                  <h3 className='font-semibold text-lg mb-1'>Smart Inventory</h3>
+                  <p className='text-purple-200 text-sm'>Manage products with ease and efficiency</p>
+                </div>
+              </div>
+
+              <div className='flex items-start gap-4'>
+                <div className='w-12 h-12 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <BarChart3 className='w-6 h-6' />
+                </div>
+                <div>
+                  <h3 className='font-semibold text-lg mb-1'>Growth Insights</h3>
+                  <p className='text-purple-200 text-sm'>Make data-driven decisions to scale faster</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Login Form */}
-        <div className='bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20'>
+        {/* Right Side - Login Form */}
+        <div className='p-8 lg:p-16 flex flex-col justify-center'>
+          {/* Mobile Logo */}
+          <div className='lg:hidden flex items-center justify-center gap-3 mb-8'>
+            <div className='w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center'>
+              <Store className='w-7 h-7 text-white' />
+            </div>
+            <h1 className='text-2xl font-bold text-gray-800'>ABCD Vendor</h1>
+          </div>
+
+          {/* Welcome Text */}
+          <div className='mb-10'>
+            <h2 className='text-4xl font-bold text-gray-900 mb-3'>Welcome Back!</h2>
+            <p className='text-gray-600 text-lg'>Sign in to manage your vendor account</p>
+          </div>
+
+          {/* Login Form */}
           <form onSubmit={handleSubmit} className='space-y-6'>
-            {/* Email Field */}
+            {/* Email or Mobile Input */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Email Address</label>
-              <div className='relative'>
+              <label className='block text-sm font-bold text-gray-700 mb-3'>
+                Email or Mobile Number
+              </label>
+              <div className='relative group'>
+                <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-indigo-600 transition-colors'>
+                  <Mail className='w-5 h-5' />
+                </div>
                 <input
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className='w-full px-4 py-3 pl-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition backdrop-blur-sm'
-                  placeholder='vendor@example.com'
+                  type='text'
+                  value={emailOrMobile}
+                  onChange={(e) => setEmailOrMobile(e.target.value)}
+                  className='w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all duration-200 font-medium'
+                  placeholder='Enter email or mobile number'
                   required
                 />
-                <svg className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207' />
-                </svg>
               </div>
             </div>
 
-            {/* Password Field */}
+            {/* Password Input */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Password</label>
-              <div className='relative'>
+              <label className='block text-sm font-bold text-gray-700 mb-3'>
+                Password
+              </label>
+              <div className='relative group'>
+                <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-indigo-600 transition-colors'>
+                  <Lock className='w-5 h-5' />
+                </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className='w-full px-4 py-3 pl-11 pr-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition backdrop-blur-sm'
+                  className='w-full pl-12 pr-14 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all duration-200 font-medium'
                   placeholder='Enter your password'
                   required
                 />
-                <svg className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' />
-                </svg>
                 <button
                   type='button'
                   onClick={() => setShowPassword(!showPassword)}
-                  className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300'
+                  className='absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-indigo-600 transition-colors'
                 >
                   {showPassword ? (
-                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21' />
-                    </svg>
+                    <EyeOff className='w-5 h-5' />
                   ) : (
-                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
-                    </svg>
+                    <Eye className='w-5 h-5' />
                   )}
                 </button>
               </div>
             </div>
 
-            {/* Remember & Forgot */}
+            {/* Remember Me & Forgot Password */}
             <div className='flex items-center justify-between'>
-              <label className='flex items-center cursor-pointer'>
-                <input type='checkbox' className='w-4 h-4 text-green-600 bg-white/20 border-white/30 rounded focus:ring-green-500' />
-                <span className='ml-2 text-sm text-gray-300'>Remember me</span>
+              <label className='flex items-center cursor-pointer group'>
+                <input
+                  type='checkbox'
+                  className='w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 cursor-pointer'
+                />
+                <span className='ml-3 text-sm font-medium text-gray-700 group-hover:text-gray-900'>
+                  Remember me
+                </span>
               </label>
-              <a href='#' className='text-sm text-green-400 hover:text-green-300 font-semibold'>
+              <a href='#' className='text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors'>
                 Forgot Password?
               </a>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className='bg-red-50 border-l-4 border-red-500 rounded-lg p-4 animate-shake'>
+                <div className='flex items-center gap-3'>
+                  <div className='w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0'>
+                    <span className='text-red-600 text-sm font-bold'>!</span>
+                  </div>
+                  <p className='text-sm font-semibold text-red-800'>{error}</p>
+                </div>
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type='submit'
-              className='w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105'
+              disabled={loading}
+              className='w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 text-lg'
             >
-              Sign In to Dashboard
+              {loading ? (
+                <>
+                  <Loader2 className='w-6 h-6 animate-spin' />
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  <LogIn className='w-6 h-6' />
+                  Sign In to Dashboard
+                </>
+              )}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className='mt-6'>
-            <div className='relative'>
-              <div className='absolute inset-0 flex items-center'>
-                <div className='w-full border-t border-white/20'></div>
-              </div>
-              <div className='relative flex justify-center text-sm'>
-                <span className='px-4 bg-white/10 text-gray-400'>New vendor?</span>
-              </div>
+          {/* Footer */}
+          <div className='mt-10 pt-8 border-t border-gray-200'>
+            <div className='flex items-center justify-center gap-2 text-gray-500 text-sm'>
+              <Shield className='w-4 h-4' />
+              <span>Secured with end-to-end encryption</span>
             </div>
-          </div>
 
-          {/* Registration Link */}
-          <div className='mt-6 text-center'>
-            <Link
-              to='/register'
-              className='block w-full bg-white/10 backdrop-blur-sm border-2 border-green-400 text-green-400 py-3 rounded-xl font-bold hover:bg-white/20 transition-all'
-            >
-              Register Your Business
-            </Link>
+            {/* Register Link */}
+            <div className='mt-6 text-center'>
+              <p className='text-gray-600 mb-3'>Don't have a vendor account?</p>
+              <a
+                href='/signup'
+                className='inline-block w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]'
+              >
+                Register Your Business
+              </a>
+            </div>
+
+            <p className='text-center text-sm text-gray-600 mt-6'>
+              Need assistance?{' '}
+              <a href='#' className='font-bold text-indigo-600 hover:text-indigo-700 transition-colors'>
+                Contact Support
+              </a>
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Footer Info */}
-        <div className='mt-6 text-center text-gray-400 text-sm'>
-          <p>Secure vendor authentication • SSL encrypted</p>
+      {/* Bottom Badge - Mobile Only */}
+      <div className='lg:hidden absolute bottom-4 left-0 right-0 flex justify-center'>
+        <div className='bg-white/10 backdrop-blur-md rounded-full px-6 py-2 border border-white/20'>
+          <p className='text-white text-sm font-medium'>Trusted by 10,000+ vendors</p>
         </div>
       </div>
     </div>

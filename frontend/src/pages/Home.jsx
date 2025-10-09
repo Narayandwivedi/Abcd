@@ -375,7 +375,7 @@ const Home = () => {
       <div className='fixed bottom-6 right-6 flex flex-col gap-3 z-50'>
         {/* WhatsApp Button */}
         <a
-          href='https://wa.me/919876543210'
+          href='https://wa.me/917000484146'
           target='_blank'
           rel='noopener noreferrer'
           className='group bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 flex items-center gap-2 px-4 py-3'

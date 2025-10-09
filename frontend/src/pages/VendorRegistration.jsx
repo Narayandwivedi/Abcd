@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const VendorRegistration = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     businessName: '',
     ownerName: '',
@@ -11,20 +12,80 @@ const VendorRegistration = () => {
     gstNumber: '',
     address: '',
     city: '',
-    state: '',
+    state: 'Chhattisgarh',
     pincode: '',
     description: '',
     password: '',
     confirmPassword: ''
   })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+    setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Vendor Registration:', formData)
+    setError('')
+
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
+
+    if (formData.gstNumber && formData.gstNumber.length !== 15) {
+      setError('GST number must be 15 characters')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const response = await fetch('http://localhost:5000/api/vendor-auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          businessName: formData.businessName,
+          ownerName: formData.ownerName,
+          email: formData.email,
+          mobile: parseInt(formData.phone),
+          password: formData.password,
+          gstNumber: formData.gstNumber,
+          businessCategory: formData.businessType,
+          businessAddress: {
+            street: formData.address,
+            city: formData.city,
+            state: formData.state,
+            pincode: formData.pincode,
+          },
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        alert('Vendor registration successful! You can now login.')
+        navigate('/vendor-login')
+      } else {
+        setError(data.message || 'Registration failed')
+      }
+    } catch (err) {
+      console.error('Registration error:', err)
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -188,7 +249,8 @@ const VendorRegistration = () => {
                     <input
                       type='text'
                       name='state'
-                      value='chhatisgarh'
+                      value={formData.state}
+                      onChange={handleChange}
                       className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 transition'
                       placeholder='State'
                       required
@@ -286,16 +348,24 @@ const VendorRegistration = () => {
               </label>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl'>
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
             <div className='flex flex-col sm:flex-row gap-4'>
               <button
                 type='submit'
-                className='flex-1 bg-gradient-to-r from-green-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105'
+                disabled={loading}
+                className='flex-1 bg-gradient-to-r from-green-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                Submit Application
+                {loading ? 'Submitting...' : 'Submit Application'}
               </button>
               <Link
-                to='/login'
+                to='/vendor-login'
                 className='flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-bold text-lg hover:bg-gray-300 transition-all text-center'
               >
                 Already a vendor? Login
