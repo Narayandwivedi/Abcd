@@ -245,26 +245,26 @@ const Signup = () => {
     ]
 
     return (
-      <div className='flex items-center justify-between mb-12'>
+      <div className='flex items-center justify-between'>
         {steps.map((step, index) => (
           <React.Fragment key={step.num}>
             <div className='flex flex-col items-center'>
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-base lg:text-lg transition-all duration-300 ${
                 currentStep >= step.num
                   ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
                   : 'bg-gray-200 text-gray-400'
               }`}>
-                {currentStep > step.num ? <CheckCircle className='w-6 h-6' /> : step.num}
+                {currentStep > step.num ? <CheckCircle className='w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6' /> : step.num}
               </div>
-              <span className={`text-xs mt-2 font-medium ${
-                currentStep >= step.num ? 'text-indigo-600' : 'text-gray-400'
+              <span className={`text-[10px] sm:text-xs mt-1 sm:mt-2 font-medium hidden sm:block ${
+                currentStep >= step.num ? 'text-white' : 'text-purple-200'
               }`}>
                 {step.label}
               </span>
             </div>
             {index < steps.length - 1 && (
-              <div className={`flex-1 h-1 mx-2 rounded transition-all duration-300 ${
-                currentStep > step.num ? 'bg-indigo-600' : 'bg-gray-200'
+              <div className={`flex-1 h-0.5 sm:h-1 mx-1 sm:mx-2 rounded transition-all duration-300 ${
+                currentStep > step.num ? 'bg-white' : 'bg-white/30'
               }`}></div>
             )}
           </React.Fragment>
@@ -274,7 +274,7 @@ const Signup = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden'>
+    <div className='min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-0 lg:p-4 relative overflow-hidden'>
       {/* Animated Background */}
       <div className='absolute inset-0 overflow-hidden'>
         <div className='absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob'></div>
@@ -283,38 +283,39 @@ const Signup = () => {
       </div>
 
       {/* Main Container */}
-      <div className='relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden'>
+      <div className='relative w-full max-w-4xl bg-white lg:rounded-3xl lg:shadow-2xl overflow-hidden min-h-screen lg:min-h-0'>
         {/* Header */}
-        <div className='bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 px-8 py-8 text-white'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/30'>
-                <Store className='w-7 h-7' />
+        <div className='bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 px-4 sm:px-6 lg:px-8 py-6 lg:py-8 text-white'>
+          <div className='flex items-center justify-between mb-4 lg:mb-4'>
+            <div className='flex items-center gap-2 lg:gap-3'>
+              <div className='w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/30'>
+                <Store className='w-6 h-6 lg:w-7 lg:h-7' />
               </div>
               <div>
-                <h1 className='text-2xl font-bold'>Vendor Registration</h1>
-                <p className='text-purple-100 text-sm'>Join ABCD Marketplace</p>
+                <h1 className='text-lg sm:text-xl lg:text-2xl font-bold'>Vendor Registration</h1>
+                <p className='text-purple-100 text-xs lg:text-sm hidden sm:block'>Join ABCD Marketplace</p>
               </div>
             </div>
             <button
               onClick={() => navigate('/login')}
-              className='flex items-center gap-2 text-white hover:bg-white/10 px-4 py-2 rounded-lg transition-all'
+              className='flex items-center gap-1 lg:gap-2 text-white hover:bg-white/10 px-2 lg:px-4 py-2 rounded-lg transition-all text-sm lg:text-base'
             >
-              <ArrowLeft className='w-4 h-4' />
-              Back to Login
+              <ArrowLeft className='w-3 h-3 lg:w-4 lg:h-4' />
+              <span className='hidden sm:inline'>Back to Login</span>
+              <span className='sm:hidden'>Back</span>
             </button>
           </div>
           {renderStepIndicator()}
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className='p-8 lg:p-12'>
+        <form onSubmit={handleSubmit} className='p-5 sm:p-6 lg:p-12'>
           {/* Step 1: Business Information */}
           {currentStep === 1 && (
-            <div className='space-y-6 animate-fadeIn'>
-              <div className='flex items-center gap-3 mb-6'>
-                <Building2 className='w-6 h-6 text-indigo-600' />
-                <h2 className='text-2xl font-bold text-gray-900'>Business Information</h2>
+            <div className='space-y-5 lg:space-y-6 animate-fadeIn'>
+              <div className='flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6'>
+                <Building2 className='w-5 h-5 lg:w-6 lg:h-6 text-indigo-600' />
+                <h2 className='text-xl lg:text-2xl font-bold text-gray-900'>Business Information</h2>
               </div>
 
               <div className='grid md:grid-cols-2 gap-6'>
@@ -400,10 +401,10 @@ const Signup = () => {
 
           {/* Step 2: Upload Documents */}
           {currentStep === 2 && (
-            <div className='space-y-6 animate-fadeIn'>
-              <div className='flex items-center gap-3 mb-6'>
-                <FileText className='w-6 h-6 text-indigo-600' />
-                <h2 className='text-2xl font-bold text-gray-900'>Upload Documents</h2>
+            <div className='space-y-5 lg:space-y-6 animate-fadeIn'>
+              <div className='flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6'>
+                <FileText className='w-5 h-5 lg:w-6 lg:h-6 text-indigo-600' />
+                <h2 className='text-xl lg:text-2xl font-bold text-gray-900'>Upload Documents</h2>
               </div>
 
               <div className='bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-xl p-6 mb-8'>
@@ -516,10 +517,10 @@ const Signup = () => {
 
           {/* Step 3: Contact Information */}
           {currentStep === 3 && (
-            <div className='space-y-6 animate-fadeIn'>
-              <div className='flex items-center gap-3 mb-6'>
-                <Phone className='w-6 h-6 text-indigo-600' />
-                <h2 className='text-2xl font-bold text-gray-900'>Contact Information</h2>
+            <div className='space-y-5 lg:space-y-6 animate-fadeIn'>
+              <div className='flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6'>
+                <Phone className='w-5 h-5 lg:w-6 lg:h-6 text-indigo-600' />
+                <h2 className='text-xl lg:text-2xl font-bold text-gray-900'>Contact Information</h2>
               </div>
 
               <div className='grid md:grid-cols-2 gap-6'>
@@ -570,10 +571,10 @@ const Signup = () => {
 
           {/* Step 4: Business Address */}
           {currentStep === 4 && (
-            <div className='space-y-6 animate-fadeIn'>
-              <div className='flex items-center gap-3 mb-6'>
-                <MapPin className='w-6 h-6 text-indigo-600' />
-                <h2 className='text-2xl font-bold text-gray-900'>Business Address</h2>
+            <div className='space-y-5 lg:space-y-6 animate-fadeIn'>
+              <div className='flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6'>
+                <MapPin className='w-5 h-5 lg:w-6 lg:h-6 text-indigo-600' />
+                <h2 className='text-xl lg:text-2xl font-bold text-gray-900'>Business Address</h2>
               </div>
 
               <div>
@@ -639,10 +640,10 @@ const Signup = () => {
 
           {/* Step 5: Account Security */}
           {currentStep === 5 && (
-            <div className='space-y-6 animate-fadeIn'>
-              <div className='flex items-center gap-3 mb-6'>
-                <Lock className='w-6 h-6 text-indigo-600' />
-                <h2 className='text-2xl font-bold text-gray-900'>Account Security</h2>
+            <div className='space-y-5 lg:space-y-6 animate-fadeIn'>
+              <div className='flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6'>
+                <Lock className='w-5 h-5 lg:w-6 lg:h-6 text-indigo-600' />
+                <h2 className='text-xl lg:text-2xl font-bold text-gray-900'>Account Security</h2>
               </div>
 
               <div className='grid md:grid-cols-2 gap-6'>
@@ -734,14 +735,14 @@ const Signup = () => {
           )}
 
           {/* Navigation Buttons */}
-          <div className='flex items-center justify-between mt-10 pt-6 border-t border-gray-200'>
+          <div className='flex items-center justify-between mt-6 lg:mt-10 pt-4 lg:pt-6 border-t border-gray-200'>
             {currentStep > 1 && (
               <button
                 type='button'
                 onClick={prevStep}
-                className='flex items-center gap-2 px-6 py-3 text-gray-700 font-semibold hover:bg-gray-100 rounded-xl transition-all'
+                className='flex items-center gap-1 lg:gap-2 px-4 lg:px-6 py-2 lg:py-3 text-gray-700 font-semibold hover:bg-gray-100 rounded-xl transition-all text-sm lg:text-base'
               >
-                <ArrowLeft className='w-5 h-5' />
+                <ArrowLeft className='w-4 h-4 lg:w-5 lg:h-5' />
                 Previous
               </button>
             )}
@@ -752,25 +753,25 @@ const Signup = () => {
               <button
                 type='button'
                 onClick={nextStep}
-                className='flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:shadow-xl transition-all hover:scale-105'
+                className='flex items-center gap-1 lg:gap-2 px-6 lg:px-8 py-2 lg:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:shadow-xl transition-all hover:scale-105 text-sm lg:text-base'
               >
                 Next Step
-                <ArrowRight className='w-5 h-5' />
+                <ArrowRight className='w-4 h-4 lg:w-5 lg:h-5' />
               </button>
             ) : (
               <button
                 type='submit'
                 disabled={loading}
-                className='flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'
+                className='flex items-center gap-1 lg:gap-2 px-6 lg:px-8 py-2 lg:py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-sm lg:text-base'
               >
                 {loading ? (
                   <>
-                    <Loader2 className='w-5 h-5 animate-spin' />
+                    <Loader2 className='w-4 h-4 lg:w-5 lg:h-5 animate-spin' />
                     Creating Account...
                   </>
                 ) : (
                   <>
-                    <CheckCircle className='w-5 h-5' />
+                    <CheckCircle className='w-4 h-4 lg:w-5 lg:h-5' />
                     Complete Registration
                   </>
                 )}
