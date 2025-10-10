@@ -37,12 +37,14 @@ const GoogleLogin = () => {
 
       // Render the Google button
       if (googleButtonRef.current) {
+        // Get the container width and set Google button to fit
+        const containerWidth = googleButtonRef.current.offsetWidth || 300;
         window.google.accounts.id.renderButton(
           googleButtonRef.current,
           {
             theme: 'outline',
             size: 'large',
-            width: googleButtonRef.current.offsetWidth || 400,
+            width: containerWidth,
             text: 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'center'

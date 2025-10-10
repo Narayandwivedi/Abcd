@@ -12,40 +12,76 @@ const Navbar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
 
-  // Check if user is logged in on component mount
+  // Check if user is logged in on component mount and when route changes
   useEffect(() => {
     checkAuthStatus()
+
+    // Listen for storage changes (e.g., when user logs in/out in another tab)
+    const handleStorageChange = (e) => {
+      if (e.key === 'userData') {
+        checkAuthStatus()
+      }
+    }
+
+    // Listen for custom auth event (for same-tab login/logout)
+    const handleAuthChange = () => {
+      checkAuthStatus()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('authChange', handleAuthChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('authChange', handleAuthChange)
+    }
   }, [])
 
   const checkAuthStatus = async () => {
     try {
       // Check localStorage first
       const storedUser = localStorage.getItem('userData')
-      if (storedUser) {
-        setUserData(JSON.parse(storedUser))
-        setIsLoggedIn(true)
+
+      // If no stored user, set logged out state immediately
+      if (!storedUser) {
+        setIsLoggedIn(false)
+        setUserData(null)
+        return
       }
 
-      // Verify with backend
+      // Parse and set stored user data
+      const parsedUser = JSON.parse(storedUser)
+      setUserData(parsedUser)
+      setIsLoggedIn(true)
+
+      // Verify with backend in the background
       const response = await fetch(`${backendUrl}/api/auth/status`, {
         method: 'GET',
         credentials: 'include',
       })
       const data = await response.json()
 
-      if (data.isLoggedIn) {
-        setIsLoggedIn(true)
+      if (data.isLoggedIn && data.user) {
+        // Update with fresh data from backend
         setUserData(data.user)
         localStorage.setItem('userData', JSON.stringify(data.user))
       } else {
+        // Session expired or invalid, clear everything
         setIsLoggedIn(false)
         setUserData(null)
         localStorage.removeItem('userData')
       }
     } catch (error) {
       console.error('Auth check error:', error)
-      setIsLoggedIn(false)
-      setUserData(null)
+      // On error, keep the localStorage data if it exists
+      const storedUser = localStorage.getItem('userData')
+      if (storedUser) {
+        setUserData(JSON.parse(storedUser))
+        setIsLoggedIn(true)
+      } else {
+        setIsLoggedIn(false)
+        setUserData(null)
+      }
     }
   }
 
@@ -63,6 +99,8 @@ const Navbar = () => {
         setUserData(null)
         localStorage.removeItem('userData')
         setShowProfileMenu(false)
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new Event('authChange'))
         navigate('/login')
       }
     } catch (error) {

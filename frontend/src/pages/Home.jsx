@@ -364,7 +364,7 @@ const Home = () => {
             Join thousands of successful businesses in the ABCD community today.
           </p>
           <button className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-10 py-5 rounded-xl font-bold text-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-2xl transform hover:scale-105 hover:-translate-y-1'>
-            Join Now - It's Free!
+            Join as a Buyer
           </button>
         </div>
       </section>

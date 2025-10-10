@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import GoogleLogin from '../component/GoogleLogin'
 
 const Signup = () => {
-  const { backendUrl } = useContext(AppContext)
+  const { backendUrl, checkAuthStatus } = useContext(AppContext)
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
@@ -78,11 +78,16 @@ const Signup = () => {
 
       if (data.success) {
         toast.success(data.message || 'Account created successfully!')
-        // Store user data
-        localStorage.setItem('userData', JSON.stringify(data.userData))
-        // Navigate to home and reload to update navbar
-        navigate('/')
-        window.location.reload()
+        // Update auth state
+        if (checkAuthStatus) {
+          await checkAuthStatus()
+        } else {
+          // Fallback: Store user data and dispatch event
+          localStorage.setItem('userData', JSON.stringify(data.userData))
+          window.dispatchEvent(new Event('authChange'))
+        }
+        // Navigate to home
+        navigate('/', { replace: true })
       } else {
         toast.error(data.message || 'Signup failed')
       }
