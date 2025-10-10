@@ -22,7 +22,8 @@ const corsOptions = {
     'http://localhost:5174',
     'http://localhost:5175',
     'https://abcdvyapar.com',
-    'https://www.abcdvyapar.com'
+    'https://www.abcdvyapar.com',
+    'https://api.abcdvyapar.com'  // Backend domain for admin/vendor panels
   ],
   credentials: true, // Allow cookies to be sent
   optionsSuccessStatus: 200
