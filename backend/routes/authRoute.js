@@ -3,6 +3,8 @@ const {
   handelUserSignup,
   handelUserLogin,
   handleUserLogout,
+  generateResetPassOTP,
+  submitResetPassOTP,
   isloggedin,
 } = require("../controllers/authController.js");
 
@@ -12,6 +14,10 @@ const router = express.Router();
 router.post("/signup", handelUserSignup);
 router.post("/login", handelUserLogin);
 router.post("/logout", handleUserLogout);
+
+// Password Reset Routes
+router.post("/forgot-password", generateResetPassOTP);
+router.post("/reset-password", submitResetPassOTP);
 
 // Check Authentication Status
 router.get("/status", isloggedin);

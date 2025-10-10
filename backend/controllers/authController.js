@@ -80,8 +80,9 @@ const handelUserSignup = async (req, res) => {
       userData: userObj,
     });
   } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({ message: err.message });
+    console.error("Signup Error:", err);
+    console.error("Error Stack:", err.stack);
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -152,7 +153,8 @@ const handelUserLogin = async (req, res) => {
       userData: userObj,
     });
   } catch (err) {
-    console.error("Login Error:", err.message);
+    console.error("Login Error:", err);
+    console.error("Error Stack:", err.stack);
     return res
       .status(500)
       .json({ success: false, message: "Something went wrong" });
@@ -168,7 +170,8 @@ const handleUserLogout = async (req, res) => {
     });
     return res.status(200).json({ success: true, message: "User logged out" });
   } catch (error) {
-    console.error("Logout Error:", error.message);
+    console.error("Logout Error:", error);
+    console.error("Error Stack:", error.stack);
     return res.status(500).json({ success: false, message: "Logout failed" });
   }
 };
@@ -190,9 +193,113 @@ const isloggedin = async (req, res) => {
 
     return res.status(200).json({ isLoggedIn: true, user: user });
   } catch (err) {
+    console.error("Auth Status Error:", err);
+    console.error("Error Stack:", err.stack);
     return res
       .status(401)
       .json({ isLoggedIn: false, message: "Invalid or expired token" });
+  }
+};
+
+const generateResetPassOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Please provide email address" });
+    }
+
+    const getUser = await userModel.findOne({ email });
+
+    if (!getUser) {
+      return res.status(400).json({
+        success: false,
+        message: `User with this email doesn't exist`,
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    getUser.resetOtp = otp;
+    getUser.otpExpiresAt = Date.now() + 10 * 60 * 1000; // 10 mins
+    await getUser.save();
+
+    // For development, log the OTP to console
+    console.log(`Reset OTP for ${email}: ${otp}`);
+
+    // TODO: Send email with OTP using nodemailer
+    // const transporter = require("../utils/nodemailer.js");
+    // const mailOptions = {
+    //   from: "your-email@gmail.com",
+    //   to: email,
+    //   subject: "Account Password Reset OTP",
+    //   text: `Your OTP for password reset is: ${otp}. It will expire in 10 minutes.`,
+    // };
+    // await transporter.sendMail(mailOptions);
+
+    return res.json({ success: true, message: "OTP sent successfully" });
+  } catch (err) {
+    console.error("Generate OTP Error:", err);
+    console.error("Error Stack:", err.stack);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+const submitResetPassOTP = async (req, res) => {
+  try {
+    const { otp, newPass, email } = req.body;
+
+    if (!otp || !newPass || !email) {
+      return res.status(400).json({ success: false, message: "Missing data" });
+    }
+
+    const getUser = await userModel.findOne({ email });
+    if (!getUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found, try again" });
+    }
+
+    // Check if OTP exists
+    if (!getUser.resetOtp) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No OTP found for this user" });
+    }
+
+    // Check if OTP is expired
+    if (getUser.otpExpiresAt < Date.now()) {
+      // Clear expired OTP
+      getUser.resetOtp = undefined;
+      getUser.otpExpiresAt = undefined;
+      await getUser.save();
+      return res.status(400).json({ success: false, message: "OTP expired" });
+    }
+
+    // Convert both OTP values to numbers for comparison
+    if (Number(otp) === Number(getUser.resetOtp)) {
+      const newHashedPass = await bcrypt.hash(newPass, 10);
+      getUser.password = newHashedPass;
+
+      // Clear OTP fields after successful password reset
+      getUser.resetOtp = undefined;
+      getUser.otpExpiresAt = undefined;
+
+      await getUser.save();
+
+      return res.json({
+        success: true,
+        message: "Password reset successfully",
+      });
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    }
+  } catch (err) {
+    console.error("Submit OTP Error:", err);
+    console.error("Error Stack:", err.stack);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -200,5 +307,7 @@ module.exports = {
   handelUserSignup,
   handelUserLogin,
   handleUserLogout,
+  generateResetPassOTP,
+  submitResetPassOTP,
   isloggedin,
 };

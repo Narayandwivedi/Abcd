@@ -47,7 +47,12 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-
+  resetOtp: {
+    type: Number,
+  },
+  otpExpiresAt: {
+    type: Date,
+  },
 
 }, { timestamps: true });
 

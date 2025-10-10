@@ -1,14 +1,52 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useContext } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { AppContext } from '../context/AppContext'
+import { toast } from 'react-toastify'
 
 const Login = () => {
-  const [email, setEmail] = useState('')
+  const { backendUrl } = useContext(AppContext)
+  const navigate = useNavigate()
+
+  const [emailOrMobile, setEmailOrMobile] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Login attempt:', { email, password })
+    setLoading(true)
+
+    try {
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Important for cookies
+        body: JSON.stringify({
+          emailOrMobile,
+          password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success(data.message || 'Login successful!')
+        // Store user data
+        localStorage.setItem('userData', JSON.stringify(data.userData))
+        // Navigate to home and reload to update navbar
+        navigate('/')
+        window.location.reload()
+      } else {
+        toast.error(data.message || 'Login failed')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      toast.error('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -29,16 +67,16 @@ const Login = () => {
         {/* Login Form */}
         <div className='bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20'>
           <form onSubmit={handleSubmit} className='space-y-6'>
-            {/* Email Field */}
+            {/* Email or Mobile Field */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Email Address</label>
+              <label className='block text-white font-semibold mb-2 text-sm'>Email or Mobile Number</label>
               <div className='relative'>
                 <input
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type='text'
+                  value={emailOrMobile}
+                  onChange={(e) => setEmailOrMobile(e.target.value)}
                   className='w-full px-4 py-3 pl-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition backdrop-blur-sm'
-                  placeholder='you@example.com'
+                  placeholder='Email or 10-digit mobile number'
                   required
                 />
                 <svg className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -87,17 +125,18 @@ const Login = () => {
                 <input type='checkbox' className='w-4 h-4 text-blue-600 bg-white/20 border-white/30 rounded focus:ring-blue-500' />
                 <span className='ml-2 text-sm text-gray-300'>Remember me</span>
               </label>
-              <a href='#' className='text-sm text-blue-400 hover:text-blue-300 font-semibold'>
+              <Link to='/forgot-password' className='text-sm text-blue-400 hover:text-blue-300 font-semibold'>
                 Forgot Password?
-              </a>
+              </Link>
             </div>
 
             {/* Submit Button */}
             <button
               type='submit'
-              className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105'
+              disabled={loading}
+              className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
             >
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
@@ -136,9 +175,9 @@ const Login = () => {
           <div className='mt-8 text-center space-y-3'>
             <p className='text-gray-400 text-sm'>
               Don't have an account?{' '}
-              <a href='#' className='text-blue-400 font-bold hover:text-blue-300'>
+              <Link to='/signup' className='text-blue-400 font-bold hover:text-blue-300'>
                 Sign Up
-              </a>
+              </Link>
             </p>
             <p className='text-gray-400 text-sm'>
               Want to sell your products?{' '}
