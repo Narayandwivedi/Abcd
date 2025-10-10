@@ -1,6 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.js");
+const { OAuth2Client } = require('google-auth-library');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const handelUserSignup = async (req, res) => {
   try {
@@ -303,6 +306,110 @@ const submitResetPassOTP = async (req, res) => {
   }
 };
 
+// Google OAuth Handler
+const handleGoogleAuth = async (req, res) => {
+  try {
+    const { credential, userType } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: "Google credential is required"
+      });
+    }
+
+    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const {
+      sub: googleId,
+      email,
+      name: fullName,
+      picture: profilePicture,
+      email_verified
+    } = payload;
+
+    if (!email_verified) {
+      return res.status(400).json({
+        success: false,
+        message: "Google email not verified"
+      });
+    }
+
+    // Determine role based on userType parameter
+    const userRole = userType === 'vendor' ? 'vendor' : 'user';
+
+    // Check if user exists
+    let user = await userModel.findOne({
+      $or: [
+        { email: email },
+        { googleId: googleId }
+      ]
+    });
+
+    if (user) {
+      // User exists, update Google info if needed
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.profilePicture = profilePicture;
+        user.authProvider = 'google';
+        user.isEmailVerified = true;
+        await user.save();
+      }
+    } else {
+      // Create new user with specified role
+      const newUserData = {
+        fullName,
+        email,
+        googleId,
+        profilePicture,
+        isEmailVerified: email_verified,
+        authProvider: 'google',
+        role: userRole, // Set role based on userType parameter
+      };
+
+      user = await userModel.create(newUserData);
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET
+    );
+
+    // Set cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
+    });
+
+    // Prepare user data for response
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Google authentication successful',
+      userData: userObj
+    });
+
+  } catch (error) {
+    console.error('Google authentication error:', error);
+    return res.status(400).json({
+      success: false,
+      message: 'Google authentication failed',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   handelUserSignup,
   handelUserLogin,
@@ -310,4 +417,5 @@ module.exports = {
   generateResetPassOTP,
   submitResetPassOTP,
   isloggedin,
+  handleGoogleAuth,
 };

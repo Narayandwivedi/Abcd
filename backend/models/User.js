@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   mobile: {
     type: Number,
     unique: true,
-    required: true,
+    sparse: true, // Allow null values for Google users
   },
   email: {
     type: String,
@@ -22,7 +22,20 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false, // Not required for Google OAuth users
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow null for non-Google users
+  },
+  profilePicture: {
+    type: String,
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local',
   },
   
   bankAccount: {

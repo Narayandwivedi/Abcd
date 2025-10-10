@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Store,
@@ -9,10 +9,9 @@ import {
   LogIn,
   Loader2,
   Shield,
-  TrendingUp,
-  Package,
-  BarChart3
+  ArrowRight
 } from 'lucide-react'
+import GoogleLogin from '../components/GoogleLogin'
 
 const Login = () => {
   const [emailOrMobile, setEmailOrMobile] = useState('')
@@ -21,6 +20,14 @@ const Login = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+
+  // Redirect if already logged in
+  useEffect(() => {
+    const vendorData = localStorage.getItem('vendorData')
+    if (vendorData) {
+      navigate('/dashboard')
+    }
+  }, [navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -44,7 +51,7 @@ const Login = () => {
 
       if (data.success) {
         localStorage.setItem('vendorData', JSON.stringify(data.vendorData))
-        navigate('/home')
+        navigate('/dashboard')
       } else {
         setError(data.message || 'Login failed. Please check your credentials.')
       }
@@ -57,115 +64,62 @@ const Login = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-0 lg:p-4 relative overflow-hidden'>
-      {/* Animated Background Elements */}
-      <div className='absolute inset-0 overflow-hidden'>
-        <div className='absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob'></div>
-        <div className='absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000'></div>
-        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000'></div>
-      </div>
-
+    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center sm:p-4'>
       {/* Main Container */}
-      <div className='relative w-full max-w-6xl grid lg:grid-cols-2 gap-0 bg-white lg:rounded-3xl lg:shadow-2xl overflow-hidden min-h-screen lg:min-h-0'>
-        {/* Left Side - Branding */}
-        <div className='bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-12 lg:p-16 text-white relative overflow-hidden hidden lg:block'>
-          {/* Decorative Pattern */}
-          <div className='absolute inset-0 opacity-10'>
-            <div className='absolute top-0 right-0 w-64 h-64 bg-white rounded-full -mr-32 -mt-32'></div>
-            <div className='absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full -ml-48 -mb-48'></div>
+      <div className='w-full max-w-md'>
+        {/* Logo & Brand */}
+        <div className='text-center mb-6 sm:mb-8 px-6 sm:px-0 pt-8 sm:pt-0'>
+          <div className='inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl mb-3 sm:mb-4 shadow-lg'>
+            <Store className='w-7 h-7 sm:w-8 sm:h-8 text-white' />
           </div>
-
-          {/* Content */}
-          <div className='relative z-10 h-full flex flex-col justify-between'>
-            {/* Logo & Title */}
-            <div>
-              <div className='flex items-center gap-3 mb-12'>
-                <div className='w-12 h-12 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/30'>
-                  <Store className='w-7 h-7' />
-                </div>
-                <h1 className='text-3xl font-bold'>ABCD Vendor Hub</h1>
-              </div>
-
-              <h2 className='text-5xl font-extrabold leading-tight mb-6'>
-                Power Your<br />
-                <span className='text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-pink-200'>
-                  Business Growth
-                </span>
-              </h2>
-
-              <p className='text-lg text-purple-100 mb-12 leading-relaxed'>
-                Manage your inventory, track sales in real-time, and reach thousands of customers with our powerful vendor platform.
-              </p>
-            </div>
-
-            {/* Features */}
-            <div className='space-y-6'>
-              <div className='flex items-start gap-4'>
-                <div className='w-12 h-12 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0'>
-                  <TrendingUp className='w-6 h-6' />
-                </div>
-                <div>
-                  <h3 className='font-semibold text-lg mb-1'>Real-Time Analytics</h3>
-                  <p className='text-purple-200 text-sm'>Track your sales and performance metrics instantly</p>
-                </div>
-              </div>
-
-              <div className='flex items-start gap-4'>
-                <div className='w-12 h-12 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0'>
-                  <Package className='w-6 h-6' />
-                </div>
-                <div>
-                  <h3 className='font-semibold text-lg mb-1'>Smart Inventory</h3>
-                  <p className='text-purple-200 text-sm'>Manage products with ease and efficiency</p>
-                </div>
-              </div>
-
-              <div className='flex items-start gap-4'>
-                <div className='w-12 h-12 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0'>
-                  <BarChart3 className='w-6 h-6' />
-                </div>
-                <div>
-                  <h3 className='font-semibold text-lg mb-1'>Growth Insights</h3>
-                  <p className='text-purple-200 text-sm'>Make data-driven decisions to scale faster</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <h1 className='text-2xl sm:text-3xl font-black text-gray-900 mb-2'>ABCD Vendor</h1>
+          <p className='text-sm sm:text-base text-gray-600'>Welcome back! Sign in to continue</p>
         </div>
 
-        {/* Right Side - Login Form */}
-        <div className='p-5 sm:p-6 lg:p-16 flex flex-col justify-center min-h-screen lg:min-h-0'>
-          {/* Mobile Logo */}
-          <div className='lg:hidden flex items-center justify-center gap-2 mb-6'>
-            <div className='w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center'>
-              <Store className='w-6 h-6 text-white' />
-            </div>
-            <h1 className='text-xl font-bold text-gray-800'>ABCD Vendor</h1>
+        {/* Login Card */}
+        <div className='bg-white sm:rounded-3xl sm:shadow-xl p-6 sm:p-8 mb-6 sm:mb-6'>
+          {/* Register Prompt */}
+          <div className='mb-5 sm:mb-6 text-center bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl sm:rounded-2xl p-3 sm:p-4'>
+            <p className='text-gray-700 text-xs sm:text-sm mb-2 sm:mb-3 font-medium'>New to ABCD?</p>
+            <a
+              href='/signup'
+              className='inline-flex items-center justify-center w-full gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 text-sm sm:text-base'
+            >
+              Register as New Vendor
+              <ArrowRight className='w-4 h-4 sm:w-5 sm:h-5' />
+            </a>
           </div>
 
-          {/* Welcome Text */}
-          <div className='mb-6 lg:mb-10'>
-            <h2 className='text-3xl lg:text-4xl font-bold text-gray-900 mb-2 lg:mb-3'>Welcome Back!</h2>
-            <p className='text-gray-600 text-base lg:text-lg'>Sign in to manage your vendor account</p>
+          {/* Google Login */}
+          <div className='mb-5 sm:mb-6'>
+            <GoogleLogin />
+          </div>
+
+          {/* Divider */}
+          <div className='relative mb-5 sm:mb-6'>
+            <div className='absolute inset-0 flex items-center'>
+              <div className='w-full border-t-2 border-gray-200'></div>
+            </div>
+            <div className='relative flex justify-center'>
+              <span className='px-3 sm:px-4 bg-white text-xs sm:text-sm font-semibold text-gray-500'>Or sign in with email</span>
+            </div>
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className='space-y-5 lg:space-y-6'>
-            {/* Email or Mobile Input */}
+          <form onSubmit={handleSubmit} className='space-y-4 sm:space-y-5'>
+            {/* Email/Mobile Input */}
             <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2 lg:mb-3'>
+              <label className='block text-xs sm:text-sm font-bold text-gray-700 mb-1.5 sm:mb-2'>
                 Email or Mobile Number
               </label>
-              <div className='relative group'>
-                <div className='absolute inset-y-0 left-0 pl-3 lg:pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-indigo-600 transition-colors'>
-                  <Mail className='w-5 h-5' />
-                </div>
+              <div className='relative'>
+                <Mail className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400' />
                 <input
                   type='text'
                   value={emailOrMobile}
                   onChange={(e) => setEmailOrMobile(e.target.value)}
-                  className='w-full pl-11 lg:pl-12 pr-3 lg:pr-4 py-3 lg:py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all duration-200 font-medium text-sm lg:text-base'
-                  placeholder='Enter email or mobile number'
+                  className='w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium'
+                  placeholder='Enter your email or mobile'
                   required
                 />
               </div>
@@ -173,59 +127,51 @@ const Login = () => {
 
             {/* Password Input */}
             <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2 lg:mb-3'>
+              <label className='block text-xs sm:text-sm font-bold text-gray-700 mb-1.5 sm:mb-2'>
                 Password
               </label>
-              <div className='relative group'>
-                <div className='absolute inset-y-0 left-0 pl-3 lg:pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-indigo-600 transition-colors'>
-                  <Lock className='w-5 h-5' />
-                </div>
+              <div className='relative'>
+                <Lock className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400' />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className='w-full pl-11 lg:pl-12 pr-11 lg:pr-14 py-3 lg:py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all duration-200 font-medium text-sm lg:text-base'
+                  className='w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-2.5 sm:py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium'
                   placeholder='Enter your password'
                   required
                 />
                 <button
                   type='button'
                   onClick={() => setShowPassword(!showPassword)}
-                  className='absolute inset-y-0 right-0 pr-3 lg:pr-4 flex items-center text-gray-400 hover:text-indigo-600 transition-colors'
+                  className='absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors'
                 >
-                  {showPassword ? (
-                    <EyeOff className='w-5 h-5' />
-                  ) : (
-                    <Eye className='w-5 h-5' />
-                  )}
+                  {showPassword ? <EyeOff className='w-4 h-4 sm:w-5 sm:h-5' /> : <Eye className='w-4 h-4 sm:w-5 sm:h-5' />}
                 </button>
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
+            {/* Remember & Forgot */}
             <div className='flex items-center justify-between'>
-              <label className='flex items-center cursor-pointer group'>
+              <label className='flex items-center cursor-pointer'>
                 <input
                   type='checkbox'
-                  className='w-4 h-4 lg:w-5 lg:h-5 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 cursor-pointer'
+                  className='w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500'
                 />
-                <span className='ml-2 lg:ml-3 text-xs lg:text-sm font-medium text-gray-700 group-hover:text-gray-900'>
-                  Remember me
-                </span>
+                <span className='ml-2 text-xs sm:text-sm font-medium text-gray-700'>Remember me</span>
               </label>
-              <a href='#' className='text-xs lg:text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors'>
+              <a href='#' className='text-xs sm:text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors'>
                 Forgot Password?
               </a>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className='bg-red-50 border-l-4 border-red-500 rounded-lg p-3 lg:p-4 animate-shake'>
-                <div className='flex items-center gap-2 lg:gap-3'>
-                  <div className='w-5 h-5 lg:w-6 lg:h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0'>
-                    <span className='text-red-600 text-xs lg:text-sm font-bold'>!</span>
+              <div className='bg-red-50 border-l-4 border-red-500 rounded-xl p-3 sm:p-4'>
+                <div className='flex items-center gap-2 sm:gap-3'>
+                  <div className='w-5 h-5 sm:w-6 sm:h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0'>
+                    <span className='text-red-600 text-xs sm:text-sm font-bold'>!</span>
                   </div>
-                  <p className='text-xs lg:text-sm font-semibold text-red-800'>{error}</p>
+                  <p className='text-xs sm:text-sm font-semibold text-red-800'>{error}</p>
                 </div>
               </div>
             )}
@@ -234,47 +180,35 @@ const Login = () => {
             <button
               type='submit'
               disabled={loading}
-              className='w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold py-3 lg:py-4 px-6 rounded-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 lg:gap-3 text-base lg:text-lg'
+              className='w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold py-3 sm:py-4 rounded-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-sm sm:text-base'
             >
               {loading ? (
                 <>
-                  <Loader2 className='w-5 h-5 lg:w-6 lg:h-6 animate-spin' />
+                  <Loader2 className='w-4 h-4 sm:w-5 sm:h-5 animate-spin' />
                   Signing In...
                 </>
               ) : (
                 <>
-                  <LogIn className='w-5 h-5 lg:w-6 lg:h-6' />
+                  <LogIn className='w-4 h-4 sm:w-5 sm:h-5' />
                   Sign In to Dashboard
                 </>
               )}
             </button>
           </form>
+        </div>
 
-          {/* Footer */}
-          <div className='mt-6 lg:mt-10 pt-6 lg:pt-8 border-t border-gray-200'>
-            <div className='flex items-center justify-center gap-2 text-gray-500 text-xs lg:text-sm'>
-              <Shield className='w-3 h-3 lg:w-4 lg:h-4' />
-              <span>Secured with end-to-end encryption</span>
-            </div>
-
-            {/* Register Link */}
-            <div className='mt-4 lg:mt-6 text-center'>
-              <p className='text-gray-600 mb-2 lg:mb-3 text-sm lg:text-base'>Don't have a vendor account?</p>
-              <a
-                href='/signup'
-                className='inline-block w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-sm lg:text-base'
-              >
-                Register Your Business
-              </a>
-            </div>
-
-            <p className='text-center text-xs lg:text-sm text-gray-600 mt-4 lg:mt-6'>
-              Need assistance?{' '}
-              <a href='#' className='font-bold text-indigo-600 hover:text-indigo-700 transition-colors'>
-                Contact Support
-              </a>
-            </p>
+        {/* Footer */}
+        <div className='text-center px-6 sm:px-0 pb-8 sm:pb-0'>
+          <div className='flex items-center justify-center gap-2 text-gray-500 text-xs sm:text-sm mb-3'>
+            <Shield className='w-3 h-3 sm:w-4 sm:h-4' />
+            <span>Secured with end-to-end encryption</span>
           </div>
+          <p className='text-xs sm:text-sm text-gray-600'>
+            Need help?{' '}
+            <a href='#' className='font-bold text-indigo-600 hover:text-indigo-700 transition-colors'>
+              Contact Support
+            </a>
+          </p>
         </div>
       </div>
     </div>

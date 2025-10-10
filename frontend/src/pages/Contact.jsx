@@ -58,7 +58,7 @@ const Contact = () => {
                   support@abcd.com
                 </a>
               </div>
-              <button className='mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg'>
+              <button className='mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg cursor-pointer'>
                 Send Email
               </button>
             </div>
@@ -83,7 +83,7 @@ const Contact = () => {
                   Mon-Sat: 9:00 AM - 6:00 PM
                 </p>
               </div>
-              <button className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg'>
+              <button className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg cursor-pointer'>
                 Start Chat
               </button>
             </div>
@@ -105,7 +105,7 @@ const Contact = () => {
                 </a>
                 <p className='text-gray-500 text-sm'>Toll-free number</p>
               </div>
-              <button className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg'>
+              <button className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg cursor-pointer'>
                 Call Now
               </button>
             </div>
@@ -204,7 +204,7 @@ const Contact = () => {
 
                 <button
                   type='submit'
-                  className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-black text-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105'
+                  className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-black text-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer'
                 >
                   Send Message
                 </button>
