@@ -4,7 +4,7 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
   // Backend URL - can be imported and used anywhere
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://api.abcdvyapar.com";
   const [demoState, setDemoState] = useState(true);
 
   // Check authentication status
