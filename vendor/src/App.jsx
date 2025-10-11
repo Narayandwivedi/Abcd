@@ -1,6 +1,10 @@
-import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useState, useContext } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import AppContextProvider, { AppContext } from './context/AppContext'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import Sidebar from './components/Sidebar'
+import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Register from './pages/Register'
@@ -14,20 +18,12 @@ import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import './App.css'
 
-// Protected Route Component
-function ProtectedRoute({ children }) {
-  const vendorData = localStorage.getItem('vendorData')
-
-  if (!vendorData) {
-    return <Navigate to='/login' replace />
-  }
-
-  return children
-}
-
 // Layout wrapper for dashboard pages
 function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const { vendor } = useContext(AppContext)
+
+  console.log('🏗️ DashboardLayout rendering with vendor:', vendor?.businessName || vendor?.email || 'null')
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -58,11 +54,11 @@ function DashboardLayout({ children }) {
 
               <div className='flex items-center gap-3 px-3 py-2 bg-gray-100 rounded-xl'>
                 <div className='w-9 h-9 bg-gradient-to-br from-indigo-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold shadow-md'>
-                  V
+                  {vendor?.businessName?.charAt(0).toUpperCase() || 'V'}
                 </div>
                 <div className='hidden md:block'>
-                  <div className='text-sm font-semibold text-gray-800'>Vendor Name</div>
-                  <div className='text-xs text-gray-600'>Vendor</div>
+                  <div className='text-sm font-semibold text-gray-800'>{vendor?.businessName || 'Vendor'}</div>
+                  <div className='text-xs text-gray-600'>{vendor?.ownerName || 'Owner'}</div>
                 </div>
               </div>
             </div>
@@ -79,22 +75,110 @@ function DashboardLayout({ children }) {
 function App() {
   return (
     <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path='/login' element={<Login />} />
-        <Route path='/signup' element={<Signup />} />
-        <Route path='/register' element={<Register />} />
+      <AppContextProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path='/login' element={<Login />} />
+          <Route path='/signup' element={<Signup />} />
+          <Route path='/register' element={<Register />} />
 
-        {/* Dashboard Routes */}
-        <Route path='/' element={<Navigate to='/dashboard' replace />} />
-        <Route path='/dashboard' element={<DashboardLayout><Dashboard /></DashboardLayout>} />
-        <Route path='/products' element={<DashboardLayout><Products /></DashboardLayout>} />
-        <Route path='/add-product' element={<DashboardLayout><AddProduct /></DashboardLayout>} />
-        <Route path='/orders' element={<DashboardLayout><Orders /></DashboardLayout>} />
-        <Route path='/payments' element={<DashboardLayout><Payments /></DashboardLayout>} />
-        <Route path='/reports' element={<DashboardLayout><Reports /></DashboardLayout>} />
-        <Route path='/settings' element={<DashboardLayout><Settings /></DashboardLayout>} />
-      </Routes>
+          {/* Protected Dashboard Routes */}
+          <Route
+            path='/'
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Home />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/dashboard'
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/products'
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Products />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/add-product'
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <AddProduct />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/orders'
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Orders />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/payments'
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Payments />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/reports'
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Reports />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/settings'
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Settings />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+
+        {/* Toast Notification Container */}
+        <ToastContainer
+          position="top-right"
+          autoClose={700}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+      </AppContextProvider>
     </Router>
   )
 }

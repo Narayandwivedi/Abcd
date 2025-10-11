@@ -17,20 +17,32 @@ const vendorSchema = new mongoose.Schema({
   mobile: {
     type: Number,
     unique: true,
-    required: true,
+    sparse: true, // Allow null/undefined values for unique index
   },
   password: {
     type: String,
-    required: true,
   },
   gstNumber: {
     type: String,
-    required: true,
     unique: true,
+    sparse: true, // Allow null/undefined values for unique index
+  },
+  // Google OAuth fields
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  profilePicture: {
+    type: String,
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local',
   },
   businessCategory: {
     type: String,
-    required: true,
   },
   businessAddress: {
     street: String,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Store,
@@ -13,8 +13,11 @@ import {
   CheckCircle
 } from 'lucide-react'
 import GoogleLogin from '../components/GoogleLogin'
+import { AppContext } from '../context/AppContext'
+import { toast } from 'react-toastify'
 
 const Signup = () => {
+  const { isAuthenticated, signup } = useContext(AppContext)
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -32,11 +35,10 @@ const Signup = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    const vendorData = localStorage.getItem('vendorData')
-    if (vendorData) {
-      navigate('/dashboard')
+    if (isAuthenticated) {
+      navigate('/')
     }
-  }, [navigate])
+  }, [isAuthenticated, navigate])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -85,32 +87,25 @@ const Signup = () => {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:5000/api/vendor-auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          mobile: parseInt(formData.mobile),
-          password: formData.password,
-        }),
+      const result = await signup({
+        fullName: formData.fullName,
+        email: formData.email,
+        mobile: parseInt(formData.mobile),
+        password: formData.password,
       })
 
-      const data = await response.json()
-
-      if (data.success) {
-        localStorage.setItem('vendorData', JSON.stringify(data.vendorData))
-        alert('Registration successful! Please complete your business profile.')
-        navigate('/dashboard')
+      if (result.success) {
+        console.log('✅ Signup result successful')
+        toast.success('Registration successful! Please complete your business profile.')
+        // Navigation will happen automatically via useEffect when isAuthenticated changes
       } else {
-        setError(data.message || 'Registration failed')
+        console.log('❌ Signup result failed:', result.error)
+        setError(result.error)
+        toast.error(result.error || 'Registration failed')
       }
     } catch (err) {
       console.error('Registration error:', err)
-      setError('Something went wrong. Please try again.')
+      toast.error('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }

@@ -1,7 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const GoogleLogin = () => {
+  const { BACKEND_URL } = useContext(AppContext);
   const navigate = useNavigate();
   const googleButtonRef = useRef(null);
   const isGoogleLoaded = useRef(false);
@@ -58,32 +62,27 @@ const GoogleLogin = () => {
 
   const handleCredentialResponse = async (response) => {
     try {
-      const result = await fetch('http://localhost:5000/api/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          credential: response.credential,
-          userType: 'vendor' // Specify this is a vendor registration
-        }),
+      console.log('🔐 Google login attempt...')
+      const result = await axios.post(`${BACKEND_URL}/api/vendor-auth/google`, {
+        credential: response.credential
+      }, {
+        withCredentials: true
       });
 
-      const data = await result.json();
-
-      if (data.success) {
-        // Store vendor data
-        localStorage.setItem('vendorData', JSON.stringify(data.userData));
-        // Navigate to dashboard
-        navigate('/dashboard');
+      if (result.data.success) {
+        console.log('✅ Google login successful')
+        toast.success('Login successful! Redirecting to home...');
+        // Reload to trigger fresh auth check from server
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
       } else {
-        console.error('Backend login failed:', data.message);
-        alert(data.message || 'Google login failed');
+        console.error('❌ Google login failed:', result.data.message);
+        toast.error(result.data.message || 'Google login failed');
       }
     } catch (error) {
-      console.error('Google login error:', error);
-      alert('Google login failed. Please try again.');
+      console.error('❌ Google login error:', error);
+      toast.error('Google login failed. Please try again.');
     }
   };
 

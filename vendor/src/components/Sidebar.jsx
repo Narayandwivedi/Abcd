@@ -1,8 +1,16 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { AppContext } from '../context/AppContext'
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation()
+  const { vendor, logout } = useContext(AppContext)
+
+  const handleLogout = async () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      await logout()
+    }
+  }
 
   const menuItems = [
     {
@@ -126,16 +134,27 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           ))}
         </nav>
 
-        {/* User Info */}
+        {/* User Info & Logout */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-purple-700/30 bg-purple-900/50">
-          <div className="flex items-center space-x-3 px-4 py-3 bg-black/20 rounded-xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
-              V
+          <div className="space-y-2">
+            <div className="flex items-center space-x-3 px-4 py-3 bg-black/20 rounded-xl">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                {vendor?.businessName?.charAt(0).toUpperCase() || 'V'}
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <div className="font-semibold text-purple-100 truncate">{vendor?.businessName || 'Vendor'}</div>
+                <div className="text-xs text-purple-300 truncate">{vendor?.ownerName || 'Owner'}</div>
+              </div>
             </div>
-            <div>
-              <div className="font-semibold text-purple-100">Vendor Name</div>
-              <div className="text-xs text-purple-300">Vendor</div>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-red-500/80 hover:bg-red-600 rounded-xl transition-all group"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="font-semibold">Logout</span>
+            </button>
           </div>
         </div>
       </div>

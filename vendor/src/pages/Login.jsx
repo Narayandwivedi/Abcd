@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Store,
@@ -12,8 +12,11 @@ import {
   ArrowRight
 } from 'lucide-react'
 import GoogleLogin from '../components/GoogleLogin'
+import { AppContext } from '../context/AppContext'
+import { toast } from 'react-toastify'
 
 const Login = () => {
+  const { isAuthenticated, login } = useContext(AppContext)
   const [emailOrMobile, setEmailOrMobile] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -21,13 +24,13 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  // Redirect if already logged in
+  // Redirect if already logged in or after successful login
   useEffect(() => {
-    const vendorData = localStorage.getItem('vendorData')
-    if (vendorData) {
-      navigate('/dashboard')
+    if (isAuthenticated === true) {
+      console.log('🔀 Login page: User is authenticated, redirecting to home')
+      navigate('/', { replace: true })
     }
-  }, [navigate])
+  }, [isAuthenticated, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -35,29 +38,25 @@ const Login = () => {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:5000/api/vendor-auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          emailOrMobile: emailOrMobile.trim(),
-          password: password,
-        }),
+      console.log('📤 Submitting login form...')
+      const result = await login({
+        emailOrMobile: emailOrMobile.trim(),
+        password: password
       })
 
-      const data = await response.json()
-
-      if (data.success) {
-        localStorage.setItem('vendorData', JSON.stringify(data.vendorData))
-        navigate('/dashboard')
+      if (result.success) {
+        console.log('✅ Login result successful')
+        toast.success('Login successful! Welcome back!')
+        // Navigation will happen automatically via useEffect when isAuthenticated changes
       } else {
-        setError(data.message || 'Login failed. Please check your credentials.')
+        console.log('❌ Login result failed:', result.error)
+        setError(result.error)
+        toast.error(result.error || 'Login failed. Please check your credentials.')
       }
     } catch (err) {
-      console.error('Login error:', err)
+      console.error('❌ Login form error:', err)
       setError('Something went wrong. Please try again.')
+      toast.error('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
