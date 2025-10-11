@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const vendorSchema = new mongoose.Schema({
   businessName: {
     type: String,
-    required: true,
+    required: false,
   },
   ownerName: {
     type: String,
-    required: true,
+    required: false,
   },
   email: {
     type: String,
@@ -86,14 +86,11 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     default: "vendor",
   },
-  isActive: {
+  isBusinessFormCompleted: {
     type: Boolean,
-    default: true,
+    default: false,
   },
-  lastActive: {
-    type: Date,
-    default: Date.now,
-  },
+
 }, { timestamps: true });
 
 const Vendor = mongoose.model("Vendor", vendorSchema);

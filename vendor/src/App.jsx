@@ -8,6 +8,8 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Register from './pages/Register'
+import BusinessForm from './pages/BusinessForm'
+import PendingApproval from './pages/PendingApproval'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Products from './pages/Products'
@@ -81,6 +83,26 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
           <Route path='/register' element={<Register />} />
+
+          {/* Business Form Route - Requires auth but NOT form completion */}
+          <Route
+            path='/business-form'
+            element={
+              <ProtectedRoute>
+                <BusinessForm />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Pending Approval Route - Requires auth and form completion but NOT admin approval */}
+          <Route
+            path='/pending-approval'
+            element={
+              <ProtectedRoute>
+                <PendingApproval />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected Dashboard Routes */}
           <Route

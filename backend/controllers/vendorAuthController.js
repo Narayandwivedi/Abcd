@@ -8,27 +8,14 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let {
-      businessName,
-      ownerName,
-      email,
-      mobile,
-      password,
-      gstNumber,
-      businessCategory,
-      businessAddress
-    } = req.body;
+    let { email, mobile, password } = req.body;
 
     // Trim input fields
-    businessName = businessName?.trim();
-    ownerName = ownerName?.trim();
     email = email?.trim();
     password = password?.trim();
-    gstNumber = gstNumber?.trim();
-    businessCategory = businessCategory?.trim();
 
-    if (!businessName || !ownerName || !email || !mobile || !password || !gstNumber || !businessCategory) {
-      return res.status(400).json({ success: false, message: "missing required fields" });
+    if (!email || !mobile || !password) {
+      return res.status(400).json({ success: false, message: "Email, mobile, and password are required" });
     }
 
     // Validate Indian mobile number
@@ -39,17 +26,9 @@ const handleVendorSignup = async (req, res) => {
       });
     }
 
-    // Validate GST number format (15 characters)
-    if (gstNumber.length !== 15) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter a valid GST number (15 characters)",
-      });
-    }
-
-    // Check if vendor already exists by email, mobile, or GST number
+    // Check if vendor already exists by email or mobile
     const existingVendor = await vendorModel.findOne({
-      $or: [{ email }, { mobile }, { gstNumber }]
+      $or: [{ email }, { mobile }]
     });
 
     if (existingVendor) {
@@ -65,26 +44,15 @@ const handleVendorSignup = async (req, res) => {
           message: "Mobile number already exists",
         });
       }
-      if (existingVendor.gstNumber === gstNumber) {
-        return res.status(400).json({
-          success: false,
-          message: "GST number already registered",
-        });
-      }
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 8);
 
     const newVendorData = {
-      businessName,
-      ownerName,
       email,
       password: hashedPassword,
       mobile,
-      gstNumber,
-      businessCategory,
-      businessAddress: businessAddress || {},
     };
 
     // Create new vendor
@@ -96,8 +64,7 @@ const handleVendorSignup = async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    // Cookie settings for cross-origin requests (localhost frontend to remote backend)
-    // For HTTPS backends, always use None/secure even in development
+    // Cookie settings for cross-origin requests
     const isHttpsBackend = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https';
 
     res.cookie("vendorToken", token, {
@@ -123,7 +90,6 @@ const handleVendorSignup = async (req, res) => {
 };
 
 const handleVendorLogin = async (req, res) => {
-  console.log('📥 Login request received:', { emailOrMobile: req.body.emailOrMobile, hasPassword: !!req.body.password });
   try {
     const { emailOrMobile, password } = req.body;
 
@@ -184,8 +150,7 @@ const handleVendorLogin = async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    // Cookie settings for cross-origin requests (localhost frontend to remote backend)
-    // For HTTPS backends, always use None/secure even in development
+    // Cookie settings for cross-origin requests
     const isHttpsBackend = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https';
 
     console.log('🍪 Setting cookie:', {
@@ -332,9 +297,9 @@ const handleVendorGoogleAuth = async (req, res) => {
         googleId,
         profilePicture,
         authProvider: 'google',
-        // These fields will need to be filled later
-        gstNumber: 'PENDING',
-        businessCategory: 'General',
+        isEmailVerified: true,
+        // Don't set mobile, gstNumber, businessCategory - leave as undefined
+        // This allows sparse indexes to work properly
       };
 
       vendor = await vendorModel.create(newVendorData);

@@ -12,6 +12,7 @@ const PORT = process.env.PORT
 
 const authRoute = require('./routes/authRoute')
 const vendorAuthRoute = require('./routes/vendorAuthRoute')
+const vendorRoute = require('./routes/vendorRoute')
 const uploadRoute = require('./routes/uploadRoute')
 const searchRoute = require('./routes/searchRoute')
 
@@ -36,6 +37,7 @@ app.use(cookieParser());
 
 app.use('/api/auth',authRoute)
 app.use('/api/vendor-auth',vendorAuthRoute)
+app.use('/api/vendor',vendorRoute)
 app.use('/api/search',searchRoute)
 app.use('/api/upload',uploadRoute)
 

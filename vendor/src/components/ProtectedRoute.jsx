@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useContext(AppContext)
+  const { isAuthenticated, loading, vendor } = useContext(AppContext)
   const location = useLocation()
 
   useEffect(() => {
@@ -11,9 +11,11 @@ const ProtectedRoute = ({ children }) => {
       path: location.pathname,
       isAuthenticated,
       loading,
+      isBusinessFormCompleted: vendor?.isBusinessFormCompleted,
+      verificationStatus: vendor?.verificationStatus,
       timestamp: new Date().toISOString()
     })
-  }, [isAuthenticated, loading, location.pathname])
+  }, [isAuthenticated, loading, vendor, location.pathname])
 
   // Show loading spinner while checking authentication
   if (loading) {
@@ -34,8 +36,20 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to='/login' state={{ from: location }} replace />
   }
 
-  // User is authenticated, render the protected content
-  console.log('✅ ProtectedRoute: Authenticated, rendering protected content')
+  // Check if business form is completed (skip check for /business-form and /pending-approval pages)
+  if (vendor && !vendor.isBusinessFormCompleted && location.pathname !== '/business-form' && location.pathname !== '/pending-approval') {
+    console.log('📋 ProtectedRoute: Business form not completed, redirecting to form')
+    return <Navigate to='/business-form' replace />
+  }
+
+  // Check if vendor is approved by admin (skip check for /business-form and /pending-approval pages)
+  if (vendor && vendor.isBusinessFormCompleted && vendor.verificationStatus !== 'approved' && location.pathname !== '/business-form' && location.pathname !== '/pending-approval') {
+    console.log('⏳ ProtectedRoute: Vendor not approved, redirecting to pending approval page')
+    return <Navigate to='/pending-approval' replace />
+  }
+
+  // User is authenticated, form is completed, and approved - render the protected content
+  console.log('✅ ProtectedRoute: Authenticated and authorized, rendering protected content')
   return children
 }
 
