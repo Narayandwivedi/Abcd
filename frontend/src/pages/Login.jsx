@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import GoogleLogin from '../component/GoogleLogin'
 
 const Login = () => {
-  const { backendUrl, checkAuthStatus } = useContext(AppContext)
+  const { isAuthenticated, login } = useContext(AppContext)
   const navigate = useNavigate()
 
   const [emailOrMobile, setEmailOrMobile] = useState('')
@@ -15,45 +15,23 @@ const Login = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    const userData = localStorage.getItem('userData')
-    if (userData) {
+    if (isAuthenticated) {
       navigate('/')
     }
-  }, [navigate])
+  }, [isAuthenticated, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      const response = await fetch(`${backendUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important for cookies
-        body: JSON.stringify({
-          emailOrMobile,
-          password,
-        }),
-      })
+      const result = await login({ emailOrMobile, password })
 
-      const data = await response.json()
-
-      if (data.success) {
-        toast.success(data.message || 'Login successful!')
-        // Update auth state
-        if (checkAuthStatus) {
-          await checkAuthStatus()
-        } else {
-          // Fallback: Store user data and dispatch event
-          localStorage.setItem('userData', JSON.stringify(data.userData))
-          window.dispatchEvent(new Event('authChange'))
-        }
-        // Navigate to home
+      if (result.success) {
+        toast.success('Login successful!')
         navigate('/', { replace: true })
       } else {
-        toast.error(data.message || 'Login failed')
+        toast.error(result.error || 'Login failed')
       }
     } catch (error) {
       console.error('Login error:', error)

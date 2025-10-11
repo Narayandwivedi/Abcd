@@ -1,108 +1,19 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useState, useContext } from 'react'
+import { Link } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 import Logo from './Logo'
 
 const Navbar = () => {
-  const { backendUrl } = useContext(AppContext)
-  const navigate = useNavigate()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userData, setUserData] = useState(null)
+  const { user, isAuthenticated, logout } = useContext(AppContext)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
 
-  // Check if user is logged in on component mount and when route changes
-  useEffect(() => {
-    checkAuthStatus()
-
-    // Listen for storage changes (e.g., when user logs in/out in another tab)
-    const handleStorageChange = (e) => {
-      if (e.key === 'userData') {
-        checkAuthStatus()
-      }
-    }
-
-    // Listen for custom auth event (for same-tab login/logout)
-    const handleAuthChange = () => {
-      checkAuthStatus()
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('authChange', handleAuthChange)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('authChange', handleAuthChange)
-    }
-  }, [])
-
-  const checkAuthStatus = async () => {
-    try {
-      // Check localStorage first
-      const storedUser = localStorage.getItem('userData')
-
-      // If no stored user, set logged out state immediately
-      if (!storedUser) {
-        setIsLoggedIn(false)
-        setUserData(null)
-        return
-      }
-
-      // Parse and set stored user data
-      const parsedUser = JSON.parse(storedUser)
-      setUserData(parsedUser)
-      setIsLoggedIn(true)
-
-      // Verify with backend in the background
-      const response = await fetch(`${backendUrl}/api/auth/status`, {
-        method: 'GET',
-        credentials: 'include',
-      })
-      const data = await response.json()
-
-      if (data.isLoggedIn && data.user) {
-        // Update with fresh data from backend
-        setUserData(data.user)
-        localStorage.setItem('userData', JSON.stringify(data.user))
-      } else {
-        // Session expired or invalid, clear everything
-        setIsLoggedIn(false)
-        setUserData(null)
-        localStorage.removeItem('userData')
-      }
-    } catch (error) {
-      console.error('Auth check error:', error)
-      // On error, keep the localStorage data if it exists
-      const storedUser = localStorage.getItem('userData')
-      if (storedUser) {
-        setUserData(JSON.parse(storedUser))
-        setIsLoggedIn(true)
-      } else {
-        setIsLoggedIn(false)
-        setUserData(null)
-      }
-    }
-  }
-
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      })
-      const data = await response.json()
-
-      if (data.success) {
-        toast.success('Logged out successfully')
-        setIsLoggedIn(false)
-        setUserData(null)
-        localStorage.removeItem('userData')
-        setShowProfileMenu(false)
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new Event('authChange'))
-        navigate('/login')
-      }
+      await logout()
+      setShowProfileMenu(false)
+      toast.success('Logged out successfully')
     } catch (error) {
       console.error('Logout error:', error)
       toast.error('Logout failed')
@@ -135,16 +46,16 @@ const Navbar = () => {
           </Link>
 
           {/* Conditional Login/Profile Button */}
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <div className='relative'>
               <button
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className='flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg'
               >
                 <div className='w-8 h-8 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold'>
-                  {userData?.fullName?.charAt(0).toUpperCase() || 'U'}
+                  {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                 </div>
-                <span className='hidden lg:inline'>{userData?.fullName?.split(' ')[0] || 'User'}</span>
+                <span className='hidden lg:inline'>{user?.fullName?.split(' ')[0] || 'User'}</span>
                 <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
                 </svg>
@@ -154,8 +65,8 @@ const Navbar = () => {
               {showProfileMenu && (
                 <div className='absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50'>
                   <div className='px-4 py-3 border-b border-gray-200'>
-                    <p className='font-semibold text-gray-800'>{userData?.fullName}</p>
-                    <p className='text-sm text-gray-500 truncate'>{userData?.email}</p>
+                    <p className='font-semibold text-gray-800'>{user?.fullName}</p>
+                    <p className='text-sm text-gray-500 truncate'>{user?.email}</p>
                   </div>
                   <Link
                     to='/profile'
@@ -253,16 +164,16 @@ const Navbar = () => {
             </Link>
 
             {/* Mobile Auth Section */}
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <div className='border-t border-gray-200 pt-3 mt-3'>
                 <div className='px-3 py-2 mb-2'>
                   <div className='flex items-center gap-3 mb-3'>
                     <div className='w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold'>
-                      {userData?.fullName?.charAt(0).toUpperCase() || 'U'}
+                      {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <div>
-                      <p className='font-semibold text-gray-800'>{userData?.fullName}</p>
-                      <p className='text-xs text-gray-500 truncate'>{userData?.email}</p>
+                      <p className='font-semibold text-gray-800'>{user?.fullName}</p>
+                      <p className='text-xs text-gray-500 truncate'>{user?.email}</p>
                     </div>
                   </div>
                 </div>

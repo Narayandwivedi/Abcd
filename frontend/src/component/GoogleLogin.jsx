@@ -4,7 +4,7 @@ import { AppContext } from '../context/AppContext';
 import { toast } from 'react-toastify';
 
 const GoogleLogin = () => {
-  const { backendUrl, checkAuthStatus } = useContext(AppContext);
+  const { googleAuth } = useContext(AppContext);
   const navigate = useNavigate();
   const googleButtonRef = useRef(null);
   const isGoogleLoaded = useRef(false);
@@ -59,34 +59,14 @@ const GoogleLogin = () => {
 
   const handleCredentialResponse = async (response) => {
     try {
-      const result = await fetch(`${backendUrl}/api/auth/google`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          credential: response.credential,
-        }),
-      });
+      const result = await googleAuth(response.credential);
 
-      const data = await result.json();
-
-      if (data.success) {
-        toast.success(data.message || 'Google login successful!');
-        // Update auth state
-        if (checkAuthStatus) {
-          await checkAuthStatus();
-        } else {
-          // Fallback: Store user data and dispatch event
-          localStorage.setItem('userData', JSON.stringify(data.userData));
-          window.dispatchEvent(new Event('authChange'));
-        }
-        // Navigate to home
+      if (result.success) {
+        toast.success('Google login successful!');
         navigate('/', { replace: true });
       } else {
-        console.error('Backend login failed:', data.message);
-        toast.error(data.message || 'Google login failed');
+        console.error('Backend login failed:', result.error);
+        toast.error(result.error || 'Google login failed');
       }
     } catch (error) {
       console.error('Google login error:', error);
