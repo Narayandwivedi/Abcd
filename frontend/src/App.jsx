@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Navbar from './component/Navbar'
 import Footer from './component/Footer'
+import BottomNav from './component/BottomNav'
 import Home from './pages/Home'
 import About from './pages/About'
 import Login from './pages/Login'
@@ -15,15 +16,18 @@ const App = () => {
   return (
     <div className='flex flex-col min-h-screen'>
       <Navbar />
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/signup' element={<Signup />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/forgot-password' element={<ForgotPassword />} />
-      </Routes>
+      <div className='pb-20 md:pb-0'>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/signup' element={<Signup />} />
+          <Route path='/contact' element={<Contact />} />
+          <Route path='/forgot-password' element={<ForgotPassword />} />
+        </Routes>
+      </div>
       <Footer />
+      <BottomNav />
 
       {/* Toast Notification Container */}
       <ToastContainer
