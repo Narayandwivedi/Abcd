@@ -157,9 +157,9 @@ const Login = () => {
             </p>
             <p className='text-gray-400 text-sm'>
               Want to sell your products?{' '}
-              <Link to='/vendor-registration' className='text-green-400 font-bold hover:text-green-300'>
+              <a href='https://vendor.abcdvyapar.com' target='_blank' rel='noopener noreferrer' className='text-green-400 font-bold hover:text-green-300'>
                 Join as a Vendor
-              </Link>
+              </a>
             </p>
           </div>
         </div>
