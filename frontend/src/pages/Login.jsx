@@ -152,7 +152,7 @@ const Login = () => {
             <p className='text-gray-400 text-sm'>
               Don't have an account?{' '}
               <Link to='/signup' className='text-blue-400 font-bold hover:text-blue-300'>
-                Sign Up
+                Join as a Buyer
               </Link>
             </p>
             <p className='text-gray-400 text-sm'>

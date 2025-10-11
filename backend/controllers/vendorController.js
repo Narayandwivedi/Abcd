@@ -1,16 +1,27 @@
 const vendorModel = require("../models/Vendor.js");
+const BusinessApplication = require("../models/BusinessApplication.js");
 
-// Submit/Update Vendor Business Form
+// Submit Business Application
 const submitBusinessForm = async (req, res) => {
   try {
     const vendorId = req.vendorId; // From auth middleware
 
-    // Check if vendor has already submitted the form
-    const existingVendorCheck = await vendorModel.findById(vendorId);
-    if (existingVendorCheck && existingVendorCheck.isBusinessFormCompleted === true) {
+    // Check if vendor already has an approved or pending application
+    const existingApplication = await BusinessApplication.findOne({
+      vendorId,
+      applicationStatus: { $in: ["pending", "under_review", "approved"] }
+    });
+
+    if (existingApplication) {
+      if (existingApplication.applicationStatus === "approved") {
+        return res.status(403).json({
+          success: false,
+          message: "Your business application has already been approved.",
+        });
+      }
       return res.status(403).json({
         success: false,
-        message: "Business form has already been submitted. You cannot submit again.",
+        message: "You already have a pending application. Please wait for admin review.",
       });
     }
 
@@ -23,13 +34,22 @@ const submitBusinessForm = async (req, res) => {
       businessAddress,
       bankAccount,
       upiId,
+      verificationDocuments,
     } = req.body;
 
     // Validation - require key business information
-    if (!businessName || !ownerName || !mobile || !gstNumber) {
+    if (!businessName || !ownerName || !mobile || !gstNumber || !businessCategory) {
       return res.status(400).json({
         success: false,
-        message: "Business name, owner name, mobile, and GST number are required",
+        message: "Business name, owner name, mobile, GST number, and business category are required",
+      });
+    }
+
+    // Validate business address
+    if (!businessAddress || !businessAddress.street || !businessAddress.city || !businessAddress.pincode) {
+      return res.status(400).json({
+        success: false,
+        message: "Complete business address (street, city, pincode) is required",
       });
     }
 
@@ -49,85 +69,64 @@ const submitBusinessForm = async (req, res) => {
       });
     }
 
-    // Check if mobile or GST is already used by another vendor
-    const existingVendor = await vendorModel.findOne({
-      _id: { $ne: vendorId },
-      $or: [
-        { mobile: mobile },
-        ...(gstNumber ? [{ gstNumber: gstNumber }] : [])
-      ]
+    // Check if GST is already used by another approved application
+    const existingGST = await BusinessApplication.findOne({
+      gstNumber,
+      applicationStatus: "approved",
+      vendorId: { $ne: vendorId }
     });
 
-    if (existingVendor) {
-      if (existingVendor.mobile === mobile) {
-        return res.status(400).json({
-          success: false,
-          message: "Mobile number already registered by another vendor",
-        });
-      }
-      if (gstNumber && existingVendor.gstNumber === gstNumber) {
-        return res.status(400).json({
-          success: false,
-          message: "GST number already registered by another vendor",
-        });
-      }
+    if (existingGST) {
+      return res.status(400).json({
+        success: false,
+        message: "GST number is already registered by another vendor",
+      });
     }
 
-    // Prepare update data
-    const updateData = {
+    // Create business application
+    const applicationData = {
+      vendorId,
       businessName,
       ownerName,
       mobile,
       gstNumber,
       businessCategory,
-      isBusinessFormCompleted: true,
-      isMobileVerified: false, // Reset mobile verification if mobile changed
-    };
-
-    // Add business address with hardcoded Chhattisgarh state
-    if (businessAddress) {
-      updateData.businessAddress = {
+      businessAddress: {
         ...businessAddress,
         state: "Chhattisgarh" // Hardcoded - only Chhattisgarh allowed
-      };
-    }
+      },
+      bankAccount: bankAccount || {},
+      upiId: upiId || {},
+      verificationDocuments: verificationDocuments || {},
+      applicationStatus: "pending",
+      submittedAt: new Date(),
+    };
 
-    // Add optional fields if provided
-    if (bankAccount) updateData.bankAccount = bankAccount;
-    if (upiId) updateData.upiId = upiId;
+    const newApplication = await BusinessApplication.create(applicationData);
 
-    // Update vendor
-    const updatedVendor = await vendorModel.findByIdAndUpdate(
-      vendorId,
-      updateData,
-      { new: true, runValidators: true }
-    ).select("-password");
+    // Update vendor to mark application as submitted
+    await vendorModel.findByIdAndUpdate(vendorId, {
+      isBusinessApplicationSubmitted: true
+    });
 
-    if (!updatedVendor) {
-      return res.status(404).json({
-        success: false,
-        message: "Vendor not found",
-      });
-    }
+    console.log('✅ Business application submitted successfully for vendor:', vendorId);
 
-    console.log('✅ Business form submitted successfully for:', updatedVendor.businessName);
-
-    return res.status(200).json({
+    return res.status(201).json({
       success: true,
-      message: "Business information submitted successfully",
-      vendorData: updatedVendor,
+      message: "Business application submitted successfully. Please wait for admin approval.",
+      application: newApplication,
     });
   } catch (err) {
-    console.error("Business form submission error:", err.message);
+    console.error("Business application submission error:", err.message);
     return res.status(500).json({
       success: false,
-      message: "Failed to submit business form",
+      message: "Failed to submit business application",
       error: err.message,
     });
   }
 };
 
-// Get current vendor details
+// Get current vendor details along with application status
 const getVendorDetails = async (req, res) => {
   try {
     const vendorId = req.vendorId; // From auth middleware
@@ -141,9 +140,15 @@ const getVendorDetails = async (req, res) => {
       });
     }
 
+    // Get latest business application
+    const application = await BusinessApplication.findOne({ vendorId })
+      .sort({ createdAt: -1 });
+
     return res.status(200).json({
       success: true,
       vendorData: vendor,
+      application: application || null,
+      hasApprovedApplication: vendor.isVerified,
     });
   } catch (err) {
     console.error("Get vendor details error:", err.message);
@@ -155,7 +160,38 @@ const getVendorDetails = async (req, res) => {
   }
 };
 
+// Get application status
+const getApplicationStatus = async (req, res) => {
+  try {
+    const vendorId = req.vendorId;
+
+    const application = await BusinessApplication.findOne({ vendorId })
+      .sort({ createdAt: -1 })
+      .populate("reviewedBy", "name email");
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: "No application found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      application,
+    });
+  } catch (err) {
+    console.error("Get application status error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch application status",
+      error: err.message,
+    });
+  }
+};
+
 module.exports = {
   submitBusinessForm,
   getVendorDetails,
+  getApplicationStatus,
 };

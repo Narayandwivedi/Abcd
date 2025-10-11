@@ -18,7 +18,7 @@ import { toast } from 'react-toastify'
 import axios from 'axios'
 
 const BusinessForm = () => {
-  const { vendor, BACKEND_URL, isAuthenticated, refreshVendor, logout } = useContext(AppContext)
+  const { vendor, application, BACKEND_URL, isAuthenticated, refreshVendor, logout } = useContext(AppContext)
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -45,47 +45,44 @@ const BusinessForm = () => {
     upiAccountHolderName: '',
   })
 
-  // Pre-fill form with existing vendor data if available
+  // Pre-fill form with existing application data if available
   useEffect(() => {
-    if (vendor) {
+    if (application) {
       setFormData({
-        businessName: vendor.businessName || '',
-        ownerName: vendor.ownerName || '',
-        mobile: vendor.mobile || '',
-        gstNumber: vendor.gstNumber || '',
-        businessCategory: vendor.businessCategory || '',
-        street: vendor.businessAddress?.street || '',
-        city: vendor.businessAddress?.city || '',
-        state: 'Chhattisgarh', // Always Chhattisgarh
-        pincode: vendor.businessAddress?.pincode || '',
-        accountHolderName: vendor.bankAccount?.accountHolderName || '',
-        accountNumber: vendor.bankAccount?.accountNumber || '',
-        ifscCode: vendor.bankAccount?.ifscCode || '',
-        bankName: vendor.bankAccount?.bankName || '',
-        upiId: vendor.upiId?.upi || '',
-        upiAccountHolderName: vendor.upiId?.accountHolderName || '',
+        businessName: application.businessName || '',
+        ownerName: application.ownerName || '',
+        mobile: application.mobile || '',
+        gstNumber: application.gstNumber || '',
+        businessCategory: application.businessCategory || '',
+        street: application.businessAddress?.street || '',
+        city: application.businessAddress?.city || '',
+        state: 'Chhattisgarh',
+        pincode: application.businessAddress?.pincode || '',
+        accountHolderName: application.bankAccount?.accountHolderName || '',
+        accountNumber: application.bankAccount?.accountNumber || '',
+        ifscCode: application.bankAccount?.ifscCode || '',
+        bankName: application.bankAccount?.bankName || '',
+        upiId: application.upiId?.upi || '',
+        upiAccountHolderName: application.upiId?.accountHolderName || '',
       })
     }
-  }, [vendor])
+  }, [application])
 
-  // Redirect to appropriate page if form already completed - do not allow editing
+  // Redirect to appropriate page if application already submitted
   useEffect(() => {
-    if (vendor?.isBusinessFormCompleted === true) {
-      console.log('📋 Form already submitted, cannot edit')
-      // If form completed but not approved, redirect to pending approval page
-      if (vendor.verificationStatus !== 'approved') {
-        console.log('📋 Form completed but not approved, redirecting to pending approval')
-        navigate('/pending-approval', { replace: true })
-      } else {
-        // If approved, redirect to dashboard
-        console.log('📋 Form completed and approved, redirecting to dashboard')
+    if (application) {
+      if (application.applicationStatus === 'approved' || vendor?.isVerified) {
+        console.log('📋 Application approved, redirecting to dashboard')
         navigate('/dashboard', { replace: true })
+      } else if (['pending', 'under_review'].includes(application.applicationStatus)) {
+        console.log('📋 Application pending/under review, redirecting to pending approval')
+        navigate('/pending-approval', { replace: true })
       }
     }
-  }, [vendor, navigate])
+  }, [application, vendor, navigate])
 
-  // Prevent rendering form if already submitted
-  if (vendor?.isBusinessFormCompleted === true) {
+  // Prevent rendering form if already submitted (except rejected - they can resubmit)
+  if (application && ['approved', 'pending', 'under_review'].includes(application.applicationStatus)) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50'>
         <Loader2 className='w-8 h-8 animate-spin text-indigo-600' />
@@ -152,21 +149,21 @@ const BusinessForm = () => {
       )
 
       if (response.data.success) {
-        console.log('✅ Business form submitted successfully')
-        toast.success('Business information submitted successfully! Your application is under review.')
+        console.log('✅ Business application submitted successfully')
+        toast.success('Business application submitted successfully! Your application is under review.')
 
-        // Refresh vendor data to get updated information
+        // Refresh vendor data to get updated information including application
         await refreshVendor()
 
         // Navigate to pending approval page
         navigate('/pending-approval', { replace: true })
       } else {
-        setError(response.data.message || 'Failed to submit form')
-        toast.error(response.data.message || 'Failed to submit form')
+        setError(response.data.message || 'Failed to submit application')
+        toast.error(response.data.message || 'Failed to submit application')
       }
     } catch (err) {
-      console.error('❌ Business form submission error:', err)
-      const errorMessage = err.response?.data?.message || 'Failed to submit business information'
+      console.error('❌ Business application submission error:', err)
+      const errorMessage = err.response?.data?.message || 'Failed to submit business application'
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
@@ -506,7 +503,7 @@ const BusinessForm = () => {
               ) : (
                 <>
                   <CheckCircle2 className='w-5 h-5' />
-                  Submit Business Information
+                  Submit Business Application
                 </>
               )}
             </button>

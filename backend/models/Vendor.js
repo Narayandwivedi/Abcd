@@ -1,14 +1,7 @@
 const mongoose = require("mongoose");
 
 const vendorSchema = new mongoose.Schema({
-  businessName: {
-    type: String,
-    required: false,
-  },
-  ownerName: {
-    type: String,
-    required: false,
-  },
+  // Authentication Fields
   email: {
     type: String,
     required: true,
@@ -22,11 +15,7 @@ const vendorSchema = new mongoose.Schema({
   password: {
     type: String,
   },
-  gstNumber: {
-    type: String,
-    unique: true,
-    sparse: true, // Allow null/undefined values for unique index
-  },
+
   // Google OAuth fields
   googleId: {
     type: String,
@@ -41,24 +30,11 @@ const vendorSchema = new mongoose.Schema({
     enum: ['local', 'google'],
     default: 'local',
   },
-  businessCategory: {
-    type: String,
-  },
-  businessAddress: {
-    street: String,
-    city: String,
-    state: String,
-    pincode: String,
-  },
-  bankAccount: {
-    accountHolderName: String,
-    accountNumber: String,
-    ifscCode: String,
-    bankName: String,
-  },
-  upiId: {
-    upi: { type: String },
-    accountHolderName: { type: String },
+
+  // Application & Verification Status
+  isBusinessApplicationSubmitted: {
+    type: Boolean,
+    default: false,
   },
   isVerified: {
     type: Boolean,
@@ -72,24 +48,13 @@ const vendorSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  verificationStatus: {
-    type: String,
-    enum: ["pending", "approved", "rejected"],
-    default: "pending",
+
+  // Reference to approved application (for quick access)
+  approvedApplicationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "BusinessApplication",
   },
-  verificationDocuments: {
-    gstCertificate: String,
-    businessLicense: String,
-    addressProof: String,
-  },
-  role: {
-    type: String,
-    default: "vendor",
-  },
-  isBusinessFormCompleted: {
-    type: Boolean,
-    default: false,
-  },
+
 
 }, { timestamps: true });
 

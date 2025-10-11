@@ -23,9 +23,9 @@ import './App.css'
 // Layout wrapper for dashboard pages
 function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const { vendor } = useContext(AppContext)
+  const { vendor, application } = useContext(AppContext)
 
-  console.log('🏗️ DashboardLayout rendering with vendor:', vendor?.businessName || vendor?.email || 'null')
+  console.log('🏗️ DashboardLayout rendering with vendor:', vendor?.email || 'null')
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -56,11 +56,11 @@ function DashboardLayout({ children }) {
 
               <div className='flex items-center gap-3 px-3 py-2 bg-gray-100 rounded-xl'>
                 <div className='w-9 h-9 bg-gradient-to-br from-indigo-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold shadow-md'>
-                  {vendor?.businessName?.charAt(0).toUpperCase() || 'V'}
+                  {application?.businessName?.charAt(0).toUpperCase() || vendor?.email?.charAt(0).toUpperCase() || 'V'}
                 </div>
                 <div className='hidden md:block'>
-                  <div className='text-sm font-semibold text-gray-800'>{vendor?.businessName || 'Vendor'}</div>
-                  <div className='text-xs text-gray-600'>{vendor?.ownerName || 'Owner'}</div>
+                  <div className='text-sm font-semibold text-gray-800'>{application?.businessName || 'Vendor'}</div>
+                  <div className='text-xs text-gray-600'>{application?.ownerName || vendor?.email || ''}</div>
                 </div>
               </div>
             </div>

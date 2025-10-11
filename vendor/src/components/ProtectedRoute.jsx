@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading, vendor } = useContext(AppContext)
+  const { isAuthenticated, loading, vendor, application } = useContext(AppContext)
   const location = useLocation()
 
   useEffect(() => {
@@ -11,11 +11,12 @@ const ProtectedRoute = ({ children }) => {
       path: location.pathname,
       isAuthenticated,
       loading,
-      isBusinessFormCompleted: vendor?.isBusinessFormCompleted,
-      verificationStatus: vendor?.verificationStatus,
+      isBusinessApplicationSubmitted: vendor?.isBusinessApplicationSubmitted,
+      applicationStatus: application?.applicationStatus,
+      isVerified: vendor?.isVerified,
       timestamp: new Date().toISOString()
     })
-  }, [isAuthenticated, loading, vendor, location.pathname])
+  }, [isAuthenticated, loading, vendor, application, location.pathname])
 
   // Show loading spinner while checking authentication
   if (loading) {
@@ -36,15 +37,15 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to='/login' state={{ from: location }} replace />
   }
 
-  // Check if business form is completed (skip check for /business-form and /pending-approval pages)
-  if (vendor && !vendor.isBusinessFormCompleted && location.pathname !== '/business-form' && location.pathname !== '/pending-approval') {
-    console.log('📋 ProtectedRoute: Business form not completed, redirecting to form')
+  // Check if business application submitted (skip check for /business-form and /pending-approval pages)
+  if (vendor && !vendor.isBusinessApplicationSubmitted && location.pathname !== '/business-form' && location.pathname !== '/pending-approval') {
+    console.log('📋 ProtectedRoute: Business application not submitted, redirecting to form')
     return <Navigate to='/business-form' replace />
   }
 
-  // Check if vendor is approved by admin (skip check for /business-form and /pending-approval pages)
-  if (vendor && vendor.isBusinessFormCompleted && vendor.verificationStatus !== 'approved' && location.pathname !== '/business-form' && location.pathname !== '/pending-approval') {
-    console.log('⏳ ProtectedRoute: Vendor not approved, redirecting to pending approval page')
+  // Check if vendor is verified/approved by admin (skip check for /business-form and /pending-approval pages)
+  if (vendor && vendor.isBusinessApplicationSubmitted && !vendor.isVerified && location.pathname !== '/business-form' && location.pathname !== '/pending-approval') {
+    console.log('⏳ ProtectedRoute: Vendor not verified, redirecting to pending approval page')
     return <Navigate to='/pending-approval' replace />
   }
 

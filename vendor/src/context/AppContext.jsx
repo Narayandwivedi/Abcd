@@ -12,6 +12,7 @@ const AppContextProvider = (props) => {
 
   // Auth states
   const [vendor, setVendor] = useState(null)
+  const [application, setApplication] = useState(null) // Business application data
   const [isAuthenticated, setIsAuthenticated] = useState(null) // null = loading, true/false = auth status
   const [loading, setLoading] = useState(true)
   const [isCheckingAuth, setIsCheckingAuth] = useState(false)
@@ -46,15 +47,31 @@ const AppContextProvider = (props) => {
         setIsAuthenticated(true)
         setVendor(response.data.vendor)
         console.log('✓ User authenticated successfully')
+
+        // Fetch vendor details including application status
+        try {
+          const detailsResponse = await axios.get(`${BACKEND_URL}/api/vendor/details`, {
+            withCredentials: true
+          })
+          if (detailsResponse.data.success) {
+            setVendor(detailsResponse.data.vendorData)
+            setApplication(detailsResponse.data.application)
+            console.log('✓ Vendor details and application loaded')
+          }
+        } catch (err) {
+          console.log('⚠️ Could not fetch vendor details:', err.message)
+        }
       } else {
         setIsAuthenticated(false)
         setVendor(null)
+        setApplication(null)
         console.log('✗ User not authenticated')
       }
     } catch (error) {
       console.error('❌ Auth check failed:', error.message)
       setIsAuthenticated(false)
       setVendor(null)
+      setApplication(null)
     } finally {
       setLoading(false)
       setIsCheckingAuth(false)
@@ -168,6 +185,7 @@ const AppContextProvider = (props) => {
     BACKEND_URL,
     // Auth values
     vendor,
+    application,
     isAuthenticated,
     loading,
     // Auth functions
@@ -177,7 +195,7 @@ const AppContextProvider = (props) => {
     checkAuthStatus,
     refreshVendor,
     updateVendor,
-  }), [vendor, isAuthenticated, loading, login, signup, logout, checkAuthStatus, refreshVendor, updateVendor])
+  }), [vendor, application, isAuthenticated, loading, login, signup, logout, checkAuthStatus, refreshVendor, updateVendor])
 
   return (
     <AppContext.Provider value={value}>

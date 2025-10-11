@@ -12,7 +12,7 @@ import {
 import { AppContext } from '../context/AppContext'
 
 const PendingApproval = () => {
-  const { vendor, logout, refreshVendor, isAuthenticated } = useContext(AppContext)
+  const { vendor, application, logout, refreshVendor, isAuthenticated } = useContext(AppContext)
   const navigate = useNavigate()
 
   // Redirect to login if not authenticated
@@ -22,19 +22,19 @@ const PendingApproval = () => {
     }
   }, [isAuthenticated, navigate])
 
-  // Redirect to business form if not completed
+  // Redirect to business form if no application submitted
   useEffect(() => {
-    if (vendor && !vendor.isBusinessFormCompleted) {
+    if (vendor && !vendor.isBusinessApplicationSubmitted) {
       navigate('/business-form', { replace: true })
     }
   }, [vendor, navigate])
 
   // Redirect to dashboard if approved
   useEffect(() => {
-    if (vendor && vendor.verificationStatus === 'approved') {
+    if (application?.applicationStatus === 'approved' || vendor?.isVerified) {
       navigate('/dashboard', { replace: true })
     }
-  }, [vendor, navigate])
+  }, [application, vendor, navigate])
 
   const handleLogout = async () => {
     if (window.confirm('Are you sure you want to logout?')) {
@@ -58,16 +58,28 @@ const PendingApproval = () => {
   }
 
   const getStatusInfo = () => {
-    switch (vendor.verificationStatus) {
+    const status = application?.applicationStatus || 'pending'
+
+    switch (status) {
       case 'pending':
         return {
           icon: <Clock className='w-16 h-16 text-yellow-500' />,
           bgColor: 'bg-yellow-50',
           borderColor: 'border-yellow-200',
           textColor: 'text-yellow-800',
-          title: 'Verification Pending',
-          message: 'Your business information has been submitted and is under review by our admin team.',
-          detail: 'This process typically takes 24-48 hours. You will be notified once your account is verified.'
+          title: 'Application Pending',
+          message: 'Your business application has been submitted and is awaiting admin review.',
+          detail: 'This process typically takes 24-48 hours. You will be notified once your application is reviewed.'
+        }
+      case 'under_review':
+        return {
+          icon: <Clock className='w-16 h-16 text-blue-500' />,
+          bgColor: 'bg-blue-50',
+          borderColor: 'border-blue-200',
+          textColor: 'text-blue-800',
+          title: 'Under Review',
+          message: 'Your business application is currently being reviewed by our admin team.',
+          detail: 'We are carefully reviewing your submitted information. You will be notified shortly.'
         }
       case 'rejected':
         return {
@@ -75,9 +87,10 @@ const PendingApproval = () => {
           bgColor: 'bg-red-50',
           borderColor: 'border-red-200',
           textColor: 'text-red-800',
-          title: 'Verification Rejected',
-          message: 'Unfortunately, your business information could not be verified.',
-          detail: 'Please contact our support team for more information or to resubmit your application.'
+          title: 'Application Rejected',
+          message: application?.rejectionReason || 'Unfortunately, your business application could not be verified.',
+          detail: application?.adminComments || 'Please contact our support team for more information or to resubmit your application.',
+          showResubmit: true
         }
       default:
         return {
@@ -105,7 +118,7 @@ const PendingApproval = () => {
             </div>
             <div>
               <h1 className='text-xl font-bold text-gray-900'>ABCD Vendor</h1>
-              <p className='text-sm text-gray-600'>{vendor.businessName || 'Vendor Portal'}</p>
+              <p className='text-sm text-gray-600'>{application?.businessName || 'Vendor Portal'}</p>
             </div>
           </div>
           <button
@@ -147,49 +160,63 @@ const PendingApproval = () => {
             <div className='space-y-3'>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Business Name:</span>
-                <span className='text-sm font-bold text-gray-900'>{vendor.businessName || 'N/A'}</span>
+                <span className='text-sm font-bold text-gray-900'>{application?.businessName || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Owner Name:</span>
-                <span className='text-sm font-bold text-gray-900'>{vendor.ownerName || 'N/A'}</span>
+                <span className='text-sm font-bold text-gray-900'>{application?.ownerName || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Email:</span>
-                <span className='text-sm font-bold text-gray-900'>{vendor.email || 'N/A'}</span>
+                <span className='text-sm font-bold text-gray-900'>{vendor?.email || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Mobile:</span>
-                <span className='text-sm font-bold text-gray-900'>{vendor.mobile || 'N/A'}</span>
+                <span className='text-sm font-bold text-gray-900'>{application?.mobile || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>GST Number:</span>
-                <span className='text-sm font-bold text-gray-900'>{vendor.gstNumber || 'N/A'}</span>
+                <span className='text-sm font-bold text-gray-900'>{application?.gstNumber || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Category:</span>
-                <span className='text-sm font-bold text-gray-900'>{vendor.businessCategory || 'N/A'}</span>
+                <span className='text-sm font-bold text-gray-900'>{application?.businessCategory || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Status:</span>
                 <span className={`text-sm font-bold uppercase ${
-                  vendor.verificationStatus === 'pending' ? 'text-yellow-600' :
-                  vendor.verificationStatus === 'approved' ? 'text-green-600' :
-                  vendor.verificationStatus === 'rejected' ? 'text-red-600' : 'text-gray-600'
+                  application?.applicationStatus === 'pending' ? 'text-yellow-600' :
+                  application?.applicationStatus === 'under_review' ? 'text-blue-600' :
+                  application?.applicationStatus === 'approved' ? 'text-green-600' :
+                  application?.applicationStatus === 'rejected' ? 'text-red-600' : 'text-gray-600'
                 }`}>
-                  {vendor.verificationStatus || 'Pending'}
+                  {application?.applicationStatus?.replace('_', ' ') || 'Pending'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Refresh Button */}
-          <button
-            onClick={handleRefresh}
-            className='w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold py-4 rounded-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2'
-          >
-            <RefreshCw className='w-5 h-5' />
-            Refresh Status
-          </button>
+          {/* Action Buttons */}
+          <div className='space-y-3'>
+            <button
+              onClick={handleRefresh}
+              className='w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold py-4 rounded-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2'
+            >
+              <RefreshCw className='w-5 h-5' />
+              Refresh Status
+            </button>
+
+            {/* Show resubmit button if rejected */}
+            {statusInfo.showResubmit && (
+              <button
+                onClick={() => navigate('/business-form')}
+                className='w-full bg-white border-2 border-indigo-600 text-indigo-600 font-bold py-4 rounded-xl hover:bg-indigo-50 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2'
+              >
+                <Store className='w-5 h-5' />
+                Resubmit Application
+              </button>
+            )}
+          </div>
 
           {/* Support Link */}
           <div className='mt-6 text-center'>

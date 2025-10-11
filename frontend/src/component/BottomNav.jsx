@@ -40,7 +40,7 @@ const BottomNav = () => {
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 4v16m8-8H4' />
             </svg>
           </div>
-          <span className='text-xs mt-0.5 font-semibold'>Vendor</span>
+          <span className='text-xs mt-0.5 font-semibold'>Join as Vendor</span>
         </a>
 
         {/* Profile / Login */}
