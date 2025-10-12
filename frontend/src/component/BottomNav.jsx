@@ -30,7 +30,7 @@ const BottomNav = () => {
 
         {/* Join as Vendor */}
         <a
-          href='http://localhost:5174'
+          href='https://vendor.abcdvyapar.com'
           target='_blank'
           rel='noopener noreferrer'
           className='flex flex-col items-center justify-center px-3 py-1.5 transition-colors text-blue-600'

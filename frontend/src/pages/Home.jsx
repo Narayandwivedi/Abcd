@@ -387,7 +387,7 @@ const Home = () => {
 
         {/* Join as Vendor Button - Desktop Only */}
         <a
-          href='http://localhost:5174'
+          href='https://vendor.abcdvyapar.com'
           target='_blank'
           rel='noopener noreferrer'
           className='hidden md:flex group bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 items-center gap-2 px-4 py-3'
