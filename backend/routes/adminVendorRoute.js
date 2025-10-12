@@ -11,12 +11,8 @@ const {
   quickApproveVendor,
   quickRejectVendor,
 } = require("../controllers/adminVendorController.js");
-const adminAuth = require("../middleware/adminAuth.js");
 
 const router = express.Router();
-
-// All routes require admin authentication
-router.use(adminAuth);
 
 // Vendor management
 router.get("/vendors", getAllVendors);
