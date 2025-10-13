@@ -11,7 +11,6 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Contact from './pages/Contact'
 import ForgotPassword from './pages/ForgotPassword'
-import LogoTest from './pages/LogoTest'
 
 const App = () => {
   return (
@@ -25,7 +24,6 @@ const App = () => {
           <Route path='/signup' element={<Signup />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
-          <Route path='/logo-test' element={<LogoTest />} />
         </Routes>
       </div>
       <Footer />
