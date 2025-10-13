@@ -47,9 +47,10 @@ const Footer = () => {
           <div>
             <h4 className='text-lg font-semibold mb-4'>Contact</h4>
             <ul className='space-y-2 text-gray-400 text-sm'>
-              <li>Email: info@abcd.com</li>
-              <li>Phone: +1 234 567 890</li>
-              <li>Address: 123 Main St, City</li>
+              <li>Email: cgpasabcd@gmail.com</li>
+              <li>Tele: 0771-3562323</li>
+              <li>Mob: +91 9993961778</li>
+              <li>Address: Hanuman Market, Ramsagar Para, RAIPUR (CG) 492001</li>
             </ul>
           </div>
         </div>

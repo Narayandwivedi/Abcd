@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
-import Logo from './Logo'
+import Logo3 from './Logo3'
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useContext(AppContext)
@@ -24,7 +24,7 @@ const Navbar = () => {
     <nav className='bg-white shadow-lg sticky top-0 z-50 border-b border-gray-200'>
       <div className='container mx-auto px-4 py-3 flex justify-between items-center'>
         {/* Logo */}
-        <Logo />
+        <Logo3 />
 
         {/* Navigation Links */}
         <div className='hidden md:flex items-center gap-8'>
