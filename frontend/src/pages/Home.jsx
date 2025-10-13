@@ -13,24 +13,24 @@ const Home = () => {
                 <input
                   type='text'
                   placeholder='Search for products, services, vendors...'
-                  className='w-full px-6 py-4 pl-14 pr-32 rounded-2xl border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 shadow-lg'
+                  className='w-full px-5 py-2.5 pl-12 pr-28 rounded-xl border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 shadow-lg text-sm'
                 />
                 <svg
-                  className='absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400'
+                  className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
                 >
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
                 </svg>
-                <button className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md'>
+                <button className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md text-sm'>
                   Search
                 </button>
               </div>
 
               {/* City Selector */}
               <div className='relative w-full md:w-auto md:min-w-[160px]'>
-                <select className='w-full px-3 py-3 md:py-4 pl-9 pr-8 rounded-xl md:rounded-xl border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-sm font-medium shadow-lg bg-white cursor-pointer appearance-none'>
+                <select className='w-full px-3 py-2 pl-9 pr-8 rounded-xl border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-sm font-medium shadow-lg bg-white cursor-pointer appearance-none h-[38px]'>
                   <option value=''>📍 Select District</option>
                   <option value='balod'>Balod</option>
                   <option value='baloda-bazar'>Baloda Bazar</option>
@@ -126,12 +126,6 @@ const Home = () => {
 
         <div className='container mx-auto px-4 text-center relative z-10'>
           <div className='max-w-4xl mx-auto'>
-            {/* Badge */}
-            <div className='inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6'>
-              <span className='w-2 h-2 bg-green-400 rounded-full'></span>
-              <span className='text-sm font-medium'>Welcome to the Future of Community Growth</span>
-            </div>
-
             <h1 className='text-4xl md:text-5xl font-black mb-4 leading-tight'>
               <span className='block bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent drop-shadow-2xl'>
                 ABCD Platform

@@ -11,7 +11,7 @@ const Logo = () => {
 
               {/* Left Side - Logo Image in Shield Shape */}
               <div className='relative'>
-                <div className='relative w-14 h-16 sm:w-16 sm:h-20'>
+                <div className='relative w-16 h-20 sm:w-20 sm:h-24'>
                   {/* Shield Background */}
                   <svg className='absolute inset-0 w-full h-full' viewBox='0 0 100 120' fill='none'>
                     <path 
@@ -34,17 +34,17 @@ const Logo = () => {
                   </svg>
                   
                   {/* Logo Image */}
-                  <div className='absolute inset-0 flex items-center justify-center p-1.5'>
+                  <div className='absolute inset-0 flex items-center justify-center p-2'>
                     <img
                       src='/abcd logo3.png'
                       alt='ABCD Logo'
-                      className='w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-lg'
+                      className='w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-lg'
                     />
                   </div>
 
                   {/* Crown Icon on Top */}
-                  <div className='absolute -top-1.5 left-1/2 transform -translate-x-1/2'>
-                    <svg className='w-4 h-4 text-yellow-500 drop-shadow-md' fill='currentColor' viewBox='0 0 24 24'>
+                  <div className='absolute -top-2 left-1/2 transform -translate-x-1/2'>
+                    <svg className='w-5 h-5 text-yellow-500 drop-shadow-md' fill='currentColor' viewBox='0 0 24 24'>
                       <path d='M12 6L9 9l3-8 3 8zm0 0l-3 3h6zm-3 3v10l3-3 3 3V9z'/>
                     </svg>
                   </div>
