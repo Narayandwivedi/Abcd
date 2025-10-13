@@ -1,6 +1,16 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 const Home = () => {
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  // Auto-slide functionality - cycles through 0, 1, 2, 3 for mobile (showing 2 ads at a time)
+  useEffect(() => {
+    const slideInterval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % 4) // 0, 1, 2, 3 then back to 0
+    }, 3000) // Change slide every 3 seconds
+
+    return () => clearInterval(slideInterval)
+  }, [])
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Search Bar Section */}
@@ -85,83 +95,360 @@ const Home = () => {
                 </svg>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Quick Search Tags */}
-            <div className='flex flex-wrap gap-2 mt-3 justify-center'>
-              <span className='px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold cursor-pointer hover:bg-blue-100 transition'>
-                Medicine
-              </span>
-              <span className='px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-semibold cursor-pointer hover:bg-green-100 transition'>
-                Grocery
-              </span>
-              <span className='px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-semibold cursor-pointer hover:bg-orange-100 transition'>
-                Foods
-              </span>
-              <span className='px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold cursor-pointer hover:bg-purple-100 transition'>
-                Electronics
-              </span>
-              <span className='px-3 py-1 bg-pink-50 text-pink-700 rounded-full text-xs font-semibold cursor-pointer hover:bg-pink-100 transition'>
-                Fashion
-              </span>
+      {/* Sponsored Ads Section */}
+      <section className='py-6 bg-gray-100'>
+        <div className='container mx-auto px-4'>
+          <div className='text-center mb-4'>
+            <h2 className='text-2xl font-bold text-gray-700'>Sponsored</h2>
+          </div>
+
+          {/* Desktop: Show all 5 in grid */}
+          <div className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'>
+            {/* Ad 1 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-gradient-to-br from-blue-500 to-blue-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>🛍️</div>
+                  <h3 className='font-bold text-lg'>Shop Now</h3>
+                  <p className='text-sm opacity-90'>Amazing Deals</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Exclusive offers on all products</p>
+                <span className='text-xs text-blue-600 font-semibold'>Sponsored</span>
+              </div>
+            </div>
+
+            {/* Ad 2 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-gradient-to-br from-green-500 to-green-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>🎯</div>
+                  <h3 className='font-bold text-lg'>New Arrivals</h3>
+                  <p className='text-sm opacity-90'>Fresh Collection</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Discover latest products today</p>
+                <span className='text-xs text-green-600 font-semibold'>Sponsored</span>
+              </div>
+            </div>
+
+            {/* Ad 3 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-gradient-to-br from-purple-500 to-purple-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>⭐</div>
+                  <h3 className='font-bold text-lg'>Premium</h3>
+                  <p className='text-sm opacity-90'>Quality Assured</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Top rated vendors near you</p>
+                <span className='text-xs text-purple-600 font-semibold'>Sponsored</span>
+              </div>
+            </div>
+
+            {/* Ad 4 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-gradient-to-br from-orange-500 to-orange-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>🔥</div>
+                  <h3 className='font-bold text-lg'>Hot Deals</h3>
+                  <p className='text-sm opacity-90'>Limited Time</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Save big on featured items</p>
+                <span className='text-xs text-orange-600 font-semibold'>Sponsored</span>
+              </div>
+            </div>
+
+            {/* Ad 5 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-gradient-to-br from-pink-500 to-pink-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>💎</div>
+                  <h3 className='font-bold text-lg'>Luxury</h3>
+                  <p className='text-sm opacity-90'>Premium Selection</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Exclusive luxury products</p>
+                <span className='text-xs text-pink-600 font-semibold'>Sponsored</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile: Horizontal sliding carousel showing 2 at a time */}
+          <div className='lg:hidden relative mx-auto overflow-hidden'>
+            <div
+              className='flex transition-transform duration-500 ease-in-out'
+              style={{ transform: `translateX(-${currentSlide * 50}%)` }}
+            >
+              {/* Ad 1 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
+                  <div className='bg-gradient-to-br from-blue-500 to-blue-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>🛍️</div>
+                      <h3 className='font-bold text-sm'>Shop Now</h3>
+                      <p className='text-[10px] opacity-90'>Amazing Deals</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Exclusive offers</p>
+                    <span className='text-[9px] text-blue-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ad 2 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
+                  <div className='bg-gradient-to-br from-green-500 to-green-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>🎯</div>
+                      <h3 className='font-bold text-sm'>New Arrivals</h3>
+                      <p className='text-[10px] opacity-90'>Fresh Collection</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Latest products</p>
+                    <span className='text-[9px] text-green-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ad 3 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
+                  <div className='bg-gradient-to-br from-purple-500 to-purple-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>⭐</div>
+                      <h3 className='font-bold text-sm'>Premium</h3>
+                      <p className='text-[10px] opacity-90'>Quality Assured</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Top rated vendors</p>
+                    <span className='text-[9px] text-purple-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ad 4 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
+                  <div className='bg-gradient-to-br from-orange-500 to-orange-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>🔥</div>
+                      <h3 className='font-bold text-sm'>Hot Deals</h3>
+                      <p className='text-[10px] opacity-90'>Limited Time</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Save big today</p>
+                    <span className='text-[9px] text-orange-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ad 5 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
+                  <div className='bg-gradient-to-br from-pink-500 to-pink-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>💎</div>
+                      <h3 className='font-bold text-sm'>Luxury</h3>
+                      <p className='text-[10px] opacity-90'>Premium Selection</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Exclusive luxury</p>
+                    <span className='text-[9px] text-pink-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Hero Section */}
-      <section className='relative bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white py-12 overflow-hidden'>
-        {/* Background Elements */}
-        <div className='absolute inset-0 overflow-hidden'>
-          <div className='absolute top-20 right-20 w-64 h-64 bg-blue-500 opacity-10 rounded-full blur-3xl'></div>
-          <div className='absolute bottom-20 left-20 w-80 h-80 bg-purple-500 opacity-10 rounded-full blur-3xl'></div>
-          <div className='absolute top-1/2 left-1/3 w-40 h-40 bg-indigo-500 opacity-10 rounded-full blur-2xl'></div>
-        </div>
-
-        {/* Grid Pattern Overlay */}
-        <div className='absolute inset-0 opacity-5'>
-          <div className='absolute inset-0' style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }}></div>
-        </div>
-
-        <div className='container mx-auto px-4 text-center relative z-10'>
-          <div className='max-w-4xl mx-auto'>
-            <h1 className='text-4xl md:text-5xl font-black mb-4 leading-tight'>
-              <span className='block bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent drop-shadow-2xl'>
-                ABCD Platform
-              </span>
-            </h1>
-
-            <p className='text-xl md:text-2xl mb-3 font-bold bg-gradient-to-r from-yellow-300 to-red-400 bg-clip-text text-transparent'>
-              Agrawal Business & Community Development
-            </p>
-
-            <p className='text-base md:text-lg mb-6 text-gray-300 max-w-2xl mx-auto leading-relaxed'>
-              Empowering businesses, strengthening communities, and building a prosperous future together through innovation and unity.
-            </p>
-
-            <div className='flex flex-col sm:flex-row gap-3 justify-center items-center'>
-              <button className='bg-white text-gray-900 px-6 py-3 rounded-xl font-bold text-base hover:bg-yellow-400 hover:text-gray-900 transition-all shadow-2xl transform hover:scale-105 hover:-translate-y-1'>
-                Get Started Now →
-              </button>
-              <button className='bg-transparent border-2 border-white text-white px-6 py-3 rounded-xl font-bold text-base hover:bg-white hover:text-gray-900 transition-all shadow-xl transform hover:scale-105'>
-                Learn More
-              </button>
+      {/* Sponsored Ads Section - Row 2 */}
+      <section className='py-2 bg-white'>
+        <div className='container mx-auto px-4'>
+          {/* Desktop: Show all 5 in grid */}
+          <div className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'>
+            {/* Ad 1 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
+              <div className='bg-gradient-to-br from-teal-500 to-teal-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>🎁</div>
+                  <h3 className='font-bold text-lg'>Gift Ideas</h3>
+                  <p className='text-sm opacity-90'>Perfect Presents</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Find the perfect gift today</p>
+                <span className='text-xs text-teal-600 font-semibold'>Sponsored</span>
+              </div>
             </div>
 
-            {/* Stats */}
-            <div className='grid grid-cols-3 gap-6 mt-8 max-w-2xl mx-auto'>
-              <div className='text-center'>
-                <div className='text-3xl font-black text-yellow-400'>500+</div>
-                <div className='text-xs text-gray-400 mt-1'>Active Members</div>
+            {/* Ad 2 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
+              <div className='bg-gradient-to-br from-indigo-500 to-indigo-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>📚</div>
+                  <h3 className='font-bold text-lg'>Education</h3>
+                  <p className='text-sm opacity-90'>Learn & Grow</p>
+                </div>
               </div>
-              <div className='text-center'>
-                <div className='text-3xl font-black text-yellow-400'>1000+</div>
-                <div className='text-xs text-gray-400 mt-1'>Businesses</div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Quality learning resources</p>
+                <span className='text-xs text-indigo-600 font-semibold'>Sponsored</span>
               </div>
-              <div className='text-center'>
-                <div className='text-3xl font-black text-yellow-400'>24/7</div>
-                <div className='text-xs text-gray-400 mt-1'>Support</div>
+            </div>
+
+            {/* Ad 3 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
+              <div className='bg-gradient-to-br from-rose-500 to-rose-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>💄</div>
+                  <h3 className='font-bold text-lg'>Beauty</h3>
+                  <p className='text-sm opacity-90'>Style & Care</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Premium beauty products</p>
+                <span className='text-xs text-rose-600 font-semibold'>Sponsored</span>
+              </div>
+            </div>
+
+            {/* Ad 4 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
+              <div className='bg-gradient-to-br from-amber-500 to-amber-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>🏡</div>
+                  <h3 className='font-bold text-lg'>Home</h3>
+                  <p className='text-sm opacity-90'>Comfort Living</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Transform your home space</p>
+                <span className='text-xs text-amber-600 font-semibold'>Sponsored</span>
+              </div>
+            </div>
+
+            {/* Ad 5 */}
+            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
+              <div className='bg-gradient-to-br from-cyan-500 to-cyan-600 h-40 flex items-center justify-center'>
+                <div className='text-white text-center p-4'>
+                  <div className='text-4xl mb-2'>⚡</div>
+                  <h3 className='font-bold text-lg'>Tech</h3>
+                  <p className='text-sm opacity-90'>Latest Gadgets</p>
+                </div>
+              </div>
+              <div className='p-4'>
+                <p className='text-gray-600 text-sm'>Cutting-edge technology</p>
+                <span className='text-xs text-cyan-600 font-semibold'>Sponsored</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile: Horizontal sliding carousel showing 2 at a time */}
+          <div className='lg:hidden relative mx-auto overflow-hidden'>
+            <div
+              className='flex transition-transform duration-500 ease-in-out'
+              style={{ transform: `translateX(-${currentSlide * 50}%)` }}
+            >
+              {/* Ad 1 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
+                  <div className='bg-gradient-to-br from-teal-500 to-teal-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>🎁</div>
+                      <h3 className='font-bold text-sm'>Gift Ideas</h3>
+                      <p className='text-[10px] opacity-90'>Perfect Presents</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Perfect gifts</p>
+                    <span className='text-[9px] text-teal-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ad 2 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
+                  <div className='bg-gradient-to-br from-indigo-500 to-indigo-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>📚</div>
+                      <h3 className='font-bold text-sm'>Education</h3>
+                      <p className='text-[10px] opacity-90'>Learn & Grow</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Learning resources</p>
+                    <span className='text-[9px] text-indigo-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ad 3 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
+                  <div className='bg-gradient-to-br from-rose-500 to-rose-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>💄</div>
+                      <h3 className='font-bold text-sm'>Beauty</h3>
+                      <p className='text-[10px] opacity-90'>Style & Care</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Beauty products</p>
+                    <span className='text-[9px] text-rose-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ad 4 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
+                  <div className='bg-gradient-to-br from-amber-500 to-amber-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>🏡</div>
+                      <h3 className='font-bold text-sm'>Home</h3>
+                      <p className='text-[10px] opacity-90'>Comfort Living</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Home space</p>
+                    <span className='text-[9px] text-amber-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ad 5 */}
+              <div className='w-1/2 flex-shrink-0 px-1'>
+                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
+                  <div className='bg-gradient-to-br from-cyan-500 to-cyan-600 h-28 flex items-center justify-center'>
+                    <div className='text-white text-center p-2'>
+                      <div className='text-2xl mb-1'>⚡</div>
+                      <h3 className='font-bold text-sm'>Tech</h3>
+                      <p className='text-[10px] opacity-90'>Latest Gadgets</p>
+                    </div>
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-gray-600 text-[10px] leading-tight'>Latest technology</p>
+                    <span className='text-[9px] text-cyan-600 font-semibold'>Sponsored</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
