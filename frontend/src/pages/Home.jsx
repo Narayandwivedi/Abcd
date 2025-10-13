@@ -15,13 +15,13 @@ const Home = () => {
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Search Bar Section */}
-      <section className='bg-white shadow-md sticky top-0 z-40 border-b border-gray-200'>
-        <div className='container mx-auto px-4 py-4'>
+      <section className='bg-white shadow-sm md:shadow-md sticky top-0 z-40 border-b border-gray-200'>
+        <div className='container mx-auto px-3 md:px-4 py-1 md:py-4'>
           <div className='max-w-6xl mx-auto'>
-            <div className='flex flex-col md:flex-row gap-4 items-stretch md:items-center'>
+            <div className='flex flex-col md:flex-row gap-1.5 md:gap-4 items-stretch md:items-center'>
               {/* City Selector - First on Mobile, Second on Desktop */}
               <div className='relative w-full md:w-auto md:min-w-[160px] md:order-2'>
-                <select className='w-full px-3 py-2 pl-9 pr-8 rounded-xl border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-sm font-medium shadow-lg bg-white cursor-pointer appearance-none h-[38px]'>
+                <select className='w-full px-2 py-1 pl-6 pr-5 md:px-3 md:py-2 md:pl-9 md:pr-8 rounded-md md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-[11px] md:text-sm font-medium shadow-sm md:shadow-lg bg-white cursor-pointer appearance-none h-[28px] md:h-[38px]'>
                   <option value=''>📍 Select District</option>
                   <option value='balod'>Balod</option>
                   <option value='baloda-bazar'>Baloda Bazar</option>
@@ -58,7 +58,7 @@ const Home = () => {
                   <option value='surguja'>Surguja</option>
                 </select>
                 <svg
-                  className='absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:hidden text-gray-500 pointer-events-none'
+                  className='absolute left-1 md:left-2.5 top-1/2 transform -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 md:hidden text-gray-500 pointer-events-none'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -67,7 +67,7 @@ const Home = () => {
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
                 </svg>
                 <svg
-                  className='absolute right-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none'
+                  className='absolute right-1 md:right-2.5 top-1/2 transform -translate-y-1/2 w-2.5 h-2.5 md:w-3.5 md:h-3.5 text-gray-500 pointer-events-none'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -80,18 +80,18 @@ const Home = () => {
               <div className='relative flex-1 md:order-1'>
                 <input
                   type='text'
-                  placeholder='Search for products, services, vendors...'
-                  className='w-full px-5 py-2.5 pl-12 pr-28 rounded-xl border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 shadow-lg text-sm'
+                  placeholder='Search products, services...'
+                  className='w-full px-2 py-1 pl-7 pr-16 md:px-5 md:py-2.5 md:pl-12 md:pr-28 rounded-md md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 placeholder:text-[11px] md:placeholder:text-sm shadow-sm md:shadow-lg text-[11px] md:text-sm h-[28px] md:h-auto'
                 />
                 <svg
-                  className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400'
+                  className='absolute left-1.5 md:left-4 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 md:w-5 md:h-5 text-gray-400'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
                 >
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
                 </svg>
-                <button className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md text-sm'>
+                <button className='absolute right-1 md:right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-2 py-0.5 md:px-5 md:py-2 rounded-md font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-sm md:shadow-md text-[10px] md:text-sm'>
                   Search
                 </button>
               </div>
