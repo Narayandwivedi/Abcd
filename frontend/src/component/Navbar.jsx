@@ -21,8 +21,8 @@ const Navbar = () => {
   }
 
   return (
-    <nav className='bg-white shadow-lg sticky top-0 z-50 border-b border-gray-200'>
-      <div className='container mx-auto px-4 py-3 flex justify-between items-center'>
+    <nav className='bg-white shadow-md md:shadow-lg sticky top-0 z-50 border-b border-gray-200'>
+      <div className='container mx-auto px-3 md:px-4 py-1.5 md:py-3 flex justify-between items-center'>
         {/* Logo */}
         <Logo3 />
 
@@ -112,14 +112,14 @@ const Navbar = () => {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setShowMobileMenu(!showMobileMenu)}
-          className='md:hidden text-gray-700 hover:text-blue-600 transition-colors'
+          className='md:hidden text-gray-700 hover:text-blue-600 transition-colors p-1'
         >
           {showMobileMenu ? (
-            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
             </svg>
           ) : (
-            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' />
             </svg>
           )}

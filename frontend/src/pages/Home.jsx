@@ -81,17 +81,17 @@ const Home = () => {
                 <input
                   type='text'
                   placeholder='Search products, services...'
-                  className='w-full px-2 py-1 pl-7 pr-16 md:px-5 md:py-2.5 md:pl-12 md:pr-28 rounded-md md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 placeholder:text-[11px] md:placeholder:text-sm shadow-sm md:shadow-lg text-[11px] md:text-sm h-[28px] md:h-auto'
+                  className='w-full px-3 py-1.5 pl-9 pr-20 md:px-5 md:py-2.5 md:pl-12 md:pr-28 rounded-lg md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 placeholder:text-xs md:placeholder:text-sm shadow-sm md:shadow-lg text-xs md:text-sm h-[32px] md:h-auto'
                 />
                 <svg
-                  className='absolute left-1.5 md:left-4 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 md:w-5 md:h-5 text-gray-400'
+                  className='absolute left-2.5 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
                 >
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
                 </svg>
-                <button className='absolute right-1 md:right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-2 py-0.5 md:px-5 md:py-2 rounded-md font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-sm md:shadow-md text-[10px] md:text-sm'>
+                <button className='absolute right-1.5 md:right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-1 md:px-5 md:py-2 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-sm md:shadow-md text-xs md:text-sm'>
                   Search
                 </button>
               </div>
