@@ -16,7 +16,7 @@ const App = () => {
   return (
     <div className='flex flex-col min-h-screen'>
       <Navbar />
-      <div className='pb-20 md:pb-0'>
+      <div className='pb-0 md:pb-0'>
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/about' element={<About />} />

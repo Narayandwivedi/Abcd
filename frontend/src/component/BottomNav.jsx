@@ -25,12 +25,12 @@ const BottomNav = () => {
 
   return (
     <>
-      <nav className='md:hidden fixed left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50' style={{ bottom: '28px' }}>
-        <div className='flex justify-around items-center py-2 gap-6 px-4'>
+      <nav className='md:hidden fixed left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50' style={{ bottom: '56px' }}>
+        <div className='flex justify-around items-center py-1 gap-6 px-4'>
         {/* Home */}
         <Link
           to='/'
-          className={`flex flex-col items-center justify-center px-1 py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center px-1 py-0.5 transition-colors ${
             isActive('/') ? 'text-blue-600' : 'text-gray-600'
           }`}
         >
@@ -45,7 +45,7 @@ const BottomNav = () => {
         </Link>
 
         {/* Vendor Group */}
-        <div className='flex gap-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-4 py-1.5 border border-purple-200'>
+        <div className='flex gap-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-4 py-0.5 border border-purple-200'>
           {/* Join as Vendor */}
           <a
             href='https://vendor.abcdvyapar.com/register'
@@ -78,7 +78,7 @@ const BottomNav = () => {
         </div>
 
         {/* Buyer Group */}
-        <div className='flex gap-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg px-4 py-1.5 border border-orange-200'>
+        <div className='flex gap-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg px-4 py-0.5 border border-orange-200'>
           {/* Join as Buyer */}
           <Link
             to='/register'
@@ -117,9 +117,16 @@ const BottomNav = () => {
     </nav>
 
     {/* Black Strip Below Bottom Nav - Mobile Only */}
-    <div className='md:hidden fixed bottom-0 left-0 right-0 bg-black text-white text-center py-1.5 z-40 h-7'>
+    <div className='md:hidden fixed left-0 right-0 bg-black text-white text-center py-1.5 z-40 h-7' style={{ bottom: '28px' }}>
       <p className='text-[10px] font-medium leading-4'>
-        Welcome to ABCD Vyapar with 50000+ verified buyers
+        Welcome to ABCD Vyapar with 15000+ verified buyers
+      </p>
+    </div>
+
+    {/* Gray Strip at Very Bottom - Mobile Only */}
+    <div className='md:hidden fixed bottom-0 left-0 right-0 bg-slate-700 text-white text-center py-1.5 z-40 h-7'>
+      <p className='text-[10px] font-medium leading-4'>
+        Empowering growth & empowering unity
       </p>
     </div>
     </>

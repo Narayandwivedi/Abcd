@@ -276,194 +276,123 @@ const Home = () => {
       </section>
 
       {/* Shop Categories Section */}
-      <section className='pt-2 pb-32 md:py-12 bg-gray-50'>
-        <div className='container mx-auto px-4'>
-          <div className='text-center mb-1.5 md:mb-8'>
-            <h2 className='text-base md:text-3xl font-bold text-gray-800'>
+      <section className='pt-2 pb-1 md:pt-6 md:pb-3 bg-gray-50'>
+        <div className='container mx-auto px-3 md:px-4'>
+          <div className='text-center mb-2 md:mb-8'>
+            <h2 className='text-sm md:text-3xl font-bold text-gray-800'>
               Shop by Category
             </h2>
           </div>
 
-          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 max-w-7xl mx-auto'>
+          <div className='grid grid-cols-4 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 max-w-7xl mx-auto'>
             {/* Medicine */}
-            <div className='group bg-gradient-to-br from-green-50 to-green-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-green-200 hover:border-green-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>💊</span>
+            <div className='group bg-gradient-to-br from-green-50 to-green-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-green-200 hover:border-green-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>💊</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Medicine</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Health & Pharmacy</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Medicine</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Health & Pharmacy</p>
             </div>
 
             {/* Services */}
-            <div className='group bg-gradient-to-br from-blue-50 to-blue-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-blue-200 hover:border-blue-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>🔧</span>
+            <div className='group bg-gradient-to-br from-blue-50 to-blue-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-blue-200 hover:border-blue-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>🔧</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Services</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Professional Help</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Services</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Professional Help</p>
             </div>
 
             {/* Foods */}
-            <div className='group bg-gradient-to-br from-orange-50 to-orange-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>🍔</span>
+            <div className='group bg-gradient-to-br from-orange-50 to-orange-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>🍔</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Foods</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Restaurants & Cafes</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Foods</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Restaurants & Cafes</p>
             </div>
 
             {/* Beverages */}
-            <div className='group bg-gradient-to-br from-purple-50 to-purple-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-purple-200 hover:border-purple-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>🍾</span>
+            <div className='group bg-gradient-to-br from-purple-50 to-purple-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-purple-200 hover:border-purple-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>🍾</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Beverages</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Drinks & Juices</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Beverages</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Drinks & Juices</p>
             </div>
 
             {/* Grocery */}
-            <div className='group bg-gradient-to-br from-red-50 to-red-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-red-200 hover:border-red-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>🛒</span>
+            <div className='group bg-gradient-to-br from-red-50 to-red-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-red-200 hover:border-red-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>🛒</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Grocery</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Daily Essentials</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Grocery</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Daily Essentials</p>
             </div>
 
             {/* Electronics */}
-            <div className='group bg-gradient-to-br from-indigo-50 to-indigo-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-indigo-200 hover:border-indigo-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>📱</span>
+            <div className='group bg-gradient-to-br from-indigo-50 to-indigo-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-indigo-200 hover:border-indigo-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>📱</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Electronics</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Gadgets & Tech</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Electronics</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Gadgets & Tech</p>
             </div>
 
             {/* Fashion */}
-            <div className='group bg-gradient-to-br from-pink-50 to-pink-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-pink-200 hover:border-pink-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>👗</span>
+            <div className='group bg-gradient-to-br from-pink-50 to-pink-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-pink-200 hover:border-pink-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>👗</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Fashion</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Clothing & Style</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Fashion</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Clothing & Style</p>
             </div>
 
             {/* Home & Living */}
-            <div className='group bg-gradient-to-br from-teal-50 to-teal-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-teal-200 hover:border-teal-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>🏠</span>
+            <div className='group bg-gradient-to-br from-teal-50 to-teal-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-teal-200 hover:border-teal-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>🏠</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Home & Living</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Furniture & Decor</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Home & Living</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Furniture & Decor</p>
             </div>
 
             {/* Beauty */}
-            <div className='group bg-gradient-to-br from-rose-50 to-rose-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-rose-200 hover:border-rose-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>💄</span>
+            <div className='group bg-gradient-to-br from-rose-50 to-rose-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-rose-200 hover:border-rose-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>💄</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Beauty</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Cosmetics & Care</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Beauty</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Cosmetics & Care</p>
             </div>
 
             {/* Books */}
-            <div className='group bg-gradient-to-br from-amber-50 to-amber-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-amber-200 hover:border-amber-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>📚</span>
+            <div className='group bg-gradient-to-br from-amber-50 to-amber-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-amber-200 hover:border-amber-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>📚</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Books</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Education & Learning</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Books</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Education & Learning</p>
             </div>
 
             {/* Sports */}
-            <div className='group bg-gradient-to-br from-lime-50 to-lime-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-lime-200 hover:border-lime-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>⚽</span>
+            <div className='group bg-gradient-to-br from-lime-50 to-lime-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-lime-200 hover:border-lime-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>⚽</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Sports</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Fitness & Outdoor</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Sports</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Fitness & Outdoor</p>
             </div>
 
             {/* Toys */}
-            <div className='group bg-gradient-to-br from-cyan-50 to-cyan-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-cyan-200 hover:border-cyan-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-lg md:text-3xl'>🧸</span>
+            <div className='group bg-gradient-to-br from-cyan-50 to-cyan-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-cyan-200 hover:border-cyan-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-xl md:text-3xl'>🧸</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Toys</h3>
-              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Kids & Games</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm leading-tight'>Toys</h3>
+              <p className='text-center text-[7px] md:text-[10px] text-gray-600 mt-0 hidden md:block'>Kids & Games</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className='py-12 md:py-20 bg-white'>
-        <div className='container mx-auto px-4'>
-          <div className='text-center mb-16'>
-            <h2 className='text-4xl md:text-5xl font-black mb-4 text-gray-800'>
-              Why Choose ABCD?
-            </h2>
-            <p className='text-lg text-gray-600 max-w-2xl mx-auto'>
-              Discover the powerful features that make us the premier platform for the Agrawal community
-            </p>
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto'>
-            {/* Feature 1 */}
-            <div className='group relative bg-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-blue-400 transform hover:-translate-y-2'>
-              <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-t-2xl'></div>
-              <div className='bg-gradient-to-br from-blue-600 to-blue-700 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg'>
-                <span className='text-3xl'>📈</span>
-              </div>
-              <h3 className='text-2xl font-bold mb-3 text-blue-900'>Business Growth</h3>
-              <p className='text-gray-600 leading-relaxed'>
-                Accelerate your business with cutting-edge tools, expert guidance, and a supportive network designed for success.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className='group relative bg-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-red-400 transform hover:-translate-y-2'>
-              <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-700 rounded-t-2xl'></div>
-              <div className='bg-gradient-to-br from-red-600 to-red-700 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg'>
-                <span className='text-3xl'>🤝</span>
-              </div>
-              <h3 className='text-2xl font-bold mb-3 text-red-900'>Community Unity</h3>
-              <p className='text-gray-600 leading-relaxed'>
-                Connect with like-minded individuals, share experiences, and build lasting relationships within our thriving community.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className='group relative bg-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-yellow-400 transform hover:-translate-y-2'>
-              <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-t-2xl'></div>
-              <div className='bg-gradient-to-br from-yellow-500 to-yellow-600 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg'>
-                <span className='text-3xl'>⚡</span>
-              </div>
-              <h3 className='text-2xl font-bold mb-3 text-yellow-900'>Fast & Reliable</h3>
-              <p className='text-gray-600 leading-relaxed'>
-                Experience lightning-fast performance and dependable service that keeps your business running smoothly 24/7.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action Section */}
-      <section className='pt-12 pb-32 md:py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white relative overflow-hidden'>
-        {/* Background Elements */}
-        <div className='absolute inset-0 overflow-hidden'>
-          <div className='absolute top-20 right-20 w-96 h-96 bg-blue-500 opacity-10 rounded-full blur-3xl'></div>
-          <div className='absolute bottom-20 left-20 w-80 h-80 bg-purple-500 opacity-10 rounded-full blur-3xl'></div>
-        </div>
-
-        <div className='container mx-auto px-4 text-center relative z-10'>
-          <h2 className='text-4xl md:text-5xl font-black mb-6'>Ready to Get Started?</h2>
-          <p className='text-xl text-gray-300 mb-8 max-w-2xl mx-auto'>
-            Join thousands of successful businesses in the ABCD community today.
-          </p>
-          <button className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-10 py-5 rounded-xl font-bold text-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-2xl transform hover:scale-105 hover:-translate-y-1'>
-            Join as a Buyer
-          </button>
         </div>
       </section>
 
