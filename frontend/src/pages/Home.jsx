@@ -12,6 +12,15 @@ const Home = () => {
 
     return () => clearInterval(slideInterval)
   }, [])
+
+  // Manual navigation functions
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? 3 : prev - 1))
+  }
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % 4)
+  }
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Search Bar Section */}
@@ -161,14 +170,40 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Mobile: Horizontal sliding carousel showing 2 at a time */}
+          {/* Mobile: Horizontal sliding carousel (First: 85%-15%, Then: 10%-80%-10%) */}
           <div className='lg:hidden relative mx-auto overflow-hidden'>
+            {/* Previous Button */}
+            <button
+              onClick={handlePrevSlide}
+              className='absolute left-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1.5 shadow-lg transition-all'
+              aria-label='Previous slide'
+            >
+              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+              </svg>
+            </button>
+
+            {/* Next Button */}
+            <button
+              onClick={handleNextSlide}
+              className='absolute right-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1.5 shadow-lg transition-all'
+              aria-label='Next slide'
+            >
+              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+              </svg>
+            </button>
+
             <div
               className='flex transition-transform duration-500 ease-in-out'
-              style={{ transform: `translateX(-${currentSlide * 50}%)` }}
+              style={{
+                transform: currentSlide === 0
+                  ? 'translateX(0)'
+                  : `translateX(calc(-70% - ${(currentSlide - 1) * 80}%))`
+              }}
             >
               {/* Ad 1 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
                   <div className='bg-gradient-to-br from-blue-500 to-blue-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -181,7 +216,7 @@ const Home = () => {
               </div>
 
               {/* Ad 2 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
                   <div className='bg-gradient-to-br from-green-500 to-green-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -194,7 +229,7 @@ const Home = () => {
               </div>
 
               {/* Ad 3 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
                   <div className='bg-gradient-to-br from-purple-500 to-purple-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -207,7 +242,7 @@ const Home = () => {
               </div>
 
               {/* Ad 4 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
                   <div className='bg-gradient-to-br from-orange-500 to-orange-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -220,7 +255,7 @@ const Home = () => {
               </div>
 
               {/* Ad 5 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
                   <div className='bg-gradient-to-br from-pink-500 to-pink-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -237,7 +272,7 @@ const Home = () => {
       </section>
 
       {/* Sponsored Ads Section - Row 2 */}
-      <section className='py-1 lg:py-2 bg-white'>
+      <section className='pb-1 lg:py-2 bg-white'>
         <div className='container mx-auto px-4'>
           {/* Desktop: Show all 5 in grid */}
           <div className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'>
@@ -297,14 +332,40 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Mobile: Horizontal sliding carousel showing 2 at a time */}
+          {/* Mobile: Horizontal sliding carousel (First: 85%-15%, Then: 10%-80%-10%) */}
           <div className='lg:hidden relative mx-auto overflow-hidden'>
+            {/* Previous Button */}
+            <button
+              onClick={handlePrevSlide}
+              className='absolute left-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1.5 shadow-lg transition-all'
+              aria-label='Previous slide'
+            >
+              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+              </svg>
+            </button>
+
+            {/* Next Button */}
+            <button
+              onClick={handleNextSlide}
+              className='absolute right-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1.5 shadow-lg transition-all'
+              aria-label='Next slide'
+            >
+              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+              </svg>
+            </button>
+
             <div
               className='flex transition-transform duration-500 ease-in-out'
-              style={{ transform: `translateX(-${currentSlide * 50}%)` }}
+              style={{
+                transform: currentSlide === 0
+                  ? 'translateX(0)'
+                  : `translateX(calc(-70% - ${(currentSlide - 1) * 80}%))`
+              }}
             >
               {/* Ad 1 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
                   <div className='bg-gradient-to-br from-teal-500 to-teal-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -317,7 +378,7 @@ const Home = () => {
               </div>
 
               {/* Ad 2 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
                   <div className='bg-gradient-to-br from-indigo-500 to-indigo-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -330,7 +391,7 @@ const Home = () => {
               </div>
 
               {/* Ad 3 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
                   <div className='bg-gradient-to-br from-rose-500 to-rose-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -343,7 +404,7 @@ const Home = () => {
               </div>
 
               {/* Ad 4 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
                   <div className='bg-gradient-to-br from-amber-500 to-amber-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -356,7 +417,7 @@ const Home = () => {
               </div>
 
               {/* Ad 5 */}
-              <div className='w-1/2 flex-shrink-0 px-1'>
+              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
                   <div className='bg-gradient-to-br from-cyan-500 to-cyan-600 h-28 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
@@ -373,124 +434,121 @@ const Home = () => {
       </section>
 
       {/* Shop Categories Section */}
-      <section className='py-20 bg-gray-50'>
+      <section className='pt-3 pb-24 md:py-12 bg-gray-50'>
         <div className='container mx-auto px-4'>
-          <div className='text-center mb-16'>
-            <h2 className='text-4xl md:text-5xl font-black mb-4 text-gray-800'>
+          <div className='text-center mb-2 md:mb-8'>
+            <h2 className='text-lg md:text-3xl font-bold text-gray-800'>
               Shop by Category
             </h2>
-            <p className='text-lg text-gray-600 max-w-2xl mx-auto'>
-              Browse through our wide range of categories from trusted vendors
-            </p>
           </div>
 
-          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-7xl mx-auto'>
+          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 md:gap-4 max-w-7xl mx-auto'>
             {/* Medicine */}
-            <div className='group bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-green-200 hover:border-green-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>💊</span>
+            <div className='group bg-gradient-to-br from-green-50 to-green-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-green-200 hover:border-green-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>💊</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Medicine</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Health & Pharmacy</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Medicine</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Health & Pharmacy</p>
             </div>
 
             {/* Services */}
-            <div className='group bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-blue-200 hover:border-blue-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>🔧</span>
+            <div className='group bg-gradient-to-br from-blue-50 to-blue-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-blue-200 hover:border-blue-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>🔧</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Services</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Professional Help</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Services</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Professional Help</p>
             </div>
 
             {/* Foods */}
-            <div className='group bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-orange-200 hover:border-orange-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>🍔</span>
+            <div className='group bg-gradient-to-br from-orange-50 to-orange-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>🍔</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Foods</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Restaurants & Cafes</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Foods</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Restaurants & Cafes</p>
             </div>
 
             {/* Beverages */}
-            <div className='group bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-purple-200 hover:border-purple-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>🍾</span>
+            <div className='group bg-gradient-to-br from-purple-50 to-purple-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-purple-200 hover:border-purple-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>🍾</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Beverages</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Drinks & Juices</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Beverages</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Drinks & Juices</p>
             </div>
 
             {/* Grocery */}
-            <div className='group bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-red-200 hover:border-red-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>🛒</span>
+            <div className='group bg-gradient-to-br from-red-50 to-red-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-red-200 hover:border-red-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>🛒</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Grocery</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Daily Essentials</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Grocery</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Daily Essentials</p>
             </div>
 
             {/* Electronics */}
-            <div className='group bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-indigo-200 hover:border-indigo-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>📱</span>
+            <div className='group bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-indigo-200 hover:border-indigo-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>📱</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Electronics</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Gadgets & Tech</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Electronics</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Gadgets & Tech</p>
             </div>
 
             {/* Fashion */}
-            <div className='group bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-pink-200 hover:border-pink-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>👗</span>
+            <div className='group bg-gradient-to-br from-pink-50 to-pink-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-pink-200 hover:border-pink-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>👗</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Fashion</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Clothing & Style</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Fashion</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Clothing & Style</p>
             </div>
 
             {/* Home & Living */}
-            <div className='group bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-teal-200 hover:border-teal-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>🏠</span>
+            <div className='group bg-gradient-to-br from-teal-50 to-teal-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-teal-200 hover:border-teal-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>🏠</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Home & Living</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Furniture & Decor</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Home & Living</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Furniture & Decor</p>
             </div>
 
             {/* Beauty */}
-            <div className='group bg-gradient-to-br from-rose-50 to-rose-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-rose-200 hover:border-rose-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>💄</span>
+            <div className='group bg-gradient-to-br from-rose-50 to-rose-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-rose-200 hover:border-rose-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>💄</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Beauty</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Cosmetics & Care</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Beauty</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Cosmetics & Care</p>
             </div>
 
             {/* Books */}
-            <div className='group bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-amber-200 hover:border-amber-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>📚</span>
+            <div className='group bg-gradient-to-br from-amber-50 to-amber-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-amber-200 hover:border-amber-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>📚</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Books</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Education & Learning</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Books</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Education & Learning</p>
             </div>
 
             {/* Sports */}
-            <div className='group bg-gradient-to-br from-lime-50 to-lime-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-lime-200 hover:border-lime-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>⚽</span>
+            <div className='group bg-gradient-to-br from-lime-50 to-lime-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-lime-200 hover:border-lime-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>⚽</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Sports</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Fitness & Outdoor</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Sports</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Fitness & Outdoor</p>
             </div>
 
             {/* Toys */}
-            <div className='group bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-cyan-200 hover:border-cyan-400 transform hover:-translate-y-2 cursor-pointer'>
-              <div className='bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-md'>
-                <span className='text-4xl'>🧸</span>
+            <div className='group bg-gradient-to-br from-cyan-50 to-cyan-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-cyan-200 hover:border-cyan-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-2xl md:text-3xl'>🧸</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800'>Toys</h3>
-              <p className='text-center text-xs text-gray-600 mt-1'>Kids & Games</p>
+              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Toys</h3>
+              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Kids & Games</p>
             </div>
           </div>
         </div>
@@ -567,8 +625,10 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Fixed Buttons */}
-      <WhatsAppButton />
+      {/* Fixed Buttons - Hidden on Mobile */}
+      <div className='hidden md:block'>
+        <WhatsAppButton />
+      </div>
     </div>
   )
 }

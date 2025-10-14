@@ -6,12 +6,12 @@ const Logo = () => {
       {/* Premium Logo Design */}
       <div className='relative'>
         {/* Main Container */}
-        <div className='relative bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-1.5 md:p-3'>
-            <div className='flex items-center gap-1.5 md:gap-3'>
+        <div className='relative bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-2 md:p-3'>
+            <div className='flex items-center gap-2 md:gap-3'>
 
               {/* Left Side - Logo Image in Shield Shape */}
               <div className='relative'>
-                <div className='relative w-10 h-12 md:w-20 md:h-24'>
+                <div className='relative w-12 h-14 md:w-20 md:h-24'>
                   {/* Shield Background */}
                   <svg className='absolute inset-0 w-full h-full' viewBox='0 0 100 120' fill='none'>
                     <path
@@ -34,11 +34,11 @@ const Logo = () => {
                   </svg>
 
                   {/* Logo Image */}
-                  <div className='absolute inset-0 flex items-center justify-center p-1.5 md:p-2'>
+                  <div className='absolute inset-0 flex items-center justify-center p-2 md:p-2'>
                     <img
                       src='/abcd logo3.png'
                       alt='ABCD Logo'
-                      className='w-8 h-8 md:w-16 md:h-16 object-contain drop-shadow-lg'
+                      className='w-9 h-9 md:w-16 md:h-16 object-contain drop-shadow-lg'
                     />
                   </div>
 
@@ -56,22 +56,22 @@ const Logo = () => {
                 {/* ABCD with Modern Typography */}
                 <div className='relative mb-0.5 md:mb-1'>
                   <div className='flex items-center gap-1 md:gap-1.5'>
-                    <h1 className='text-lg md:text-3xl font-black tracking-tight'>
+                    <h1 className='text-xl md:text-3xl font-black tracking-tight'>
                       <span className='text-orange-600'>A</span>
                       <span className='text-red-600'>B</span>
                       <span className='text-blue-600'>C</span>
                       <span className='text-green-600'>D</span>
                     </h1>
                     <div className='flex flex-col gap-0.5'>
-                      <div className='h-0.5 w-3 md:w-4 bg-gradient-to-r from-orange-500 to-red-500'></div>
-                      <div className='h-0.5 w-2 md:w-3 bg-gradient-to-r from-blue-500 to-green-500'></div>
+                      <div className='h-0.5 w-3.5 md:w-4 bg-gradient-to-r from-orange-500 to-red-500'></div>
+                      <div className='h-0.5 w-2.5 md:w-3 bg-gradient-to-r from-blue-500 to-green-500'></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Organization Full Name */}
-                <div className='bg-gradient-to-r from-gray-900 to-gray-800 text-white px-1.5 py-0.5 md:px-2 md:py-1 rounded md:rounded-md'>
-                  <div className='text-[7px] md:text-[10px] font-bold tracking-wide leading-tight'>
+                <div className='bg-gradient-to-r from-gray-900 to-gray-800 text-white px-2 py-0.5 md:px-2 md:py-1 rounded md:rounded-md'>
+                  <div className='text-[8px] md:text-[10px] font-bold tracking-wide leading-tight'>
                     <div>AGRAWAL BUSINESS &</div>
                     <div>COMMUNITY DEVELOPMENT</div>
                   </div>
