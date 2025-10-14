@@ -26,134 +26,93 @@ const BottomNav = () => {
   return (
     <>
       <nav className='md:hidden fixed left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50' style={{ bottom: '28px' }}>
-        <div className='flex justify-around items-center py-1'>
+        <div className='flex justify-around items-center py-2 gap-6 px-4'>
         {/* Home */}
         <Link
           to='/'
-          className={`flex flex-col items-center justify-center px-2 py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center px-1 py-1 transition-colors ${
             isActive('/') ? 'text-blue-600' : 'text-gray-600'
           }`}
         >
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
+          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
             isActive('/') ? 'bg-blue-50' : ''
           }`}>
-            <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
             </svg>
           </div>
-          <span className='text-[10px] mt-0.5'>Home</span>
+          <span className='text-[9px] mt-0.5'>Home</span>
         </Link>
 
-        {/* Join/Login as Vendor */}
-        <a
-          href='https://vendor.abcdvyapar.com'
-          target='_blank'
-          rel='noopener noreferrer'
-          className='flex flex-col items-center justify-center px-1.5 py-1 transition-colors text-blue-600'
-        >
-          <div className='w-7 h-7 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white flex items-center justify-center shadow-md'>
-            <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 4v16m8-8H4' />
-            </svg>
-          </div>
-          <span className='text-[9px] mt-0.5 font-semibold leading-tight text-center'>Join/Login<br/>as Vendor</span>
-        </a>
-
-        {/* Profile / Login */}
-        {isAuthenticated ? (
-          <div className='relative flex flex-col items-center justify-center px-2 py-1'>
-            <button
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className='flex flex-col items-center transition-colors'
-            >
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
-                isActive('/profile') || showProfileMenu
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}>
-                {user?.fullName?.charAt(0).toUpperCase() || 'U'}
-              </div>
-              <span className={`text-[10px] mt-0.5 ${isActive('/profile') || showProfileMenu ? 'text-blue-600' : 'text-gray-600'}`}>
-                Profile
-              </span>
-            </button>
-
-            {/* Profile Dropdown Menu */}
-            {showProfileMenu && (
-              <>
-                {/* Backdrop to close menu */}
-                <div
-                  className='fixed inset-0 z-40'
-                  onClick={() => setShowProfileMenu(false)}
-                ></div>
-
-                {/* Menu */}
-                <div className='absolute bottom-full right-0 mb-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50'>
-                  <div className='px-4 py-3 border-b border-gray-200'>
-                    <p className='font-semibold text-gray-800 text-sm'>{user?.fullName}</p>
-                    <p className='text-xs text-gray-500 truncate'>{user?.email}</p>
-                  </div>
-
-                  <Link
-                    to='/profile'
-                    onClick={() => setShowProfileMenu(false)}
-                    className='block px-4 py-2.5 text-gray-700 hover:bg-blue-50 transition-colors'
-                  >
-                    <div className='flex items-center gap-3'>
-                      <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' />
-                      </svg>
-                      <span className='text-sm'>Manage Profile</span>
-                    </div>
-                  </Link>
-
-                  <Link
-                    to='/orders'
-                    onClick={() => setShowProfileMenu(false)}
-                    className='block px-4 py-2.5 text-gray-700 hover:bg-blue-50 transition-colors'
-                  >
-                    <div className='flex items-center gap-3'>
-                      <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' />
-                      </svg>
-                      <span className='text-sm'>Orders</span>
-                    </div>
-                  </Link>
-
-                  <button
-                    onClick={handleLogout}
-                    className='w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors border-t border-gray-200 mt-1'
-                  >
-                    <div className='flex items-center gap-3'>
-                      <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1' />
-                      </svg>
-                      <span className='text-sm'>Logout</span>
-                    </div>
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        ) : (
-          <Link
-            to='/login'
-            className='flex flex-col items-center justify-center px-1.5 py-1 transition-colors'
+        {/* Vendor Group */}
+        <div className='flex gap-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-4 py-1.5 border border-purple-200'>
+          {/* Join as Vendor */}
+          <a
+            href='https://vendor.abcdvyapar.com/register'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
           >
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
-              isActive('/login')
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
-            }`}>
-              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <div className='w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-sm'>
+              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' />
+              </svg>
+            </div>
+            <span className='text-[8px] mt-0.5 leading-tight text-center font-medium text-purple-700'>Join<br/>Vendor</span>
+          </a>
+
+          {/* Login as Vendor */}
+          <a
+            href='https://vendor.abcdvyapar.com/login'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
+          >
+            <div className='w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-sm'>
+              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1' />
               </svg>
             </div>
-            <span className={`text-[9px] mt-0.5 leading-tight text-center ${isActive('/login') ? 'text-blue-600' : 'text-gray-600'}`}>
-              Join/Login<br/>as Buyer
-            </span>
+            <span className='text-[8px] mt-0.5 leading-tight text-center font-medium text-indigo-700'>Login<br/>Vendor</span>
+          </a>
+        </div>
+
+        {/* Buyer Group */}
+        <div className='flex gap-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg px-4 py-1.5 border border-orange-200'>
+          {/* Join as Buyer */}
+          <Link
+            to='/register'
+            className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
+          >
+            <div className={`w-6 h-6 rounded-md flex items-center justify-center shadow-sm ${
+              isActive('/register')
+                ? 'bg-gradient-to-br from-orange-600 to-orange-700 text-white'
+                : 'bg-gradient-to-br from-orange-500 to-orange-600 text-white'
+            }`}>
+              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' />
+              </svg>
+            </div>
+            <span className={`text-[8px] mt-0.5 leading-tight text-center font-medium ${isActive('/register') ? 'text-orange-700' : 'text-orange-600'}`}>Join<br/>Buyer</span>
           </Link>
-        )}
+
+          {/* Login as Buyer */}
+          <Link
+            to='/login'
+            className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
+          >
+            <div className={`w-6 h-6 rounded-md flex items-center justify-center shadow-sm ${
+              isActive('/login')
+                ? 'bg-gradient-to-br from-amber-600 to-amber-700 text-white'
+                : 'bg-gradient-to-br from-amber-500 to-amber-600 text-white'
+            }`}>
+              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1' />
+              </svg>
+            </div>
+            <span className={`text-[8px] mt-0.5 leading-tight text-center font-medium ${isActive('/login') ? 'text-amber-700' : 'text-amber-600'}`}>Login<br/>Buyer</span>
+          </Link>
+        </div>
       </div>
     </nav>
 
