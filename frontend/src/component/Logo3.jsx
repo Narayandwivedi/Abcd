@@ -9,45 +9,15 @@ const Logo = () => {
         <div className='relative bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-2 md:p-3'>
             <div className='flex items-center gap-2 md:gap-3'>
 
-              {/* Left Side - Logo Image in Shield Shape */}
+              {/* Left Side - Logo Image */}
               <div className='relative'>
-                <div className='relative w-12 h-14 md:w-20 md:h-24'>
-                  {/* Shield Background */}
-                  <svg className='absolute inset-0 w-full h-full' viewBox='0 0 100 120' fill='none'>
-                    <path
-                      d='M50 5 L90 25 L90 75 Q90 100 50 115 Q10 100 10 75 L10 25 Z'
-                      fill='url(#shieldGradient)'
-                      stroke='url(#borderGradient)'
-                      strokeWidth='2'
-                    />
-                    <defs>
-                      <linearGradient id='shieldGradient' x1='0%' y1='0%' x2='100%' y2='100%'>
-                        <stop offset='0%' stopColor='#FEF3C7' />
-                        <stop offset='100%' stopColor='#FED7AA' />
-                      </linearGradient>
-                      <linearGradient id='borderGradient' x1='0%' y1='0%' x2='100%' y2='100%'>
-                        <stop offset='0%' stopColor='#EA580C' />
-                        <stop offset='50%' stopColor='#DC2626' />
-                        <stop offset='100%' stopColor='#EA580C' />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-
+                <div className='relative w-18 h-18 md:w-28 md:h-28'>
                   {/* Logo Image */}
-                  <div className='absolute inset-0 flex items-center justify-center p-2 md:p-2'>
-                    <img
-                      src='/abcd logo3.png'
-                      alt='ABCD Logo'
-                      className='w-9 h-9 md:w-16 md:h-16 object-contain drop-shadow-lg'
-                    />
-                  </div>
-
-                  {/* Crown Icon on Top - Hidden on mobile */}
-                  <div className='hidden md:block absolute -top-2 left-1/2 transform -translate-x-1/2'>
-                    <svg className='w-5 h-5 text-yellow-500 drop-shadow-md' fill='currentColor' viewBox='0 0 24 24'>
-                      <path d='M12 6L9 9l3-8 3 8zm0 0l-3 3h6zm-3 3v10l3-3 3 3V9z'/>
-                    </svg>
-                  </div>
+                  <img
+                    src='/abcd logo3.png'
+                    alt='ABCD Logo'
+                    className='w-full h-full object-contain drop-shadow-lg'
+                  />
                 </div>
               </div>
 
@@ -71,7 +41,7 @@ const Logo = () => {
 
                 {/* Organization Full Name */}
                 <div className='bg-gradient-to-r from-gray-900 to-gray-800 text-white px-2 py-0.5 md:px-2 md:py-1 rounded md:rounded-md'>
-                  <div className='text-[8px] md:text-[10px] font-bold tracking-wide leading-tight'>
+                  <div className='text-[9px] md:text-[11px] font-bold tracking-wide leading-tight'>
                     <div>AGRAWAL BUSINESS &</div>
                     <div>COMMUNITY DEVELOPMENT</div>
                   </div>

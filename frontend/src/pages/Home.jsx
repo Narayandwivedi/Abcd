@@ -110,7 +110,7 @@ const Home = () => {
       </section>
 
       {/* Sponsored Ads Section */}
-      <section className='py-3 lg:py-6 bg-gray-100'>
+      <section className='py-2 lg:py-6 bg-gray-100'>
         <div className='container mx-auto px-4'>
           {/* Desktop: Show all 5 in grid */}
           <div className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'>
@@ -205,9 +205,9 @@ const Home = () => {
               {/* Ad 1 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
-                  <div className='bg-gradient-to-br from-blue-500 to-blue-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-blue-500 to-blue-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>🛍️</div>
+                      <div className='text-2xl mb-0.5'>🛍️</div>
                       <h3 className='font-bold text-sm'>Shop Now</h3>
                       <p className='text-[10px] opacity-90'>Amazing Deals</p>
                     </div>
@@ -218,9 +218,9 @@ const Home = () => {
               {/* Ad 2 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
-                  <div className='bg-gradient-to-br from-green-500 to-green-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-green-500 to-green-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>🎯</div>
+                      <div className='text-2xl mb-0.5'>🎯</div>
                       <h3 className='font-bold text-sm'>New Arrivals</h3>
                       <p className='text-[10px] opacity-90'>Fresh Collection</p>
                     </div>
@@ -231,9 +231,9 @@ const Home = () => {
               {/* Ad 3 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
-                  <div className='bg-gradient-to-br from-purple-500 to-purple-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-purple-500 to-purple-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>⭐</div>
+                      <div className='text-2xl mb-0.5'>⭐</div>
                       <h3 className='font-bold text-sm'>Premium</h3>
                       <p className='text-[10px] opacity-90'>Quality Assured</p>
                     </div>
@@ -244,9 +244,9 @@ const Home = () => {
               {/* Ad 4 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
-                  <div className='bg-gradient-to-br from-orange-500 to-orange-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-orange-500 to-orange-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>🔥</div>
+                      <div className='text-2xl mb-0.5'>🔥</div>
                       <h3 className='font-bold text-sm'>Hot Deals</h3>
                       <p className='text-[10px] opacity-90'>Limited Time</p>
                     </div>
@@ -257,9 +257,9 @@ const Home = () => {
               {/* Ad 5 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full'>
-                  <div className='bg-gradient-to-br from-pink-500 to-pink-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-pink-500 to-pink-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>💎</div>
+                      <div className='text-2xl mb-0.5'>💎</div>
                       <h3 className='font-bold text-sm'>Luxury</h3>
                       <p className='text-[10px] opacity-90'>Premium Selection</p>
                     </div>
@@ -367,9 +367,9 @@ const Home = () => {
               {/* Ad 1 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-teal-500 to-teal-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-teal-500 to-teal-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>🎁</div>
+                      <div className='text-2xl mb-0.5'>🎁</div>
                       <h3 className='font-bold text-sm'>Gift Ideas</h3>
                       <p className='text-[10px] opacity-90'>Perfect Presents</p>
                     </div>
@@ -380,9 +380,9 @@ const Home = () => {
               {/* Ad 2 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-indigo-500 to-indigo-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-indigo-500 to-indigo-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>📚</div>
+                      <div className='text-2xl mb-0.5'>📚</div>
                       <h3 className='font-bold text-sm'>Education</h3>
                       <p className='text-[10px] opacity-90'>Learn & Grow</p>
                     </div>
@@ -393,9 +393,9 @@ const Home = () => {
               {/* Ad 3 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-rose-500 to-rose-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-rose-500 to-rose-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>💄</div>
+                      <div className='text-2xl mb-0.5'>💄</div>
                       <h3 className='font-bold text-sm'>Beauty</h3>
                       <p className='text-[10px] opacity-90'>Style & Care</p>
                     </div>
@@ -406,9 +406,9 @@ const Home = () => {
               {/* Ad 4 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-amber-500 to-amber-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-amber-500 to-amber-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>🏡</div>
+                      <div className='text-2xl mb-0.5'>🏡</div>
                       <h3 className='font-bold text-sm'>Home</h3>
                       <p className='text-[10px] opacity-90'>Comfort Living</p>
                     </div>
@@ -419,9 +419,9 @@ const Home = () => {
               {/* Ad 5 */}
               <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
                 <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-cyan-500 to-cyan-600 h-28 flex items-center justify-center'>
+                  <div className='bg-gradient-to-br from-cyan-500 to-cyan-600 h-26 flex items-center justify-center'>
                     <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-1'>⚡</div>
+                      <div className='text-2xl mb-0.5'>⚡</div>
                       <h3 className='font-bold text-sm'>Tech</h3>
                       <p className='text-[10px] opacity-90'>Latest Gadgets</p>
                     </div>
@@ -434,128 +434,128 @@ const Home = () => {
       </section>
 
       {/* Shop Categories Section */}
-      <section className='pt-3 pb-24 md:py-12 bg-gray-50'>
+      <section className='pt-2 pb-32 md:py-12 bg-gray-50'>
         <div className='container mx-auto px-4'>
-          <div className='text-center mb-2 md:mb-8'>
-            <h2 className='text-lg md:text-3xl font-bold text-gray-800'>
+          <div className='text-center mb-1.5 md:mb-8'>
+            <h2 className='text-base md:text-3xl font-bold text-gray-800'>
               Shop by Category
             </h2>
           </div>
 
-          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 md:gap-4 max-w-7xl mx-auto'>
+          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 max-w-7xl mx-auto'>
             {/* Medicine */}
-            <div className='group bg-gradient-to-br from-green-50 to-green-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-green-200 hover:border-green-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>💊</span>
+            <div className='group bg-gradient-to-br from-green-50 to-green-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-green-200 hover:border-green-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>💊</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Medicine</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Health & Pharmacy</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Medicine</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Health & Pharmacy</p>
             </div>
 
             {/* Services */}
-            <div className='group bg-gradient-to-br from-blue-50 to-blue-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-blue-200 hover:border-blue-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>🔧</span>
+            <div className='group bg-gradient-to-br from-blue-50 to-blue-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-blue-200 hover:border-blue-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>🔧</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Services</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Professional Help</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Services</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Professional Help</p>
             </div>
 
             {/* Foods */}
-            <div className='group bg-gradient-to-br from-orange-50 to-orange-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>🍔</span>
+            <div className='group bg-gradient-to-br from-orange-50 to-orange-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>🍔</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Foods</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Restaurants & Cafes</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Foods</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Restaurants & Cafes</p>
             </div>
 
             {/* Beverages */}
-            <div className='group bg-gradient-to-br from-purple-50 to-purple-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-purple-200 hover:border-purple-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>🍾</span>
+            <div className='group bg-gradient-to-br from-purple-50 to-purple-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-purple-200 hover:border-purple-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>🍾</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Beverages</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Drinks & Juices</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Beverages</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Drinks & Juices</p>
             </div>
 
             {/* Grocery */}
-            <div className='group bg-gradient-to-br from-red-50 to-red-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-red-200 hover:border-red-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>🛒</span>
+            <div className='group bg-gradient-to-br from-red-50 to-red-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-red-200 hover:border-red-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>🛒</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Grocery</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Daily Essentials</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Grocery</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Daily Essentials</p>
             </div>
 
             {/* Electronics */}
-            <div className='group bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-indigo-200 hover:border-indigo-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>📱</span>
+            <div className='group bg-gradient-to-br from-indigo-50 to-indigo-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-indigo-200 hover:border-indigo-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>📱</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Electronics</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Gadgets & Tech</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Electronics</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Gadgets & Tech</p>
             </div>
 
             {/* Fashion */}
-            <div className='group bg-gradient-to-br from-pink-50 to-pink-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-pink-200 hover:border-pink-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>👗</span>
+            <div className='group bg-gradient-to-br from-pink-50 to-pink-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-pink-200 hover:border-pink-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>👗</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Fashion</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Clothing & Style</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Fashion</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Clothing & Style</p>
             </div>
 
             {/* Home & Living */}
-            <div className='group bg-gradient-to-br from-teal-50 to-teal-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-teal-200 hover:border-teal-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>🏠</span>
+            <div className='group bg-gradient-to-br from-teal-50 to-teal-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-teal-200 hover:border-teal-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>🏠</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Home & Living</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Furniture & Decor</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Home & Living</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Furniture & Decor</p>
             </div>
 
             {/* Beauty */}
-            <div className='group bg-gradient-to-br from-rose-50 to-rose-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-rose-200 hover:border-rose-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>💄</span>
+            <div className='group bg-gradient-to-br from-rose-50 to-rose-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-rose-200 hover:border-rose-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>💄</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Beauty</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Cosmetics & Care</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Beauty</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Cosmetics & Care</p>
             </div>
 
             {/* Books */}
-            <div className='group bg-gradient-to-br from-amber-50 to-amber-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-amber-200 hover:border-amber-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>📚</span>
+            <div className='group bg-gradient-to-br from-amber-50 to-amber-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-amber-200 hover:border-amber-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>📚</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Books</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Education & Learning</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Books</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Education & Learning</p>
             </div>
 
             {/* Sports */}
-            <div className='group bg-gradient-to-br from-lime-50 to-lime-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-lime-200 hover:border-lime-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>⚽</span>
+            <div className='group bg-gradient-to-br from-lime-50 to-lime-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-lime-200 hover:border-lime-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>⚽</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Sports</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Fitness & Outdoor</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Sports</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Fitness & Outdoor</p>
             </div>
 
             {/* Toys */}
-            <div className='group bg-gradient-to-br from-cyan-50 to-cyan-100 p-3 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-cyan-200 hover:border-cyan-400 transform hover:-translate-y-1 cursor-pointer'>
-              <div className='bg-white w-14 h-14 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
-                <span className='text-2xl md:text-3xl'>🧸</span>
+            <div className='group bg-gradient-to-br from-cyan-50 to-cyan-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-cyan-200 hover:border-cyan-400 transform hover:-translate-y-1 cursor-pointer'>
+              <div className='bg-white w-11 h-11 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
+                <span className='text-lg md:text-3xl'>🧸</span>
               </div>
-              <h3 className='text-center font-bold text-gray-800 text-xs md:text-sm'>Toys</h3>
-              <p className='text-center text-[9px] md:text-[10px] text-gray-600 mt-0.5'>Kids & Games</p>
+              <h3 className='text-center font-bold text-gray-800 text-[10px] md:text-sm'>Toys</h3>
+              <p className='text-center text-[8px] md:text-[10px] text-gray-600 mt-0.5'>Kids & Games</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className='py-20 bg-white'>
+      <section className='py-12 md:py-20 bg-white'>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl md:text-5xl font-black mb-4 text-gray-800'>
@@ -607,7 +607,7 @@ const Home = () => {
       </section>
 
       {/* Call to Action Section */}
-      <section className='py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white relative overflow-hidden'>
+      <section className='pt-12 pb-32 md:py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white relative overflow-hidden'>
         {/* Background Elements */}
         <div className='absolute inset-0 overflow-hidden'>
           <div className='absolute top-20 right-20 w-96 h-96 bg-blue-500 opacity-10 rounded-full blur-3xl'></div>
