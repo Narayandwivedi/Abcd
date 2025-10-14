@@ -45,7 +45,7 @@ const BottomNav = () => {
         </Link>
 
         {/* Vendor Group */}
-        <div className='flex gap-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-4 py-1.5 border border-purple-200'>
+        <div className='flex gap-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-4 py-1.5 border border-purple-200'>
           {/* Join as Vendor */}
           <a
             href='https://vendor.abcdvyapar.com/register'
@@ -78,7 +78,7 @@ const BottomNav = () => {
         </div>
 
         {/* Buyer Group */}
-        <div className='flex gap-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg px-4 py-1.5 border border-orange-200'>
+        <div className='flex gap-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg px-4 py-1.5 border border-orange-200'>
           {/* Join as Buyer */}
           <Link
             to='/register'
