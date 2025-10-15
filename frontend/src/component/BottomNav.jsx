@@ -25,7 +25,7 @@ const BottomNav = () => {
 
   return (
     <>
-      <nav className='md:hidden fixed left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50' style={{ bottom: '56px' }}>
+      <nav className='md:hidden fixed left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50' style={{ bottom: '40px' }}>
         <div className='flex justify-around items-center py-1 gap-6 px-4'>
         {/* Home */}
         <Link
@@ -117,15 +117,15 @@ const BottomNav = () => {
     </nav>
 
     {/* Black Strip Below Bottom Nav - Mobile Only */}
-    <div className='md:hidden fixed left-0 right-0 bg-black text-white text-center py-1.5 z-40 h-7' style={{ bottom: '28px' }}>
-      <p className='text-[10px] font-medium leading-4'>
+    <div className='md:hidden fixed left-0 right-0 bg-black text-white text-center py-0.5 z-40 h-5' style={{ bottom: '20px' }}>
+      <p className='text-[9px] font-medium leading-4'>
         Welcome to ABCD Vyapar with 15000+ verified buyers
       </p>
     </div>
 
     {/* Gray Strip at Very Bottom - Mobile Only */}
-    <div className='md:hidden fixed bottom-0 left-0 right-0 bg-slate-700 text-white text-center py-1.5 z-40 h-7'>
-      <p className='text-[10px] font-medium leading-4'>
+    <div className='md:hidden fixed bottom-0 left-0 right-0 bg-slate-700 text-white text-center py-0.5 z-40 h-5'>
+      <p className='text-[9px] font-medium leading-4'>
         Empowering growth & empowering unity
       </p>
     </div>

@@ -10,21 +10,35 @@ const Home = () => {
     '/ad4.webp',
     '/ad5.webp',
     '/ad6.webp',
-    '/ad7.webp'
+    '/ad7.webp',
+    '/ad8.webp',
+    '/ad9.webp',
+    '/ad10.webp',
+    '/ad11.webp',
+    '/ad12.webp',
+    '/ad13.webp',
+    '/ad14.webp',
+    '/ad15.webp',
+    '/ad16.webp'
   ]
 
   // Start from the middle set (second set of 7 images)
   const [currentSlide, setCurrentSlide] = useState(adImages.length)
   const [isTransitioning, setIsTransitioning] = useState(true)
+  const [isPaused, setIsPaused] = useState(false)
+  const [touchStart, setTouchStart] = useState(0)
+  const [touchEnd, setTouchEnd] = useState(0)
 
   // Auto-slide functionality - infinite scroll to the right
   useEffect(() => {
+    if (isPaused) return // Don't auto-scroll when paused
+
     const slideInterval = setInterval(() => {
       setCurrentSlide((prev) => prev + 1)
-    }, 3000) // Change slide every 3 seconds
+    }, 1200) // Change slide every 1.2 seconds
 
     return () => clearInterval(slideInterval)
-  }, [])
+  }, [isPaused])
 
   // Reset position for infinite loop effect
   useEffect(() => {
@@ -51,6 +65,47 @@ const Home = () => {
 
   const handleNextSlide = () => {
     setCurrentSlide((prev) => prev + 1)
+  }
+
+  // Touch event handlers
+  const handleTouchStart = (e) => {
+    setTouchStart(e.targetTouches[0].clientX)
+    setIsPaused(true) // Pause auto-scroll on touch
+  }
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) {
+      setIsPaused(false)
+      return
+    }
+
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe) {
+      handleNextSlide() // Swipe left = next slide
+    } else if (isRightSwipe) {
+      handlePrevSlide() // Swipe right = previous slide
+    }
+
+    // Reset touch values and resume auto-scroll
+    setTouchStart(0)
+    setTouchEnd(0)
+    setIsPaused(false)
+  }
+
+  // Mouse event handlers for desktop
+  const handleMouseDown = () => {
+    setIsPaused(true)
+  }
+
+  const handleMouseUp = () => {
+    setIsPaused(false)
   }
 
   return (
@@ -145,23 +200,36 @@ const Home = () => {
       <YouTubeDemo />
 
       {/* Sponsored Ads Section - Row 2 */}
-      <section className='pb-1 lg:py-2 bg-white'>
+      <section className='pb-0 lg:pb-1 bg-white'>
         <div className='container mx-auto px-4'>
           {/* Desktop: Show all ads in grid */}
-          <div className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'>
+          <div
+            className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+          >
             {adImages.slice(0, 5).map((ad, index) => (
               <div key={index} className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
                 <img
                   src={ad}
                   alt={`Advertisement ${index + 1}`}
-                  className='w-full h-40 object-cover'
+                  className='w-full h-56 object-contain bg-gray-50'
                 />
               </div>
             ))}
           </div>
 
           {/* Mobile: Horizontal sliding carousel */}
-          <div className='lg:hidden relative mx-auto overflow-hidden'>
+          <div
+            className='lg:hidden relative mx-auto overflow-hidden cursor-grab active:cursor-grabbing'
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+          >
             {/* Previous Button */}
             <button
               onClick={handlePrevSlide}
@@ -195,11 +263,11 @@ const Home = () => {
               {[...Array(3)].map((_, setIndex) =>
                 adImages.map((ad, index) => (
                   <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                    <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
+                    <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '200px' }}>
                       <img
                         src={ad}
                         alt={`Advertisement ${index + 1}`}
-                        className='w-full h-32 object-cover'
+                        className='w-full h-full object-contain p-2'
                       />
                     </div>
                   </div>
@@ -211,9 +279,9 @@ const Home = () => {
       </section>
 
       {/* Shop Categories Section */}
-      <section className='pt-2 pb-1 md:pt-6 md:pb-3 bg-gray-50'>
+      <section className='pt-1 pb-1 md:pt-3 md:pb-3 bg-gray-50'>
         <div className='container mx-auto px-3 md:px-4'>
-          <div className='text-center mb-2 md:mb-8'>
+          <div className='text-center mb-1 md:mb-6'>
             <h2 className='text-sm md:text-3xl font-bold text-gray-800'>
               Shop by Category
             </h2>
