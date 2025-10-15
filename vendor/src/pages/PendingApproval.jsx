@@ -22,19 +22,12 @@ const PendingApproval = () => {
     }
   }, [isAuthenticated, navigate])
 
-  // Redirect to business form if no application submitted
-  useEffect(() => {
-    if (vendor && !vendor.isBusinessApplicationSubmitted) {
-      navigate('/business-form', { replace: true })
-    }
-  }, [vendor, navigate])
-
   // Redirect to dashboard if approved
   useEffect(() => {
-    if (application?.applicationStatus === 'approved' || vendor?.isVerified) {
+    if (vendor?.isVerified) {
       navigate('/dashboard', { replace: true })
     }
-  }, [application, vendor, navigate])
+  }, [vendor, navigate])
 
   const handleLogout = async () => {
     if (window.confirm('Are you sure you want to logout?')) {
@@ -58,50 +51,14 @@ const PendingApproval = () => {
   }
 
   const getStatusInfo = () => {
-    const status = application?.applicationStatus || 'pending'
-
-    switch (status) {
-      case 'pending':
-        return {
-          icon: <Clock className='w-16 h-16 text-yellow-500' />,
-          bgColor: 'bg-yellow-50',
-          borderColor: 'border-yellow-200',
-          textColor: 'text-yellow-800',
-          title: 'Application Pending',
-          message: 'Your business application has been submitted and is awaiting admin review.',
-          detail: 'This process typically takes 24-48 hours. You will be notified once your application is reviewed.'
-        }
-      case 'under_review':
-        return {
-          icon: <Clock className='w-16 h-16 text-blue-500' />,
-          bgColor: 'bg-blue-50',
-          borderColor: 'border-blue-200',
-          textColor: 'text-blue-800',
-          title: 'Under Review',
-          message: 'Your business application is currently being reviewed by our admin team.',
-          detail: 'We are carefully reviewing your submitted information. You will be notified shortly.'
-        }
-      case 'rejected':
-        return {
-          icon: <XCircle className='w-16 h-16 text-red-500' />,
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-200',
-          textColor: 'text-red-800',
-          title: 'Application Rejected',
-          message: application?.rejectionReason || 'Unfortunately, your business application could not be verified.',
-          detail: application?.adminComments || 'Please contact our support team for more information or to resubmit your application.',
-          showResubmit: true
-        }
-      default:
-        return {
-          icon: <AlertCircle className='w-16 h-16 text-gray-500' />,
-          bgColor: 'bg-gray-50',
-          borderColor: 'border-gray-200',
-          textColor: 'text-gray-800',
-          title: 'Status Unknown',
-          message: 'We are processing your application.',
-          detail: 'Please check back later or contact support for assistance.'
-        }
+    return {
+      icon: <Clock className='w-16 h-16 text-yellow-500' />,
+      bgColor: 'bg-yellow-50',
+      borderColor: 'border-yellow-200',
+      textColor: 'text-yellow-800',
+      title: 'Application Under Review',
+      message: 'Your vendor registration has been submitted and is awaiting admin approval.',
+      detail: 'This process typically takes 24-48 hours. You will be notified once your account is approved and you can access the dashboard.'
     }
   }
 
@@ -118,7 +75,7 @@ const PendingApproval = () => {
             </div>
             <div>
               <h1 className='text-xl font-bold text-gray-900'>ABCD Vendor</h1>
-              <p className='text-sm text-gray-600'>{application?.businessName || 'Vendor Portal'}</p>
+              <p className='text-sm text-gray-600'>{vendor?.businessName || 'Vendor Portal'}</p>
             </div>
           </div>
           <button
@@ -154,17 +111,17 @@ const PendingApproval = () => {
             </p>
           </div>
 
-          {/* Business Details */}
+          {/* Vendor Details */}
           <div className='bg-gray-50 rounded-2xl p-6 mb-6'>
             <h3 className='text-lg font-bold text-gray-900 mb-4'>Submitted Information</h3>
             <div className='space-y-3'>
               <div className='flex justify-between'>
-                <span className='text-sm font-medium text-gray-600'>Business Name:</span>
-                <span className='text-sm font-bold text-gray-900'>{application?.businessName || 'N/A'}</span>
+                <span className='text-sm font-medium text-gray-600'>Owner Name:</span>
+                <span className='text-sm font-bold text-gray-900'>{vendor?.ownerName || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
-                <span className='text-sm font-medium text-gray-600'>Owner Name:</span>
-                <span className='text-sm font-bold text-gray-900'>{application?.ownerName || 'N/A'}</span>
+                <span className='text-sm font-medium text-gray-600'>Business Name:</span>
+                <span className='text-sm font-bold text-gray-900'>{vendor?.businessName || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Email:</span>
@@ -172,25 +129,12 @@ const PendingApproval = () => {
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Mobile:</span>
-                <span className='text-sm font-bold text-gray-900'>{application?.mobile || 'N/A'}</span>
-              </div>
-              <div className='flex justify-between'>
-                <span className='text-sm font-medium text-gray-600'>GST Number:</span>
-                <span className='text-sm font-bold text-gray-900'>{application?.gstNumber || 'N/A'}</span>
-              </div>
-              <div className='flex justify-between'>
-                <span className='text-sm font-medium text-gray-600'>Category:</span>
-                <span className='text-sm font-bold text-gray-900'>{application?.businessCategory || 'N/A'}</span>
+                <span className='text-sm font-bold text-gray-900'>{vendor?.mobile || 'N/A'}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-sm font-medium text-gray-600'>Status:</span>
-                <span className={`text-sm font-bold uppercase ${
-                  application?.applicationStatus === 'pending' ? 'text-yellow-600' :
-                  application?.applicationStatus === 'under_review' ? 'text-blue-600' :
-                  application?.applicationStatus === 'approved' ? 'text-green-600' :
-                  application?.applicationStatus === 'rejected' ? 'text-red-600' : 'text-gray-600'
-                }`}>
-                  {application?.applicationStatus?.replace('_', ' ') || 'Pending'}
+                <span className='text-sm font-bold uppercase text-yellow-600'>
+                  Pending Approval
                 </span>
               </div>
             </div>
@@ -205,17 +149,6 @@ const PendingApproval = () => {
               <RefreshCw className='w-5 h-5' />
               Refresh Status
             </button>
-
-            {/* Show resubmit button if rejected */}
-            {statusInfo.showResubmit && (
-              <button
-                onClick={() => navigate('/business-form')}
-                className='w-full bg-white border-2 border-indigo-600 text-indigo-600 font-bold py-4 rounded-xl hover:bg-indigo-50 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2'
-              >
-                <Store className='w-5 h-5' />
-                Resubmit Application
-              </button>
-            )}
           </div>
 
           {/* Support Link */}

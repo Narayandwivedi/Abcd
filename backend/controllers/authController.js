@@ -11,14 +11,13 @@ const handelUserSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { fullName, email, password, mobile } = req.body;
+    let { fullName, email, mobile, gotra } = req.body;
 
     // Trim input fields
     fullName = fullName?.trim();
     email = email?.trim();
-    password = password?.trim();
 
-    if (!fullName || !email || !password || !mobile) {
+    if (!fullName || !email || !mobile || !gotra) {
       return res.status(400).json({ success: false, message: "missing field" });
     }
 
@@ -50,14 +49,11 @@ const handelUserSignup = async (req, res) => {
       }
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 8);
-
     const newUserData = {
       fullName,
       email,
-      password: hashedPassword,
       mobile,
+      gotra,
     };
 
     // Create new user

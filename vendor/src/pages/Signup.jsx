@@ -5,9 +5,6 @@ import {
   User,
   Mail,
   Phone,
-  Lock,
-  Eye,
-  EyeOff,
   Loader2,
   ArrowLeft,
   CheckCircle
@@ -21,15 +18,12 @@ const Signup = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const [formData, setFormData] = useState({
-    fullName: '',
+    ownerName: '',
+    businessName: '',
     email: '',
     mobile: '',
-    password: '',
-    confirmPassword: '',
     acceptTerms: false
   })
 
@@ -54,7 +48,7 @@ const Signup = () => {
     setError('')
 
     // Validation
-    if (!formData.fullName || !formData.email || !formData.mobile || !formData.password || !formData.confirmPassword) {
+    if (!formData.ownerName || !formData.businessName || !formData.email || !formData.mobile) {
       setError('Please fill in all fields')
       return
     }
@@ -69,16 +63,6 @@ const Signup = () => {
       return
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
-
     if (!formData.acceptTerms) {
       setError('You must accept the terms and conditions')
       return
@@ -88,16 +72,21 @@ const Signup = () => {
 
     try {
       const result = await signup({
-        fullName: formData.fullName,
+        ownerName: formData.ownerName,
+        businessName: formData.businessName,
         email: formData.email,
         mobile: parseInt(formData.mobile),
-        password: formData.password,
       })
 
       if (result.success) {
         console.log('✅ Signup result successful')
-        toast.success('Registration successful! Please complete your business profile.')
+        toast.success('Registration successful! We will review your details and contact you soon.', {
+          autoClose: 5000,
+        })
         // Navigation will happen automatically via useEffect when isAuthenticated changes
+        setTimeout(() => {
+          navigate('/', { replace: true })
+        }, 2000)
       } else {
         console.log('❌ Signup result failed:', result.error)
         setError(result.error)
@@ -123,8 +112,8 @@ const Signup = () => {
       {/* Main Container */}
       <div className='relative w-full max-w-lg bg-white sm:rounded-3xl shadow-2xl overflow-hidden min-h-screen sm:min-h-0'>
         {/* Header */}
-        <div className='bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 px-4 sm:px-6 py-6 sm:py-8 text-white'>
-          <div className='flex items-center justify-between mb-4'>
+        <div className='bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 px-4 sm:px-6 py-4 sm:py-6 text-white'>
+          <div className='flex items-center justify-between mb-2'>
             <div className='flex items-center gap-2 sm:gap-3'>
               <div className='w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/30'>
                 <Store className='w-5 h-5 sm:w-7 sm:h-7' />
@@ -145,38 +134,41 @@ const Signup = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className='p-4 sm:p-8'>
-          {/* Google Sign-Up */}
-          <div className='mb-6'>
-            <GoogleLogin />
-          </div>
-
-          {/* Divider */}
-          <div className='relative mb-8'>
-            <div className='absolute inset-0 flex items-center'>
-              <div className='w-full border-t border-gray-200'></div>
-            </div>
-            <div className='relative flex justify-center text-sm'>
-              <span className='px-4 bg-white text-gray-500 font-medium'>Or register with email</span>
-            </div>
-          </div>
-
+        <form onSubmit={handleSubmit} className='p-4 sm:p-6'>
           {/* Form Fields */}
-          <div className='space-y-4 sm:space-y-5'>
-            {/* Full Name */}
+          <div className='space-y-3 sm:space-y-4'>
+            {/* Owner Name */}
             <div>
               <label className='block text-sm font-bold text-gray-700 mb-2'>
-                Full Name <span className='text-red-500'>*</span>
+                Owner Name <span className='text-red-500'>*</span>
               </label>
               <div className='relative'>
                 <User className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
                 <input
                   type='text'
-                  name='fullName'
-                  value={formData.fullName}
+                  name='ownerName'
+                  value={formData.ownerName}
                   onChange={handleChange}
                   className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
-                  placeholder='Enter your full name'
+                  placeholder='Enter owner name'
+                />
+              </div>
+            </div>
+
+            {/* Business Name */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                Business Name <span className='text-red-500'>*</span>
+              </label>
+              <div className='relative'>
+                <Store className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                <input
+                  type='text'
+                  name='businessName'
+                  value={formData.businessName}
+                  onChange={handleChange}
+                  className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
+                  placeholder='Enter your business name'
                 />
               </div>
             </div>
@@ -216,71 +208,19 @@ const Signup = () => {
                   placeholder='9876543210'
                 />
               </div>
-              <p className='text-xs text-gray-500 mt-1'>10-digit Indian mobile number</p>
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2'>
-                Password <span className='text-red-500'>*</span>
-              </label>
-              <div className='relative'>
-                <Lock className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name='password'
-                  value={formData.password}
-                  onChange={handleChange}
-                  className='w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
-                  placeholder='Create password'
-                />
-                <button
-                  type='button'
-                  onClick={() => setShowPassword(!showPassword)}
-                  className='absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'
-                >
-                  {showPassword ? <EyeOff className='w-5 h-5' /> : <Eye className='w-5 h-5' />}
-                </button>
-              </div>
-              <p className='text-xs text-gray-500 mt-1'>Minimum 6 characters</p>
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2'>
-                Confirm Password <span className='text-red-500'>*</span>
-              </label>
-              <div className='relative'>
-                <Lock className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name='confirmPassword'
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className='w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
-                  placeholder='Confirm password'
-                />
-                <button
-                  type='button'
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className='absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'
-                >
-                  {showConfirmPassword ? <EyeOff className='w-5 h-5' /> : <Eye className='w-5 h-5' />}
-                </button>
-              </div>
             </div>
 
             {/* Terms */}
-            <div className='bg-green-50 border-2 border-green-200 rounded-xl p-4'>
-              <label className='flex items-start gap-3 cursor-pointer'>
+            <div className='bg-green-50 border-2 border-green-200 rounded-xl p-3'>
+              <label className='flex items-start gap-2 cursor-pointer'>
                 <input
                   type='checkbox'
                   name='acceptTerms'
                   checked={formData.acceptTerms}
                   onChange={handleChange}
-                  className='mt-1 w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 cursor-pointer'
+                  className='mt-0.5 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 cursor-pointer'
                 />
-                <span className='text-sm text-gray-700 leading-relaxed'>
+                <span className='text-xs text-gray-700 leading-relaxed'>
                   I agree to the{' '}
                   <a href='#' className='text-indigo-600 font-bold hover:underline'>
                     Terms & Conditions

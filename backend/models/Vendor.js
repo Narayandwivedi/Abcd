@@ -12,8 +12,17 @@ const vendorSchema = new mongoose.Schema({
     unique: true,
     sparse: true, // Allow null/undefined values for unique index
   },
+  ownerName: {
+    type: String,
+    required: true,
+  },
+  businessName: {
+    type: String,
+    required: true,
+  },
   password: {
     type: String,
+    required: false, // Admin will set this later
   },
 
   // Google OAuth fields

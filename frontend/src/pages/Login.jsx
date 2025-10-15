@@ -42,7 +42,7 @@ const Login = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center py-12 px-4 relative overflow-hidden'>
+    <div className='h-screen w-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center px-4 relative overflow-hidden fixed inset-0'>
       {/* Decorative Background Elements */}
       <div className='absolute inset-0 overflow-hidden'>
         <div className='absolute top-20 right-20 w-96 h-96 bg-blue-500 opacity-10 rounded-full blur-3xl'></div>
@@ -51,38 +51,23 @@ const Login = () => {
 
       <div className='max-w-md w-full relative z-10'>
         {/* Header */}
-        <div className='text-center mb-8'>
-          <h1 className='text-4xl font-black text-white mb-2'>Welcome Back</h1>
-          <p className='text-gray-400'>Sign in to continue to ABCD Platform</p>
+        <div className='text-center mb-4'>
+          <h1 className='text-3xl font-black text-white mb-2'>Welcome Back</h1>
+          <p className='text-gray-400 text-sm'>Sign in to continue to ABCD Platform</p>
         </div>
 
         {/* Login Form */}
-        <div className='bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20'>
-          {/* Google Login at Top */}
-          <div className='mb-6'>
-            <GoogleLogin />
-          </div>
-
-          {/* Divider */}
-          <div className='relative mb-6'>
-            <div className='absolute inset-0 flex items-center'>
-              <div className='w-full border-t border-white/20'></div>
-            </div>
-            <div className='relative flex justify-center text-sm'>
-              <span className='px-4 bg-white/10 text-gray-400'>Or continue with email</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className='space-y-6'>
+        <div className='bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-white/20'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
             {/* Email or Mobile Field */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Email or Mobile Number</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>Email or Mobile Number</label>
               <div className='relative'>
                 <input
                   type='text'
                   value={emailOrMobile}
                   onChange={(e) => setEmailOrMobile(e.target.value)}
-                  className='w-full px-4 py-3 pl-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition backdrop-blur-sm'
+                  className='w-full px-4 py-2.5 pl-10 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition backdrop-blur-sm text-sm'
                   placeholder='Email or 10-digit mobile number'
                   required
                 />
@@ -94,13 +79,13 @@ const Login = () => {
 
             {/* Password Field */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Password</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>Password</label>
               <div className='relative'>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className='w-full px-4 py-3 pl-11 pr-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition backdrop-blur-sm'
+                  className='w-full px-4 py-2.5 pl-10 pr-10 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition backdrop-blur-sm text-sm'
                   placeholder='Enter your password'
                   required
                 />
@@ -141,25 +126,19 @@ const Login = () => {
             <button
               type='submit'
               disabled={loading}
-              className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
+              className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm'
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
-          {/* Sign Up Links */}
-          <div className='mt-8 text-center space-y-3'>
-            <p className='text-gray-400 text-sm'>
+          {/* Signup Link */}
+          <div className='mt-6 text-center'>
+            <p className='text-gray-300 text-sm'>
               Don't have an account?{' '}
-              <Link to='/signup' className='text-blue-400 font-bold hover:text-blue-300'>
-                Join as a Buyer
+              <Link to='/signup' className='text-blue-400 font-bold hover:text-blue-300 transition-colors'>
+                Join as a New Member
               </Link>
-            </p>
-            <p className='text-gray-400 text-sm'>
-              Want to sell your products?{' '}
-              <a href='https://vendor.abcdvyapar.com' target='_blank' rel='noopener noreferrer' className='text-green-400 font-bold hover:text-green-300'>
-                Join as a Vendor
-              </a>
             </p>
           </div>
         </div>

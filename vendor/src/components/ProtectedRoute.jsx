@@ -37,14 +37,8 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to='/login' state={{ from: location }} replace />
   }
 
-  // Check if business application submitted (skip check for /business-form and /pending-approval pages)
-  if (vendor && !vendor.isBusinessApplicationSubmitted && location.pathname !== '/business-form' && location.pathname !== '/pending-approval') {
-    console.log('📋 ProtectedRoute: Business application not submitted, redirecting to form')
-    return <Navigate to='/business-form' replace />
-  }
-
-  // Check if vendor is verified/approved by admin (skip check for /business-form and /pending-approval pages)
-  if (vendor && vendor.isBusinessApplicationSubmitted && !vendor.isVerified && location.pathname !== '/business-form' && location.pathname !== '/pending-approval') {
+  // Check if vendor is verified/approved by admin (skip check for /pending-approval page)
+  if (vendor && !vendor.isVerified && location.pathname !== '/pending-approval') {
     console.log('⏳ ProtectedRoute: Vendor not verified, redirecting to pending approval page')
     return <Navigate to='/pending-approval' replace />
   }

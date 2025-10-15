@@ -8,14 +8,15 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, password } = req.body;
+    let { email, mobile, ownerName, businessName } = req.body;
 
     // Trim input fields
     email = email?.trim();
-    password = password?.trim();
+    ownerName = ownerName?.trim();
+    businessName = businessName?.trim();
 
-    if (!email || !mobile || !password) {
-      return res.status(400).json({ success: false, message: "Email, mobile, and password are required" });
+    if (!email || !mobile || !ownerName || !businessName) {
+      return res.status(400).json({ success: false, message: "Email, mobile, owner name, and business name are required" });
     }
 
     // Validate Indian mobile number
@@ -46,13 +47,12 @@ const handleVendorSignup = async (req, res) => {
       }
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 8);
-
     const newVendorData = {
       email,
-      password: hashedPassword,
       mobile,
+      ownerName,
+      businessName,
+      isBusinessApplicationSubmitted: true, // Skip business form, go directly to pending approval
     };
 
     // Create new vendor
@@ -80,7 +80,7 @@ const handleVendorSignup = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Vendor registered successfully",
+      message: "Vendor registered successfully. We will review your details and contact you soon.",
       vendorData: vendorObj,
     });
   } catch (err) {

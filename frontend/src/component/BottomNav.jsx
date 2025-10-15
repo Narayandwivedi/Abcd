@@ -81,11 +81,11 @@ const BottomNav = () => {
         <div className='flex gap-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg px-4 py-0.5 border border-orange-200'>
           {/* Join as Buyer */}
           <Link
-            to='/register'
+            to='/signup'
             className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
           >
             <div className={`w-6 h-6 rounded-md flex items-center justify-center shadow-sm ${
-              isActive('/register')
+              isActive('/signup')
                 ? 'bg-gradient-to-br from-orange-600 to-orange-700 text-white'
                 : 'bg-gradient-to-br from-orange-500 to-orange-600 text-white'
             }`}>
@@ -93,7 +93,7 @@ const BottomNav = () => {
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' />
               </svg>
             </div>
-            <span className={`text-[8px] mt-0.5 leading-tight text-center font-medium ${isActive('/register') ? 'text-orange-700' : 'text-orange-600'}`}>Join<br/>Buyer</span>
+            <span className={`text-[8px] mt-0.5 leading-tight text-center font-medium ${isActive('/signup') ? 'text-orange-700' : 'text-orange-600'}`}>Join<br/>Buyer</span>
           </Link>
 
           {/* Login as Buyer */}

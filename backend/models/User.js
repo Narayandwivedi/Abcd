@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  gotra: {
+    type: String,
+    enum: ["Garg", "Mangal", "Goel", "Kansal", "Singhal", "Mittal", "Bansal", "Jindal", "Tayal", "Goyal", "Bindal", "Narangal", "Bhandal", "Airan", "Dharan", "Madhukul", "Kuchhal", "Nangal"],
+    required: true,
+  },
   role: {
     type: String,
     enum: ["user", "admin",'vendor'],
@@ -22,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: false, // Not required for Google OAuth users
+    required: false, // Not required for Google OAuth users or regular signup
   },
   googleId: {
     type: String,

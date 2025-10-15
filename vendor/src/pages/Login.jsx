@@ -89,21 +89,6 @@ const Login = () => {
             </a>
           </div>
 
-          {/* Google Login */}
-          <div className='mb-5 sm:mb-6'>
-            <GoogleLogin />
-          </div>
-
-          {/* Divider */}
-          <div className='relative mb-5 sm:mb-6'>
-            <div className='absolute inset-0 flex items-center'>
-              <div className='w-full border-t-2 border-gray-200'></div>
-            </div>
-            <div className='relative flex justify-center'>
-              <span className='px-3 sm:px-4 bg-white text-xs sm:text-sm font-semibold text-gray-500'>Or sign in with email</span>
-            </div>
-          </div>
-
           {/* Login Form */}
           <form onSubmit={handleSubmit} className='space-y-4 sm:space-y-5'>
             {/* Email/Mobile Input */}
@@ -198,10 +183,6 @@ const Login = () => {
 
         {/* Footer */}
         <div className='text-center px-6 sm:px-0 pb-8 sm:pb-0'>
-          <div className='flex items-center justify-center gap-2 text-gray-500 text-xs sm:text-sm mb-3'>
-            <Shield className='w-3 h-3 sm:w-4 sm:h-4' />
-            <span>Secured with end-to-end encryption</span>
-          </div>
           <p className='text-xs sm:text-sm text-gray-600'>
             Need help?{' '}
             <a href='#' className='font-bold text-indigo-600 hover:text-indigo-700 transition-colors'>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Navbar from './component/Navbar'
@@ -13,9 +13,12 @@ import Contact from './pages/Contact'
 import ForgotPassword from './pages/ForgotPassword'
 
 const App = () => {
+  const location = useLocation()
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
+
   return (
-    <div className='flex flex-col min-h-screen'>
-      <Navbar />
+    <div className={isAuthPage ? '' : 'flex flex-col min-h-screen'}>
+      {!isAuthPage && <Navbar />}
       <div className='pb-0 md:pb-0'>
         <Routes>
           <Route path='/' element={<Home />} />
@@ -26,8 +29,8 @@ const App = () => {
           <Route path='/forgot-password' element={<ForgotPassword />} />
         </Routes>
       </div>
-      <Footer />
-      <BottomNav />
+      {!isAuthPage && <Footer />}
+      {!isAuthPage && <BottomNav />}
 
       {/* Toast Notification Container */}
       <ToastContainer

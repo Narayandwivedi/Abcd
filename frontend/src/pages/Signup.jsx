@@ -5,18 +5,15 @@ import { toast } from 'react-toastify'
 import GoogleLogin from '../component/GoogleLogin'
 
 const Signup = () => {
-  const { backendUrl, checkAuthStatus } = useContext(AppContext)
+  const { BACKEND_URL, checkAuthStatus } = useContext(AppContext)
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     mobile: '',
-    password: '',
-    confirmPassword: ''
+    gotra: ''
   })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
   // Redirect if already logged in
@@ -38,19 +35,6 @@ const Signup = () => {
     e.preventDefault()
     setLoading(true)
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match')
-      setLoading(false)
-      return
-    }
-
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters')
-      setLoading(false)
-      return
-    }
-
     // Validate mobile number (10 digits starting with 6-9)
     const mobileRegex = /^[6-9]\d{9}$/
     if (!mobileRegex.test(formData.mobile)) {
@@ -60,7 +44,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch(`${backendUrl}/api/auth/signup`, {
+      const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,14 +54,16 @@ const Signup = () => {
           fullName: formData.fullName,
           email: formData.email,
           mobile: parseInt(formData.mobile),
-          password: formData.password,
+          gotra: formData.gotra,
         }),
       })
 
       const data = await response.json()
 
       if (data.success) {
-        toast.success(data.message || 'Account created successfully!')
+        toast.success('Account created successfully! We will review your details and contact you soon.', {
+          autoClose: 5000,
+        })
         // Update auth state
         if (checkAuthStatus) {
           await checkAuthStatus()
@@ -87,7 +73,9 @@ const Signup = () => {
           window.dispatchEvent(new Event('authChange'))
         }
         // Navigate to home
-        navigate('/', { replace: true })
+        setTimeout(() => {
+          navigate('/', { replace: true })
+        }, 2000)
       } else {
         toast.error(data.message || 'Signup failed')
       }
@@ -100,48 +88,33 @@ const Signup = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center py-12 px-4 relative overflow-hidden'>
+    <div className='h-screen w-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center px-4 relative overflow-hidden fixed inset-0'>
       {/* Decorative Background Elements */}
       <div className='absolute inset-0 overflow-hidden'>
         <div className='absolute top-20 right-20 w-96 h-96 bg-purple-500 opacity-10 rounded-full blur-3xl'></div>
         <div className='absolute bottom-20 left-20 w-80 h-80 bg-blue-500 opacity-10 rounded-full blur-3xl'></div>
       </div>
 
-      <div className='max-w-md w-full relative z-10'>
+      <div className='max-w-md w-full relative z-10 overflow-y-auto max-h-screen py-4'>
         {/* Header */}
-        <div className='text-center mb-8'>
-          <h1 className='text-4xl font-black text-white mb-2'>Create Account</h1>
-          <p className='text-gray-400'>Join ABCD Platform today</p>
+        <div className='text-center mb-4'>
+          <h1 className='text-3xl font-black text-white mb-2'>Create Account</h1>
+          <p className='text-gray-400 text-sm'>Join ABCD Platform today</p>
         </div>
 
         {/* Signup Form */}
-        <div className='bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20'>
-          {/* Google Sign-In at Top */}
-          <div className='mb-6'>
-            <GoogleLogin />
-          </div>
-
-          {/* Divider */}
-          <div className='relative mb-6'>
-            <div className='absolute inset-0 flex items-center'>
-              <div className='w-full border-t border-white/20'></div>
-            </div>
-            <div className='relative flex justify-center text-sm'>
-              <span className='px-4 bg-white/10 text-gray-400'>Or sign up with email</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className='space-y-5'>
+        <div className='bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-white/20'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
             {/* Full Name Field */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Full Name</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>Full Name</label>
               <div className='relative'>
                 <input
                   type='text'
                   name='fullName'
                   value={formData.fullName}
                   onChange={handleChange}
-                  className='w-full px-4 py-3 pl-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm'
+                  className='w-full px-4 py-2.5 pl-10 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-sm'
                   placeholder='Enter your full name'
                   required
                 />
@@ -153,14 +126,14 @@ const Signup = () => {
 
             {/* Email Field */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Email Address</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>Email Address</label>
               <div className='relative'>
                 <input
                   type='email'
                   name='email'
                   value={formData.email}
                   onChange={handleChange}
-                  className='w-full px-4 py-3 pl-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm'
+                  className='w-full px-4 py-2.5 pl-10 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-sm'
                   placeholder='you@example.com'
                   required
                 />
@@ -172,14 +145,14 @@ const Signup = () => {
 
             {/* Mobile Number Field */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Mobile Number</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>Mobile Number</label>
               <div className='relative'>
                 <input
                   type='tel'
                   name='mobile'
                   value={formData.mobile}
                   onChange={handleChange}
-                  className='w-full px-4 py-3 pl-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm'
+                  className='w-full px-4 py-2.5 pl-10 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-sm'
                   placeholder='10-digit mobile number'
                   maxLength='10'
                   required
@@ -190,73 +163,43 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Password Field */}
+            {/* Gotra Dropdown */}
             <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Password</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>Gotra</label>
               <div className='relative'>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name='password'
-                  value={formData.password}
+                <select
+                  name='gotra'
+                  value={formData.gotra}
                   onChange={handleChange}
-                  className='w-full px-4 py-3 pl-11 pr-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm'
-                  placeholder='Create a password'
+                  className='w-full px-4 py-2.5 pl-10 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-sm appearance-none cursor-pointer'
                   required
-                />
-                <svg className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' />
-                </svg>
-                <button
-                  type='button'
-                  onClick={() => setShowPassword(!showPassword)}
-                  className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300'
                 >
-                  {showPassword ? (
-                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21' />
-                    </svg>
-                  ) : (
-                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password Field */}
-            <div>
-              <label className='block text-white font-semibold mb-2 text-sm'>Confirm Password</label>
-              <div className='relative'>
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name='confirmPassword'
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className='w-full px-4 py-3 pl-11 pr-11 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm'
-                  placeholder='Confirm your password'
-                  required
-                />
+                  <option value='' className='bg-gray-800'>Select your Gotra</option>
+                  <option value='Garg' className='bg-gray-800'>Garg</option>
+                  <option value='Mangal' className='bg-gray-800'>Mangal</option>
+                  <option value='Goel' className='bg-gray-800'>Goel</option>
+                  <option value='Kansal' className='bg-gray-800'>Kansal</option>
+                  <option value='Singhal' className='bg-gray-800'>Singhal</option>
+                  <option value='Mittal' className='bg-gray-800'>Mittal</option>
+                  <option value='Bansal' className='bg-gray-800'>Bansal</option>
+                  <option value='Jindal' className='bg-gray-800'>Jindal</option>
+                  <option value='Tayal' className='bg-gray-800'>Tayal</option>
+                  <option value='Goyal' className='bg-gray-800'>Goyal</option>
+                  <option value='Bindal' className='bg-gray-800'>Bindal</option>
+                  <option value='Narangal' className='bg-gray-800'>Narangal</option>
+                  <option value='Bhandal' className='bg-gray-800'>Bhandal</option>
+                  <option value='Airan' className='bg-gray-800'>Airan</option>
+                  <option value='Dharan' className='bg-gray-800'>Dharan</option>
+                  <option value='Madhukul' className='bg-gray-800'>Madhukul</option>
+                  <option value='Kuchhal' className='bg-gray-800'>Kuchhal</option>
+                  <option value='Nangal' className='bg-gray-800'>Nangal</option>
+                </select>
                 <svg className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' />
                 </svg>
-                <button
-                  type='button'
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300'
-                >
-                  {showConfirmPassword ? (
-                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21' />
-                    </svg>
-                  ) : (
-                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
-                    </svg>
-                  )}
-                </button>
+                <svg className='absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                </svg>
               </div>
             </div>
 
@@ -284,17 +227,17 @@ const Signup = () => {
             <button
               type='submit'
               disabled={loading}
-              className='w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
+              className='w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm'
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 
           {/* Login Link */}
-          <div className='mt-8 text-center'>
-            <p className='text-gray-400 text-sm'>
+          <div className='mt-6 text-center'>
+            <p className='text-gray-300 text-sm'>
               Already have an account?{' '}
-              <Link to='/login' className='text-purple-400 font-bold hover:text-purple-300'>
+              <Link to='/login' className='text-purple-400 font-bold hover:text-purple-300 transition-colors'>
                 Sign In
               </Link>
             </p>
