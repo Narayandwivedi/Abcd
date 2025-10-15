@@ -4,7 +4,7 @@ const YouTubeDemo = () => {
   return (
     <section className='py-1 pb-2 lg:py-2 lg:pb-3 bg-gray-100'>
       <div className='container mx-auto px-4'>
-        <div className='max-w-xs lg:max-w-sm mx-auto'>
+        <div className='max-w-xs lg:max-w-4xl mx-auto'>
           {/* YouTube Video Container */}
           <div className='relative w-full bg-white rounded shadow-sm overflow-hidden'>
             <div className='relative' style={{ paddingBottom: '40%' }}>

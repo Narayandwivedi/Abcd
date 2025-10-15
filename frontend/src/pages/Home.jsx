@@ -3,25 +3,56 @@ import WhatsAppButton from '../component/WhatsAppButton'
 import YouTubeDemo from '../component/YouTubeDemo'
 
 const Home = () => {
-  const [currentSlide, setCurrentSlide] = useState(0)
+  const adImages = [
+    '/ad1.webp',
+    '/ad2.webp',
+    '/ad3.webp',
+    '/ad4.webp',
+    '/ad5.webp',
+    '/ad6.webp',
+    '/ad7.webp'
+  ]
 
-  // Auto-slide functionality - cycles through 0, 1, 2, 3 for mobile (showing 2 ads at a time)
+  // Start from the middle set (second set of 7 images)
+  const [currentSlide, setCurrentSlide] = useState(adImages.length)
+  const [isTransitioning, setIsTransitioning] = useState(true)
+
+  // Auto-slide functionality - infinite scroll to the right
   useEffect(() => {
     const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 4) // 0, 1, 2, 3 then back to 0
+      setCurrentSlide((prev) => prev + 1)
     }, 3000) // Change slide every 3 seconds
 
     return () => clearInterval(slideInterval)
   }, [])
 
-  // Manual navigation functions
+  // Reset position for infinite loop effect
+  useEffect(() => {
+    // When we reach the end of the second set, instantly reset to the first set
+    if (currentSlide >= adImages.length * 2) {
+      setTimeout(() => {
+        setIsTransitioning(false)
+        setCurrentSlide(adImages.length)
+        setTimeout(() => setIsTransitioning(true), 50)
+      }, 500) // Wait for transition to complete
+    }
+    // When going backward past the first set, reset to the second set
+    if (currentSlide < adImages.length) {
+      setIsTransitioning(false)
+      setCurrentSlide(adImages.length)
+      setTimeout(() => setIsTransitioning(true), 50)
+    }
+  }, [currentSlide, adImages.length])
+
+  // Manual navigation functions - always move forward
   const handlePrevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? 3 : prev - 1))
+    setCurrentSlide((prev) => prev - 1)
   }
 
   const handleNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % 4)
+    setCurrentSlide((prev) => prev + 1)
   }
+
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Search Bar Section */}
@@ -116,65 +147,20 @@ const Home = () => {
       {/* Sponsored Ads Section - Row 2 */}
       <section className='pb-1 lg:py-2 bg-white'>
         <div className='container mx-auto px-4'>
-          {/* Desktop: Show all 5 in grid */}
+          {/* Desktop: Show all ads in grid */}
           <div className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'>
-            {/* Ad 1 */}
-            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
-              <div className='bg-gradient-to-br from-teal-500 to-teal-600 h-40 flex items-center justify-center'>
-                <div className='text-white text-center p-4'>
-                  <div className='text-4xl mb-2'>🎁</div>
-                  <h3 className='font-bold text-lg'>Gift Ideas</h3>
-                  <p className='text-sm opacity-90'>Perfect Presents</p>
-                </div>
+            {adImages.slice(0, 5).map((ad, index) => (
+              <div key={index} className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
+                <img
+                  src={ad}
+                  alt={`Advertisement ${index + 1}`}
+                  className='w-full h-40 object-cover'
+                />
               </div>
-            </div>
-
-            {/* Ad 2 */}
-            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
-              <div className='bg-gradient-to-br from-indigo-500 to-indigo-600 h-40 flex items-center justify-center'>
-                <div className='text-white text-center p-4'>
-                  <div className='text-4xl mb-2'>📚</div>
-                  <h3 className='font-bold text-lg'>Education</h3>
-                  <p className='text-sm opacity-90'>Learn & Grow</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Ad 3 */}
-            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
-              <div className='bg-gradient-to-br from-rose-500 to-rose-600 h-40 flex items-center justify-center'>
-                <div className='text-white text-center p-4'>
-                  <div className='text-4xl mb-2'>💄</div>
-                  <h3 className='font-bold text-lg'>Beauty</h3>
-                  <p className='text-sm opacity-90'>Style & Care</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Ad 4 */}
-            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
-              <div className='bg-gradient-to-br from-amber-500 to-amber-600 h-40 flex items-center justify-center'>
-                <div className='text-white text-center p-4'>
-                  <div className='text-4xl mb-2'>🏡</div>
-                  <h3 className='font-bold text-lg'>Home</h3>
-                  <p className='text-sm opacity-90'>Comfort Living</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Ad 5 */}
-            <div className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200'>
-              <div className='bg-gradient-to-br from-cyan-500 to-cyan-600 h-40 flex items-center justify-center'>
-                <div className='text-white text-center p-4'>
-                  <div className='text-4xl mb-2'>⚡</div>
-                  <h3 className='font-bold text-lg'>Tech</h3>
-                  <p className='text-sm opacity-90'>Latest Gadgets</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Mobile: Horizontal sliding carousel (First: 85%-15%, Then: 10%-80%-10%) */}
+          {/* Mobile: Horizontal sliding carousel */}
           <div className='lg:hidden relative mx-auto overflow-hidden'>
             {/* Previous Button */}
             <button
@@ -199,77 +185,26 @@ const Home = () => {
             </button>
 
             <div
-              className='flex transition-transform duration-500 ease-in-out'
+              className='flex'
               style={{
-                transform: currentSlide === 0
-                  ? 'translateX(0)'
-                  : `translateX(calc(-70% - ${(currentSlide - 1) * 80}%))`
+                transform: `translateX(calc(-${currentSlide * 80}%))`,
+                transition: isTransitioning ? 'transform 500ms ease-in-out' : 'none'
               }}
             >
-              {/* Ad 1 */}
-              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-teal-500 to-teal-600 h-26 flex items-center justify-center'>
-                    <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-0.5'>🎁</div>
-                      <h3 className='font-bold text-sm'>Gift Ideas</h3>
-                      <p className='text-[10px] opacity-90'>Perfect Presents</p>
+              {/* Render 3 sets of images for seamless infinite scrolling */}
+              {[...Array(3)].map((_, setIndex) =>
+                adImages.map((ad, index) => (
+                  <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
+                    <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
+                      <img
+                        src={ad}
+                        alt={`Advertisement ${index + 1}`}
+                        className='w-full h-32 object-cover'
+                      />
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Ad 2 */}
-              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-indigo-500 to-indigo-600 h-26 flex items-center justify-center'>
-                    <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-0.5'>📚</div>
-                      <h3 className='font-bold text-sm'>Education</h3>
-                      <p className='text-[10px] opacity-90'>Learn & Grow</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ad 3 */}
-              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-rose-500 to-rose-600 h-26 flex items-center justify-center'>
-                    <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-0.5'>💄</div>
-                      <h3 className='font-bold text-sm'>Beauty</h3>
-                      <p className='text-[10px] opacity-90'>Style & Care</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ad 4 */}
-              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-amber-500 to-amber-600 h-26 flex items-center justify-center'>
-                    <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-0.5'>🏡</div>
-                      <h3 className='font-bold text-sm'>Home</h3>
-                      <p className='text-[10px] opacity-90'>Comfort Living</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ad 5 */}
-              <div className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full border border-gray-200'>
-                  <div className='bg-gradient-to-br from-cyan-500 to-cyan-600 h-26 flex items-center justify-center'>
-                    <div className='text-white text-center p-2'>
-                      <div className='text-2xl mb-0.5'>⚡</div>
-                      <h3 className='font-bold text-sm'>Tech</h3>
-                      <p className='text-[10px] opacity-90'>Latest Gadgets</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                ))
+              )}
             </div>
           </div>
         </div>
