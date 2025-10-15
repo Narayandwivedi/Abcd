@@ -126,7 +126,7 @@ const BottomNav = () => {
     {/* Gray Strip at Very Bottom - Mobile Only */}
     <div className='md:hidden fixed bottom-0 left-0 right-0 bg-slate-700 text-white text-center py-0.5 z-40 h-5'>
       <p className='text-[9px] font-medium leading-4'>
-        Empowering growth & empowering unity
+        Empowering growth & empowering unity - Lalit Agrawal (Chairman, Abcd)
       </p>
     </div>
     </>
