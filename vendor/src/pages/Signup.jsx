@@ -5,6 +5,7 @@ import {
   User,
   Mail,
   Phone,
+  MapPin,
   Loader2,
   ArrowLeft,
   CheckCircle
@@ -24,7 +25,7 @@ const Signup = () => {
     businessName: '',
     email: '',
     mobile: '',
-    acceptTerms: false
+    city: ''
   })
 
   // Redirect if already logged in
@@ -48,23 +49,19 @@ const Signup = () => {
     setError('')
 
     // Validation
-    if (!formData.ownerName || !formData.businessName || !formData.email || !formData.mobile) {
-      setError('Please fill in all fields')
+    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.city) {
+      setError('Please fill in all required fields')
       return
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    // Email validation only if provided
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError('Please enter a valid email address')
       return
     }
 
     if (!/^[6-9]\d{9}$/.test(formData.mobile)) {
       setError('Please enter a valid 10-digit mobile number')
-      return
-    }
-
-    if (!formData.acceptTerms) {
-      setError('You must accept the terms and conditions')
       return
     }
 
@@ -76,6 +73,7 @@ const Signup = () => {
         businessName: formData.businessName,
         email: formData.email,
         mobile: parseInt(formData.mobile),
+        city: formData.city,
       })
 
       if (result.success) {
@@ -173,24 +171,6 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Email */}
-            <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2'>
-                Email Address <span className='text-red-500'>*</span>
-              </label>
-              <div className='relative'>
-                <Mail className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                <input
-                  type='email'
-                  name='email'
-                  value={formData.email}
-                  onChange={handleChange}
-                  className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
-                  placeholder='vendor@example.com'
-                />
-              </div>
-            </div>
-
             {/* Mobile */}
             <div>
               <label className='block text-sm font-bold text-gray-700 mb-2'>
@@ -210,28 +190,73 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Terms */}
-            <div className='bg-green-50 border-2 border-green-200 rounded-xl p-3'>
-              <label className='flex items-start gap-2 cursor-pointer'>
-                <input
-                  type='checkbox'
-                  name='acceptTerms'
-                  checked={formData.acceptTerms}
-                  onChange={handleChange}
-                  className='mt-0.5 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 cursor-pointer'
-                />
-                <span className='text-xs text-gray-700 leading-relaxed'>
-                  I agree to the{' '}
-                  <a href='#' className='text-indigo-600 font-bold hover:underline'>
-                    Terms & Conditions
-                  </a>{' '}
-                  and{' '}
-                  <a href='#' className='text-indigo-600 font-bold hover:underline'>
-                    Privacy Policy
-                  </a>
-                  . I understand I'll need to complete my business profile after registration.
-                </span>
+            {/* City */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                City <span className='text-red-500'>*</span>
               </label>
+              <div className='relative'>
+                <MapPin className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                <select
+                  name='city'
+                  value={formData.city}
+                  onChange={handleChange}
+                  className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer'
+                >
+                  <option value=''>Select your District</option>
+                  <option value='Balod'>Balod</option>
+                  <option value='Baloda Bazar'>Baloda Bazar</option>
+                  <option value='Balrampur'>Balrampur</option>
+                  <option value='Bastar'>Bastar</option>
+                  <option value='Bemetara'>Bemetara</option>
+                  <option value='Bijapur'>Bijapur</option>
+                  <option value='Bilaspur'>Bilaspur</option>
+                  <option value='Dantewada'>Dantewada</option>
+                  <option value='Dhamtari'>Dhamtari</option>
+                  <option value='Durg'>Durg</option>
+                  <option value='Gariaband'>Gariaband</option>
+                  <option value='Gaurela-Pendra-Marwahi'>Gaurela-Pendra-Marwahi</option>
+                  <option value='Janjgir-Champa'>Janjgir-Champa</option>
+                  <option value='Jashpur'>Jashpur</option>
+                  <option value='Kanker'>Kanker</option>
+                  <option value='Kawardha'>Kawardha (Kabirdham)</option>
+                  <option value='Khairagarh-Chhuikhadan-Gandai'>Khairagarh-Chhuikhadan-Gandai</option>
+                  <option value='Kondagaon'>Kondagaon</option>
+                  <option value='Korba'>Korba</option>
+                  <option value='Korea'>Korea (Koriya)</option>
+                  <option value='Mahasamund'>Mahasamund</option>
+                  <option value='Manendragarh-Chirmiri-Bharatpur'>Manendragarh-Chirmiri-Bharatpur</option>
+                  <option value='Mohla-Manpur-Ambagarh Chouki'>Mohla-Manpur-Ambagarh Chouki</option>
+                  <option value='Mungeli'>Mungeli</option>
+                  <option value='Narayanpur'>Narayanpur</option>
+                  <option value='Raigarh'>Raigarh</option>
+                  <option value='Raipur'>Raipur</option>
+                  <option value='Rajnandgaon'>Rajnandgaon</option>
+                  <option value='Sakti'>Sakti</option>
+                  <option value='Sarangarh-Bilaigarh'>Sarangarh-Bilaigarh</option>
+                  <option value='Sukma'>Sukma</option>
+                  <option value='Surajpur'>Surajpur</option>
+                  <option value='Surguja'>Surguja</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                Email Address <span className='text-gray-500'>(Optional)</span>
+              </label>
+              <div className='relative'>
+                <Mail className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                <input
+                  type='email'
+                  name='email'
+                  value={formData.email}
+                  onChange={handleChange}
+                  className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
+                  placeholder='vendor@example.com (optional)'
+                />
+              </div>
             </div>
 
             {/* Error Message */}

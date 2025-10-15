@@ -48,7 +48,7 @@ const BottomNav = () => {
         <div className='flex gap-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-4 py-0.5 border border-purple-200'>
           {/* Join as Vendor */}
           <a
-            href='https://vendor.abcdvyapar.com/register'
+            href='https://vendor.abcdvyapar.com/signup'
             target='_blank'
             rel='noopener noreferrer'
             className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
