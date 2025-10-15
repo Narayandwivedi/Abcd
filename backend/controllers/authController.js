@@ -17,8 +17,8 @@ const handelUserSignup = async (req, res) => {
     fullName = fullName?.trim();
     email = email?.trim();
 
-    if (!fullName || !email || !mobile || !gotra) {
-      return res.status(400).json({ success: false, message: "missing field" });
+    if (!fullName || !mobile || !gotra) {
+      return res.status(400).json({ success: false, message: "Full name, mobile, and gotra are required" });
     }
 
     // Validate Indian mobile number
@@ -29,13 +29,15 @@ const handelUserSignup = async (req, res) => {
       });
     }
 
-    // Check if user already exists by email or mobile
-    const existingUser = await userModel.findOne({
-      $or: [{ email }, { mobile }]
-    });
+    // Check if user already exists by mobile (or email if provided)
+    const query = email
+      ? { $or: [{ email }, { mobile }] }
+      : { mobile };
+
+    const existingUser = await userModel.findOne(query);
 
     if (existingUser) {
-      if (existingUser.email === email) {
+      if (email && existingUser.email === email) {
         return res.status(400).json({
           success: false,
           message: "Email already exists",
@@ -51,10 +53,14 @@ const handelUserSignup = async (req, res) => {
 
     const newUserData = {
       fullName,
-      email,
       mobile,
       gotra,
     };
+
+    // Add email only if provided
+    if (email) {
+      newUserData.email = email;
+    }
 
     // Create new user
     const newUser = await userModel.create(newUserData);

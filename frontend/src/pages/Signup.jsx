@@ -107,7 +107,9 @@ const Signup = () => {
           <form onSubmit={handleSubmit} className='space-y-4'>
             {/* Full Name Field */}
             <div>
-              <label className='block text-white font-semibold mb-1.5 text-sm'>Full Name</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>
+                Full Name <span className='text-red-400'>*</span>
+              </label>
               <div className='relative'>
                 <input
                   type='text'
@@ -126,7 +128,7 @@ const Signup = () => {
 
             {/* Email Field */}
             <div>
-              <label className='block text-white font-semibold mb-1.5 text-sm'>Email Address</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>Email Address (Optional)</label>
               <div className='relative'>
                 <input
                   type='email'
@@ -134,8 +136,7 @@ const Signup = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className='w-full px-4 py-2.5 pl-10 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-sm'
-                  placeholder='you@example.com'
-                  required
+                  placeholder='you@example.com (optional)'
                 />
                 <svg className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207' />
@@ -145,7 +146,9 @@ const Signup = () => {
 
             {/* Mobile Number Field */}
             <div>
-              <label className='block text-white font-semibold mb-1.5 text-sm'>Mobile Number</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>
+                Mobile Number <span className='text-red-400'>*</span>
+              </label>
               <div className='relative'>
                 <input
                   type='tel'
@@ -165,7 +168,9 @@ const Signup = () => {
 
             {/* Gotra Dropdown */}
             <div>
-              <label className='block text-white font-semibold mb-1.5 text-sm'>Gotra</label>
+              <label className='block text-white font-semibold mb-1.5 text-sm'>
+                Gotra <span className='text-red-400'>*</span>
+              </label>
               <div className='relative'>
                 <select
                   name='gotra'

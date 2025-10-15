@@ -7,13 +7,14 @@ const userSchema = new mongoose.Schema({
   },
   mobile: {
     type: Number,
+    required: true,
     unique: true,
-    sparse: true, // Allow null values for Google users
   },
   email: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
+    sparse: true, // Allow null/undefined values for unique index
   },
   gotra: {
     type: String,
