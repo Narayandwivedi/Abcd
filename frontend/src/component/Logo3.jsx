@@ -1,8 +1,9 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Logo = () => {
   return (
-    <div className='inline-block'>
+    <Link to='/' className='inline-block cursor-pointer hover:opacity-90 transition-opacity'>
       {/* Premium Logo Design */}
       <div className='relative'>
         {/* Main Container */}
@@ -62,7 +63,7 @@ const Logo = () => {
             </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 

@@ -36,6 +36,14 @@ const Navbar = () => {
             About
             <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300'></span>
           </Link>
+          <Link to='/blog' className='text-gray-700 font-medium hover:text-blue-600 transition-colors relative group'>
+            Blog
+            <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300'></span>
+          </Link>
+          <Link to='/gallery' className='text-gray-700 font-medium hover:text-blue-600 transition-colors relative group'>
+            Gallery
+            <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300'></span>
+          </Link>
           <Link to='/contact' className='text-gray-700 font-medium hover:text-blue-600 transition-colors relative group'>
             Contact
             <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300'></span>
@@ -173,6 +181,20 @@ const Navbar = () => {
               className='block text-gray-700 font-medium hover:text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors'
             >
               About
+            </Link>
+            <Link
+              to='/blog'
+              onClick={() => setShowMobileMenu(false)}
+              className='block text-gray-700 font-medium hover:text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors'
+            >
+              Blog
+            </Link>
+            <Link
+              to='/gallery'
+              onClick={() => setShowMobileMenu(false)}
+              className='block text-gray-700 font-medium hover:text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors'
+            >
+              Gallery
             </Link>
             <Link
               to='/contact'

@@ -49,15 +49,30 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Address */}
+          <div>
+            <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Address</h4>
+            <div className='space-y-1 md:space-y-2 text-gray-400 text-[10px] md:text-sm'>
+              <p>Agrawal Business and Community Development (ABCD)</p>
+              <p>Hanuman Market, Ramsagar Para,</p>
+              <p className='font-bold text-yellow-400'>RAIPUR (CG) 492001</p>
+            </div>
+          </div>
+
           {/* Contact */}
           <div>
             <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Contact</h4>
-            <ul className='space-y-1 md:space-y-2 text-gray-400 text-[10px] md:text-sm'>
-              <li>Email: cgpasabcd@gmail.com</li>
-              <li>Tele: 0771-3562323</li>
-              <li>Mob: +91 9993961778</li>
-              <li>Address: Hanuman Market, Ramsagar Para,<br/><span className='font-bold text-yellow-400'>RAIPUR (CG)</span> <span className='font-bold text-yellow-400'>492001</span></li>
-            </ul>
+            <div className='space-y-1 md:space-y-2 text-gray-400 text-[10px] md:text-sm'>
+              <p>
+                Tele: <a href='tel:07713562323' className='hover:text-white transition underline'>0771-3562323</a>
+              </p>
+              <p>
+                Mob: <a href='tel:+919993961778' className='hover:text-white transition underline'>+91 9993961778</a>
+              </p>
+              <p>
+                Email: <a href='mailto:cgpasabcd@gmail.com' className='hover:text-white transition underline'>cgpasabcd@gmail.com</a>
+              </p>
+            </div>
           </div>
         </div>
 

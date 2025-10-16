@@ -7,6 +7,9 @@ import Footer from './component/Footer'
 import BottomNav from './component/BottomNav'
 import Home from './pages/Home'
 import About from './pages/About'
+import Blog from './pages/Blog'
+import BlogDetail from './pages/BlogDetail'
+import Gallery from './pages/Gallery'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Contact from './pages/Contact'
@@ -23,6 +26,9 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/about' element={<About />} />
+          <Route path='/blog' element={<Blog />} />
+          <Route path='/blog/:id' element={<BlogDetail />} />
+          <Route path='/gallery' element={<Gallery />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
           <Route path='/contact' element={<Contact />} />
