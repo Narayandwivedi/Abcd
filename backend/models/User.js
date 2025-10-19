@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: false,
     unique: true,
     sparse: true, // Allow null/undefined values for unique index
   },
@@ -21,6 +20,9 @@ const userSchema = new mongoose.Schema({
     enum: ["Garg", "Mangal", "Goel", "Kansal", "Singhal", "Mittal", "Bansal", "Jindal", "Tayal", "Goyal", "Bindal", "Narangal", "Bhandal", "Airan", "Dharan", "Madhukul", "Kuchhal", "Nangal"],
     required: true,
   },
+  city: {
+    type: String,
+  },
   role: {
     type: String,
     enum: ["user", "admin",'vendor'],
@@ -28,7 +30,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: false, // Not required for Google OAuth users or regular signup
   },
   googleId: {
     type: String,
@@ -44,16 +45,6 @@ const userSchema = new mongoose.Schema({
     default: 'local',
   },
   
-  bankAccount: {
-    accountHolderName: String,
-    accountNumber: String,
-    ifscCode: String,
-    bankName: String,
-  },
-  upiId: {
-    upi: { type: String },
-    accountHolderName: { type: String },
-  },
   isVerified: {
     type: Boolean,
     default: false,
@@ -71,6 +62,16 @@ const userSchema = new mongoose.Schema({
   },
   otpExpiresAt: {
     type: Date,
+  },
+  paymentScreenshot: {
+    type: String,
+  },
+  utrNumber: {
+    type: String,
+  },
+  paymentVerified: {
+    type: Boolean,
+    default: false,
   },
 
 }, { timestamps: true });

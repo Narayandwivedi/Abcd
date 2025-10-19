@@ -4,13 +4,12 @@ const vendorSchema = new mongoose.Schema({
   // Authentication Fields
   email: {
     type: String,
-    required: true,
     unique: true,
   },
   mobile: {
     type: Number,
+    required:true,
     unique: true,
-    sparse: true, // Allow null/undefined values for unique index
   },
   ownerName: {
     type: String,
@@ -22,7 +21,6 @@ const vendorSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: false, // Admin will set this later
   },
 
   // Google OAuth fields
@@ -40,11 +38,6 @@ const vendorSchema = new mongoose.Schema({
     default: 'local',
   },
 
-  // Application & Verification Status
-  isBusinessApplicationSubmitted: {
-    type: Boolean,
-    default: false,
-  },
   isVerified: {
     type: Boolean,
     default: false,
@@ -57,13 +50,6 @@ const vendorSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-
-  // Reference to approved application (for quick access)
-  approvedApplicationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "BusinessApplication",
-  },
-
 
 }, { timestamps: true });
 

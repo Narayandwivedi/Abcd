@@ -2,6 +2,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.js");
 const { OAuth2Client } = require('google-auth-library');
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -11,14 +14,24 @@ const handelUserSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { fullName, email, mobile, gotra } = req.body;
+    let { fullName, email, mobile, gotra, city, utrNumber } = req.body;
 
     // Trim input fields
     fullName = fullName?.trim();
     email = email?.trim();
+    city = city?.trim();
+    utrNumber = utrNumber?.trim();
 
     if (!fullName || !mobile || !gotra) {
       return res.status(400).json({ success: false, message: "Full name, mobile, and gotra are required" });
+    }
+
+    // Validate payment information - either UTR or screenshot must be provided
+    if (!utrNumber && !req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide either UTR number or payment screenshot"
+      });
     }
 
     // Validate Indian mobile number
@@ -37,6 +50,11 @@ const handelUserSignup = async (req, res) => {
     const existingUser = await userModel.findOne(query);
 
     if (existingUser) {
+      // Clean up uploaded file if exists
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+
       if (email && existingUser.email === email) {
         return res.status(400).json({
           success: false,
@@ -57,36 +75,84 @@ const handelUserSignup = async (req, res) => {
       gotra,
     };
 
-    // Add email only if provided
+    // Add optional fields if provided
     if (email) {
       newUserData.email = email;
     }
 
-    // Create new user
+    if (city) {
+      newUserData.city = city;
+    }
+
+    // Add UTR number if provided
+    if (utrNumber) {
+      newUserData.utrNumber = utrNumber;
+    }
+
+    // Process payment screenshot if provided
+    if (req.file) {
+      try {
+        // Define output path for WebP image
+        const uploadDir = path.join(__dirname, "..", "uploads", "payment-screenshots");
+
+        // Ensure directory exists
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const webpFilename = `payment-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+        const webpPath = path.join(uploadDir, webpFilename);
+
+        // Process image: resize and convert to WebP
+        await sharp(req.file.path)
+          .resize(1200, 1200, {
+            fit: "inside",
+            withoutEnlargement: true,
+          })
+          .webp({
+            quality: 80,
+          })
+          .toFile(webpPath);
+
+        // Delete original uploaded file
+        fs.unlinkSync(req.file.path);
+
+        // Store relative path in database
+        newUserData.paymentScreenshot = `uploads/payment-screenshots/${webpFilename}`;
+      } catch (imageError) {
+        console.error("Image processing error:", imageError);
+        // Clean up files
+        if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        return res.status(500).json({
+          success: false,
+          message: "Failed to process payment screenshot"
+        });
+      }
+    }
+
+    // Create new user (without generating token - admin will verify first)
     const newUser = await userModel.create(newUserData);
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET);
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
-    });
-
-    // Remove password before sending response
+    // Remove sensitive data before sending response
     const userObj = newUser.toObject();
     delete userObj.password;
 
     return res.status(201).json({
       success: true,
-      message: "user created successfully",
+      message: "Registration submitted successfully. Admin will verify your payment and contact you.",
       userData: userObj,
     });
   } catch (err) {
     console.error("Signup Error:", err);
     console.error("Error Stack:", err.stack);
+
+    // Clean up uploaded file if exists
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
     return res.status(500).json({ success: false, message: err.message });
   }
 };

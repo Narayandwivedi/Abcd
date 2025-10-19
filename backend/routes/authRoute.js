@@ -8,11 +8,12 @@ const {
   isloggedin,
   handleGoogleAuth,
 } = require("../controllers/authController.js");
+const upload = require("../utils/multer");
 
 const router = express.Router();
 
 // User Authentication Routes
-router.post("/signup", handelUserSignup);
+router.post("/signup", upload.single('paymentImage'), handelUserSignup);
 router.post("/login", handelUserLogin);
 router.post("/logout", handleUserLogout);
 
