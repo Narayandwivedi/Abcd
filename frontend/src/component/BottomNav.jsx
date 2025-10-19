@@ -26,11 +26,11 @@ const BottomNav = () => {
   return (
     <>
       <nav className='md:hidden fixed left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50' style={{ bottom: '40px' }}>
-        <div className='flex justify-around items-center py-1 gap-6 px-4'>
+        <div className='flex justify-around items-center py-1 gap-1 px-2'>
         {/* Home */}
         <Link
           to='/'
-          className={`flex flex-col items-center justify-center px-1 py-0.5 transition-colors ${
+          className={`flex flex-col items-center justify-center px-0.5 py-0.5 transition-colors ${
             isActive('/') ? 'text-blue-600' : 'text-gray-600'
           }`}
         >
@@ -45,20 +45,20 @@ const BottomNav = () => {
         </Link>
 
         {/* Vendor Group */}
-        <div className='flex gap-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-4 py-0.5 border border-purple-200'>
+        <div className='flex gap-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-2 py-0.5 border border-purple-200'>
           {/* Join as Vendor */}
           <a
             href='https://vendor.abcdvyapar.com/signup'
             target='_blank'
             rel='noopener noreferrer'
-            className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
+            className='flex flex-col items-center justify-center px-0.5 py-0.5 transition-colors'
           >
-            <div className='w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-sm'>
-              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <div className='w-5 h-5 rounded-md flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-sm'>
+              <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' />
               </svg>
             </div>
-            <span className='text-[8px] mt-0.5 leading-tight text-center font-medium text-purple-700'>Join<br/>Vendor</span>
+            <span className='text-[7px] mt-0.5 leading-tight text-center font-medium text-purple-700'>Join as<br/>Vendor</span>
           </a>
 
           {/* Login as Vendor */}
@@ -66,51 +66,51 @@ const BottomNav = () => {
             href='https://vendor.abcdvyapar.com/login'
             target='_blank'
             rel='noopener noreferrer'
-            className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
+            className='flex flex-col items-center justify-center px-0.5 py-0.5 transition-colors'
           >
-            <div className='w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-sm'>
-              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <div className='w-5 h-5 rounded-md flex items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-sm'>
+              <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1' />
               </svg>
             </div>
-            <span className='text-[8px] mt-0.5 leading-tight text-center font-medium text-indigo-700'>Login<br/>Vendor</span>
+            <span className='text-[7px] mt-0.5 leading-tight text-center font-medium text-indigo-700'>Login as<br/>Vendor</span>
           </a>
         </div>
 
         {/* Buyer Group */}
-        <div className='flex gap-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg px-4 py-0.5 border border-orange-200'>
+        <div className='flex gap-3 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg px-2 py-0.5 border border-orange-200'>
           {/* Join as Buyer */}
           <Link
             to='/signup'
-            className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
+            className='flex flex-col items-center justify-center px-0.5 py-0.5 transition-colors'
           >
-            <div className={`w-6 h-6 rounded-md flex items-center justify-center shadow-sm ${
+            <div className={`w-5 h-5 rounded-md flex items-center justify-center shadow-sm ${
               isActive('/signup')
                 ? 'bg-gradient-to-br from-orange-600 to-orange-700 text-white'
                 : 'bg-gradient-to-br from-orange-500 to-orange-600 text-white'
             }`}>
-              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' />
               </svg>
             </div>
-            <span className={`text-[8px] mt-0.5 leading-tight text-center font-medium ${isActive('/signup') ? 'text-orange-700' : 'text-orange-600'}`}>Join<br/>Buyer</span>
+            <span className={`text-[7px] mt-0.5 leading-tight text-center font-medium ${isActive('/signup') ? 'text-orange-700' : 'text-orange-600'}`}>Join as<br/>Buyer/Member</span>
           </Link>
 
           {/* Login as Buyer */}
           <Link
             to='/login'
-            className='flex flex-col items-center justify-center px-1 py-0.5 transition-colors'
+            className='flex flex-col items-center justify-center px-0.5 py-0.5 transition-colors'
           >
-            <div className={`w-6 h-6 rounded-md flex items-center justify-center shadow-sm ${
+            <div className={`w-5 h-5 rounded-md flex items-center justify-center shadow-sm ${
               isActive('/login')
                 ? 'bg-gradient-to-br from-amber-600 to-amber-700 text-white'
                 : 'bg-gradient-to-br from-amber-500 to-amber-600 text-white'
             }`}>
-              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1' />
               </svg>
             </div>
-            <span className={`text-[8px] mt-0.5 leading-tight text-center font-medium ${isActive('/login') ? 'text-amber-700' : 'text-amber-600'}`}>Login<br/>Buyer</span>
+            <span className={`text-[7px] mt-0.5 leading-tight text-center font-medium ${isActive('/login') ? 'text-amber-700' : 'text-amber-600'}`}>Login as<br/>Buyer/Member</span>
           </Link>
         </div>
       </div>

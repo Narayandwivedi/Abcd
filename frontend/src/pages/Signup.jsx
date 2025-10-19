@@ -369,24 +369,24 @@ const Signup = () => {
                   required
                 >
                   <option value='' className='bg-gray-800'>Select your Gotra</option>
-                  <option value='Garg' className='bg-gray-800'>Garg</option>
-                  <option value='Mangal' className='bg-gray-800'>Mangal</option>
-                  <option value='Goel' className='bg-gray-800'>Goel</option>
-                  <option value='Kansal' className='bg-gray-800'>Kansal</option>
-                  <option value='Singhal' className='bg-gray-800'>Singhal</option>
-                  <option value='Mittal' className='bg-gray-800'>Mittal</option>
                   <option value='Bansal' className='bg-gray-800'>Bansal</option>
-                  <option value='Jindal' className='bg-gray-800'>Jindal</option>
-                  <option value='Tayal' className='bg-gray-800'>Tayal</option>
-                  <option value='Goyal' className='bg-gray-800'>Goyal</option>
-                  <option value='Bindal' className='bg-gray-800'>Bindal</option>
-                  <option value='Narangal' className='bg-gray-800'>Narangal</option>
-                  <option value='Bhandal' className='bg-gray-800'>Bhandal</option>
-                  <option value='Airan' className='bg-gray-800'>Airan</option>
-                  <option value='Dharan' className='bg-gray-800'>Dharan</option>
-                  <option value='Madhukul' className='bg-gray-800'>Madhukul</option>
                   <option value='Kuchhal' className='bg-gray-800'>Kuchhal</option>
+                  <option value='Kansal' className='bg-gray-800'>Kansal</option>
+                  <option value='Bindal' className='bg-gray-800'>Bindal</option>
+                  <option value='Singhal' className='bg-gray-800'>Singhal</option>
+                  <option value='Jindal' className='bg-gray-800'>Jindal</option>
+                  <option value='Mittal' className='bg-gray-800'>Mittal</option>
+                  <option value='Garg' className='bg-gray-800'>Garg</option>
                   <option value='Nangal' className='bg-gray-800'>Nangal</option>
+                  <option value='Mangal' className='bg-gray-800'>Mangal</option>
+                  <option value='Tayal' className='bg-gray-800'>Tayal</option>
+                  <option value='Tingal' className='bg-gray-800'>Tingal</option>
+                  <option value='Madhukul' className='bg-gray-800'>Madhukul</option>
+                  <option value='Goyal' className='bg-gray-800'>Goyal</option>
+                  <option value='Airan' className='bg-gray-800'>Airan</option>
+                  <option value='Goyan' className='bg-gray-800'>Goyan</option>
+                  <option value='Dharan' className='bg-gray-800'>Dharan</option>
+                  <option value='Bhandal' className='bg-gray-800'>Bhandal</option>
                 </select>
                 <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' />

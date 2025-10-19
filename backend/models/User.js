@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   gotra: {
     type: String,
-    enum: ["Garg", "Mangal", "Goel", "Kansal", "Singhal", "Mittal", "Bansal", "Jindal", "Tayal", "Goyal", "Bindal", "Narangal", "Bhandal", "Airan", "Dharan", "Madhukul", "Kuchhal", "Nangal"],
+    enum: ["Bansal", "Kuchhal", "Kansal", "Bindal", "Singhal", "Jindal", "Mittal", "Garg", "Nangal", "Mangal", "Tayal", "Tingal", "Madhukul", "Goyal", "Airan", "Goyan", "Dharan", "Bhandal"],
     required: true,
   },
   city: {
