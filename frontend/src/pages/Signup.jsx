@@ -13,16 +13,20 @@ const Signup = () => {
     fullName: '',
     email: '',
     mobile: '',
+    fatherName: '',
+    address: '',
     city: '',
     gotra: '',
+    passportPhoto: null,
     utrNumber: '',
     paymentImage: null
   })
   const [loading, setLoading] = useState(false)
   const [previewImage, setPreviewImage] = useState(null)
+  const [previewPassportPhoto, setPreviewPassportPhoto] = useState(null)
 
   // UPI ID for payment
-  const UPI_ID = '860214586@ybl'
+  const UPI_ID = '222716826030217@cnrb'
 
   // Redirect if already logged in
   useEffect(() => {
@@ -69,6 +73,36 @@ const Signup = () => {
     }
   }
 
+  const handlePassportPhotoChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!validTypes.includes(file.type)) {
+        toast.error('Please upload a valid image (JPG, PNG, or WebP)')
+        return
+      }
+
+      // Validate file size (max 5MB for passport photo)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Photo size should be less than 5MB')
+        return
+      }
+
+      setFormData({
+        ...formData,
+        passportPhoto: file
+      })
+
+      // Create preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewPassportPhoto(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   const handleUTRChange = (e) => {
     const value = e.target.value
     setFormData({
@@ -89,6 +123,13 @@ const Signup = () => {
       return
     }
 
+    // Validate passport photo is uploaded
+    if (!formData.passportPhoto) {
+      toast.error('Please upload your passport size photo')
+      setLoading(false)
+      return
+    }
+
     // Validate payment - either screenshot or UTR must be provided
     if (!formData.paymentImage && !formData.utrNumber) {
       toast.error('Please upload payment screenshot OR enter UTR number')
@@ -101,9 +142,12 @@ const Signup = () => {
       const submitData = new FormData()
       submitData.append('fullName', formData.fullName)
       submitData.append('mobile', formData.mobile)
+      submitData.append('fatherName', formData.fatherName)
+      submitData.append('address', formData.address)
       submitData.append('gotra', formData.gotra)
       if (formData.email) submitData.append('email', formData.email)
       if (formData.city) submitData.append('city', formData.city)
+      if (formData.passportPhoto) submitData.append('passportPhoto', formData.passportPhoto)
       if (formData.utrNumber) submitData.append('utrNumber', formData.utrNumber)
       if (formData.paymentImage) submitData.append('paymentImage', formData.paymentImage)
 
@@ -124,12 +168,16 @@ const Signup = () => {
           fullName: '',
           email: '',
           mobile: '',
+          fatherName: '',
+          address: '',
           city: '',
           gotra: '',
+          passportPhoto: null,
           utrNumber: '',
           paymentImage: null
         })
         setPreviewImage(null)
+        setPreviewPassportPhoto(null)
 
         // Navigate to login after delay
         setTimeout(() => {
@@ -203,6 +251,48 @@ const Signup = () => {
                 />
                 <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
+                </svg>
+              </div>
+            </div>
+
+            {/* Father's Name Field */}
+            <div>
+              <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
+                Father's Name <span className='text-red-400'>*</span>
+              </label>
+              <div className='relative'>
+                <input
+                  type='text'
+                  name='fatherName'
+                  value={formData.fatherName}
+                  onChange={handleChange}
+                  className='w-full px-3 md:px-4 py-2 md:py-3 pl-9 md:pl-11 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm'
+                  placeholder="Enter your father's name"
+                  required
+                />
+                <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' />
+                </svg>
+              </div>
+            </div>
+
+            {/* Address Field */}
+            <div>
+              <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
+                Address <span className='text-red-400'>*</span>
+              </label>
+              <div className='relative'>
+                <textarea
+                  name='address'
+                  value={formData.address}
+                  onChange={handleChange}
+                  className='w-full px-3 md:px-4 py-2 md:py-3 pl-9 md:pl-11 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm resize-none'
+                  placeholder='Enter your full address'
+                  rows='3'
+                  required
+                />
+                <svg className='absolute left-2.5 md:left-3.5 top-3 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
                 </svg>
               </div>
             </div>
@@ -325,13 +415,64 @@ const Signup = () => {
               </div>
             </div>
 
+            {/* Passport Size Photo Upload */}
+            <div>
+              <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
+                Upload Passport Size Photo <span className='text-red-400'>*</span>
+              </label>
+              <div className='relative'>
+                <input
+                  type='file'
+                  accept='image/jpeg,image/jpg,image/png,image/webp'
+                  onChange={handlePassportPhotoChange}
+                  className='hidden'
+                  id='passport-photo-upload'
+                  required
+                />
+                <label
+                  htmlFor='passport-photo-upload'
+                  className='w-full px-3 md:px-4 py-2 md:py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm cursor-pointer flex items-center justify-center hover:bg-white/30'
+                >
+                  <svg className='w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' />
+                  </svg>
+                  {formData.passportPhoto ? formData.passportPhoto.name : 'Choose Passport Photo'}
+                </label>
+              </div>
+
+              {/* Photo Preview */}
+              {previewPassportPhoto && (
+                <div className='mt-2 relative flex justify-center'>
+                  <div className='relative'>
+                    <img
+                      src={previewPassportPhoto}
+                      alt='Passport photo preview'
+                      className='w-24 h-32 md:w-32 md:h-40 object-cover rounded-lg border-2 border-white/30'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setFormData({ ...formData, passportPhoto: null })
+                        setPreviewPassportPhoto(null)
+                      }}
+                      className='absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600'
+                    >
+                      <svg className='w-3 h-3 md:w-4 md:h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Payment Section */}
             <div className='bg-white/5 rounded-lg p-3 md:p-5 border border-white/20'>
               <h3 className='text-white font-bold text-xs md:text-sm mb-2 md:mb-3 flex items-center'>
                 <svg className='w-4 h-4 md:w-5 md:h-5 mr-1.5 text-green-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' />
                 </svg>
-                Complete Payment
+                Please Pay Rs 500 for 1 Year Membership
               </h3>
 
               {/* QR Code Display */}
@@ -445,7 +586,7 @@ const Signup = () => {
               disabled={loading}
               className='w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2.5 md:py-3 rounded-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-xs md:text-sm'
             >
-              {loading ? 'Submitting Registration...' : 'Complete Registration'}
+              {loading ? 'Submitting Application...' : 'Submit Application'}
             </button>
           </form>
 
@@ -464,6 +605,18 @@ const Signup = () => {
             <p className='text-blue-300 text-[10px] md:text-xs'>
               <strong>Note:</strong> After registration, admin will verify your payment and provide login credentials via mobile/email.
             </p>
+          </div>
+
+          {/* Go to Home Button */}
+          <div className='mt-4 md:mt-5 text-center'>
+            <a
+              href='https://abcdvyapar.com'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='inline-block w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-2.5 md:py-3 rounded-lg font-bold hover:from-green-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 text-xs md:text-sm'
+            >
+              Go to Home
+            </a>
           </div>
         </div>
       </div>

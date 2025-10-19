@@ -23,6 +23,14 @@ const userSchema = new mongoose.Schema({
   city: {
     type: String,
   },
+  address: {
+    type: String,
+    required: true,
+  },
+  fatherName: {
+    type: String,
+    required: true,
+  },
   role: {
     type: String,
     enum: ["user", "admin",'vendor'],
@@ -37,6 +45,9 @@ const userSchema = new mongoose.Schema({
     sparse: true, // Allow null for non-Google users
   },
   profilePicture: {
+    type: String,
+  },
+  passportPhoto: {
     type: String,
   },
   authProvider: {

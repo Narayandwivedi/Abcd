@@ -14,20 +14,30 @@ const handelUserSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { fullName, email, mobile, gotra, city, utrNumber } = req.body;
+    let { fullName, email, mobile, fatherName, address, gotra, city, utrNumber } = req.body;
 
     // Trim input fields
     fullName = fullName?.trim();
     email = email?.trim();
+    fatherName = fatherName?.trim();
+    address = address?.trim();
     city = city?.trim();
     utrNumber = utrNumber?.trim();
 
-    if (!fullName || !mobile || !gotra) {
-      return res.status(400).json({ success: false, message: "Full name, mobile, and gotra are required" });
+    if (!fullName || !mobile || !fatherName || !address || !gotra) {
+      return res.status(400).json({ success: false, message: "Full name, mobile, father's name, address, and gotra are required" });
+    }
+
+    // Validate passport photo is uploaded
+    if (!req.files || !req.files.passportPhoto) {
+      return res.status(400).json({
+        success: false,
+        message: "Passport photo is required"
+      });
     }
 
     // Validate payment information - either UTR or screenshot must be provided
-    if (!utrNumber && !req.file) {
+    if (!utrNumber && (!req.files || !req.files.paymentImage)) {
       return res.status(400).json({
         success: false,
         message: "Please provide either UTR number or payment screenshot"
@@ -50,9 +60,14 @@ const handelUserSignup = async (req, res) => {
     const existingUser = await userModel.findOne(query);
 
     if (existingUser) {
-      // Clean up uploaded file if exists
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
+      // Clean up uploaded files if exist
+      if (req.files) {
+        if (req.files.passportPhoto && fs.existsSync(req.files.passportPhoto[0].path)) {
+          fs.unlinkSync(req.files.passportPhoto[0].path);
+        }
+        if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
+          fs.unlinkSync(req.files.paymentImage[0].path);
+        }
       }
 
       if (email && existingUser.email === email) {
@@ -72,6 +87,8 @@ const handelUserSignup = async (req, res) => {
     const newUserData = {
       fullName,
       mobile,
+      fatherName,
+      address,
       gotra,
     };
 
@@ -89,8 +106,57 @@ const handelUserSignup = async (req, res) => {
       newUserData.utrNumber = utrNumber;
     }
 
+    // Process passport photo (required)
+    if (req.files && req.files.passportPhoto) {
+      try {
+        const passportPhotoFile = req.files.passportPhoto[0];
+
+        // Define output path for WebP image
+        const uploadDir = path.join(__dirname, "..", "uploads", "passport-photos");
+
+        // Ensure directory exists
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const webpFilename = `passport-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+        const webpPath = path.join(uploadDir, webpFilename);
+
+        // Process image: resize and convert to WebP
+        await sharp(passportPhotoFile.path)
+          .resize(400, 600, {
+            fit: "inside",
+            withoutEnlargement: true,
+          })
+          .webp({
+            quality: 85,
+          })
+          .toFile(webpPath);
+
+        // Delete original uploaded file
+        fs.unlinkSync(passportPhotoFile.path);
+
+        // Store relative path in database
+        newUserData.passportPhoto = `uploads/passport-photos/${webpFilename}`;
+      } catch (imageError) {
+        console.error("Passport photo processing error:", imageError);
+        // Clean up files
+        if (req.files.passportPhoto && fs.existsSync(req.files.passportPhoto[0].path)) {
+          fs.unlinkSync(req.files.passportPhoto[0].path);
+        }
+        if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
+          fs.unlinkSync(req.files.paymentImage[0].path);
+        }
+        return res.status(500).json({
+          success: false,
+          message: "Failed to process passport photo"
+        });
+      }
+    }
+
     // Process payment screenshot if provided
-    if (req.file) {
+    if (req.files && req.files.paymentImage) {
+      const paymentImageFile = req.files.paymentImage[0];
       try {
         // Define output path for WebP image
         const uploadDir = path.join(__dirname, "..", "uploads", "payment-screenshots");
@@ -104,7 +170,7 @@ const handelUserSignup = async (req, res) => {
         const webpPath = path.join(uploadDir, webpFilename);
 
         // Process image: resize and convert to WebP
-        await sharp(req.file.path)
+        await sharp(paymentImageFile.path)
           .resize(1200, 1200, {
             fit: "inside",
             withoutEnlargement: true,
@@ -115,15 +181,20 @@ const handelUserSignup = async (req, res) => {
           .toFile(webpPath);
 
         // Delete original uploaded file
-        fs.unlinkSync(req.file.path);
+        fs.unlinkSync(paymentImageFile.path);
 
         // Store relative path in database
         newUserData.paymentScreenshot = `uploads/payment-screenshots/${webpFilename}`;
       } catch (imageError) {
         console.error("Image processing error:", imageError);
         // Clean up files
-        if (req.file && fs.existsSync(req.file.path)) {
-          fs.unlinkSync(req.file.path);
+        if (req.files) {
+          if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
+            fs.unlinkSync(req.files.paymentImage[0].path);
+          }
+          if (req.files.passportPhoto && fs.existsSync(req.files.passportPhoto[0].path)) {
+            fs.unlinkSync(req.files.passportPhoto[0].path);
+          }
         }
         return res.status(500).json({
           success: false,
@@ -148,9 +219,14 @@ const handelUserSignup = async (req, res) => {
     console.error("Signup Error:", err);
     console.error("Error Stack:", err.stack);
 
-    // Clean up uploaded file if exists
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    // Clean up uploaded files if exist
+    if (req.files) {
+      if (req.files.passportPhoto && fs.existsSync(req.files.passportPhoto[0].path)) {
+        fs.unlinkSync(req.files.passportPhoto[0].path);
+      }
+      if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
+        fs.unlinkSync(req.files.paymentImage[0].path);
+      }
     }
 
     return res.status(500).json({ success: false, message: err.message });

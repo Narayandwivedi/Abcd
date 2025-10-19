@@ -25,8 +25,11 @@ const Signup = () => {
     businessName: '',
     email: '',
     mobile: '',
-    city: ''
+    city: '',
+    category: '',
+    vendorPhoto: null
   })
+  const [previewPhoto, setPreviewPhoto] = useState(null)
 
   // Redirect if already logged in
   useEffect(() => {
@@ -44,13 +47,49 @@ const Signup = () => {
     setError('')
   }
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!validTypes.includes(file.type)) {
+        toast.error('Please upload a valid image (JPG, PNG, or WebP)')
+        return
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Photo size should be less than 5MB')
+        return
+      }
+
+      setFormData({
+        ...formData,
+        vendorPhoto: file
+      })
+
+      // Create preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewPhoto(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
     // Validation
-    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.city) {
+    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.city || !formData.category) {
       setError('Please fill in all required fields')
+      return
+    }
+
+    // Validate photo is uploaded
+    if (!formData.vendorPhoto) {
+      setError('Please upload your photo')
       return
     }
 
@@ -68,13 +107,17 @@ const Signup = () => {
     setLoading(true)
 
     try {
-      const result = await signup({
-        ownerName: formData.ownerName,
-        businessName: formData.businessName,
-        email: formData.email,
-        mobile: parseInt(formData.mobile),
-        city: formData.city,
-      })
+      // Create FormData for file upload
+      const submitData = new FormData()
+      submitData.append('ownerName', formData.ownerName)
+      submitData.append('businessName', formData.businessName)
+      submitData.append('mobile', formData.mobile)
+      submitData.append('city', formData.city)
+      submitData.append('category', formData.category)
+      if (formData.email) submitData.append('email', formData.email)
+      if (formData.vendorPhoto) submitData.append('vendorPhoto', formData.vendorPhoto)
+
+      const result = await signup(submitData)
 
       if (result.success) {
         console.log('✅ Signup result successful')
@@ -259,6 +302,74 @@ const Signup = () => {
               </div>
             </div>
 
+            {/* Category Selection */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                Membership Category <span className='text-red-500'>*</span>
+              </label>
+              <select
+                name='category'
+                value={formData.category}
+                onChange={handleChange}
+                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer'
+              >
+                <option value=''>Select Membership Category</option>
+                <option value='Bronze'>Bronze - Rs. 1,000 per year</option>
+                <option value='Silver'>Silver - Rs. 2,000 per year</option>
+                <option value='Gold'>Gold - Rs. 5,000 per year</option>
+                <option value='Diamond'>Diamond - Rs. 10,000 per year</option>
+                <option value='Platinum'>Platinum - Rs. 25,000 per year</option>
+              </select>
+            </div>
+
+            {/* Photo Upload */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                Upload Your Photo <span className='text-red-500'>*</span>
+              </label>
+              <div className='relative'>
+                <input
+                  type='file'
+                  accept='image/jpeg,image/jpg,image/png,image/webp'
+                  onChange={handlePhotoChange}
+                  className='hidden'
+                  id='vendor-photo-upload'
+                />
+                <label
+                  htmlFor='vendor-photo-upload'
+                  className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base cursor-pointer flex items-center justify-center hover:bg-gray-100'
+                >
+                  <User className='w-5 h-5 mr-2 text-gray-400' />
+                  {formData.vendorPhoto ? formData.vendorPhoto.name : 'Choose Photo'}
+                </label>
+              </div>
+
+              {/* Photo Preview */}
+              {previewPhoto && (
+                <div className='mt-3 relative flex justify-center'>
+                  <div className='relative'>
+                    <img
+                      src={previewPhoto}
+                      alt='Vendor photo preview'
+                      className='w-24 h-32 sm:w-32 sm:h-40 object-cover rounded-xl border-2 border-indigo-200'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setFormData({ ...formData, vendorPhoto: null })
+                        setPreviewPhoto(null)
+                      }}
+                      className='absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors'
+                    >
+                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Error Message */}
             {error && (
               <div className='bg-red-50 border-l-4 border-red-500 rounded-lg p-4'>
@@ -280,12 +391,12 @@ const Signup = () => {
               {loading ? (
                 <>
                   <Loader2 className='w-5 h-5 animate-spin' />
-                  Creating Account...
+                  Submitting Registration...
                 </>
               ) : (
                 <>
                   <CheckCircle className='w-5 h-5' />
-                  Create Vendor Account
+                  Submit Registration Form
                 </>
               )}
             </button>
@@ -299,6 +410,18 @@ const Signup = () => {
                 Sign In
               </a>
             </p>
+          </div>
+
+          {/* Go to Home Button */}
+          <div className='mt-4 sm:mt-6'>
+            <a
+              href='https://abcdvyapar.com'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='w-full bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold py-3 sm:py-4 rounded-xl hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-2 text-sm sm:text-base'
+            >
+              Go to Home
+            </a>
           </div>
         </form>
       </div>
