@@ -271,8 +271,6 @@ const Home = () => {
       {/* Top Deals Section */}
       <section className='py-1 pb-2 lg:py-2 lg:pb-3 bg-gray-100'>
         <div className='container mx-auto px-4'>
-        
-
           {/* Desktop: Show all deals in grid */}
           <div
             className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'
@@ -281,11 +279,11 @@ const Home = () => {
             onMouseLeave={handleDealMouseUp}
           >
             {dealImages.slice(0, 5).map((deal, index) => (
-              <div key={index} className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '160px' }}>
+              <div key={index} className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '240px' }}>
                 <img
                   src={deal}
                   alt={`Hot Deal ${index + 1}`}
-                  className='w-full h-full object-contain p-2'
+                  className='w-full h-full object-contain'
                 />
               </div>
             ))}
@@ -312,11 +310,11 @@ const Home = () => {
               {[...Array(3)].map((_, setIndex) =>
                 dealImages.map((deal, index) => (
                   <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                    <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '150px' }}>
+                    <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '220px' }}>
                       <img
                         src={deal}
                         alt={`Hot Deal ${index + 1}`}
-                        className='w-full h-full object-contain p-2'
+                        className='w-full h-full object-contain'
                       />
                     </div>
                   </div>
