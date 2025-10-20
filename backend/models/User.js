@@ -84,6 +84,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isRejected: {
+    type: Boolean,
+    default: false,
+  },
 
 }, { timestamps: true });
 
