@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import WhatsAppButton from '../component/WhatsAppButton'
-import YouTubeDemo from '../component/YouTubeDemo'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -28,12 +27,29 @@ const Home = () => {
     '/ad16.webp'
   ]
 
-  // Start from the middle set (second set of 7 images)
+  const dealImages = [
+    '/hot deals/deal1.jpg',
+    '/hot deals/deal2.jpg',
+    '/hot deals/deal3.jpg',
+    '/hot deals/deal4.jpg',
+    '/hot deals/deal5.jpg',
+    '/hot deals/deal6.jpg',
+    '/hot deals/deal7.jpg'
+  ]
+
+  // Ads slider state
   const [currentSlide, setCurrentSlide] = useState(adImages.length)
   const [isTransitioning, setIsTransitioning] = useState(true)
   const [isPaused, setIsPaused] = useState(false)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
+
+  // Hot Deals slider state
+  const [currentDealSlide, setCurrentDealSlide] = useState(dealImages.length)
+  const [isDealTransitioning, setIsDealTransitioning] = useState(true)
+  const [isDealPaused, setIsDealPaused] = useState(false)
+  const [dealTouchStart, setDealTouchStart] = useState(0)
+  const [dealTouchEnd, setDealTouchEnd] = useState(0)
 
   // Auto-slide functionality - infinite scroll to the right
   useEffect(() => {
@@ -114,6 +130,73 @@ const Home = () => {
     setIsPaused(false)
   }
 
+  // Hot Deals auto-slide functionality
+  useEffect(() => {
+    if (isDealPaused) return
+
+    const dealSlideInterval = setInterval(() => {
+      setCurrentDealSlide((prev) => prev + 1)
+    }, 2200)
+
+    return () => clearInterval(dealSlideInterval)
+  }, [isDealPaused])
+
+  // Hot Deals reset position for infinite loop
+  useEffect(() => {
+    if (currentDealSlide >= dealImages.length * 2) {
+      setTimeout(() => {
+        setIsDealTransitioning(false)
+        setCurrentDealSlide(dealImages.length)
+        setTimeout(() => setIsDealTransitioning(true), 50)
+      }, 500)
+    }
+    if (currentDealSlide < dealImages.length) {
+      setIsDealTransitioning(false)
+      setCurrentDealSlide(dealImages.length)
+      setTimeout(() => setIsDealTransitioning(true), 50)
+    }
+  }, [currentDealSlide, dealImages.length])
+
+  // Hot Deals touch handlers
+  const handleDealTouchStart = (e) => {
+    setDealTouchStart(e.targetTouches[0].clientX)
+    setIsDealPaused(true)
+  }
+
+  const handleDealTouchMove = (e) => {
+    setDealTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleDealTouchEnd = () => {
+    if (!dealTouchStart || !dealTouchEnd) {
+      setIsDealPaused(false)
+      return
+    }
+
+    const distance = dealTouchStart - dealTouchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe) {
+      setCurrentDealSlide((prev) => prev + 1)
+    } else if (isRightSwipe) {
+      setCurrentDealSlide((prev) => prev - 1)
+    }
+
+    setDealTouchStart(0)
+    setDealTouchEnd(0)
+    setIsDealPaused(false)
+  }
+
+  // Hot Deals mouse handlers
+  const handleDealMouseDown = () => {
+    setIsDealPaused(true)
+  }
+
+  const handleDealMouseUp = () => {
+    setIsDealPaused(false)
+  }
+
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Search Bar Section */}
@@ -122,7 +205,7 @@ const Home = () => {
           <div className='max-w-6xl mx-auto'>
             <div className='flex flex-row gap-1.5 md:gap-4 items-stretch md:items-center'>
               {/* City Selector - 30% width on Mobile, Second on Desktop */}
-              <div className='relative w-[26%] md:w-auto md:min-w-[160px] md:order-2'>
+              <div className='relative w-[28%] md:w-auto md:min-w-[160px] md:order-2'>
                 <select className='w-full px-2 py-1 md:px-3 md:py-2 rounded-md md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-[11px] md:text-sm font-medium shadow-sm md:shadow-lg bg-white cursor-pointer h-[32px] md:h-[38px]'>
                   <option value=''>Select City</option>
                   <option value='balod'>Balod</option>
@@ -162,10 +245,10 @@ const Home = () => {
               </div>
 
               {/* Search Input - 70% width on Mobile, First on Desktop */}
-              <div className='relative w-[74%] md:flex-1 md:order-1'>
+              <div className='relative w-[72%] md:flex-1 md:order-1'>
                 <input
                   type='text'
-                  placeholder='Search products, services...'
+                  placeholder='products, services , vendors'
                   className='w-full px-3 py-1.5 pl-9 pr-20 md:px-5 md:py-2.5 md:pl-12 md:pr-28 rounded-lg md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 placeholder:text-xs md:placeholder:text-sm shadow-sm md:shadow-lg text-xs md:text-sm h-[32px] md:h-auto'
                 />
                 <svg
@@ -185,8 +268,64 @@ const Home = () => {
         </div>
       </section>
 
-      {/* YouTube Demo Video Section */}
-      <YouTubeDemo />
+      {/* Top Deals Section */}
+      <section className='py-1 pb-2 lg:py-2 lg:pb-3 bg-gray-100'>
+        <div className='container mx-auto px-4'>
+        
+
+          {/* Desktop: Show all deals in grid */}
+          <div
+            className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'
+            onMouseDown={handleDealMouseDown}
+            onMouseUp={handleDealMouseUp}
+            onMouseLeave={handleDealMouseUp}
+          >
+            {dealImages.slice(0, 5).map((deal, index) => (
+              <div key={index} className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '160px' }}>
+                <img
+                  src={deal}
+                  alt={`Hot Deal ${index + 1}`}
+                  className='w-full h-full object-contain p-2'
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile: Horizontal sliding carousel */}
+          <div
+            className='lg:hidden relative mx-auto overflow-hidden cursor-grab active:cursor-grabbing'
+            onTouchStart={handleDealTouchStart}
+            onTouchMove={handleDealTouchMove}
+            onTouchEnd={handleDealTouchEnd}
+            onMouseDown={handleDealMouseDown}
+            onMouseUp={handleDealMouseUp}
+            onMouseLeave={handleDealMouseUp}
+          >
+            <div
+              className='flex'
+              style={{
+                transform: `translateX(calc(-${currentDealSlide * 80}%))`,
+                transition: isDealTransitioning ? 'transform 500ms ease-in-out' : 'none'
+              }}
+            >
+              {/* Render 3 sets of images for seamless infinite scrolling */}
+              {[...Array(3)].map((_, setIndex) =>
+                dealImages.map((deal, index) => (
+                  <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
+                    <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '150px' }}>
+                      <img
+                        src={deal}
+                        alt={`Hot Deal ${index + 1}`}
+                        className='w-full h-full object-contain p-2'
+                      />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Sponsored Ads Section - Row 2 */}
       <section className='pb-0 lg:pb-1 bg-white'>

@@ -1,3 +1,5 @@
+import YouTubeDemo from '../component/YouTubeDemo'
+
 const About = () => {
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -15,6 +17,9 @@ const About = () => {
           </p>
         </div>
       </section>
+
+      {/* YouTube Demo Video Section */}
+      <YouTubeDemo />
 
       {/* Mission & Vision */}
       <section className='py-20'>
