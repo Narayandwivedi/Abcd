@@ -205,7 +205,7 @@ const Signup = () => {
       <div className='max-w-xl md:max-w-2xl w-full relative z-10 overflow-y-auto max-h-screen py-4'>
         {/* Header */}
         <div className='text-center mb-3 md:mb-6'>
-          <h1 className='text-2xl md:text-4xl font-black text-white mb-1 md:mb-2'>Join as a Member</h1>
+          <h1 className='text-2xl md:text-4xl font-black text-white mb-1 md:mb-2'>Join as a member/buyer</h1>
           <p className='text-gray-400 text-xs md:text-base'>Complete payment to register on ABCD Platform</p>
         </div>
 

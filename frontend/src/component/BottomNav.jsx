@@ -45,7 +45,7 @@ const BottomNav = () => {
         </Link>
 
         {/* Vendor Group */}
-        <div className='flex gap-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-2 py-0.5 border border-purple-200'>
+        <div className='flex gap-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg px-3 py-0.5 border border-purple-200'>
           {/* Join as Vendor */}
           <a
             href='https://vendor.abcdvyapar.com/signup'
