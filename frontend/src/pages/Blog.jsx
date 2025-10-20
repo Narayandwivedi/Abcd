@@ -15,28 +15,6 @@ const Blog = () => {
       readTime: '5 min read',
       bannerGradient: 'bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600',
       bannerIcon: '🏢'
-    },
-    {
-      id: 2,
-      category: 'Business Tips',
-      categoryColor: 'bg-orange-100 text-orange-700',
-      title: '5 Ways to Grow Your Business with ABCD Vyapar',
-      excerpt: 'Discover proven strategies to expand your business network and increase sales through our platform.',
-      date: 'January 10, 2025',
-      readTime: '4 min read',
-      bannerGradient: 'bg-gradient-to-br from-orange-500 via-orange-400 to-amber-500',
-      bannerIcon: '💡'
-    },
-    {
-      id: 3,
-      category: 'Success Stories',
-      categoryColor: 'bg-green-100 text-green-700',
-      title: 'How ABCD Members Are Achieving Success',
-      excerpt: 'Real stories from our community members who transformed their businesses through collaboration.',
-      date: 'January 5, 2025',
-      readTime: '6 min read',
-      bannerGradient: 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600',
-      bannerIcon: '🏆'
     }
   ]
 

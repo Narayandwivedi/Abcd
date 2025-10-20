@@ -14,6 +14,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Contact from './pages/Contact'
 import ForgotPassword from './pages/ForgotPassword'
+import CategoryPage from './pages/CategoryPage'
 
 const App = () => {
   const location = useLocation()
@@ -33,6 +34,7 @@ const App = () => {
           <Route path='/signup' element={<Signup />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
+          <Route path='/category/:categoryName' element={<CategoryPage />} />
         </Routes>
       </div>
       {!isAuthPage && <Footer />}

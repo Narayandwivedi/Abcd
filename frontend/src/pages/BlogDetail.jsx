@@ -22,45 +22,6 @@ const BlogDetail = () => {
         'Our platform serves as a bridge between traditional business values and modern digital commerce, enabling members to showcase their products, connect with potential buyers, and build lasting partnerships. Through innovative technology and community-driven initiatives, ABCD is revolutionizing how the Agrawal community conducts business in the digital age.',
         'Under the visionary leadership of Chairman Lalit Agrawal, ABCD has grown into a robust ecosystem that celebrates our cultural heritage while embracing progress. We believe in empowering growth and empowering unity, ensuring that every member of our community has access to opportunities that drive success. Join us in building a stronger, more prosperous future together.'
       ]
-    },
-    2: {
-      category: 'Business Tips',
-      categoryColor: 'bg-orange-100 text-orange-700',
-      title: '5 Ways to Grow Your Business with ABCD Vyapar',
-      date: 'January 10, 2025',
-      readTime: '4 min read',
-      author: 'Business Team',
-      authorRole: 'ABCD Business Development',
-      authorInitials: 'BT',
-      bannerGradient: 'bg-gradient-to-br from-orange-500 via-orange-400 to-amber-500',
-      bannerIcon: '💡',
-      content: [
-        'Growing your business in today\'s competitive market requires strategic planning and the right network. ABCD Vyapar provides a unique platform that connects you with verified buyers and sellers within the Agrawal community, creating endless opportunities for growth.',
-        'The first strategy is to optimize your business profile on our platform. Make sure to showcase your products with high-quality images and detailed descriptions. This increases your visibility and attracts potential buyers who are looking for exactly what you offer.',
-        'Networking is key to business success. Attend our community events and webinars to connect with other members, share experiences, and learn from success stories. Building these relationships can lead to valuable partnerships and collaborations.',
-        'Leverage our digital tools to streamline your operations. From inventory management to customer communication, ABCD Vyapar offers integrated solutions that save time and increase efficiency, allowing you to focus on growth.',
-        'Finally, stay engaged with the community. Participate in discussions, share your expertise, and be active on the platform. Your involvement not only builds your reputation but also opens doors to new opportunities you might not have discovered otherwise.'
-      ]
-    },
-    3: {
-      category: 'Success Stories',
-      categoryColor: 'bg-green-100 text-green-700',
-      title: 'How ABCD Members Are Achieving Success',
-      date: 'January 5, 2025',
-      readTime: '6 min read',
-      author: 'Community Team',
-      authorRole: 'ABCD Community Relations',
-      authorInitials: 'CT',
-      bannerGradient: 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600',
-      bannerIcon: '🏆',
-      content: [
-        'Success stories from our community members serve as inspiration for others looking to grow their businesses. The ABCD platform has been instrumental in transforming how businesses connect, collaborate, and thrive together.',
-        'One remarkable example is a textile business owner from Rajasthan who expanded their reach from local markets to nationwide distribution within just six months of joining ABCD. By connecting with verified buyers across different states, they increased their revenue by 300%.',
-        'Another inspiring story comes from a young entrepreneur who started a handicrafts business. Through ABCD\'s networking events and online platform, they found mentors who guided them through challenges and connected them with export opportunities, taking their local craft to international markets.',
-        'A food processing unit owner shared how ABCD helped them during challenging times. When traditional distribution channels were disrupted, the ABCD platform enabled them to connect directly with retailers and bulk buyers, maintaining business continuity and even expanding their customer base.',
-        'These success stories highlight the power of community-driven business development. When members support each other, share knowledge, and create opportunities together, everyone benefits. The ABCD platform is more than just a business directory; it\'s a ecosystem where success is shared and celebrated.',
-        'Join us today and write your own success story. Whether you\'re a established business owner or just starting your entrepreneurial journey, ABCD provides the tools, network, and support you need to achieve your goals.'
-      ]
     }
   }
 

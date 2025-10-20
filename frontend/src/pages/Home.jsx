@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import WhatsAppButton from '../component/WhatsAppButton'
 import YouTubeDemo from '../component/YouTubeDemo'
 
 const Home = () => {
+  const navigate = useNavigate()
+
+  const handleCategoryClick = (categoryName) => {
+    navigate(`/category/${categoryName}`)
+  }
   const adImages = [
     '/ad1.webp',
     '/ad2.webp',
@@ -114,11 +120,11 @@ const Home = () => {
       <section className='bg-white shadow-sm md:shadow-md sticky top-0 z-40 border-b border-gray-200'>
         <div className='container mx-auto px-3 md:px-4 py-1 md:py-4'>
           <div className='max-w-6xl mx-auto'>
-            <div className='flex flex-col md:flex-row gap-1.5 md:gap-4 items-stretch md:items-center'>
-              {/* City Selector - First on Mobile, Second on Desktop */}
-              <div className='relative w-full md:w-auto md:min-w-[160px] md:order-2'>
-                <select className='w-full px-2 py-1 pl-6 pr-5 md:px-3 md:py-2 md:pl-9 md:pr-8 rounded-md md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-[11px] md:text-sm font-medium shadow-sm md:shadow-lg bg-white cursor-pointer appearance-none h-[28px] md:h-[38px]'>
-                  <option value=''>📍 Select District</option>
+            <div className='flex flex-row gap-1.5 md:gap-4 items-stretch md:items-center'>
+              {/* City Selector - 30% width on Mobile, Second on Desktop */}
+              <div className='relative w-[26%] md:w-auto md:min-w-[160px] md:order-2'>
+                <select className='w-full px-2 py-1 md:px-3 md:py-2 rounded-md md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-[11px] md:text-sm font-medium shadow-sm md:shadow-lg bg-white cursor-pointer h-[32px] md:h-[38px]'>
+                  <option value=''>Select City</option>
                   <option value='balod'>Balod</option>
                   <option value='baloda-bazar'>Baloda Bazar</option>
                   <option value='balrampur'>Balrampur</option>
@@ -153,27 +159,10 @@ const Home = () => {
                   <option value='surajpur'>Surajpur</option>
                   <option value='surguja'>Surguja</option>
                 </select>
-                <svg
-                  className='absolute left-1 md:left-2.5 top-1/2 transform -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 md:hidden text-gray-500 pointer-events-none'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
-                </svg>
-                <svg
-                  className='absolute right-1 md:right-2.5 top-1/2 transform -translate-y-1/2 w-2.5 h-2.5 md:w-3.5 md:h-3.5 text-gray-500 pointer-events-none'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-                </svg>
               </div>
 
-              {/* Search Input - Second on Mobile, First on Desktop */}
-              <div className='relative flex-1 md:order-1'>
+              {/* Search Input - 70% width on Mobile, First on Desktop */}
+              <div className='relative w-[74%] md:flex-1 md:order-1'>
                 <input
                   type='text'
                   placeholder='Search products, services...'
@@ -289,7 +278,7 @@ const Home = () => {
 
           <div className='grid grid-cols-4 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 max-w-7xl mx-auto'>
             {/* Medicine */}
-            <div className='group bg-gradient-to-br from-green-50 to-green-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-green-200 hover:border-green-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Medicine')} className='group bg-gradient-to-br from-green-50 to-green-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-green-200 hover:border-green-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>💊</span>
               </div>
@@ -298,7 +287,7 @@ const Home = () => {
             </div>
 
             {/* Services */}
-            <div className='group bg-gradient-to-br from-blue-50 to-blue-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-blue-200 hover:border-blue-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Services')} className='group bg-gradient-to-br from-blue-50 to-blue-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-blue-200 hover:border-blue-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>🔧</span>
               </div>
@@ -307,7 +296,7 @@ const Home = () => {
             </div>
 
             {/* Foods */}
-            <div className='group bg-gradient-to-br from-orange-50 to-orange-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Foods')} className='group bg-gradient-to-br from-orange-50 to-orange-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-orange-200 hover:border-orange-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>🍔</span>
               </div>
@@ -316,7 +305,7 @@ const Home = () => {
             </div>
 
             {/* Beverages */}
-            <div className='group bg-gradient-to-br from-purple-50 to-purple-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-purple-200 hover:border-purple-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Beverages')} className='group bg-gradient-to-br from-purple-50 to-purple-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-purple-200 hover:border-purple-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>🍾</span>
               </div>
@@ -325,7 +314,7 @@ const Home = () => {
             </div>
 
             {/* Grocery */}
-            <div className='group bg-gradient-to-br from-red-50 to-red-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-red-200 hover:border-red-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Grocery')} className='group bg-gradient-to-br from-red-50 to-red-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-red-200 hover:border-red-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>🛒</span>
               </div>
@@ -334,7 +323,7 @@ const Home = () => {
             </div>
 
             {/* Electronics */}
-            <div className='group bg-gradient-to-br from-indigo-50 to-indigo-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-indigo-200 hover:border-indigo-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Electronics')} className='group bg-gradient-to-br from-indigo-50 to-indigo-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-indigo-200 hover:border-indigo-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>📱</span>
               </div>
@@ -343,7 +332,7 @@ const Home = () => {
             </div>
 
             {/* Fashion */}
-            <div className='group bg-gradient-to-br from-pink-50 to-pink-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-pink-200 hover:border-pink-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Fashion')} className='group bg-gradient-to-br from-pink-50 to-pink-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-pink-200 hover:border-pink-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>👗</span>
               </div>
@@ -352,7 +341,7 @@ const Home = () => {
             </div>
 
             {/* Home & Living */}
-            <div className='group bg-gradient-to-br from-teal-50 to-teal-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-teal-200 hover:border-teal-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Home & Living')} className='group bg-gradient-to-br from-teal-50 to-teal-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-teal-200 hover:border-teal-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>🏠</span>
               </div>
@@ -361,7 +350,7 @@ const Home = () => {
             </div>
 
             {/* Beauty */}
-            <div className='group bg-gradient-to-br from-rose-50 to-rose-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-rose-200 hover:border-rose-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Beauty')} className='group bg-gradient-to-br from-rose-50 to-rose-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-rose-200 hover:border-rose-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>💄</span>
               </div>
@@ -370,7 +359,7 @@ const Home = () => {
             </div>
 
             {/* Books */}
-            <div className='group bg-gradient-to-br from-amber-50 to-amber-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-amber-200 hover:border-amber-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Books')} className='group bg-gradient-to-br from-amber-50 to-amber-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-amber-200 hover:border-amber-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>📚</span>
               </div>
@@ -379,7 +368,7 @@ const Home = () => {
             </div>
 
             {/* Sports */}
-            <div className='group bg-gradient-to-br from-lime-50 to-lime-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-lime-200 hover:border-lime-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Sports')} className='group bg-gradient-to-br from-lime-50 to-lime-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-lime-200 hover:border-lime-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>⚽</span>
               </div>
@@ -388,7 +377,7 @@ const Home = () => {
             </div>
 
             {/* Toys */}
-            <div className='group bg-gradient-to-br from-cyan-50 to-cyan-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-cyan-200 hover:border-cyan-400 transform hover:-translate-y-1 cursor-pointer'>
+            <div onClick={() => handleCategoryClick('Toys')} className='group bg-gradient-to-br from-cyan-50 to-cyan-100 p-2 md:p-4 rounded-lg md:rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-cyan-200 hover:border-cyan-400 transform hover:-translate-y-1 cursor-pointer'>
               <div className='bg-white w-10 h-10 md:w-14 md:h-14 rounded-lg flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:scale-110 transition-transform shadow-sm'>
                 <span className='text-xl md:text-3xl'>🧸</span>
               </div>

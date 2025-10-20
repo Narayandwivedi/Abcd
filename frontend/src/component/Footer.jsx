@@ -80,7 +80,7 @@ const Footer = () => {
             <Link to='/signup' className='block'>
               <div className='bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-3 py-2 rounded-lg font-bold text-center animate-pulse shadow-lg'>
                 <p className='text-[11px] leading-tight'>Join as a Member</p>
-                <p className='text-sm font-extrabold'>@₹499</p>
+                <p className='text-sm font-extrabold'>@₹499/year</p>
               </div>
             </Link>
           </div>
