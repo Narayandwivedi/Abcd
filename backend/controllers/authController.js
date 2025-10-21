@@ -5,6 +5,7 @@ const { OAuth2Client } = require('google-auth-library');
 const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
+const { sendLoginAlert, sendSignupAlert } = require("../utils/telegramAlert");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -210,6 +211,11 @@ const handelUserSignup = async (req, res) => {
     const userObj = newUser.toObject();
     delete userObj.password;
 
+    // Send Telegram signup alert
+    sendSignupAlert(newUser.fullName, newUser.email || newUser.mobile).catch((err) =>
+      console.error("Telegram Error:", err.message)
+    );
+
     return res.status(201).json({
       success: true,
       message: "Registration submitted successfully. Admin will verify your payment and contact you.",
@@ -293,6 +299,11 @@ const handelUserLogin = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
     });
+
+    // Send Telegram login alert
+    sendLoginAlert(user.fullName).catch((err) =>
+      console.error("Telegram Error:", err.message)
+    );
 
     return res.status(200).json({
       success: true,
