@@ -18,8 +18,13 @@ const sendLoginAlert = async (userName) => {
       chat_id: CHAT_ID,
       text: message,
     });
+    console.log("✅ Telegram login alert sent successfully");
   } catch (err) {
     console.error("Telegram error:", err.message);
+    console.error("Full error:", err.response?.data);
+    console.error("Bot Token:", BOT_TOKEN);
+    console.error("Chat ID:", CHAT_ID);
+    console.error("Chat ID type:", typeof CHAT_ID);
   }
 };
 
@@ -41,8 +46,13 @@ const sendSignupAlert = async (userName, email) => {
       chat_id: CHAT_ID,
       text: message,
     });
+    console.log("✅ Telegram signup alert sent successfully");
   } catch (err) {
     console.error("Telegram error:", err.message);
+    console.error("Full error:", err.response?.data);
+    console.error("Bot Token:", BOT_TOKEN);
+    console.error("Chat ID:", CHAT_ID);
+    console.error("Chat ID type:", typeof CHAT_ID);
   }
 };
 

@@ -6,6 +6,7 @@ const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
 const { sendLoginAlert, sendSignupAlert } = require("../utils/telegramAlert");
+const { saveSignupToSheet } = require("../utils/googleSheets");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -214,6 +215,11 @@ const handelUserSignup = async (req, res) => {
     // Send Telegram signup alert
     sendSignupAlert(newUser.fullName, newUser.email || newUser.mobile).catch((err) =>
       console.error("Telegram Error:", err.message)
+    );
+
+    // Save to Google Sheets
+    saveSignupToSheet(newUser).catch((err) =>
+      console.error("Google Sheets Error:", err.message)
     );
 
     return res.status(201).json({
