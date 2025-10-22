@@ -2,11 +2,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.js");
 const { OAuth2Client } = require('google-auth-library');
-const sharp = require("sharp");
-const path = require("path");
 const fs = require("fs");
 const { sendLoginAlert, sendSignupAlert } = require("../utils/telegramAlert");
 const { saveSignupToSheet } = require("../utils/googleSheets");
+const { processPassportPhoto, processPaymentScreenshot } = require("./uploadController");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -112,40 +111,10 @@ const handelUserSignup = async (req, res) => {
     if (req.files && req.files.passportPhoto) {
       try {
         const passportPhotoFile = req.files.passportPhoto[0];
-
-        // Define output path for WebP image
-        const uploadDir = path.join(__dirname, "..", "uploads", "passport-photos");
-
-        // Ensure directory exists
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        const webpFilename = `passport-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
-        const webpPath = path.join(uploadDir, webpFilename);
-
-        // Process image: resize and convert to WebP
-        await sharp(passportPhotoFile.path)
-          .resize(400, 600, {
-            fit: "inside",
-            withoutEnlargement: true,
-          })
-          .webp({
-            quality: 85,
-          })
-          .toFile(webpPath);
-
-        // Delete original uploaded file
-        fs.unlinkSync(passportPhotoFile.path);
-
-        // Store relative path in database
-        newUserData.passportPhoto = `uploads/passport-photos/${webpFilename}`;
+        newUserData.passportPhoto = await processPassportPhoto(passportPhotoFile);
       } catch (imageError) {
         console.error("Passport photo processing error:", imageError);
         // Clean up files
-        if (req.files.passportPhoto && fs.existsSync(req.files.passportPhoto[0].path)) {
-          fs.unlinkSync(req.files.passportPhoto[0].path);
-        }
         if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
           fs.unlinkSync(req.files.paymentImage[0].path);
         }
@@ -158,46 +127,11 @@ const handelUserSignup = async (req, res) => {
 
     // Process payment screenshot if provided
     if (req.files && req.files.paymentImage) {
-      const paymentImageFile = req.files.paymentImage[0];
       try {
-        // Define output path for WebP image
-        const uploadDir = path.join(__dirname, "..", "uploads", "payment-screenshots");
-
-        // Ensure directory exists
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        const webpFilename = `payment-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
-        const webpPath = path.join(uploadDir, webpFilename);
-
-        // Process image: resize and convert to WebP
-        await sharp(paymentImageFile.path)
-          .resize(1200, 1200, {
-            fit: "inside",
-            withoutEnlargement: true,
-          })
-          .webp({
-            quality: 80,
-          })
-          .toFile(webpPath);
-
-        // Delete original uploaded file
-        fs.unlinkSync(paymentImageFile.path);
-
-        // Store relative path in database
-        newUserData.paymentScreenshot = `uploads/payment-screenshots/${webpFilename}`;
+        const paymentImageFile = req.files.paymentImage[0];
+        newUserData.paymentScreenshot = await processPaymentScreenshot(paymentImageFile);
       } catch (imageError) {
-        console.error("Image processing error:", imageError);
-        // Clean up files
-        if (req.files) {
-          if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
-            fs.unlinkSync(req.files.paymentImage[0].path);
-          }
-          if (req.files.passportPhoto && fs.existsSync(req.files.passportPhoto[0].path)) {
-            fs.unlinkSync(req.files.passportPhoto[0].path);
-          }
-        }
+        console.error("Payment screenshot processing error:", imageError);
         return res.status(500).json({
           success: false,
           message: "Failed to process payment screenshot"

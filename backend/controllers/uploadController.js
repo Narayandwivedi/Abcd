@@ -3,7 +3,99 @@ const path = require("path");
 const fs = require("fs");
 const User = require("../models/User");
 
-// Upload payment screenshot
+/**
+ * Process and upload passport photo
+ * Used during user signup
+ */
+exports.processPassportPhoto = async (file) => {
+  try {
+    if (!file) {
+      throw new Error("No passport photo file provided");
+    }
+
+    const uploadDir = path.join(__dirname, "..", "uploads", "passport-photos");
+
+    // Ensure directory exists
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const webpFilename = `passport-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+    const webpPath = path.join(uploadDir, webpFilename);
+
+    // Process image: resize and convert to WebP
+    await sharp(file.path)
+      .resize(400, 600, {
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp({
+        quality: 85,
+      })
+      .toFile(webpPath);
+
+    // Delete original uploaded file
+    fs.unlinkSync(file.path);
+
+    // Return relative path for database storage
+    return `upload/passport-photos/${webpFilename}`;
+  } catch (error) {
+    // Clean up files on error
+    if (file && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+    throw new Error(`Failed to process passport photo: ${error.message}`);
+  }
+};
+
+/**
+ * Process and upload payment screenshot
+ * Used during user signup
+ */
+exports.processPaymentScreenshot = async (file) => {
+  try {
+    if (!file) {
+      throw new Error("No payment screenshot file provided");
+    }
+
+    const uploadDir = path.join(__dirname, "..", "uploads", "payment-screenshots");
+
+    // Ensure directory exists
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const webpFilename = `payment-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+    const webpPath = path.join(uploadDir, webpFilename);
+
+    // Process image: resize and convert to WebP
+    await sharp(file.path)
+      .resize(1200, 1200, {
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp({
+        quality: 80,
+      })
+      .toFile(webpPath);
+
+    // Delete original uploaded file
+    fs.unlinkSync(file.path);
+
+    // Return relative path for database storage
+    return `upload/payment-screenshots/${webpFilename}`;
+  } catch (error) {
+    // Clean up files on error
+    if (file && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+    throw new Error(`Failed to process payment screenshot: ${error.message}`);
+  }
+};
+
+/**
+ * Upload payment screenshot (API endpoint for authenticated users)
+ */
 exports.uploadPaymentScreenshot = async (req, res) => {
   try {
     // Check if file was uploaded
@@ -25,27 +117,8 @@ exports.uploadPaymentScreenshot = async (req, res) => {
       });
     }
 
-    // Define output path for WebP image
-    const outputDir = path.join(__dirname, "..", "uploads", "payment-screenshots");
-    const webpFilename = `payment-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
-    const webpPath = path.join(outputDir, webpFilename);
-
-    // Process image: resize and convert to WebP
-    await sharp(req.file.path)
-      .resize(1200, 1200, {
-        fit: "inside", // Maintain aspect ratio, don't exceed 1200x1200
-        withoutEnlargement: true, // Don't enlarge if image is smaller
-      })
-      .webp({
-        quality: 80, // Good balance between quality and file size
-      })
-      .toFile(webpPath);
-
-    // Delete original uploaded file
-    fs.unlinkSync(req.file.path);
-
-    // Store relative path in database
-    const relativePath = `uploads/payment-screenshots/${webpFilename}`;
+    // Process the payment screenshot
+    const relativePath = await this.processPaymentScreenshot(req.file);
 
     // Update user with payment screenshot path
     const user = await User.findByIdAndUpdate(
@@ -55,21 +128,24 @@ exports.uploadPaymentScreenshot = async (req, res) => {
     );
 
     if (!user) {
-      // Delete WebP file if user not found
-      fs.unlinkSync(webpPath);
+      // Delete uploaded file if user not found
+      const fullPath = path.join(__dirname, "..", relativePath);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+      }
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
 
+    const fullPath = path.join(__dirname, "..", relativePath);
     res.status(200).json({
       success: true,
       message: "Payment screenshot uploaded successfully",
       data: {
-        filename: webpFilename,
         path: relativePath,
-        size: fs.statSync(webpPath).size,
+        size: fs.statSync(fullPath).size,
       },
     });
   } catch (error) {
