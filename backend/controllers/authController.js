@@ -212,8 +212,8 @@ const handelUserSignup = async (req, res) => {
     const userObj = newUser.toObject();
     delete userObj.password;
 
-    // Send Telegram signup alert
-    sendSignupAlert(newUser.fullName, newUser.email || newUser.mobile).catch((err) =>
+    // Send Telegram signup alert with complete user data
+    sendSignupAlert(newUser).catch((err) =>
       console.error("Telegram Error:", err.message)
     );
 
