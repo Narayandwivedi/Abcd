@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors')
+const path = require('path');
 const { connectToDb } = require('./utils/mongodb');
 
 const app = express()
@@ -36,6 +37,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+// Serve static files from upload folder
+app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 app.use('/api/auth',authRoute)
 app.use('/api/vendor-auth',vendorAuthRoute)
