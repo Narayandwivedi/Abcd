@@ -137,10 +137,10 @@ const Signup = () => {
         })
         setPreviewPhoto(null)
 
-        // Redirect after 8 seconds
+        // Redirect to abcdvyapar.com after 8 seconds
         setTimeout(() => {
           setShowSuccessPopup(false)
-          navigate('/', { replace: true })
+          window.location.href = 'https://abcdvyapar.com'
         }, 8000)
       } else {
         console.log('❌ Signup result failed:', result.error)
@@ -467,7 +467,7 @@ const Signup = () => {
 
             {/* Auto Close Info */}
             <div className='mt-4 sm:mt-6 text-xs sm:text-sm text-gray-500'>
-              Redirecting to homepage in 8 seconds...
+              Redirecting to abcdvyapar.com in 8 seconds...
             </div>
           </div>
         </div>
