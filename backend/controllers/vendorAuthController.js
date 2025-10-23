@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const vendorModel = require("../models/Vendor.js");
 const fs = require("fs");
 const { processVendorPhoto } = require("./uploadController");
+const { sendVendorSignupAlert } = require("../utils/telegramAlert");
 
 const handleVendorSignup = async (req, res) => {
   try {
@@ -94,6 +95,13 @@ const handleVendorSignup = async (req, res) => {
     // Remove password before sending response
     const vendorObj = newVendor.toObject();
     delete vendorObj.password;
+
+    // Send Telegram vendor signup alert
+    try {
+      await sendVendorSignupAlert(vendorObj);
+    } catch (err) {
+      console.error("Telegram Vendor Alert Error:", err.message);
+    }
 
     // DO NOT generate JWT token or set cookies - admin will verify first
     return res.status(201).json({
