@@ -8,6 +8,14 @@ const Home = () => {
   const handleCategoryClick = (categoryName) => {
     navigate(`/category/${categoryName}`)
   }
+
+  const handleAdClick = (index) => {
+    navigate(`/ad/${index + 1}`)
+  }
+
+  const handleDealClick = (index) => {
+    navigate(`/deal/${index + 1}`)
+  }
   const adImages = [
     '/ad1.webp',
     '/ad2.webp',
@@ -285,7 +293,12 @@ const Home = () => {
             onMouseLeave={handleDealMouseUp}
           >
             {dealImages.slice(0, 5).map((deal, index) => (
-              <div key={index} className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '160px' }}>
+              <div
+                key={index}
+                onClick={() => handleDealClick(index)}
+                className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50'
+                style={{ height: '160px' }}
+              >
                 <img
                   src={deal}
                   alt={`Hot Deal ${index + 1}`}
@@ -316,7 +329,11 @@ const Home = () => {
               {[...Array(3)].map((_, setIndex) =>
                 dealImages.map((deal, index) => (
                   <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                    <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '150px' }}>
+                    <div
+                      onClick={() => handleDealClick(index)}
+                      className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50'
+                      style={{ height: '150px' }}
+                    >
                       <img
                         src={deal}
                         alt={`Hot Deal ${index + 1}`}
@@ -342,7 +359,12 @@ const Home = () => {
             onMouseLeave={handleMouseUp}
           >
             {adImages.slice(0, 5).map((ad, index) => (
-              <div key={index} className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '160px' }}>
+              <div
+                key={index}
+                onClick={() => handleAdClick(index)}
+                className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50'
+                style={{ height: '160px' }}
+              >
                 <img
                   src={ad}
                   alt={`Advertisement ${index + 1}`}
@@ -395,7 +417,11 @@ const Home = () => {
               {[...Array(3)].map((_, setIndex) =>
                 adImages.map((ad, index) => (
                   <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
-                    <div className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50' style={{ height: '150px' }}>
+                    <div
+                      onClick={() => handleAdClick(index)}
+                      className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50'
+                      style={{ height: '150px' }}
+                    >
                       <img
                         src={ad}
                         alt={`Advertisement ${index + 1}`}
