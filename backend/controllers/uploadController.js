@@ -49,6 +49,51 @@ exports.processPassportPhoto = async (file) => {
 };
 
 /**
+ * Process and upload vendor photo
+ * Used during vendor signup
+ */
+exports.processVendorPhoto = async (file) => {
+  try {
+    if (!file) {
+      throw new Error("No vendor photo file provided");
+    }
+
+    const uploadDir = path.join(__dirname, "..", "uploads", "vendor-photos");
+
+    // Ensure directory exists
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const webpFilename = `vendor-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+    const webpPath = path.join(uploadDir, webpFilename);
+
+    // Process image: resize and convert to WebP
+    await sharp(file.path)
+      .resize(400, 600, {
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp({
+        quality: 85,
+      })
+      .toFile(webpPath);
+
+    // Delete original uploaded file
+    fs.unlinkSync(file.path);
+
+    // Return relative path for database storage
+    return `upload/vendor-photos/${webpFilename}`;
+  } catch (error) {
+    // Clean up files on error
+    if (file && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+    throw new Error(`Failed to process vendor photo: ${error.message}`);
+  }
+};
+
+/**
  * Process and upload payment screenshot
  * Used during user signup
  */

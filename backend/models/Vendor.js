@@ -19,6 +19,7 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  
   password: {
     type: String,
   },
@@ -31,6 +32,16 @@ const vendorSchema = new mongoose.Schema({
   },
   profilePicture: {
     type: String,
+  },
+  passportPhoto: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  membershipCategory: {
+    type: String,
+    enum: ['Bronze', 'Silver', 'Gold', 'Diamond', 'Platinum'],
   },
   authProvider: {
     type: String,

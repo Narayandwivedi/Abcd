@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const vendorModel = require("../models/Vendor.js");
+const fs = require("fs");
+const { processVendorPhoto } = require("./uploadController");
 
 const handleVendorSignup = async (req, res) => {
   try {
@@ -8,12 +10,14 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName } = req.body;
+    let { email, mobile, ownerName, businessName, city, category } = req.body;
 
     // Trim input fields
     email = email?.trim();
     ownerName = ownerName?.trim();
     businessName = businessName?.trim();
+    city = city?.trim();
+    category = category?.trim();
 
     if (!email || !mobile || !ownerName || !businessName) {
       return res.status(400).json({ success: false, message: "Email, mobile, owner name, and business name are required" });
@@ -33,6 +37,11 @@ const handleVendorSignup = async (req, res) => {
     });
 
     if (existingVendor) {
+      // Clean up uploaded files if exist
+      if (req.files && req.files.vendorPhoto && fs.existsSync(req.files.vendorPhoto[0].path)) {
+        fs.unlinkSync(req.files.vendorPhoto[0].path);
+      }
+
       if (existingVendor.email === email) {
         return res.status(400).json({
           success: false,
@@ -55,37 +64,53 @@ const handleVendorSignup = async (req, res) => {
       isBusinessApplicationSubmitted: true, // Skip business form, go directly to pending approval
     };
 
-    // Create new vendor
+    // Add optional city field
+    if (city) {
+      newVendorData.city = city;
+    }
+
+    // Add membership category if provided
+    if (category) {
+      newVendorData.membershipCategory = category;
+    }
+
+    // Process vendor photo if provided
+    if (req.files && req.files.vendorPhoto) {
+      try {
+        const vendorPhotoFile = req.files.vendorPhoto[0];
+        newVendorData.passportPhoto = await processVendorPhoto(vendorPhotoFile);
+      } catch (imageError) {
+        console.error("Vendor photo processing error:", imageError);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to process vendor photo"
+        });
+      }
+    }
+
+    // Create new vendor WITHOUT logging them in (similar to user signup)
     const newVendor = await vendorModel.create(newVendorData);
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { vendorId: newVendor._id, role: "vendor" },
-      process.env.JWT_SECRET
-    );
-
-    // Cookie settings for cross-origin requests
-    const isHttpsBackend = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https';
-
-    res.cookie("vendorToken", token, {
-      httpOnly: true,
-      sameSite: isHttpsBackend ? "None" : "Lax",
-      secure: isHttpsBackend,
-      maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
-    });
 
     // Remove password before sending response
     const vendorObj = newVendor.toObject();
     delete vendorObj.password;
 
+    // DO NOT generate JWT token or set cookies - admin will verify first
     return res.status(201).json({
       success: true,
-      message: "Vendor registered successfully. We will review your details and contact you soon.",
+      message: "Registration submitted successfully. We will review your profile and contact you soon.",
       vendorData: vendorObj,
     });
   } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({ message: err.message });
+    console.error("Vendor Signup Error:", err);
+    console.error("Error Stack:", err.stack);
+
+    // Clean up uploaded files if exist
+    if (req.files && req.files.vendorPhoto && fs.existsSync(req.files.vendorPhoto[0].path)) {
+      fs.unlinkSync(req.files.vendorPhoto[0].path);
+    }
+
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 

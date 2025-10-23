@@ -30,6 +30,7 @@ const Signup = () => {
     vendorPhoto: null
   })
   const [previewPhoto, setPreviewPhoto] = useState(null)
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
 
   // Redirect if already logged in
   useEffect(() => {
@@ -121,13 +122,26 @@ const Signup = () => {
 
       if (result.success) {
         console.log('✅ Signup result successful')
-        toast.success('Registration successful! We will review your details and contact you soon.', {
-          autoClose: 5000,
+        // Show success popup modal
+        setShowSuccessPopup(true)
+
+        // Clear form
+        setFormData({
+          ownerName: '',
+          businessName: '',
+          email: '',
+          mobile: '',
+          city: '',
+          category: '',
+          vendorPhoto: null
         })
-        // Navigation will happen automatically via useEffect when isAuthenticated changes
+        setPreviewPhoto(null)
+
+        // Redirect after 8 seconds
         setTimeout(() => {
+          setShowSuccessPopup(false)
           navigate('/', { replace: true })
-        }, 2000)
+        }, 8000)
       } else {
         console.log('❌ Signup result failed:', result.error)
         setError(result.error)
@@ -425,6 +439,39 @@ const Signup = () => {
           </div>
         </form>
       </div>
+
+      {/* Success Popup Modal */}
+      {showSuccessPopup && (
+        <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4'>
+          <div className='bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full text-center transform transition-all animate-bounce-in shadow-2xl'>
+            {/* Success Icon */}
+            <div className='mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 sm:mb-6'>
+              <svg className='w-10 h-10 sm:w-12 sm:h-12 text-green-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' />
+              </svg>
+            </div>
+
+            {/* Success Message */}
+            <h2 className='text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-3 sm:mb-4'>
+              Application Submitted Successfully!
+            </h2>
+            <p className='text-gray-600 mb-2 text-sm sm:text-base'>
+              Your vendor application is now under review.
+            </p>
+            <p className='text-gray-700 font-semibold text-sm sm:text-base mb-2'>
+              Our team will contact you soon after reviewing your profile.
+            </p>
+            <p className='text-gray-600 text-xs sm:text-sm'>
+              You will receive login credentials via email/mobile once approved.
+            </p>
+
+            {/* Auto Close Info */}
+            <div className='mt-4 sm:mt-6 text-xs sm:text-sm text-gray-500'>
+              Redirecting to homepage in 8 seconds...
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

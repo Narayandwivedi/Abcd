@@ -34,7 +34,7 @@ const Signup = () => {
     setTimeout(() => {
       setShowSuccessPopup(false)
       navigate('/', { replace: true })
-    }, 5000)
+    }, 8000)
   }
 
   // Redirect if already logged in
@@ -649,7 +649,7 @@ const Signup = () => {
 
             {/* Auto Close Info */}
             <div className='mt-6 text-xs text-gray-500'>
-              Redirecting to homepage in 5 seconds...
+              Redirecting to homepage in 8 seconds...
             </div>
           </div>
         </div>

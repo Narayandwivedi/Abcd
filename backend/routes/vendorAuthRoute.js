@@ -6,11 +6,14 @@ const {
   isVendorLoggedIn,
   handleVendorGoogleAuth,
 } = require("../controllers/vendorAuthController.js");
+const upload = require("../utils/multer");
 
 const router = express.Router();
 
 // Vendor Authentication Routes
-router.post("/signup", handleVendorSignup);
+router.post("/signup", upload.fields([
+  { name: 'vendorPhoto', maxCount: 1 }
+]), handleVendorSignup);
 router.post("/login", handleVendorLogin);
 router.post("/logout", handleVendorLogout);
 

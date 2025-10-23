@@ -130,15 +130,16 @@ const AppContextProvider = (props) => {
       })
 
       if (response.data.success) {
-        console.log('✅ Signup successful, received vendor data:', response.data.vendorData?.businessName)
+        console.log('✅ Signup successful, application submitted for review')
 
-        // Immediately set auth state - this will allow navigation
-        setIsAuthenticated(true)
-        setVendor(response.data.vendorData)
+        // DO NOT set auth state - vendor needs admin approval first
+        // Keep them logged out until admin verifies
+        setIsAuthenticated(false)
+        setVendor(null)
         setLoading(false)
 
-        console.log('✓ Auth state updated: isAuthenticated=true, vendor set')
-        return { success: true }
+        console.log('✓ Signup completed without auto-login - awaiting admin review')
+        return { success: true, message: response.data.message }
       } else {
         console.log('❌ Signup failed:', response.data.message)
         return {
