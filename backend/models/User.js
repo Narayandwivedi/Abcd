@@ -88,6 +88,14 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  certificateNumber: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow null for users without certificates
+  },
+  certificateDownloadLink: {
+    type: String,
+  },
 
 }, { timestamps: true });
 

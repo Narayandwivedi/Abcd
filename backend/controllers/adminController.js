@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const userModel = require("../models/User.js");
+const { generateCertificatePDF } = require("../utils/generateCertificate.js");
 
 // Get all users (for admin)
 const getAllUsers = async (req, res) => {
@@ -53,20 +54,27 @@ const approveUser = async (req, res) => {
       });
     }
 
-    // Update payment verification status
+    // Generate certificate PDF
+    const certificateData = await generateCertificatePDF(user);
+
+    // Update payment verification status and certificate details
     user.paymentVerified = true;
     user.isVerified = true;
+    user.certificateNumber = certificateData.certificateNumber;
+    user.certificateDownloadLink = certificateData.downloadLink;
     await user.save();
 
     return res.status(200).json({
       success: true,
-      message: "User approved successfully",
+      message: "User approved successfully and certificate generated",
       user: {
         _id: user._id,
         fullName: user.fullName,
         email: user.email,
         mobile: user.mobile,
-        paymentVerified: user.paymentVerified
+        paymentVerified: user.paymentVerified,
+        certificateNumber: user.certificateNumber,
+        certificateDownloadLink: user.certificateDownloadLink
       }
     });
   } catch (error) {
