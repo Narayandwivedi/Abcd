@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import WhatsAppButton from '../component/WhatsAppButton'
-import { cityListByDistrict } from '../assets/citylist'
+import CityDropdown from '../component/CityDropdown'
 
 const Home = () => {
   const navigate = useNavigate()
+  const [selectedCity, setSelectedCity] = useState('')
 
   const handleCategoryClick = (categoryName) => {
     navigate(`/category/${categoryName}`)
@@ -217,24 +218,19 @@ const Home = () => {
         <div className='container mx-auto px-3 md:px-4 py-1 md:py-4'>
           <div className='max-w-6xl mx-auto'>
             <div className='flex flex-row gap-1.5 md:gap-4 items-stretch md:items-center'>
-              {/* City Selector - 30% width on Mobile, Second on Desktop */}
-              <div className='relative w-[28%] md:w-auto md:min-w-[160px] md:order-2'>
-                <select className='w-full px-2 py-1 md:px-3 md:py-2 rounded-md md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-[11px] md:text-sm font-medium shadow-sm md:shadow-lg bg-white cursor-pointer h-[32px] md:h-[38px]'>
-                  <option value=''>Select City</option>
-                  {Object.keys(cityListByDistrict).map((district) => (
-                    <optgroup key={district} label={district} className='font-bold'>
-                      {cityListByDistrict[district].map((city, index) => (
-                        <option key={index} value={city}>
-                          {city}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+              {/* City Selector - 40% width on Mobile, Second on Desktop */}
+              <div className='w-[40%] md:w-auto md:min-w-[180px] md:order-2'>
+                <CityDropdown
+                  value={selectedCity}
+                  onChange={setSelectedCity}
+                  placeholder='Select City'
+                  darkMode={false}
+                  className='h-[32px] md:h-[38px]'
+                />
               </div>
 
-              {/* Search Input - 70% width on Mobile, First on Desktop */}
-              <div className='relative w-[72%] md:flex-1 md:order-1'>
+              {/* Search Input - 60% width on Mobile, First on Desktop */}
+              <div className='relative w-[60%] md:flex-1 md:order-1'>
                 <input
                   type='text'
                   placeholder='products, services , vendors'
