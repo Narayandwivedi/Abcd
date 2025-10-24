@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import WhatsAppButton from '../component/WhatsAppButton'
+import { cityListByDistrict } from '../assets/citylist'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -220,39 +221,15 @@ const Home = () => {
               <div className='relative w-[28%] md:w-auto md:min-w-[160px] md:order-2'>
                 <select className='w-full px-2 py-1 md:px-3 md:py-2 rounded-md md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 text-[11px] md:text-sm font-medium shadow-sm md:shadow-lg bg-white cursor-pointer h-[32px] md:h-[38px]'>
                   <option value=''>Select City</option>
-                  <option value='balod'>Balod</option>
-                  <option value='baloda-bazar'>Baloda Bazar</option>
-                  <option value='balrampur'>Balrampur</option>
-                  <option value='bastar'>Bastar</option>
-                  <option value='bemetara'>Bemetara</option>
-                  <option value='bijapur'>Bijapur</option>
-                  <option value='bilaspur'>Bilaspur</option>
-                  <option value='dantewada'>Dantewada</option>
-                  <option value='dhamtari'>Dhamtari</option>
-                  <option value='durg'>Durg</option>
-                  <option value='gariaband'>Gariaband</option>
-                  <option value='gaurela-pendra-marwahi'>Gaurela-Pendra-Marwahi</option>
-                  <option value='janjgir-champa'>Janjgir-Champa</option>
-                  <option value='jashpur'>Jashpur</option>
-                  <option value='kanker'>Kanker</option>
-                  <option value='kawardha'>Kawardha (Kabirdham)</option>
-                  <option value='khairagarh-chhuikhadan-gandai'>Khairagarh-Chhuikhadan-Gandai</option>
-                  <option value='kondagaon'>Kondagaon</option>
-                  <option value='korba'>Korba</option>
-                  <option value='korea'>Korea (Koriya)</option>
-                  <option value='mahasamund'>Mahasamund</option>
-                  <option value='manendragarh-chirmiri-bharatpur'>Manendragarh-Chirmiri-Bharatpur</option>
-                  <option value='mohla-manpur-ambagarh-chouki'>Mohla-Manpur-Ambagarh Chouki</option>
-                  <option value='mungeli'>Mungeli</option>
-                  <option value='narayanpur'>Narayanpur</option>
-                  <option value='raigarh'>Raigarh</option>
-                  <option value='raipur'>Raipur</option>
-                  <option value='rajnandgaon'>Rajnandgaon</option>
-                  <option value='sakti'>Sakti</option>
-                  <option value='sarangarh-bilaigarh'>Sarangarh-Bilaigarh</option>
-                  <option value='sukma'>Sukma</option>
-                  <option value='surajpur'>Surajpur</option>
-                  <option value='surguja'>Surguja</option>
+                  {Object.keys(cityListByDistrict).map((district) => (
+                    <optgroup key={district} label={district} className='font-bold'>
+                      {cityListByDistrict[district].map((city, index) => (
+                        <option key={index} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
               </div>
 

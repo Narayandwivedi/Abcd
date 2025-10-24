@@ -4,6 +4,7 @@ import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 import GoogleLogin from '../component/GoogleLogin'
 import { QRCodeSVG } from 'qrcode.react'
+import { cityListByDistrict } from '../assets/citylist'
 
 const Signup = () => {
   const { BACKEND_URL, checkAuthStatus } = useContext(AppContext)
@@ -314,40 +315,16 @@ const Signup = () => {
                   className='w-full px-3 md:px-4 py-2 md:py-3 pl-9 md:pl-11 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm appearance-none cursor-pointer'
                   required
                 >
-                  <option value='' className='bg-gray-800'>Select your District</option>
-                  <option value='Balod' className='bg-gray-800'>Balod</option>
-                  <option value='Baloda Bazar' className='bg-gray-800'>Baloda Bazar</option>
-                  <option value='Balrampur' className='bg-gray-800'>Balrampur</option>
-                  <option value='Bastar' className='bg-gray-800'>Bastar</option>
-                  <option value='Bemetara' className='bg-gray-800'>Bemetara</option>
-                  <option value='Bijapur' className='bg-gray-800'>Bijapur</option>
-                  <option value='Bilaspur' className='bg-gray-800'>Bilaspur</option>
-                  <option value='Dantewada' className='bg-gray-800'>Dantewada</option>
-                  <option value='Dhamtari' className='bg-gray-800'>Dhamtari</option>
-                  <option value='Durg' className='bg-gray-800'>Durg</option>
-                  <option value='Gariaband' className='bg-gray-800'>Gariaband</option>
-                  <option value='Gaurela-Pendra-Marwahi' className='bg-gray-800'>Gaurela-Pendra-Marwahi</option>
-                  <option value='Janjgir-Champa' className='bg-gray-800'>Janjgir-Champa</option>
-                  <option value='Jashpur' className='bg-gray-800'>Jashpur</option>
-                  <option value='Kanker' className='bg-gray-800'>Kanker</option>
-                  <option value='Kawardha' className='bg-gray-800'>Kawardha (Kabirdham)</option>
-                  <option value='Khairagarh-Chhuikhadan-Gandai' className='bg-gray-800'>Khairagarh-Chhuikhadan-Gandai</option>
-                  <option value='Kondagaon' className='bg-gray-800'>Kondagaon</option>
-                  <option value='Korba' className='bg-gray-800'>Korba</option>
-                  <option value='Korea' className='bg-gray-800'>Korea (Koriya)</option>
-                  <option value='Mahasamund' className='bg-gray-800'>Mahasamund</option>
-                  <option value='Manendragarh-Chirmiri-Bharatpur' className='bg-gray-800'>Manendragarh-Chirmiri-Bharatpur</option>
-                  <option value='Mohla-Manpur-Ambagarh Chouki' className='bg-gray-800'>Mohla-Manpur-Ambagarh Chouki</option>
-                  <option value='Mungeli' className='bg-gray-800'>Mungeli</option>
-                  <option value='Narayanpur' className='bg-gray-800'>Narayanpur</option>
-                  <option value='Raigarh' className='bg-gray-800'>Raigarh</option>
-                  <option value='Raipur' className='bg-gray-800'>Raipur</option>
-                  <option value='Rajnandgaon' className='bg-gray-800'>Rajnandgaon</option>
-                  <option value='Sakti' className='bg-gray-800'>Sakti</option>
-                  <option value='Sarangarh-Bilaigarh' className='bg-gray-800'>Sarangarh-Bilaigarh</option>
-                  <option value='Sukma' className='bg-gray-800'>Sukma</option>
-                  <option value='Surajpur' className='bg-gray-800'>Surajpur</option>
-                  <option value='Surguja' className='bg-gray-800'>Surguja</option>
+                  <option value='' className='bg-gray-800'>Select your City</option>
+                  {Object.keys(cityListByDistrict).map((district) => (
+                    <optgroup key={district} label={district} className='bg-gray-800 font-bold'>
+                      {cityListByDistrict[district].map((city, index) => (
+                        <option key={index} value={city} className='bg-gray-800'>
+                          {city}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
                 <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />

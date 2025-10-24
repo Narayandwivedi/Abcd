@@ -2,28 +2,42 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-// Generate unique certificate number
-const generateCertificateNumber = () => {
-  const prefix = 'CERT';
-  const timestamp = Date.now().toString().slice(-8);
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-  return `${prefix}-${timestamp}-${random}`;
+// Generate unique certificate number in format: ym-cg-YYYY-MM-NNNNN
+const generateCertificateNumber = async () => {
+  const User = require('../models/User');
+
+  // Get current year and month
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+
+  // Count total users with certificates
+  const certificateCount = await User.countDocuments({
+    certificateNumber: { $exists: true, $ne: null }
+  });
+
+  // Generate member number (next member)
+  const memberNumber = String(certificateCount + 1).padStart(5, '0');
+
+  // Format: YM-CG-YYYY-MM-NNNNN
+  return `YM-CG-${year}-${month}-${memberNumber}`;
 };
 
 // Generate certificate PDF
 const generateCertificatePDF = async (user) => {
-  return new Promise((resolve, reject) => {
-    try {
-      // Create certificates directory if it doesn't exist
-      const certificatesDir = path.join(__dirname, '..', 'uploads', 'certificates');
-      if (!fs.existsSync(certificatesDir)) {
-        fs.mkdirSync(certificatesDir, { recursive: true });
-      }
+  try {
+    // Create certificates directory if it doesn't exist
+    const certificatesDir = path.join(__dirname, '..', 'uploads', 'certificates');
+    if (!fs.existsSync(certificatesDir)) {
+      fs.mkdirSync(certificatesDir, { recursive: true });
+    }
 
-      // Generate unique certificate number
-      const certificateNumber = generateCertificateNumber();
-      const fileName = `certificate_${user._id}_${Date.now()}.pdf`;
-      const filePath = path.join(certificatesDir, fileName);
+    // Generate unique certificate number
+    const certificateNumber = await generateCertificateNumber();
+    const fileName = `certificate_${user._id}_${Date.now()}.pdf`;
+    const filePath = path.join(certificatesDir, fileName);
+
+    return new Promise((resolve, reject) => {
 
       // Create PDF document
       const doc = new PDFDocument({
@@ -50,95 +64,104 @@ const generateCertificatePDF = async (user) => {
       // Add ABCD logo at the top
       const logoPath = path.join(__dirname, '..', '..', 'frontend', 'public', 'abcd logo3.png');
       if (fs.existsSync(logoPath)) {
-        doc.image(logoPath, (doc.page.width - 80) / 2, 50, {
-          width: 80,
-          height: 80
+        doc.image(logoPath, (doc.page.width - 120) / 2, 45, {
+          width: 120,
+          height: 120
         });
       }
 
       // Add organization name
-      doc.fontSize(18)
+      doc.fontSize(15)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('Agrawal Business and Community Development', 0, 145, {
+        .text('Agrawal Business and Community Development', 0, 172, {
           align: 'center',
           width: doc.page.width
         });
 
       doc.fontSize(14)
-        .fillColor('#6b7280')
-        .font('Helvetica')
-        .text('(ABCD)', 0, 168, {
+        .fillColor('#1e40af')
+        .font('Helvetica-Bold')
+        .text('(ABCD)', 0, 191, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add title
-      doc.fontSize(36)
+      doc.fontSize(28)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('CERTIFICATE OF MEMBERSHIP', 0, 210, {
+        .text('CERTIFICATE OF MEMBERSHIP', 0, 218, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add decorative line
-      doc.moveTo(150, 260)
-        .lineTo(doc.page.width - 150, 260)
+      doc.moveTo(150, 255)
+        .lineTo(doc.page.width - 150, 255)
         .strokeColor('#93c5fd')
         .lineWidth(2)
         .stroke();
 
       // Add "This is to certify that"
-      doc.fontSize(16)
+      doc.fontSize(12)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('This is to certify that', 0, 290, {
+        .text('This is to certify that', 0, 270, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add user's name
-      doc.fontSize(30)
+      doc.fontSize(24)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text(user.fullName.toUpperCase(), 0, 325, {
+        .text(user.fullName.toUpperCase(), 0, 295, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add Father's name
-      doc.fontSize(15)
+      doc.fontSize(12)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(`S/O ${user.fatherName}`, 0, 370, {
+        .text(`S/O ${user.fatherName}`, 0, 330, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add gotra
-      doc.fontSize(17)
+      doc.fontSize(13)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text(`Gotra: ${user.gotra}`, 0, 400, {
+        .text(`Gotra: ${user.gotra}`, 0, 352, {
+          align: 'center',
+          width: doc.page.width
+        });
+
+      // Add city
+      doc.fontSize(12)
+        .fillColor('#374151')
+        .font('Helvetica')
+        .text(`City: ${user.city || 'N/A'}`, 0, 372, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add description
-      doc.fontSize(14)
+      doc.fontSize(12)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('is a verified member of our community', 0, 435, {
+        .text('is a verified member of our community', 0, 393, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add certificate number
-      doc.fontSize(12)
+      doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica-Bold')
-        .text(`Certificate Number: ${certificateNumber}`, 0, 480, {
+        .text(`Certificate Number: ${certificateNumber}`, 0, 415, {
           align: 'center',
           width: doc.page.width
         });
@@ -150,47 +173,99 @@ const generateCertificatePDF = async (user) => {
         year: 'numeric'
       });
 
-      doc.fontSize(12)
+      doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica')
-        .text(`Issued on: ${issueDate}`, 0, 505, {
+        .text(`Issued on: ${issueDate}`, 0, 430, {
           align: 'center',
           width: doc.page.width
         });
 
-      // Add organization name at bottom
-      doc.fontSize(10)
+      // Add location at bottom center
+      doc.fontSize(9)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('Agrawal Business and Community Development (ABCD)', 0, doc.page.height - 70, {
+        .text('AT H.Q. Raipur India', 0, 448, {
           align: 'center',
           width: doc.page.width
         });
 
-      // Add signature image
+      // Add terms & conditions text at left bottom
+      doc.fontSize(7)
+        .fillColor('#6b7280')
+        .font('Helvetica-Oblique')
+        .text('Subject to Terms & Conditions', 50, 510, {
+          align: 'left'
+        });
+
+      // Add Chief Patron signature image on left side
+      const chiefSignaturePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'cheif sign (1).png');
+      if (fs.existsSync(chiefSignaturePath)) {
+        doc.image(chiefSignaturePath, 100, 420, {
+          width: 120,
+          height: 40,
+          align: 'center'
+        });
+      }
+
+      // Add Chief Patron signature line
+      doc.moveTo(100, 465)
+        .lineTo(220, 465)
+        .strokeColor('#374151')
+        .lineWidth(1)
+        .stroke();
+
+      // Add Dr Ashok Agrawal text
+      doc.fontSize(9)
+        .fillColor('#374151')
+        .font('Helvetica-Bold')
+        .text('Dr Ashok Agrawal', 100, 470, {
+          align: 'center',
+          width: 120
+        });
+
+      // Add Chief Patron-ABCD text
+      doc.fontSize(8)
+        .fillColor('#374151')
+        .font('Helvetica')
+        .text('(Chief Patron - ABCD)', 100, 483, {
+          align: 'center',
+          width: 120
+        });
+
+      // Add signature image on right side
       const signaturePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'signature.png');
       if (fs.existsSync(signaturePath)) {
-        doc.image(signaturePath, doc.page.width - 250, doc.page.height - 140, {
-          width: 150,
-          height: 50,
+        doc.image(signaturePath, doc.page.width - 220, 420, {
+          width: 120,
+          height: 40,
           align: 'center'
         });
       }
 
       // Add signature line
-      doc.moveTo(doc.page.width - 250, doc.page.height - 85)
-        .lineTo(doc.page.width - 100, doc.page.height - 85)
+      doc.moveTo(doc.page.width - 220, 465)
+        .lineTo(doc.page.width - 100, 465)
         .strokeColor('#374151')
         .lineWidth(1)
         .stroke();
 
-      // Add signature section text
-      doc.fontSize(12)
+      // Add Mr Lalit Agrawal text
+      doc.fontSize(9)
         .fillColor('#374151')
         .font('Helvetica-Bold')
-        .text('Authorized Signature', doc.page.width - 250, doc.page.height - 75, {
+        .text('Mr Lalit Agrawal', doc.page.width - 220, 470, {
           align: 'center',
-          width: 150
+          width: 120
+        });
+
+      // Add Chairman-ABCD text
+      doc.fontSize(8)
+        .fillColor('#374151')
+        .font('Helvetica')
+        .text('(Chairman-ABCD)', doc.page.width - 220, 483, {
+          align: 'center',
+          width: 120
         });
 
       // Finalize PDF
@@ -209,11 +284,10 @@ const generateCertificatePDF = async (user) => {
       writeStream.on('error', (error) => {
         reject(error);
       });
-
-    } catch (error) {
-      reject(error);
-    }
-  });
+    });
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = {
