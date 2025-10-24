@@ -61,32 +61,32 @@ const AdDetail = () => {
   return (
     <div className='min-h-screen bg-gray-50 pb-20 md:pb-4'>
       {/* Header */}
-      <div className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-4 shadow-md'>
+      <div className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 px-4 shadow-md'>
         <div className='container mx-auto max-w-4xl flex items-center gap-3'>
           <button
             onClick={handleBack}
-            className='hover:bg-white/20 p-2 rounded-full transition-all'
+            className='hover:bg-white/20 p-1.5 rounded-full transition-all'
             aria-label='Go back'
           >
-            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M10 19l-7-7m0 0l7-7m-7 7h18' />
             </svg>
           </button>
-          <h1 className='text-2xl font-bold'>
+          <h1 className='text-lg font-bold'>
             {type === 'ad' ? 'Advertisement Details' : 'Hot Deal Details'}
           </h1>
         </div>
       </div>
 
-      <div className='container mx-auto px-4 py-6 max-w-4xl'>
+      <div className='container mx-auto px-4 py-3 max-w-4xl'>
         {/* Image Section */}
-        <div className='bg-white rounded-xl shadow-lg overflow-hidden mb-6'>
-          <div className='bg-gradient-to-r from-blue-50 to-purple-50 p-6'>
-            <div className='flex items-center justify-center bg-white rounded-lg shadow-md p-4 min-h-[300px] md:min-h-[400px]'>
+        <div className='bg-white rounded-xl shadow-lg overflow-hidden mb-4'>
+          <div className='bg-gradient-to-r from-blue-50 to-purple-50 p-3'>
+            <div className='flex items-center justify-center bg-white rounded-lg shadow-md p-2'>
               <img
                 src={image}
                 alt={type === 'ad' ? `Advertisement ${id}` : `Hot Deal ${id}`}
-                className='max-w-full max-h-[300px] md:max-h-[400px] object-contain'
+                className='max-w-full max-h-[200px] md:max-h-[250px] object-contain'
               />
             </div>
           </div>
