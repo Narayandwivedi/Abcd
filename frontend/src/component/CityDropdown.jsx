@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { cityListByDistrict } from '../assets/citylist'
+import { cityList } from '../assets/citylist'
 
 const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select your City', required = false, darkMode = false }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const dropdownRef = useRef(null)
+
+  // Sort cities alphabetically
+  const sortedCities = [...cityList].sort((a, b) => a.localeCompare(b))
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -20,18 +23,11 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
 
   // Filter cities based on search query
   const getFilteredCities = () => {
-    if (!searchQuery.trim()) return cityListByDistrict
+    if (!searchQuery.trim()) return sortedCities
 
-    const filtered = {}
-    Object.keys(cityListByDistrict).forEach((district) => {
-      const matchingCities = cityListByDistrict[district].filter((city) =>
-        city.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      if (matchingCities.length > 0) {
-        filtered[district] = matchingCities
-      }
-    })
-    return filtered
+    return sortedCities.filter((city) =>
+      city.toLowerCase().includes(searchQuery.toLowerCase())
+    )
   }
 
   const filteredCities = getFilteredCities()
@@ -104,36 +100,22 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
 
           {/* Cities List */}
           <div className='overflow-y-auto max-h-80'>
-            {Object.keys(filteredCities).length > 0 ? (
-              Object.keys(filteredCities).map((district) => (
-                <div key={district}>
-                  {/* District Header */}
-                  <div
-                    className={`px-3 md:px-4 py-1.5 md:py-2 ${
-                      darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'
-                    } font-bold text-xs md:text-sm sticky top-0`}
-                  >
-                    {district}
-                  </div>
-
-                  {/* Cities in District */}
-                  {filteredCities[district].map((city, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleCitySelect(city)}
-                      className={`px-3 md:px-4 py-2 md:py-2.5 cursor-pointer transition-colors text-xs md:text-sm ${
-                        value === city
-                          ? darkMode
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-purple-100 text-purple-800'
-                          : darkMode
-                          ? 'text-gray-200 hover:bg-gray-700'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {city}
-                    </div>
-                  ))}
+            {filteredCities.length > 0 ? (
+              filteredCities.map((city, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleCitySelect(city)}
+                  className={`px-3 md:px-4 py-2 md:py-2.5 cursor-pointer transition-colors text-xs md:text-sm ${
+                    value === city
+                      ? darkMode
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-purple-100 text-purple-800'
+                      : darkMode
+                      ? 'text-gray-200 hover:bg-gray-700'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {city}
                 </div>
               ))
             ) : (
