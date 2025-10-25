@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const readline = require('readline');
 
-// Import User model
-const userModel = require('../models/User');
+// Import Admin model
+const Admin = require('../models/Admin');
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -54,9 +54,16 @@ async function createAdmin() {
     console.log('Database connected successfully!');
 
     // Check if admin email already exists
-    const existingUser = await userModel.findOne({ email });
-    if (existingUser) {
-      console.error(`\nError: User with email ${email} already exists!`);
+    const existingAdmin = await Admin.findOne({ email: email.toLowerCase() });
+    if (existingAdmin) {
+      console.error(`\nError: Admin with email ${email} already exists!`);
+      process.exit(1);
+    }
+
+    // Check if admin mobile already exists
+    const existingMobile = await Admin.findOne({ mobile });
+    if (existingMobile) {
+      console.error(`\nError: Admin with mobile ${mobile} already exists!`);
       process.exit(1);
     }
 
@@ -68,14 +75,12 @@ async function createAdmin() {
     console.log('Creating admin user...');
 
     // Create admin user
-    const admin = await userModel.create({
+    const admin = await Admin.create({
       fullName,
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
-      role: 'admin',
       mobile,
-      isVerified: true,
-      paymentVerified: true
+      isActive: true
     });
 
     console.log('\n✅ Admin user created successfully!');
@@ -84,9 +89,9 @@ async function createAdmin() {
     console.log(`Name:     ${admin.fullName}`);
     console.log(`Email:    ${admin.email}`);
     console.log(`Mobile:   ${admin.mobile}`);
-    console.log(`Role:     ${admin.role}`);
+    console.log(`Active:   ${admin.isActive}`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-    console.log('You can now login to the admin panel with these credentials.\n');
+    console.log('You can now login to the admin panel with email/mobile and password.\n');
 
     process.exit(0);
   } catch (error) {

@@ -1,21 +1,13 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.js");
+const Admin = require("../models/Admin.js");
 const { generateCertificatePDF } = require("../utils/generateCertificate.js");
 
 // Get all users (for admin)
 const getAllUsers = async (req, res) => {
   try {
-    // TODO: Uncomment when auth middleware is added
-    // Check if user is admin
-    // if (!req.user || req.user.role !== 'admin') {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: "Access denied. Admin only."
-    //   });
-    // }
-
-    const users = await userModel.find({ role: 'user' })
+    const users = await userModel.find()
       .select('-password')
       .sort({ createdAt: -1 });
 
@@ -35,15 +27,6 @@ const getAllUsers = async (req, res) => {
 // Approve user
 const approveUser = async (req, res) => {
   try {
-    // TODO: Uncomment when auth middleware is added
-    // Check if user is admin
-    // if (!req.user || req.user.role !== 'admin') {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: "Access denied. Admin only."
-    //   });
-    // }
-
     const { userId } = req.params;
 
     const user = await userModel.findById(userId);
@@ -90,15 +73,6 @@ const approveUser = async (req, res) => {
 // Set password for user
 const setUserPassword = async (req, res) => {
   try {
-    // TODO: Uncomment when auth middleware is added
-    // Check if user is admin
-    // if (!req.user || req.user.role !== 'admin') {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: "Access denied. Admin only."
-    //   });
-    // }
-
     const { userId } = req.params;
     const { password } = req.body;
 
@@ -142,23 +116,36 @@ const setUserPassword = async (req, res) => {
 // Admin login
 const adminLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body; // identifier can be email or mobile
 
     // Validate input
-    if (!email || !password) {
+    if (!identifier || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required"
+        message: "Email/Mobile and password are required"
       });
     }
 
-    // Find admin user by email
-    const admin = await userModel.findOne({ email, role: "admin" });
+    // Find admin by email or mobile
+    const admin = await Admin.findOne({
+      $or: [
+        { email: identifier.toLowerCase() },
+        { mobile: identifier }
+      ]
+    });
 
     if (!admin) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials"
+      });
+    }
+
+    // Check if admin is active
+    if (!admin.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "Account is deactivated. Contact system administrator."
       });
     }
 
@@ -172,15 +159,19 @@ const adminLogin = async (req, res) => {
       });
     }
 
+    // Update last login
+    admin.lastLogin = new Date();
+    await admin.save();
+
     // Generate JWT token
     const token = jwt.sign(
-      { userId: admin._id, role: admin.role },
+      { adminId: admin._id },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
     // Set cookie
-    res.cookie("token", token, {
+    res.cookie("adminToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -194,7 +185,7 @@ const adminLogin = async (req, res) => {
         _id: admin._id,
         fullName: admin.fullName,
         email: admin.email,
-        role: admin.role
+        mobile: admin.mobile
       }
     });
   } catch (error) {
@@ -209,7 +200,7 @@ const adminLogin = async (req, res) => {
 // Admin logout
 const adminLogout = async (req, res) => {
   try {
-    res.clearCookie("token");
+    res.clearCookie("adminToken");
     return res.status(200).json({
       success: true,
       message: "Logout successful"
@@ -226,7 +217,7 @@ const adminLogout = async (req, res) => {
 // Get current admin info
 const getCurrentAdmin = async (req, res) => {
   try {
-    const admin = await userModel.findById(req.userId).select("-password");
+    const admin = await Admin.findById(req.adminId).select("-password");
 
     if (!admin) {
       return res.status(404).json({

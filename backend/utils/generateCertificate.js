@@ -70,19 +70,11 @@ const generateCertificatePDF = async (user) => {
         });
       }
 
-      // Add organization name
-      doc.fontSize(15)
-        .fillColor('#1e40af')
-        .font('Helvetica-Bold')
-        .text('Agrawal Business and Community Development', 0, 172, {
-          align: 'center',
-          width: doc.page.width
-        });
-
+      // Add organization name with (ABCD) on same line
       doc.fontSize(14)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('(ABCD)', 0, 191, {
+        .text('Agrawal Business and Community Development (ABCD)', 0, 172, {
           align: 'center',
           width: doc.page.width
         });
@@ -91,14 +83,14 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(28)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('CERTIFICATE OF MEMBERSHIP', 0, 218, {
+        .text('CERTIFICATE OF MEMBERSHIP', 0, 205, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add decorative line
-      doc.moveTo(150, 255)
-        .lineTo(doc.page.width - 150, 255)
+      doc.moveTo(150, 242)
+        .lineTo(doc.page.width - 150, 242)
         .strokeColor('#93c5fd')
         .lineWidth(2)
         .stroke();
@@ -107,7 +99,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(12)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('This is to certify that', 0, 270, {
+        .text('This is to certify that', 0, 257, {
           align: 'center',
           width: doc.page.width
         });
@@ -116,16 +108,16 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(24)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text(user.fullName.toUpperCase(), 0, 295, {
+        .text(user.fullName.toUpperCase(), 0, 282, {
           align: 'center',
           width: doc.page.width
         });
 
-      // Add Father's name
+      // Add Father's name - Bold with same color as user name
       doc.fontSize(12)
-        .fillColor('#374151')
-        .font('Helvetica')
-        .text(`S/O ${user.fatherName}`, 0, 330, {
+        .fillColor('#1e40af')
+        .font('Helvetica-Bold')
+        .text(`S/O ${user.fatherName}`, 0, 317, {
           align: 'center',
           width: doc.page.width
         });
@@ -134,7 +126,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(13)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text(`Gotra: ${user.gotra}`, 0, 352, {
+        .text(`Gotra: ${user.gotra}`, 0, 339, {
           align: 'center',
           width: doc.page.width
         });
@@ -143,7 +135,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(12)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(`City: ${user.city || 'N/A'}`, 0, 372, {
+        .text(`City: ${user.city || 'N/A'}`, 0, 359, {
           align: 'center',
           width: doc.page.width
         });
@@ -152,7 +144,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(12)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('is a verified member of our community', 0, 393, {
+        .text('is a verified member of our community', 0, 380, {
           align: 'center',
           width: doc.page.width
         });
@@ -161,7 +153,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica-Bold')
-        .text(`Certificate Number: ${certificateNumber}`, 0, 415, {
+        .text(`Certificate Number: ${certificateNumber}`, 0, 402, {
           align: 'center',
           width: doc.page.width
         });
@@ -176,7 +168,16 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica')
-        .text(`Issued on: ${issueDate}`, 0, 430, {
+        .text(`Issued on: ${issueDate}`, 0, 417, {
+          align: 'center',
+          width: doc.page.width
+        });
+
+      // Add valid till date
+      doc.fontSize(9)
+        .fillColor('#6b7280')
+        .font('Helvetica-Bold')
+        .text('Valid till: 31 March 2027', 0, 432, {
           align: 'center',
           width: doc.page.width
         });
@@ -185,7 +186,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('AT H.Q. Raipur India', 0, 448, {
+        .text('AT H.Q. Raipur India', 0, 450, {
           align: 'center',
           width: doc.page.width
         });
