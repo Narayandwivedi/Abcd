@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext'
 
 const Login = () => {
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,7 +17,7 @@ const Login = () => {
     setError('')
     setLoading(true)
 
-    const result = await login(email, password)
+    const result = await login(identifier, password)
 
     if (result.success) {
       navigate('/')
@@ -56,20 +56,20 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} className='space-y-5'>
-            {/* Email Field */}
+            {/* Email or Mobile Field */}
             <div>
-              <label htmlFor='email' className='block text-sm font-semibold text-gray-700 mb-2'>
-                Email Address
+              <label htmlFor='identifier' className='block text-sm font-semibold text-gray-700 mb-2'>
+                Email or Mobile Number
               </label>
               <input
-                id='email'
-                type='email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id='identifier'
+                type='text'
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition outline-none'
-                placeholder='admin@abcd.com'
-                autoComplete='email'
+                placeholder='admin@abcd.com or 1234567890'
+                autoComplete='username'
               />
             </div>
 

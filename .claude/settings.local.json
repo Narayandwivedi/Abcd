@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd comprehensive admin security with strict login protection\n\nImplemented complete admin authentication system with enterprise-grade security measures including rate limiting, JWT authentication, and role-based access control.\n\nBackend Security:\n- Admin login with JWT authentication and HTTP-only cookies\n- Strict rate limiting: 3 login attempts per 24 hours per IP\n- Protected admin routes with adminAuth middleware\n- Admin logout and session management\n- Get current admin endpoint for session verification\n- Created admin user creation script for manual setup\n\nFrontend Security:\n- Admin login page with password visibility toggle\n- Auth context with centralized state management\n- Protected routes with authentication guards\n- Auto-redirect for unauthenticated users\n- Session persistence across page refreshes\n- Logout confirmation with two-step process\n- Loading states during authentication checks\n\nNew Routes:\n- POST /api/admin/login (rate limited, public)\n- POST /api/admin/logout (protected)\n- GET /api/admin/me (protected)\n\nDocumentation:\n- Comprehensive setup guide (ADMIN_SETUP.md)\n- Quick start guide (ADMIN_QUICK_START.md)\n- Admin user creation script with prompts\n\nSecurity Features:\n- Rate limiting prevents brute force attacks\n- Role-based access control (admin role only)\n- Password hashing with bcrypt (10 salt rounds)\n- 7-day session expiration\n- Responsive UI with security notices\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

@@ -32,9 +32,9 @@ export const AdminAuthProvider = ({ children }) => {
     }
   }
 
-  const login = async (email, password) => {
+  const login = async (identifier, password) => {
     try {
-      const response = await axios.post('/api/admin/login', { email, password })
+      const response = await axios.post('/api/admin/login', { identifier, password })
       if (response.data.success) {
         setAdmin(response.data.admin)
         setIsAuthenticated(true)
