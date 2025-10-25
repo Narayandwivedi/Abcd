@@ -1,11 +1,18 @@
 const express = require("express");
-const { getAllUsers, approveUser, setUserPassword } = require("../controllers/adminController");
+const { getAllUsers, approveUser, setUserPassword, adminLogin, adminLogout, getCurrentAdmin } = require("../controllers/adminController");
+const adminAuth = require("../middleware/adminAuth");
+const { adminLoginLimiter } = require("../middleware/adminRateLimit");
 
 const router = express.Router();
 
-// All admin routes require authentication
-router.get("/users", getAllUsers);
-router.put("/users/:userId/approve",approveUser);
-router.put("/users/:userId/set-password",setUserPassword);
+// Public routes (no authentication required)
+router.post("/login", adminLoginLimiter, adminLogin);
+
+// Protected routes (require authentication)
+router.post("/logout", adminAuth, adminLogout);
+router.get("/me", adminAuth, getCurrentAdmin);
+router.get("/users", adminAuth, getAllUsers);
+router.put("/users/:userId/approve", adminAuth, approveUser);
+router.put("/users/:userId/set-password", adminAuth, setUserPassword);
 
 module.exports = router;

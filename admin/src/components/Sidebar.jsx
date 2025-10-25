@@ -1,8 +1,17 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAdminAuth } from '../context/AdminAuthContext'
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { admin, logout } = useAdminAuth()
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
 
   const menuItems = [
     {
@@ -138,17 +147,48 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           ))}
         </nav>
 
-        {/* User Info */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-700/30 bg-blue-900/50">
+        {/* User Info & Logout */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-700/30 bg-blue-900/50 space-y-2">
           <div className="flex items-center space-x-3 px-4 py-3 bg-black/20 rounded-xl">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
-              LA
+              {admin?.fullName?.charAt(0).toUpperCase() || 'A'}
             </div>
-            <div>
-              <div className="font-semibold text-blue-100">Lalit Agrawal</div>
+            <div className="flex-1">
+              <div className="font-semibold text-blue-100 text-sm truncate">{admin?.fullName || 'Admin'}</div>
               <div className="text-xs text-blue-300">Super Admin</div>
             </div>
           </div>
+
+          {/* Logout Button */}
+          {!showLogoutConfirm ? (
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-xl transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="font-semibold text-sm">Logout</span>
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-xs text-blue-200 text-center">Are you sure?</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleLogout}
+                  className="flex-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold transition"
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-semibold transition"
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
