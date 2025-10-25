@@ -118,6 +118,12 @@ const adminLogin = async (req, res) => {
   try {
     const { identifier, password } = req.body; // identifier can be email or mobile
 
+    // Log the client IP for debugging
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+                     req.headers['x-real-ip'] ||
+                     req.ip;
+    console.log(`[ADMIN LOGIN] Login attempt from IP: ${clientIp}, Identifier: ${identifier}`);
+
     // Validate input
     if (!identifier || !password) {
       return res.status(400).json({
@@ -162,6 +168,8 @@ const adminLogin = async (req, res) => {
     // Update last login
     admin.lastLogin = new Date();
     await admin.save();
+
+    console.log(`[ADMIN LOGIN] ✅ Successful login for ${admin.email} from IP: ${clientIp}`);
 
     // Generate JWT token
     const token = jwt.sign(

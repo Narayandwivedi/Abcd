@@ -9,6 +9,10 @@ const { connectToDb } = require('./utils/mongodb');
 const app = express()
 const PORT = process.env.PORT
 
+// Trust proxy - Required for rate limiting behind proxies/load balancers
+// This allows Express to read the real client IP from X-Forwarded-For header
+app.set('trust proxy', 1);
+
 // routes
 
 const authRoute = require('./routes/authRoute')
