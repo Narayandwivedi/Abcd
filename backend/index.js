@@ -45,6 +45,7 @@ app.use(cookieParser());
 
 // Serve static files from uploads folder
 app.use('/upload', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth',authRoute)
 app.use('/api/vendor-auth',vendorAuthRoute)

@@ -64,96 +64,96 @@ const generateCertificatePDF = async (user) => {
       // Add ABCD logo at the top
       const logoPath = path.join(__dirname, '..', '..', 'frontend', 'public', 'abcd logo3.png');
       if (fs.existsSync(logoPath)) {
-        doc.image(logoPath, (doc.page.width - 120) / 2, 45, {
-          width: 120,
-          height: 120
+        doc.image(logoPath, (doc.page.width - 110) / 2, 40, {
+          width: 110,
+          height: 110
         });
       }
 
       // Add organization name with (ABCD) on same line
-      doc.fontSize(14)
+      doc.fontSize(13)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('Agrawal Business and Community Development (ABCD)', 0, 172, {
+        .text('Agrawal Business and Community Development (ABCD)', 0, 160, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add title
-      doc.fontSize(28)
+      doc.fontSize(26)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('CERTIFICATE OF MEMBERSHIP', 0, 205, {
+        .text('CERTIFICATE OF MEMBERSHIP', 0, 185, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add decorative line
-      doc.moveTo(150, 242)
-        .lineTo(doc.page.width - 150, 242)
+      doc.moveTo(150, 218)
+        .lineTo(doc.page.width - 150, 218)
         .strokeColor('#93c5fd')
         .lineWidth(2)
         .stroke();
 
       // Add "This is to certify that"
-      doc.fontSize(12)
+      doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('This is to certify that', 0, 257, {
+        .text('This is to certify that', 0, 232, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add user's name
-      doc.fontSize(24)
+      doc.fontSize(22)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text(user.fullName.toUpperCase(), 0, 282, {
+        .text(user.fullName.toUpperCase(), 0, 253, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add Father's name - Bold with same color as user name
-      doc.fontSize(12)
+      doc.fontSize(11)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text(`S/O ${user.fatherName}`, 0, 317, {
+        .text(`S/O ${user.fatherName}`, 0, 283, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add gotra
-      doc.fontSize(13)
+      doc.fontSize(12)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text(`Gotra: ${user.gotra}`, 0, 339, {
+        .text(`Gotra: ${user.gotra}`, 0, 303, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add city
-      doc.fontSize(12)
+      doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(`City: ${user.city || 'N/A'}`, 0, 359, {
+        .text(`City: ${user.city || 'N/A'}`, 0, 321, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add description
-      doc.fontSize(12)
+      doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('is a verified member of our community', 0, 380, {
+        .text('is a verified member of our community', 0, 340, {
           align: 'center',
           width: doc.page.width
         });
 
-      // Add certificate number
-      doc.fontSize(9)
-        .fillColor('#6b7280')
+      // Add certificate number - HIGHLIGHTED with darker color and background
+      doc.fontSize(11)
+        .fillColor('#000000')
         .font('Helvetica-Bold')
-        .text(`Certificate Number: ${certificateNumber}`, 0, 402, {
+        .text(`Certificate Number: ${certificateNumber}`, 0, 365, {
           align: 'center',
           width: doc.page.width
         });
@@ -168,7 +168,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica')
-        .text(`Issued on: ${issueDate}`, 0, 417, {
+        .text(`Issued on: ${issueDate}`, 0, 385, {
           align: 'center',
           width: doc.page.width
         });
@@ -177,41 +177,44 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica-Bold')
-        .text('Valid till: 31 March 2027', 0, 432, {
+        .text('Valid till: 31 March 2027', 0, 398, {
           align: 'center',
           width: doc.page.width
         });
 
-      // Add location at bottom center
-      doc.fontSize(9)
+      // Add some spacing
+      doc.moveDown(1);
+
+      // Add full HQ address at bottom center with better spacing
+      doc.fontSize(10)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('AT H.Q. Raipur India', 0, 450, {
+        .text('H.Q. Raipur', 0, 420, {
           align: 'center',
           width: doc.page.width
         });
 
-      // Add terms & conditions text at left bottom
-      doc.fontSize(7)
-        .fillColor('#6b7280')
-        .font('Helvetica-Oblique')
-        .text('Subject to Terms & Conditions', 50, 510, {
-          align: 'left'
+      doc.fontSize(9)
+        .fillColor('#374151')
+        .font('Helvetica')
+        .text('Hanuman Market, Ramsagar Para, Raipur (CG) 492001', 0, 435, {
+          align: 'center',
+          width: doc.page.width
         });
 
       // Add Chief Patron signature image on left side
       const chiefSignaturePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'cheif sign (1).png');
       if (fs.existsSync(chiefSignaturePath)) {
-        doc.image(chiefSignaturePath, 100, 420, {
-          width: 120,
-          height: 40,
+        doc.image(chiefSignaturePath, 90, 455, {
+          width: 115,
+          height: 38,
           align: 'center'
         });
       }
 
       // Add Chief Patron signature line
-      doc.moveTo(100, 465)
-        .lineTo(220, 465)
+      doc.moveTo(90, 497)
+        .lineTo(205, 497)
         .strokeColor('#374151')
         .lineWidth(1)
         .stroke();
@@ -220,33 +223,33 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#374151')
         .font('Helvetica-Bold')
-        .text('Dr Ashok Agrawal', 100, 470, {
+        .text('Dr Ashok Agrawal', 90, 501, {
           align: 'center',
-          width: 120
+          width: 115
         });
 
       // Add Chief Patron-ABCD text
       doc.fontSize(8)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('(Chief Patron - ABCD)', 100, 483, {
+        .text('(Chief Patron - ABCD)', 90, 514, {
           align: 'center',
-          width: 120
+          width: 115
         });
 
       // Add signature image on right side
       const signaturePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'signature.png');
       if (fs.existsSync(signaturePath)) {
-        doc.image(signaturePath, doc.page.width - 220, 420, {
-          width: 120,
-          height: 40,
+        doc.image(signaturePath, doc.page.width - 205, 455, {
+          width: 115,
+          height: 38,
           align: 'center'
         });
       }
 
       // Add signature line
-      doc.moveTo(doc.page.width - 220, 465)
-        .lineTo(doc.page.width - 100, 465)
+      doc.moveTo(doc.page.width - 205, 497)
+        .lineTo(doc.page.width - 90, 497)
         .strokeColor('#374151')
         .lineWidth(1)
         .stroke();
@@ -255,18 +258,26 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#374151')
         .font('Helvetica-Bold')
-        .text('Mr Lalit Agrawal', doc.page.width - 220, 470, {
+        .text('Mr Lalit Agrawal', doc.page.width - 205, 501, {
           align: 'center',
-          width: 120
+          width: 115
         });
 
       // Add Chairman-ABCD text
       doc.fontSize(8)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('(Chairman-ABCD)', doc.page.width - 220, 483, {
+        .text('(Chairman-ABCD)', doc.page.width - 205, 514, {
           align: 'center',
-          width: 120
+          width: 115
+        });
+
+      // Add terms & conditions text at LEFT BOTTOM CORNER - MOVED LOWER
+      doc.fontSize(7)
+        .fillColor('#6b7280')
+        .font('Helvetica-Oblique')
+        .text('Subject to Terms & Conditions', 40, 537, {
+          align: 'left'
         });
 
       // Finalize PDF

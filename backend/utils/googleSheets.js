@@ -1,14 +1,20 @@
 const { google } = require("googleapis");
 const path = require("path");
+const fs = require("fs");
 
 // Path to your service account credentials
 const CREDENTIALS_PATH = path.join(__dirname, "..", "abcd-backend-sheet-950692a70728.json");
 
-// Initialize Google Sheets API
-const auth = new google.auth.GoogleAuth({
-  keyFile: CREDENTIALS_PATH,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
+// Read and parse the service account key file
+const serviceAccountKey = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
+
+// Initialize auth using JWT (recommended way)
+const auth = new google.auth.JWT(
+  serviceAccountKey.client_email,
+  null,
+  serviceAccountKey.private_key,
+  ["https://www.googleapis.com/auth/spreadsheets"]
+);
 
 const sheets = google.sheets({ version: "v4", auth });
 
