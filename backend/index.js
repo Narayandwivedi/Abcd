@@ -50,7 +50,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth',authRoute)
 app.use('/api/vendor-auth',vendorAuthRoute)
 app.use('/api/vendor',vendorRoute)
-app.use('/api/admin/vendor',adminVendorRoute)
+app.use('/api/admin',adminVendorRoute)
 app.use('/api/admin',adminRoute)
 app.use('/api/search',searchRoute)
 app.use('/api/upload',uploadRoute)

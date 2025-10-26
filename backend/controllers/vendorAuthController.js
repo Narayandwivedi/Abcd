@@ -11,17 +11,19 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, city, category } = req.body;
+    let { email, mobile, ownerName, businessName, city, membershipCategory, category, subCategory } = req.body;
 
     // Trim input fields
     email = email?.trim();
     ownerName = ownerName?.trim();
     businessName = businessName?.trim();
     city = city?.trim();
+    membershipCategory = membershipCategory?.trim();
     category = category?.trim();
+    subCategory = subCategory?.trim();
 
-    if (!email || !mobile || !ownerName || !businessName) {
-      return res.status(400).json({ success: false, message: "Email, mobile, owner name, and business name are required" });
+    if (!mobile || !ownerName || !businessName || !city || !category || !subCategory || !membershipCategory) {
+      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, city, category, sub-category, and membership category are required" });
     }
 
     // Validate Indian mobile number
@@ -33,8 +35,13 @@ const handleVendorSignup = async (req, res) => {
     }
 
     // Check if vendor already exists by email or mobile
+    const existingVendorQuery = [{ mobile }];
+    if (email) {
+      existingVendorQuery.push({ email });
+    }
+
     const existingVendor = await vendorModel.findOne({
-      $or: [{ email }, { mobile }]
+      $or: existingVendorQuery
     });
 
     if (existingVendor) {
@@ -43,7 +50,7 @@ const handleVendorSignup = async (req, res) => {
         fs.unlinkSync(req.files.vendorPhoto[0].path);
       }
 
-      if (existingVendor.email === email) {
+      if (email && existingVendor.email === email) {
         return res.status(400).json({
           success: false,
           message: "Email already exists",
@@ -58,21 +65,19 @@ const handleVendorSignup = async (req, res) => {
     }
 
     const newVendorData = {
-      email,
       mobile,
       ownerName,
       businessName,
+      city, // Required field
+      category,
+      subCategory,
+      membershipCategory, // Required field
       isBusinessApplicationSubmitted: true, // Skip business form, go directly to pending approval
     };
 
-    // Add optional city field
-    if (city) {
-      newVendorData.city = city;
-    }
-
-    // Add membership category if provided
-    if (category) {
-      newVendorData.membershipCategory = category;
+    // Add optional email field
+    if (email) {
+      newVendorData.email = email;
     }
 
     // Process vendor photo if provided

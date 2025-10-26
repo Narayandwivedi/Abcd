@@ -5,6 +5,7 @@ const vendorSchema = new mongoose.Schema({
   email: {
     type: String,
     unique: true,
+    sparse: true, // Allow null/undefined values while maintaining uniqueness
   },
   mobile: {
     type: Number,
@@ -19,7 +20,7 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  
+
   password: {
     type: String,
   },
@@ -38,10 +39,20 @@ const vendorSchema = new mongoose.Schema({
   },
   city: {
     type: String,
+    required: true,
   },
   membershipCategory: {
     type: String,
     enum: ['Bronze', 'Silver', 'Gold', 'Diamond', 'Platinum'],
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  subCategory: {
+    type: String,
+    required: true,
   },
   authProvider: {
     type: String,
@@ -60,6 +71,32 @@ const vendorSchema = new mongoose.Schema({
   isEmailVerified: {
     type: Boolean,
     default: false,
+  },
+
+  // Payment and Approval Fields
+  paymentScreenshot: {
+    type: String,
+  },
+  utrNumber: {
+    type: String,
+  },
+  paymentVerified: {
+    type: Boolean,
+    default: false,
+  },
+  isRejected: {
+    type: Boolean,
+    default: false,
+  },
+
+  // Certificate Fields
+  certificateNumber: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow null for vendors without certificates
+  },
+  certificateDownloadLink: {
+    type: String,
   },
 
 }, { timestamps: true });

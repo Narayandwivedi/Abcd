@@ -26,7 +26,9 @@ const Signup = () => {
     email: '',
     mobile: '',
     city: '',
+    membershipCategory: '',
     category: '',
+    subCategory: '',
     vendorPhoto: null
   })
   const [previewPhoto, setPreviewPhoto] = useState(null)
@@ -83,7 +85,7 @@ const Signup = () => {
     setError('')
 
     // Validation
-    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.city || !formData.category) {
+    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.city || !formData.category || !formData.subCategory) {
       setError('Please fill in all required fields')
       return
     }
@@ -115,6 +117,8 @@ const Signup = () => {
       submitData.append('mobile', formData.mobile)
       submitData.append('city', formData.city)
       submitData.append('category', formData.category)
+      submitData.append('subCategory', formData.subCategory)
+      if (formData.membershipCategory) submitData.append('membershipCategory', formData.membershipCategory)
       if (formData.email) submitData.append('email', formData.email)
       if (formData.vendorPhoto) submitData.append('vendorPhoto', formData.vendorPhoto)
 
@@ -132,7 +136,9 @@ const Signup = () => {
           email: '',
           mobile: '',
           city: '',
+          membershipCategory: '',
           category: '',
+          subCategory: '',
           vendorPhoto: null
         })
         setPreviewPhoto(null)
@@ -316,14 +322,56 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Category Selection */}
+            {/* Business Category */}
             <div>
               <label className='block text-sm font-bold text-gray-700 mb-2'>
-                Membership Category <span className='text-red-500'>*</span>
+                Business Category <span className='text-red-500'>*</span>
               </label>
               <select
                 name='category'
                 value={formData.category}
+                onChange={handleChange}
+                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer'
+              >
+                <option value=''>Select Business Category</option>
+                <option value='Retail'>Retail</option>
+                <option value='Wholesale'>Wholesale</option>
+                <option value='Manufacturing'>Manufacturing</option>
+                <option value='Services'>Services</option>
+                <option value='Food & Beverage'>Food & Beverage</option>
+                <option value='Healthcare'>Healthcare</option>
+                <option value='Technology'>Technology</option>
+                <option value='Construction'>Construction</option>
+                <option value='Education'>Education</option>
+                <option value='Transportation'>Transportation</option>
+                <option value='Real Estate'>Real Estate</option>
+                <option value='Other'>Other</option>
+              </select>
+            </div>
+
+            {/* Business Sub-Category */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                Business Sub-Category <span className='text-red-500'>*</span>
+              </label>
+              <input
+                type='text'
+                name='subCategory'
+                value={formData.subCategory}
+                onChange={handleChange}
+                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
+                placeholder='e.g., Grocery Store, Electronics, etc.'
+              />
+            </div>
+
+            {/* Membership Category Selection */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                Membership Category <span className='text-gray-500'>(Optional)</span>
+              </label>
+              <select
+                name='membershipCategory'
+                value={formData.membershipCategory}
                 onChange={handleChange}
                 className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer'
               >
