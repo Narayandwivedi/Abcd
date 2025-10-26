@@ -4,7 +4,6 @@ const userModel = require("../models/User.js");
 const { OAuth2Client } = require('google-auth-library');
 const fs = require("fs");
 const { sendLoginAlert, sendSignupAlert } = require("../utils/telegramAlert");
-const { saveSignupToSheet } = require("../utils/googleSheets");
 const { processPassportPhoto, processPaymentScreenshot } = require("./uploadController");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -149,11 +148,6 @@ const handelUserSignup = async (req, res) => {
     // Send Telegram signup alert with complete user data
     sendSignupAlert(newUser).catch((err) =>
       console.error("Telegram Error:", err.message)
-    );
-
-    // Save to Google Sheets
-    saveSignupToSheet(newUser).catch((err) =>
-      console.error("Google Sheets Error:", err.message)
     );
 
     return res.status(201).json({
