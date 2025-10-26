@@ -76,7 +76,7 @@ const Login = () => {
             {/* Password Field */}
             <div>
               <label htmlFor='password' className='block text-sm font-semibold text-gray-700 mb-2'>
-                Password
+                Pass
               </label>
               <div className='relative'>
                 <input

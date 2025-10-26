@@ -32,30 +32,30 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       path: '/vendors',
       description: 'Manage Vendors'
     },
-    {
-      name: 'Products',
-      icon: '📦',
-      path: '/products',
-      description: 'Manage Products'
-    },
-    {
-      name: 'Orders',
-      icon: '🛒',
-      path: '/orders',
-      description: 'Customer Orders'
-    },
-    {
-      name: 'Categories',
-      icon: '📂',
-      path: '/categories',
-      description: 'Product Categories'
-    },
-    {
-      name: 'Payments',
-      icon: '💳',
-      path: '/payments',
-      description: 'Payment Management'
-    },
+    // {
+    //   name: 'Products',
+    //   icon: '📦',
+    //   path: '/products',
+    //   description: 'Manage Products'
+    // },
+    // {
+    //   name: 'Orders',
+    //   icon: '🛒',
+    //   path: '/orders',
+    //   description: 'Customer Orders'
+    // },
+    // {
+    //   name: 'Categories',
+    //   icon: '📂',
+    //   path: '/categories',
+    //   description: 'Product Categories'
+    // },
+    // {
+    //   name: 'Payments',
+    //   icon: '💳',
+    //   path: '/payments',
+    //   description: 'Payment Management'
+    // },
     {
       name: 'Reports',
       icon: '📈',
