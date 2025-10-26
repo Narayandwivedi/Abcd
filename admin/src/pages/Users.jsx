@@ -7,6 +7,8 @@ const Users = () => {
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [newPassword, setNewPassword] = useState('')
+  const [showPhotoModal, setShowPhotoModal] = useState(false)
+  const [selectedPhoto, setSelectedPhoto] = useState(null)
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -119,6 +121,12 @@ const Users = () => {
     }
   }
 
+  // Handle photo click
+  const handlePhotoClick = (photoUrl) => {
+    setSelectedPhoto(photoUrl)
+    setShowPhotoModal(true)
+  }
+
   // Send WhatsApp message
   const sendWhatsAppMessage = (user) => {
     if (!user.certificateNumber || !user.certificateDownloadLink) {
@@ -224,7 +232,8 @@ ABCD Team`
                             <img
                               src={`${BACKEND_URL}/${user.passportPhoto}`}
                               alt={user.fullName}
-                              className='w-12 h-12 rounded-full object-cover border-2 border-gray-200'
+                              onClick={() => handlePhotoClick(`${BACKEND_URL}/${user.passportPhoto}`)}
+                              className='w-12 h-12 rounded-full object-cover border-2 border-gray-200 cursor-pointer hover:opacity-80 transition'
                             />
                           ) : (
                             <div className='w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold'>
@@ -377,7 +386,8 @@ ABCD Team`
                       <img
                         src={`${BACKEND_URL}/${user.passportPhoto}`}
                         alt={user.fullName}
-                        className='w-12 h-12 rounded-full object-cover border-2 border-gray-200'
+                        onClick={() => handlePhotoClick(`${BACKEND_URL}/${user.passportPhoto}`)}
+                        className='w-12 h-12 rounded-full object-cover border-2 border-gray-200 cursor-pointer hover:opacity-80 transition'
                       />
                     ) : (
                       <div className='w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm'>
@@ -558,6 +568,31 @@ ABCD Team`
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Photo Modal */}
+      {showPhotoModal && selectedPhoto && (
+        <div
+          className='fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4'
+          onClick={() => setShowPhotoModal(false)}
+        >
+          <div className='relative max-w-4xl w-full'>
+            <button
+              onClick={() => setShowPhotoModal(false)}
+              className='absolute -top-12 right-0 text-white hover:text-gray-300 transition'
+            >
+              <svg className='w-8 h-8' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+              </svg>
+            </button>
+            <img
+              src={selectedPhoto}
+              alt='User Photo'
+              className='w-full h-auto max-h-[90vh] object-contain rounded-lg'
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
         </div>
       )}

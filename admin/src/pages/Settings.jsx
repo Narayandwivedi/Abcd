@@ -1,193 +1,210 @@
+import { useState } from 'react'
+import { useAdminAuth } from '../context/AdminAuthContext'
+
 const Settings = () => {
+  const { admin } = useAdminAuth()
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPasswords, setShowPasswords] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState({ type: '', text: '' })
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault()
+    setMessage({ type: '', text: '' })
+
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setMessage({ type: 'error', text: 'All fields are required' })
+      return
+    }
+
+    if (newPassword.length < 6) {
+      setMessage({ type: 'error', text: 'New password must be at least 6 characters' })
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      setMessage({ type: 'error', text: 'New passwords do not match' })
+      return
+    }
+
+    try {
+      setLoading(true)
+      const response = await fetch(`${BACKEND_URL}/api/admin/change-password`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setMessage({ type: 'success', text: 'Password changed successfully!' })
+        setCurrentPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Failed to change password' })
+      }
+    } catch (error) {
+      console.error('Change password error:', error)
+      setMessage({ type: 'error', text: 'Failed to change password' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className='p-6'>
-      <div className='mb-8'>
-        <h1 className='text-3xl font-black text-gray-800 mb-2'>System Settings</h1>
-        <p className='text-gray-600'>Manage your platform settings and preferences</p>
+    <div className='p-4 md:p-6'>
+      <div className='mb-6 md:mb-8'>
+        <h1 className='text-2xl md:text-3xl font-black text-gray-800 mb-1 md:mb-2'>Settings</h1>
+        <p className='text-sm md:text-base text-gray-600'>Manage your admin profile and security settings</p>
       </div>
 
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-        {/* Left Side - Settings Menu */}
-        <div className='lg:col-span-1'>
-          <div className='bg-white rounded-2xl shadow-lg border border-gray-200 p-4'>
-            <nav className='space-y-2'>
-              {[
-                { name: 'General Settings', icon: '⚙️', active: true },
-                { name: 'Admin Profile', icon: '👤', active: false },
-                { name: 'Platform Config', icon: '🔧', active: false },
-                { name: 'Email Settings', icon: '📧', active: false },
-                { name: 'Payment Gateway', icon: '💳', active: false },
-                { name: 'Security', icon: '🔒', active: false },
-                { name: 'Notifications', icon: '🔔', active: false },
-                { name: 'Backup & Restore', icon: '💾', active: false }
-              ].map((item, idx) => (
-                <button
-                  key={idx}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    item.active
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                      : 'hover:bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  <span className='text-xl'>{item.icon}</span>
-                  <span className='font-semibold'>{item.name}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-
-        {/* Right Side - Settings Content */}
-        <div className='lg:col-span-2 space-y-6'>
-          {/* General Settings */}
-          <div className='bg-white rounded-2xl p-6 shadow-lg border border-gray-200'>
-            <h3 className='text-xl font-bold text-gray-800 mb-6'>General Settings</h3>
-            <div className='space-y-4'>
-              <div>
-                <label className='block text-gray-700 font-semibold mb-2'>Platform Name</label>
-                <input
-                  type='text'
-                  defaultValue='ABCD'
-                  className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-              <div>
-                <label className='block text-gray-700 font-semibold mb-2'>Platform Email</label>
-                <input
-                  type='email'
-                  defaultValue='admin@abcd.com'
-                  className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-              <div>
-                <label className='block text-gray-700 font-semibold mb-2'>Support Phone</label>
-                <input
-                  type='tel'
-                  defaultValue='+91 9876543210'
-                  className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-              <div>
-                <label className='block text-gray-700 font-semibold mb-2'>Platform Description</label>
-                <textarea
-                  rows={4}
-                  defaultValue='ABCD is a multi-vendor e-commerce platform connecting buyers and sellers.'
-                  className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Admin Profile */}
-          <div className='bg-white rounded-2xl p-6 shadow-lg border border-gray-200'>
-            <h3 className='text-xl font-bold text-gray-800 mb-6'>Admin Profile</h3>
-            <div className='space-y-4'>
-              <div className='flex items-center gap-6 mb-6'>
+      <div className='max-w-4xl mx-auto space-y-6'>
+        {/* Admin Profile */}
+          <div className='bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-gray-200'>
+            <h3 className='text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6'>Admin Profile</h3>
+            <div className='space-y-3 md:space-y-4'>
+              {/* Desktop View */}
+              <div className='hidden md:flex items-center gap-6 mb-6'>
                 <div className='w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-4xl font-bold shadow-lg'>
-                  LA
+                  {admin?.fullName?.charAt(0).toUpperCase() || 'A'}
                 </div>
                 <div>
-                  <h4 className='text-2xl font-black text-gray-800'>Lalit Agrawal</h4>
+                  <h4 className='text-2xl font-black text-gray-800'>{admin?.fullName || 'Admin'}</h4>
                   <p className='text-gray-600'>Super Admin</p>
-                  <button className='mt-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-200 transition'>
-                    Change Avatar
-                  </button>
                 </div>
               </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-gray-700 font-semibold mb-2'>Full Name</label>
-                  <input
-                    type='text'
-                    defaultValue='Lalit Agrawal'
-                    className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  />
+
+              {/* Mobile View */}
+              <div className='md:hidden flex items-center gap-3 mb-4'>
+                <div className='w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg'>
+                  {admin?.fullName?.charAt(0).toUpperCase() || 'A'}
                 </div>
                 <div>
-                  <label className='block text-gray-700 font-semibold mb-2'>Email</label>
-                  <input
-                    type='email'
-                    defaultValue='lalit@abcd.com'
-                    className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  />
-                </div>
-                <div>
-                  <label className='block text-gray-700 font-semibold mb-2'>Phone</label>
-                  <input
-                    type='tel'
-                    defaultValue='+91 9876543210'
-                    className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  />
-                </div>
-                <div>
-                  <label className='block text-gray-700 font-semibold mb-2'>Role</label>
-                  <input
-                    type='text'
-                    defaultValue='Super Admin'
-                    disabled
-                    className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-600'
-                  />
+                  <h4 className='text-lg font-black text-gray-800'>{admin?.fullName || 'Admin'}</h4>
+                  <p className='text-sm text-gray-600'>Super Admin</p>
                 </div>
               </div>
+
+
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className='bg-white rounded-2xl p-6 shadow-lg border border-gray-200'>
-            <h3 className='text-xl font-bold text-gray-800 mb-6'>Quick Actions</h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <button className='flex items-center gap-3 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200'>
-                <div className='w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white text-xl'>
-                  🔄
-                </div>
-                <div className='text-left'>
-                  <div className='font-bold text-gray-800'>Clear Cache</div>
-                  <div className='text-xs text-gray-600'>Clear system cache</div>
-                </div>
-              </button>
+          {/* Change Password */}
+          <div className='bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-gray-200'>
+            <h3 className='text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 flex items-center gap-2'>
+              <span>🔒</span> Change Password
+            </h3>
 
-              <button className='flex items-center gap-3 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200'>
-                <div className='w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white text-xl'>
-                  💾
+            {/* Message Alert */}
+            {message.text && (
+              <div className={`mb-4 p-3 md:p-4 rounded-xl ${
+                message.type === 'success'
+                  ? 'bg-green-50 border border-green-200 text-green-700'
+                  : 'bg-red-50 border border-red-200 text-red-700'
+              }`}>
+                <div className='flex items-center gap-2'>
+                  <span className='text-sm md:text-base'>{message.type === 'success' ? '✅' : '❌'}</span>
+                  <span className='text-sm md:text-base font-semibold'>{message.text}</span>
                 </div>
-                <div className='text-left'>
-                  <div className='font-bold text-gray-800'>Backup Data</div>
-                  <div className='text-xs text-gray-600'>Create system backup</div>
-                </div>
-              </button>
+              </div>
+            )}
 
-              <button className='flex items-center gap-3 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition border border-green-200'>
-                <div className='w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white text-xl'>
-                  📊
+            <form onSubmit={handleChangePassword} className='space-y-3 md:space-y-4'>
+              <div>
+                <label className='block text-gray-700 font-semibold mb-2 text-sm md:text-base'>Current Password</label>
+                <div className='relative'>
+                  <input
+                    type={showPasswords ? 'text' : 'password'}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder='Enter current password'
+                    className='w-full px-3 py-2 md:px-4 md:py-3 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  />
                 </div>
-                <div className='text-left'>
-                  <div className='font-bold text-gray-800'>Export Data</div>
-                  <div className='text-xs text-gray-600'>Export all platform data</div>
-                </div>
-              </button>
+              </div>
 
-              <button className='flex items-center gap-3 p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition border border-orange-200'>
-                <div className='w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xl'>
-                  🔔
+              <div>
+                <label className='block text-gray-700 font-semibold mb-2 text-sm md:text-base'>New Password</label>
+                <div className='relative'>
+                  <input
+                    type={showPasswords ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder='Enter new password (min 6 characters)'
+                    className='w-full px-3 py-2 md:px-4 md:py-3 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  />
                 </div>
-                <div className='text-left'>
-                  <div className='font-bold text-gray-800'>Send Alert</div>
-                  <div className='text-xs text-gray-600'>Send notification to users</div>
+              </div>
+
+              <div>
+                <label className='block text-gray-700 font-semibold mb-2 text-sm md:text-base'>Confirm New Password</label>
+                <div className='relative'>
+                  <input
+                    type={showPasswords ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder='Confirm new password'
+                    className='w-full px-3 py-2 md:px-4 md:py-3 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  />
                 </div>
-              </button>
+              </div>
+
+              <div className='flex items-center gap-2'>
+                <input
+                  type='checkbox'
+                  id='showPasswords'
+                  checked={showPasswords}
+                  onChange={(e) => setShowPasswords(e.target.checked)}
+                  className='w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500'
+                />
+                <label htmlFor='showPasswords' className='text-xs md:text-sm text-gray-700 cursor-pointer'>
+                  Show passwords
+                </label>
+              </div>
+
+              <div className='flex gap-2 md:gap-4 pt-2'>
+                <button
+                  type='button'
+                  onClick={() => {
+                    setCurrentPassword('')
+                    setNewPassword('')
+                    setConfirmPassword('')
+                    setMessage({ type: '', text: '' })
+                  }}
+                  className='flex-1 px-3 py-2 md:px-6 md:py-3 border-2 border-gray-200 text-gray-700 rounded-xl text-sm md:text-base font-bold hover:bg-gray-50 transition'
+                >
+                  Clear
+                </button>
+                <button
+                  type='submit'
+                  disabled={loading}
+                  className='flex-1 px-3 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm md:text-base font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed'
+                >
+                  {loading ? 'Changing...' : 'Change Password'}
+                </button>
+              </div>
+            </form>
+
+            <div className='mt-4 md:mt-6 p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-xl'>
+              <p className='text-xs md:text-sm text-blue-800'>
+                <strong>💡 Security Tip:</strong> Use a strong password with at least 6 characters.
+                Include a mix of letters, numbers, and symbols for better security.
+              </p>
             </div>
           </div>
-
-          {/* Save Button */}
-          <div className='flex justify-end gap-4'>
-            <button className='px-6 py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition'>
-              Cancel
-            </button>
-            <button className='px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg'>
-              Save Changes
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   )
