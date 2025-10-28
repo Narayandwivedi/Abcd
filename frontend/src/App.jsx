@@ -16,6 +16,7 @@ import Contact from './pages/Contact'
 import ForgotPassword from './pages/ForgotPassword'
 import CategoryPage from './pages/CategoryPage'
 import AdDetail from './pages/AdDetail'
+import Download from './pages/Download'
 
 const App = () => {
   const location = useLocation()
@@ -31,6 +32,7 @@ const App = () => {
           <Route path='/blog' element={<Blog />} />
           <Route path='/blog/:id' element={<BlogDetail />} />
           <Route path='/gallery' element={<Gallery />} />
+          <Route path='/download' element={<Download />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
           <Route path='/contact' element={<Contact />} />

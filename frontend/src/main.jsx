@@ -18,13 +18,22 @@ createRoot(document.getElementById('root')).render(
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    console.log('PWA: Attempting to register service worker...')
     navigator.serviceWorker
-      .register('/sw.js')
+      .register('/sw.js', { scope: '/' })
       .then((registration) => {
-        console.log('SW registered: ', registration)
+        console.log('PWA: Service Worker registered successfully:', registration)
+        console.log('PWA: Scope:', registration.scope)
+
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          console.log('PWA: Service Worker update found')
+        })
       })
       .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError)
+        console.error('PWA: Service Worker registration failed:', registrationError)
       })
   })
+} else {
+  console.warn('PWA: Service Workers are not supported in this browser')
 }
