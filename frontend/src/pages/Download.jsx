@@ -1,71 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { toast } from 'react-toastify'
+import React from 'react'
+import { usePWAInstall } from '../hooks/usePWAInstall'
 
 const Download = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState(null)
-  const [isInstallable, setIsInstallable] = useState(false)
-  const [isInstalled, setIsInstalled] = useState(false)
-
-  useEffect(() => {
-    console.log('Download Page: Setting up PWA detection')
-
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      console.log('PWA: App is already installed')
-      setIsInstalled(true)
-      return
-    }
-
-    // Listen for the beforeinstallprompt event
-    const handleBeforeInstallPrompt = (e) => {
-      console.log('PWA: beforeinstallprompt event fired on Download page')
-      e.preventDefault()
-      setDeferredPrompt(e)
-      setIsInstallable(true)
-      console.log('PWA: Install button should now be available')
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-
-    // Check if service worker is registered
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistration().then((registration) => {
-        if (registration) {
-          console.log('PWA: Service Worker is registered', registration)
-        } else {
-          console.log('PWA: Service Worker is NOT registered')
-        }
-      })
-    }
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    }
-  }, [])
+  const { isInstallable, isInstalled, installPWA } = usePWAInstall()
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      toast.error('Installation not available. Please use a supported browser.')
-      return
+    const success = await installPWA()
+    if (success) {
+      console.log('App installation initiated')
     }
-
-    console.log('PWA: Showing install prompt')
-    deferredPrompt.prompt()
-
-    const { outcome } = await deferredPrompt.userChoice
-    console.log(`PWA: User response: ${outcome}`)
-
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt')
-      toast.success('App installed successfully! Check your home screen.')
-      setIsInstalled(true)
-    } else {
-      console.log('User dismissed the install prompt')
-      toast.info('Installation cancelled')
-    }
-
-    setDeferredPrompt(null)
-    setIsInstallable(false)
   }
 
   return (
@@ -106,7 +49,16 @@ const Download = () => {
                 </svg>
               </div>
               <h2 className='text-2xl font-bold text-gray-900 mb-4'>Ready to Install!</h2>
-              <p className='text-gray-600 mb-6'>Click the button below to install the app on your device.</p>
+              <p className='text-gray-600 mb-4'>Click the button below to install the app on your device.</p>
+              <div className='mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-left max-w-md mx-auto'>
+                <p className='text-sm text-blue-800 mb-2 font-semibold'>Benefits of installing:</p>
+                <ul className='text-xs text-blue-700 space-y-1 ml-4 list-disc'>
+                  <li>Launch directly from desktop/home screen</li>
+                  <li>Works offline with cached data</li>
+                  <li>Faster loading times</li>
+                  <li>No browser address bar</li>
+                </ul>
+              </div>
               <button
                 onClick={handleInstallClick}
                 className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105'
@@ -116,29 +68,22 @@ const Download = () => {
             </div>
           ) : (
             <div className='text-center'>
-              <div className='w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                <svg className='w-10 h-10 text-yellow-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' />
+              <div className='w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+                <svg className='w-10 h-10 text-gray-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
                 </svg>
               </div>
               <h2 className='text-2xl font-bold text-gray-900 mb-2'>Installation Not Available</h2>
               <p className='text-gray-600 mb-4'>
-                The app cannot be installed at this moment. This could be because:
+                To install this app, you need:
               </p>
-              <ul className='text-left text-gray-600 space-y-2 max-w-md mx-auto'>
-                <li className='flex items-start gap-2'>
-                  <span className='text-blue-600 mt-1'>•</span>
-                  <span>You're using an unsupported browser (try Chrome, Edge, or Safari)</span>
-                </li>
-                <li className='flex items-start gap-2'>
-                  <span className='text-blue-600 mt-1'>•</span>
-                  <span>The site is not served over HTTPS</span>
-                </li>
-                <li className='flex items-start gap-2'>
-                  <span className='text-blue-600 mt-1'>•</span>
-                  <span>The app is already installed</span>
-                </li>
-              </ul>
+              <div className='max-w-md mx-auto text-left p-4 bg-gray-50 border border-gray-200 rounded-lg'>
+                <ul className='text-sm text-gray-700 space-y-2 ml-4 list-disc'>
+                  <li>Use Chrome, Edge, or Safari browser</li>
+                  <li>Access via HTTPS (secure connection)</li>
+                  <li>The app may already be installed</li>
+                </ul>
+              </div>
             </div>
           )}
         </div>
@@ -191,7 +136,7 @@ const Download = () => {
               <ol className='space-y-3 text-gray-600'>
                 <li className='flex gap-3'>
                   <span className='font-bold text-blue-600'>1.</span>
-                  <span>Click the "Install Now" button above (Chrome/Edge)</span>
+                  <span>Click the "Install Now" button above</span>
                 </li>
                 <li className='flex gap-3'>
                   <span className='font-bold text-blue-600'>2.</span>
@@ -236,17 +181,6 @@ const Download = () => {
               </ol>
             </div>
           </div>
-        </div>
-
-        {/* Debug Info (remove in production) */}
-        <div className='mt-8 bg-gray-100 rounded-xl p-6 text-sm text-gray-600'>
-          <h3 className='font-bold text-gray-900 mb-2'>Debug Information:</h3>
-          <ul className='space-y-1'>
-            <li>• Browser supports Service Worker: {('serviceWorker' in navigator) ? 'Yes' : 'No'}</li>
-            <li>• App is installable: {isInstallable ? 'Yes' : 'No'}</li>
-            <li>• App is installed: {isInstalled ? 'Yes' : 'No'}</li>
-            <li>• Display mode: {window.matchMedia('(display-mode: standalone)').matches ? 'Standalone' : 'Browser'}</li>
-          </ul>
         </div>
       </div>
     </div>

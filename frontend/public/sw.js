@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abcd-vyapar-v1';
+const CACHE_NAME = 'abcd-vyapar-v2';
 const urlsToCache = [
   '/',
   '/index.html',
