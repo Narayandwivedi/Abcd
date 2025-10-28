@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext'
 
@@ -7,6 +7,48 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate()
   const { admin, logout } = useAdminAuth()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [showInstallButton, setShowInstallButton] = useState(false)
+
+  useEffect(() => {
+    // Listen for the beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault()
+      // Stash the event so it can be triggered later
+      setDeferredPrompt(e)
+      // Show the install button
+      setShowInstallButton(true)
+    }
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    }
+  }, [])
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      return
+    }
+
+    // Show the install prompt
+    deferredPrompt.prompt()
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice
+
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt')
+      setShowInstallButton(false)
+    } else {
+      console.log('User dismissed the install prompt')
+    }
+
+    // Clear the deferredPrompt for the next time
+    setDeferredPrompt(null)
+  }
 
   const handleLogout = async () => {
     await logout()
@@ -67,6 +109,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       icon: '⚙️',
       path: '/settings',
       description: 'System Settings'
+    },
+    {
+      name: 'Sub Admin',
+      icon: '👤',
+      path: '/subadmin',
+      description: 'Manage Sub Admins'
     }
   ]
 
@@ -117,7 +165,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         </div>
 
         {/* Menu Items */}
-        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-200px)]">
+        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-280px)]">
           {menuItems.map((item) => (
             <Link
               key={item.path}
@@ -145,6 +193,23 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               )}
             </Link>
           ))}
+
+          {/* PWA Install Button */}
+          {showInstallButton && (
+            <button
+              onClick={handleInstallClick}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 bg-gradient-to-r from-green-600/30 to-emerald-600/30 border border-green-400/40 hover:from-green-600/40 hover:to-emerald-600/40 shadow-lg group"
+            >
+              <span className="text-xl text-green-300">📱</span>
+              <div className="flex-1 text-left">
+                <div className="font-semibold text-green-100">Download App</div>
+                <div className="text-xs text-green-300">Install PWA</div>
+              </div>
+              <svg className="w-5 h-5 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </button>
+          )}
         </nav>
 
         {/* User Info & Logout */}

@@ -13,6 +13,7 @@ import Categories from './pages/Categories'
 import Payments from './pages/Payments'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
+import SubAdmin from './pages/SubAdmin'
 import { useAdminAuth } from './context/AdminAuthContext'
 
 function AdminLayout({ children }) {
@@ -137,6 +138,16 @@ function AppRoutes() {
           <ProtectedRoute>
             <AdminLayout>
               <Settings />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/subadmin'
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <SubAdmin />
             </AdminLayout>
           </ProtectedRoute>
         }
