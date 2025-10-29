@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useAdminAuth } from '../context/AdminAuthContext'
-import { usePWAInstall } from '../hooks/usePWAInstall'
 
 const Settings = () => {
   const { admin } = useAdminAuth()

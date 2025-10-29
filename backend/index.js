@@ -22,6 +22,8 @@ const adminVendorRoute = require('./routes/adminVendorRoute')
 const adminRoute = require('./routes/adminRoute')
 const uploadRoute = require('./routes/uploadRoute')
 const searchRoute = require('./routes/searchRoute')
+const subAdminRoute = require('./routes/subAdminRoute')
+const adminSubAdminRoute = require('./routes/adminSubAdminRoute')
 
 // CORS configuration
 const corsOptions = {
@@ -52,6 +54,8 @@ app.use('/api/vendor-auth',vendorAuthRoute)
 app.use('/api/vendor',vendorRoute)
 app.use('/api/admin',adminVendorRoute)
 app.use('/api/admin',adminRoute)
+app.use('/api/admin',adminSubAdminRoute)
+app.use('/api/subadmin',subAdminRoute)
 app.use('/api/search',searchRoute)
 app.use('/api/upload',uploadRoute)
 
