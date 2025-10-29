@@ -300,8 +300,8 @@ const SubAdmin = () => {
   const PermissionBadge = ({ permissions }) => {
     const totalPerms = Object.values(permissions).filter(Boolean).length
     return (
-      <span className='px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold'>
-        {totalPerms} Permissions
+      <span className='px-2 py-0.5 md:px-3 md:py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] md:text-xs font-semibold'>
+        {totalPerms} Permsission
       </span>
     )
   }
@@ -328,37 +328,42 @@ const SubAdmin = () => {
   }
 
   return (
-    <div className='p-6'>
+    <div className='p-4 md:p-6'>
       {/* Header */}
-      <div className='mb-8 flex items-center justify-between'>
-        <div>
-          <h1 className='text-2xl md:text-3xl font-black text-gray-800 mb-1 md:mb-2'>Sub Admin Management</h1>
-          <p className='text-sm md:text-base text-gray-600'>Manage sub-administrators and their permissions</p>
+      <div className='mb-6 md:mb-8'>
+        {/* Small Sub Admin Text */}
+
+        <div className='flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0'>
+          <div>
+            <h1 className='text-xl md:text-3xl font-black text-gray-800 mb-1'>Sub Admin Management</h1>
+            <p className='text-xs md:text-base text-gray-600'>Manage sub-administrators and their permissions</p>
+          </div>
+          <button
+            onClick={handleAddNew}
+            className='flex items-center justify-center gap-2 px-3 md:px-4 py-2 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg md:rounded-xl text-sm md:text-base font-bold hover:from-blue-700 hover:to-purple-700 transition shadow-lg whitespace-nowrap'
+          >
+            <svg className='w-4 h-4 md:w-5 md:h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
+            </svg>
+            <span className='hidden sm:inline'>Add Sub Admin</span>
+            <span className='sm:hidden'>Add</span>
+          </button>
         </div>
-        <button
-          onClick={handleAddNew}
-          className='flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition shadow-lg'
-        >
-          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
-          </svg>
-          Add Sub Admin
-        </button>
       </div>
 
-      {/* Stats */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
-        <div className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
-          <div className='text-gray-600 text-sm font-medium mb-2'>Total Sub Admins</div>
-          <div className='text-3xl font-black text-blue-600'>{stats.total}</div>
+      {/* Stats - 3 Cards in a Row for All Screens */}
+      <div className='grid grid-cols-3 gap-2 md:gap-6 mb-6 md:mb-8'>
+        <div className='bg-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-lg border border-gray-200'>
+          <div className='text-gray-600 text-[10px] md:text-sm font-medium mb-1 md:mb-2'>Total Sub Admins</div>
+          <div className='text-xl md:text-3xl font-black text-blue-600'>{stats.total}</div>
         </div>
-        <div className='bg-white rounded-xl p-6 shadow-lg border border-green-200'>
-          <div className='text-gray-600 text-sm font-medium mb-2'>Active</div>
-          <div className='text-3xl font-black text-green-600'>{stats.active}</div>
+        <div className='bg-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-lg border border-green-200'>
+          <div className='text-gray-600 text-[10px] md:text-sm font-medium mb-1 md:mb-2'>Active</div>
+          <div className='text-xl md:text-3xl font-black text-green-600'>{stats.active}</div>
         </div>
-        <div className='bg-white rounded-xl p-6 shadow-lg border border-red-200'>
-          <div className='text-gray-600 text-sm font-medium mb-2'>Inactive</div>
-          <div className='text-3xl font-black text-red-600'>{stats.inactive}</div>
+        <div className='bg-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-lg border border-red-200'>
+          <div className='text-gray-600 text-[10px] md:text-sm font-medium mb-1 md:mb-2'>Inactive</div>
+          <div className='text-xl md:text-3xl font-black text-red-600'>{stats.inactive}</div>
         </div>
       </div>
 
@@ -473,15 +478,15 @@ const SubAdmin = () => {
             {/* Mobile Card View */}
             <div className='md:hidden divide-y divide-gray-200'>
               {filteredSubAdmins.map((subAdmin) => (
-                <div key={subAdmin._id} className='p-4 hover:bg-gray-50 transition'>
-                  <div className='flex items-start gap-3 mb-3'>
-                    <div className='w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg'>
+                <div key={subAdmin._id} className='p-3 hover:bg-gray-50 transition'>
+                  <div className='flex items-start gap-2 mb-2'>
+                    <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg'>
                       {subAdmin.fullName[0].toUpperCase()}
                     </div>
                     <div className='flex-1'>
-                      <div className='font-bold text-gray-800'>{subAdmin.fullName}</div>
-                      <div className='text-xs text-gray-500 mb-1'>ID: {subAdmin._id.slice(-6)}</div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      <div className='text-sm font-bold text-gray-800'>{subAdmin.fullName}</div>
+                      <div className='text-[10px] text-gray-500'>ID: {subAdmin._id.slice(-6)}</div>
+                      <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                         subAdmin.isActive
                           ? 'bg-green-100 text-green-700'
                           : 'bg-red-100 text-red-700'
@@ -491,44 +496,46 @@ const SubAdmin = () => {
                     </div>
                   </div>
 
-                  <div className='space-y-2 mb-3'>
-                    <div className='text-sm text-gray-600'>{subAdmin.email}</div>
-                    <div className='text-sm text-blue-600 font-medium'>{subAdmin.mobile}</div>
-                    <div className='flex items-center gap-2'>
-                      <PermissionBadge permissions={subAdmin.permissions} />
+                  <div className='space-y-1 mb-2'>
+                    <div className='flex items-center gap-2 text-[11px]'>
+                      <span className='text-gray-600 truncate flex-1'>{subAdmin.email}</span>
+                      <span className='text-blue-600 font-medium'>{subAdmin.mobile}</span>
                     </div>
-                    <div className='text-xs text-gray-500'>
-                      Last Login: {subAdmin.lastLogin ? new Date(subAdmin.lastLogin).toLocaleDateString() : 'Never'}
+                    <div className='flex items-center justify-between gap-2'>
+                      <PermissionBadge permissions={subAdmin.permissions} />
+                      <span className='text-[10px] text-gray-500'>
+                        Last: {subAdmin.lastLogin ? new Date(subAdmin.lastLogin).toLocaleDateString() : 'Never'}
+                      </span>
                     </div>
                   </div>
 
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-center gap-1.5'>
                     <button
                       onClick={() => handleEdit(subAdmin)}
-                      className='flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition text-sm font-semibold'
+                      className='flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition text-[11px] font-semibold'
                     >
-                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                         <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' />
                       </svg>
                       Edit
                     </button>
                     <button
                       onClick={() => openPasswordModal(subAdmin)}
-                      className='flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition text-sm font-semibold'
+                      className='flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition text-[11px] font-semibold'
                     >
-                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                         <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' />
                       </svg>
-                      Password
+                      Pass
                     </button>
                     <button
                       onClick={() => handleDelete(subAdmin._id)}
-                      className='flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition text-sm font-semibold'
+                      className='flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition text-[11px] font-semibold'
                     >
-                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                         <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
                       </svg>
-                      Delete
+                      Del
                     </button>
                   </div>
                 </div>
