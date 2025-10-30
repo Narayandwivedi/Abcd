@@ -2,7 +2,8 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-// Generate unique certificate number in format: 001001, 001002, etc.
+// Generate unique certificate number in format: YM-CG-{year}-{month}-{6-digit-number}
+// Example: YM-CG-2025-10-001001
 const generateCertificateNumber = async () => {
   const User = require('../models/User');
 
@@ -11,10 +12,20 @@ const generateCertificateNumber = async () => {
     certificateNumber: { $exists: true, $ne: null }
   });
 
+  // Get current year and month
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11, so add 1
+
   // Generate certificate number starting from 001001
-  // Format: 00100 (fixed prefix) + incrementing number (1, 2, 3...)
+  // The incrementing number starts at 1 and grows with each new certificate
   const incrementingNumber = certificateCount + 1;
-  const certificateNumber = `00100${incrementingNumber}`;
+
+  // Pad the number to 6 digits (001001, 001002, etc.)
+  const paddedNumber = String(incrementingNumber).padStart(6, '0');
+
+  // Format: YM-CG-{year}-{month}-{6-digit-number}
+  const certificateNumber = `YM-CG-${currentYear}-${currentMonth}-${paddedNumber}`;
 
   return certificateNumber;
 };
