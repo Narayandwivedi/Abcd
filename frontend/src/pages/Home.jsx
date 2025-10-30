@@ -6,6 +6,16 @@ import CityDropdown from '../component/CityDropdown'
 const Home = () => {
   const navigate = useNavigate()
   const [selectedCity, setSelectedCity] = useState('')
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024)
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleCategoryClick = (categoryName) => {
     navigate(`/category/${categoryName}`)
@@ -256,34 +266,9 @@ const Home = () => {
       {/* Top Deals Section */}
       <section className='py-1 pb-2 lg:py-2 lg:pb-3 bg-gray-100'>
         <div className='container mx-auto px-4'>
-          
-
-          {/* Desktop: Show all deals in grid */}
+          {/* Unified: Horizontal sliding carousel for both Mobile and Desktop */}
           <div
-            className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'
-            onMouseDown={handleDealMouseDown}
-            onMouseUp={handleDealMouseUp}
-            onMouseLeave={handleDealMouseUp}
-          >
-            {dealImages.slice(0, 5).map((deal, index) => (
-              <div
-                key={index}
-                onClick={() => handleDealClick(index)}
-                className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50'
-                style={{ height: '160px' }}
-              >
-                <img
-                  src={deal}
-                  alt={`Hot Deal ${index + 1}`}
-                  className='w-full h-full object-contain p-2'
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile: Horizontal sliding carousel */}
-          <div
-            className='lg:hidden relative mx-auto overflow-hidden cursor-grab active:cursor-grabbing'
+            className='relative mx-auto overflow-hidden cursor-grab active:cursor-grabbing max-w-7xl'
             onTouchStart={handleDealTouchStart}
             onTouchMove={handleDealTouchMove}
             onTouchEnd={handleDealTouchEnd}
@@ -294,18 +279,18 @@ const Home = () => {
             <div
               className='flex'
               style={{
-                transform: `translateX(calc(-${currentDealSlide * 80}%))`,
+                transform: `translateX(calc(-${currentDealSlide * (isDesktop ? 20 : 80)}%))`,
                 transition: isDealTransitioning ? 'transform 500ms ease-in-out' : 'none'
               }}
             >
               {/* Render 3 sets of images for seamless infinite scrolling */}
               {[...Array(3)].map((_, setIndex) =>
                 dealImages.map((deal, index) => (
-                  <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
+                  <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5 lg:px-2' style={{ width: isDesktop ? '20%' : '80%' }}>
                     <div
                       onClick={() => handleDealClick(index)}
-                      className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50'
-                      style={{ height: '150px' }}
+                      className='bg-white rounded-lg lg:rounded-xl shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1'
+                      style={{ height: isDesktop ? '160px' : '150px' }}
                     >
                       <img
                         src={deal}
@@ -324,32 +309,9 @@ const Home = () => {
       {/* Sponsored Ads Section - Row 2 */}
       <section className='pb-0 lg:pb-1 bg-white'>
         <div className='container mx-auto px-4'>
-          {/* Desktop: Show all ads in grid */}
+          {/* Unified: Horizontal sliding carousel for both Mobile and Desktop */}
           <div
-            className='hidden lg:grid lg:grid-cols-5 gap-4 max-w-7xl mx-auto'
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-          >
-            {adImages.slice(0, 5).map((ad, index) => (
-              <div
-                key={index}
-                onClick={() => handleAdClick(index)}
-                className='bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50'
-                style={{ height: '160px' }}
-              >
-                <img
-                  src={ad}
-                  alt={`Advertisement ${index + 1}`}
-                  className='w-full h-full object-contain p-2'
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile: Horizontal sliding carousel */}
-          <div
-            className='lg:hidden relative mx-auto overflow-hidden cursor-grab active:cursor-grabbing'
+            className='relative mx-auto overflow-hidden cursor-grab active:cursor-grabbing max-w-7xl'
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -357,10 +319,10 @@ const Home = () => {
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
           >
-            {/* Previous Button */}
+            {/* Previous Button - Mobile Only */}
             <button
               onClick={handlePrevSlide}
-              className='absolute left-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1 shadow-md transition-all'
+              className='lg:hidden absolute left-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1 shadow-md transition-all'
               aria-label='Previous slide'
             >
               <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -368,10 +330,10 @@ const Home = () => {
               </svg>
             </button>
 
-            {/* Next Button */}
+            {/* Next Button - Mobile Only */}
             <button
               onClick={handleNextSlide}
-              className='absolute right-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1 shadow-md transition-all'
+              className='lg:hidden absolute right-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1 shadow-md transition-all'
               aria-label='Next slide'
             >
               <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -382,18 +344,18 @@ const Home = () => {
             <div
               className='flex'
               style={{
-                transform: `translateX(calc(-${currentSlide * 80}%))`,
+                transform: `translateX(calc(-${currentSlide * (isDesktop ? 20 : 80)}%))`,
                 transition: isTransitioning ? 'transform 500ms ease-in-out' : 'none'
               }}
             >
               {/* Render 3 sets of images for seamless infinite scrolling */}
               {[...Array(3)].map((_, setIndex) =>
                 adImages.map((ad, index) => (
-                  <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5' style={{ width: '80%' }}>
+                  <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5 lg:px-2' style={{ width: isDesktop ? '20%' : '80%' }}>
                     <div
                       onClick={() => handleAdClick(index)}
-                      className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50'
-                      style={{ height: '150px' }}
+                      className='bg-white rounded-lg lg:rounded-xl shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1'
+                      style={{ height: isDesktop ? '160px' : '150px' }}
                     >
                       <img
                         src={ad}
