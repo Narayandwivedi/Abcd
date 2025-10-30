@@ -44,6 +44,8 @@ const approveVendor = async (req, res) => {
     vendor.isVerified = true;
     vendor.certificateNumber = certificateData.certificateNumber;
     vendor.certificateDownloadLink = certificateData.downloadLink;
+    vendor.certificateIssueDate = certificateData.issueDate;
+    vendor.certificateExpiryDate = certificateData.expiryDate;
     await vendor.save();
 
     return res.status(200).json({

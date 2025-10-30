@@ -98,6 +98,12 @@ const vendorSchema = new mongoose.Schema({
   certificateDownloadLink: {
     type: String,
   },
+  certificateIssueDate: {
+    type: Date,
+  },
+  certificateExpiryDate: {
+    type: Date,
+  },
 
 }, { timestamps: true });
 

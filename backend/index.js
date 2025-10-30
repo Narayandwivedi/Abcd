@@ -35,7 +35,8 @@ const corsOptions = {
     'https://www.abcdvyapar.com',
     'https://api.abcdvyapar.com' , // Backend domain for admin/vendor panels
      'https://vendor.abcdvyapar.com',
-     'https://adm.abcdvyapar.com'
+     'https://adm.abcdvyapar.com',
+     'https://subadm.abcdvyapar.com'
   ],
   credentials: true, // Allow cookies to be sent
   optionsSuccessStatus: 200

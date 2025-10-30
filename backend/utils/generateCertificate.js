@@ -2,25 +2,21 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-// Generate unique certificate number in format: ym-cg-YYYY-MM-NNNNN
+// Generate unique certificate number in format: 001001, 001002, etc.
 const generateCertificateNumber = async () => {
   const User = require('../models/User');
-
-  // Get current year and month
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
 
   // Count total users with certificates
   const certificateCount = await User.countDocuments({
     certificateNumber: { $exists: true, $ne: null }
   });
 
-  // Generate member number (next member)
-  const memberNumber = String(certificateCount + 1).padStart(5, '0');
+  // Generate certificate number starting from 001001
+  // Format: 00100 (fixed prefix) + incrementing number (1, 2, 3...)
+  const incrementingNumber = certificateCount + 1;
+  const certificateNumber = `00100${incrementingNumber}`;
 
-  // Format: YM-CG-YYYY-MM-NNNNN
-  return `YM-CG-${year}-${month}-${memberNumber}`;
+  return certificateNumber;
 };
 
 // Generate certificate PDF
@@ -289,7 +285,9 @@ const generateCertificatePDF = async (user) => {
           certificateNumber,
           fileName,
           filePath,
-          downloadLink: `/uploads/certificates/${fileName}`
+          downloadLink: `/uploads/certificates/${fileName}`,
+          issueDate: new Date(),
+          expiryDate: new Date('2027-03-31')
         });
       });
 

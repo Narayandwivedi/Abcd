@@ -46,6 +46,8 @@ const approveUser = async (req, res) => {
     user.isVerified = true;
     user.certificateNumber = certificateData.certificateNumber;
     user.certificateDownloadLink = certificateData.downloadLink;
+    user.certificateIssueDate = certificateData.issueDate;
+    user.certificateExpiryDate = certificateData.expiryDate;
     await user.save();
 
     return res.status(200).json({

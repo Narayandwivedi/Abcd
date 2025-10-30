@@ -2,25 +2,26 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-// Generate unique certificate number in format: ym-cg-v-YYYY-MM-NNNNN
+// Generate unique certificate number in format: VM-CG-YYYY-MM-00101
 const generateVendorCertificateNumber = async () => {
   const Vendor = require('../models/Vendor');
 
   // Get current year and month
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const month = String(now.getMonth() + 1).padStart(2, '0');
 
   // Count total vendors with certificates
   const certificateCount = await Vendor.countDocuments({
     certificateNumber: { $exists: true, $ne: null }
   });
 
-  // Generate member number (next member)
-  const memberNumber = String(certificateCount + 1).padStart(5, '0');
+  // Generate certificate number starting from 00101
+  // Format: VM-CG-YYYY-MM-0010 (fixed) + incrementing number (1, 2, 3...)
+  const incrementingNumber = certificateCount + 1;
+  const certificateNumber = `VM-CG-${year}-${month}-0010${incrementingNumber}`;
 
-  // Format: YM-CG-V-YYYY-MM-NNNNN (V for Vendor)
-  return `YM-CG-V-${year}-${month}-${memberNumber}`;
+  return certificateNumber;
 };
 
 // Generate vendor certificate PDF
@@ -300,7 +301,9 @@ const generateVendorCertificatePDF = async (vendor) => {
           certificateNumber,
           fileName,
           filePath,
-          downloadLink: `/uploads/certificates/${fileName}`
+          downloadLink: `/uploads/certificates/${fileName}`,
+          issueDate: new Date(),
+          expiryDate: new Date('2027-03-31')
         });
       });
 
