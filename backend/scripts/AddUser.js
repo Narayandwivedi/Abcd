@@ -1,9 +1,8 @@
-require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('../models/User'); // Adjust the path to your User model
 
-// MongoDB connection string - Update this with your actual connection string
-const MONGODB_URI = process.env.MONGO_URL;
+// MongoDB connection string
+const MONGODB_URI = 'mongodb://127.0.0.1:27017/abcd';
 
 // User data sorted by createdAt (oldest first)
 const usersData = [
