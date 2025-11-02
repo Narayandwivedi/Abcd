@@ -47,9 +47,15 @@ const Signup = () => {
   }, [navigate])
 
   const handleChange = (e) => {
+    const { name, value } = e.target
+
+    // Capitalize specific fields
+    const fieldsToCapitalize = ['fullName', 'fatherName', 'address', 'city']
+    const newValue = fieldsToCapitalize.includes(name) ? value.toUpperCase() : value
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: newValue
     })
   }
 

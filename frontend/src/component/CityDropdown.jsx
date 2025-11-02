@@ -33,7 +33,7 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
   const filteredCities = getFilteredCities()
 
   const handleCitySelect = (city) => {
-    onChange(city)
+    onChange(city.toUpperCase())
     setIsOpen(false)
     setSearchQuery('')
   }

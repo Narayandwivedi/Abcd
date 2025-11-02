@@ -24,6 +24,12 @@ const handelUserSignup = async (req, res) => {
     city = city?.trim();
     utrNumber = utrNumber?.trim();
 
+    // Convert name fields to uppercase
+    fullName = fullName?.toUpperCase();
+    fatherName = fatherName?.toUpperCase();
+    address = address?.toUpperCase();
+    if (city) city = city.toUpperCase();
+
     if (!fullName || !mobile || !fatherName || !address || !gotra) {
       return res.status(400).json({ success: false, message: "Full name, mobile, father's name, address, and gotra are required" });
     }
@@ -415,13 +421,16 @@ const handleGoogleAuth = async (req, res) => {
 
     const payload = ticket.getPayload();
 
-    const {
+    let {
       sub: googleId,
       email,
       name: fullName,
       picture: profilePicture,
       email_verified
     } = payload;
+
+    // Capitalize full name from Google
+    fullName = fullName?.toUpperCase();
 
     if (!email_verified) {
       return res.status(400).json({
