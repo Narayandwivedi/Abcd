@@ -219,7 +219,55 @@ const usersData = [
     createdAt: new Date('2025-11-02T06:12:53.632Z'),
     updatedAt: new Date('2025-11-02T06:12:53.632Z'),
     __v: 0
+  },
+  {
+    fullName: 'PANKAJ AGRAWAL',
+    mobile: 9993711113,
+    email: 'pankaj09309@gmail.com',
+    gotra: 'Singhal',
+    city: 'PITHORA - MAHASAMUND',
+    address: 'NEW SINGHAL BARTAN BHANDAR, NEAR CIVIL COURT, MAIN ROAD, PITHORA',
+    fatherName: 'MR. ASHOK AGRAWAL',
+    passportPhoto: 'upload/passport-photos/passport-1762065249888-834831288.webp',
+    authProvider: 'local',
+    isVerified: false,
+    isMobileVerified: false,
+    isEmailVerified: false,
+    paymentScreenshot: 'upload/payment-screenshots/payment-1762065249953-355696995.webp',
+    paymentVerified: false,
+    isRejected: false,
+    activeCertificate: null,
+    createdAt: new Date('2025-11-02T06:34:10.002Z'),
+    updatedAt: new Date('2025-11-02T06:34:10.002Z'),
+    __v: 0
+  },
+  {
+    fullName: 'RAJESH AGRAWAL',
+    mobile: 8435548455,
+    email: 'rajeshagrawal61976@gmail.com',
+    gotra: 'Mittal',
+    city: 'PITHORA - MAHASAMUND',
+    address: 'RAJESH AGRAWAL SARAKTORA\r\n' +
+      'POST SONASILLI\r\n' +
+      'BLOCK PITHORA \r\n' +
+      'JILA MAHASMUND (CG.)',
+    fatherName: 'LATE SHRI  MAHABIR AGRAWAL',
+    passportPhoto: 'upload/passport-photos/passport-1762065309718-98125268.webp',
+    authProvider: 'local',
+    isVerified: false,
+    isMobileVerified: false,
+    isEmailVerified: false,
+    paymentScreenshot: 'upload/payment-screenshots/payment-1762065309728-116899342.webp',
+    utrNumber: '886879960584',
+    paymentVerified: false,
+    isRejected: false,
+    activeCertificate: null,
+    createdAt: new Date('2025-11-02T06:35:09.869Z'),
+    updatedAt: new Date('2025-11-02T06:35:09.869Z'),
+    __v: 0
   }
+
+
 ];
 
 async function addUsers() {
@@ -265,6 +313,9 @@ async function addUsers() {
       }
       if (userData.paymentScreenshot) {
         userToInsert.paymentScreenshot = userData.paymentScreenshot;
+      }
+      if (userData.activeCertificate !== undefined) {
+        userToInsert.activeCertificate = userData.activeCertificate;
       }
 
       // Note: Not including certificateDownloadLink, certificateExpiryDate,
