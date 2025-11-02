@@ -220,9 +220,7 @@ const usersData = [
     updatedAt: new Date('2025-11-02T06:12:53.632Z'),
     __v: 0
   },
-
-   {
-    _id: ObjectId('6906fb61f77006cf94fcca7f'),
+  {
     fullName: 'PANKAJ AGRAWAL',
     mobile: 9993711113,
     email: 'pankaj09309@gmail.com',
@@ -239,12 +237,11 @@ const usersData = [
     paymentVerified: false,
     isRejected: false,
     activeCertificate: null,
-    createdAt: ISODate('2025-11-02T06:34:10.002Z'),
-    updatedAt: ISODate('2025-11-02T06:34:10.002Z'),
+    createdAt: new Date('2025-11-02T06:34:10.002Z'),
+    updatedAt: new Date('2025-11-02T06:34:10.002Z'),
     __v: 0
   },
   {
-    _id: ObjectId('6906fb9df77006cf94fcca82'),
     fullName: 'RAJESH AGRAWAL',
     mobile: 8435548455,
     email: 'rajeshagrawal61976@gmail.com',
@@ -265,8 +262,8 @@ const usersData = [
     paymentVerified: false,
     isRejected: false,
     activeCertificate: null,
-    createdAt: ISODate('2025-11-02T06:35:09.869Z'),
-    updatedAt: ISODate('2025-11-02T06:35:09.869Z'),
+    createdAt: new Date('2025-11-02T06:35:09.869Z'),
+    updatedAt: new Date('2025-11-02T06:35:09.869Z'),
     __v: 0
   }
 
@@ -316,6 +313,9 @@ async function addUsers() {
       }
       if (userData.paymentScreenshot) {
         userToInsert.paymentScreenshot = userData.paymentScreenshot;
+      }
+      if (userData.activeCertificate !== undefined) {
+        userToInsert.activeCertificate = userData.activeCertificate;
       }
 
       // Note: Not including certificateDownloadLink, certificateExpiryDate,
