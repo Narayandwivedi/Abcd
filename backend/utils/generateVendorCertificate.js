@@ -35,7 +35,7 @@ const generateVendorCertificatePDF = async (vendor) => {
 
     // Generate unique certificate number
     const certificateNumber = await generateVendorCertificateNumber();
-    const fileName = `vendor_certificate_${vendor._id}_${Date.now()}.pdf`;
+    const fileName = `ABCD_VENDOR_CERTIFICATE_${certificateNumber}.pdf`;
     const filePath = path.join(certificatesDir, fileName);
 
     return new Promise((resolve, reject) => {

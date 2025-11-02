@@ -46,7 +46,7 @@ const generateCertificatePDF = async (user) => {
     const last5Digits = certificateDigits.slice(-5); // Gets "01001"
     const referralCode = `CG${last5Digits}`; // Creates "CG01001"
 
-    const fileName = `certificate_${user._id}_${Date.now()}.pdf`;
+    const fileName = `ABCD_MEMBER_CERTIFICATE_${certificateNumber}.pdf`;
     const filePath = path.join(certificatesDir, fileName);
 
     return new Promise((resolve, reject) => {
