@@ -14,24 +14,25 @@ const handelUserSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { fullName, email, mobile, fatherName, address, gotra, city, utrNumber } = req.body;
+    let { fullName, email, mobile, relativeName, relationship, address, gotra, city, utrNumber } = req.body;
 
     // Trim input fields
     fullName = fullName?.trim();
     email = email?.trim();
-    fatherName = fatherName?.trim();
+    relativeName = relativeName?.trim();
+    relationship = relationship?.trim();
     address = address?.trim();
     city = city?.trim();
     utrNumber = utrNumber?.trim();
 
     // Convert name fields to uppercase
     fullName = fullName?.toUpperCase();
-    fatherName = fatherName?.toUpperCase();
+    relativeName = relativeName?.toUpperCase();
     address = address?.toUpperCase();
     if (city) city = city.toUpperCase();
 
-    if (!fullName || !mobile || !fatherName || !address || !gotra) {
-      return res.status(400).json({ success: false, message: "Full name, mobile, father's name, address, and gotra are required" });
+    if (!fullName || !mobile || !relativeName || !address || !gotra) {
+      return res.status(400).json({ success: false, message: "Full name, mobile, relative's name, address, and gotra are required" });
     }
 
     // Validate passport photo is uploaded
@@ -93,7 +94,8 @@ const handelUserSignup = async (req, res) => {
     const newUserData = {
       fullName,
       mobile,
-      fatherName,
+      relativeName,
+      relationship,
       address,
       gotra,
     };

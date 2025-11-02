@@ -14,7 +14,8 @@ const Signup = () => {
     fullName: '',
     email: '',
     mobile: '',
-    fatherName: '',
+    relationship: 'S/O',
+    relativeName: '',
     address: '',
     city: '',
     gotra: '',
@@ -50,7 +51,7 @@ const Signup = () => {
     const { name, value } = e.target
 
     // Capitalize specific fields
-    const fieldsToCapitalize = ['fullName', 'fatherName', 'address', 'city']
+    const fieldsToCapitalize = ['fullName', 'relativeName', 'address', 'city']
     const newValue = fieldsToCapitalize.includes(name) ? value.toUpperCase() : value
 
     setFormData({
@@ -158,7 +159,8 @@ const Signup = () => {
       const submitData = new FormData()
       submitData.append('fullName', formData.fullName)
       submitData.append('mobile', formData.mobile)
-      submitData.append('fatherName', formData.fatherName)
+      submitData.append('relationship', formData.relationship)
+      submitData.append('relativeName', formData.relativeName)
       submitData.append('address', formData.address)
       submitData.append('gotra', formData.gotra)
       if (formData.email) submitData.append('email', formData.email)
@@ -184,7 +186,8 @@ const Signup = () => {
           fullName: '',
           email: '',
           mobile: '',
-          fatherName: '',
+          relationship: 'S/O',
+          relativeName: '',
           address: '',
           city: '',
           gotra: '',
@@ -266,19 +269,45 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Father's Name Field */}
+            {/* Relationship Dropdown */}
             <div>
               <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
-                Father's Name <span className='text-red-400'>*</span>
+                Relationship <span className='text-red-400'>*</span>
+              </label>
+              <div className='relative'>
+                <select
+                  name='relationship'
+                  value={formData.relationship}
+                  onChange={handleChange}
+                  className='w-full px-3 md:px-4 py-2 md:py-3 pl-9 md:pl-11 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm appearance-none cursor-pointer'
+                  required
+                >
+                  <option value='S/O' className='bg-gray-800'>Son Of</option>
+                  <option value='D/O' className='bg-gray-800'>Daughter Of</option>
+                  <option value='W/O' className='bg-gray-800'>Wife Of</option>
+                </select>
+                <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' />
+                </svg>
+                <svg className='absolute right-2.5 md:right-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                </svg>
+              </div>
+            </div>
+
+            {/* Relative's Name Field */}
+            <div>
+              <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
+                {formData.relationship === 'W/O' ? "Husband's Name" : "Father's Name"} <span className='text-red-400'>*</span>
               </label>
               <div className='relative'>
                 <input
                   type='text'
-                  name='fatherName'
-                  value={formData.fatherName}
+                  name='relativeName'
+                  value={formData.relativeName}
                   onChange={handleChange}
                   className='w-full px-3 md:px-4 py-2 md:py-3 pl-9 md:pl-11 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm'
-                  placeholder="Enter your father's name"
+                  placeholder={formData.relationship === 'W/O' ? "Enter your husband's name" : "Enter your father's name"}
                   required
                 />
                 <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>

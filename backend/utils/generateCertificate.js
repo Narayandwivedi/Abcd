@@ -125,11 +125,12 @@ const generateCertificatePDF = async (user) => {
           width: doc.page.width
         });
 
-      // Add Father's name - Bold with same color as user name
+      // Add Relative's name with relationship - Bold with same color as user name
+      const relationship = user.relationship || 'S/O'; // Default to S/O if not specified
       doc.fontSize(11)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text(`S/O ${user.fatherName}`, 0, 283, {
+        .text(`${relationship} ${user.relativeName}`, 0, 283, {
           align: 'center',
           width: doc.page.width
         });

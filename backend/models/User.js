@@ -27,9 +27,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  fatherName: {
+  relativeName: {
     type: String,
     required: true,
+  },
+  relationship: {
+    type: String,
+    enum: ['S/O', 'D/O', 'W/O'],
+    default: 'S/O',
   },
   password: {
     type: String,
