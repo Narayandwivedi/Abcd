@@ -243,11 +243,22 @@ ABCD Team`
                           )}
                           <div>
                             <div className='font-semibold text-gray-800'>{user.fullName}</div>
-                            <div className='text-xs text-gray-500'>Father: {user.fatherName}</div>
+                            <div className='text-xs text-gray-500'>{user.relationship || 'S/O'} {user.relativeName}</div>
                             <div className='text-xs text-gray-500'>{user.address}</div>
                             {user.activeCertificate?.certificateNumber && (
                               <div className='text-xs text-blue-600 font-semibold mt-1'>
                                 Cert: {user.activeCertificate.certificateNumber}
+                              </div>
+                            )}
+                            {user.createdAt && (
+                              <div className='text-xs text-gray-500 mt-1'>
+                                Created: {new Date(user.createdAt).toLocaleDateString('en-IN', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
                               </div>
                             )}
                           </div>
@@ -397,11 +408,22 @@ ABCD Team`
                     )}
                     <div className='text-center mt-1'>
                       <div className='font-bold text-gray-800 text-sm'>{user.fullName}</div>
-                      <div className='text-xs text-gray-600'>Father: {user.fatherName}</div>
+                      <div className='text-xs text-gray-600'>{user.relationship || 'S/O'} {user.relativeName}</div>
                       {user.activeCertificate?.certificateNumber && (
                         <div className='text-xs text-blue-600 font-semibold'>Cert: {user.activeCertificate.certificateNumber}</div>
                       )}
                       <div className='text-xs text-gray-700 mt-1'>{user.address}</div>
+                      {user.createdAt && (
+                        <div className='text-xs text-gray-500 mt-1'>
+                          Created: {new Date(user.createdAt).toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
 
