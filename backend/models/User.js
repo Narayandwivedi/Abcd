@@ -83,19 +83,19 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  certificateNumber: {
+  // Active certificate reference (current certificate with PDF)
+  activeCertificate: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Certificate',
+    default: null,
+  },
+  referralCode: {
     type: String,
     unique: true,
-    sparse: true, // Allow null for users without certificates
+    sparse: true, // Allow null for users without referral codes
   },
-  certificateDownloadLink: {
-    type: String,
-  },
-  certificateIssueDate: {
-    type: Date,
-  },
-  certificateExpiryDate: {
-    type: Date,
+  referredBy: {
+    type: String, // Will store the referral code of the user who referred this user
   },
 
 }, { timestamps: true });

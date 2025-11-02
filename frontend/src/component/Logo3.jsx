@@ -12,7 +12,7 @@ const Logo = () => {
 
               {/* Left Side - Logo Image */}
               <div className='relative'>
-                <div className='relative w-18 h-18 md:w-28 md:h-28'>
+                <div className='relative w-18 h-18 md:w-20 md:h-20'>
                   {/* Logo Image */}
                   <img
                     src='/abcd logo3.png'

@@ -1,7 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
 const userModel = require("../models/User.js");
 const Admin = require("../models/Admin.js");
+const Certificate = require("../models/Certificate.js");
 const { generateCertificatePDF } = require("../utils/generateCertificate.js");
 
 // Get all users (for admin)
@@ -9,6 +12,7 @@ const getAllUsers = async (req, res) => {
   try {
     const users = await userModel.find()
       .select('-password')
+      .populate('activeCertificate', 'certificateNumber downloadLink issueDate expiryDate renewalCount pdfDeleted')
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -41,13 +45,23 @@ const approveUser = async (req, res) => {
     // Generate certificate PDF
     const certificateData = await generateCertificatePDF(user);
 
-    // Update payment verification status and certificate details
+    // Create new certificate document
+    const certificate = new Certificate({
+      certificateNumber: certificateData.certificateNumber,
+      userId: user._id,
+      downloadLink: certificateData.downloadLink,
+      issueDate: certificateData.issueDate,
+      expiryDate: certificateData.expiryDate,
+      renewalCount: 0
+    });
+
+    await certificate.save();
+
+    // Update user with certificate reference and referral code
     user.paymentVerified = true;
     user.isVerified = true;
-    user.certificateNumber = certificateData.certificateNumber;
-    user.certificateDownloadLink = certificateData.downloadLink;
-    user.certificateIssueDate = certificateData.issueDate;
-    user.certificateExpiryDate = certificateData.expiryDate;
+    user.activeCertificate = certificate._id;
+    user.referralCode = certificateData.referralCode;
     await user.save();
 
     return res.status(200).json({
@@ -59,8 +73,9 @@ const approveUser = async (req, res) => {
         email: user.email,
         mobile: user.mobile,
         paymentVerified: user.paymentVerified,
-        certificateNumber: user.certificateNumber,
-        certificateDownloadLink: user.certificateDownloadLink
+        certificateNumber: certificate.certificateNumber,
+        certificateDownloadLink: certificate.downloadLink,
+        referralCode: user.referralCode
       }
     });
   } catch (error) {
@@ -311,6 +326,83 @@ const changeAdminPassword = async (req, res) => {
   }
 };
 
+// Renew user certificate
+const renewCertificate = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await userModel.findById(userId).populate('activeCertificate');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    if (!user.activeCertificate) {
+      return res.status(400).json({
+        success: false,
+        message: "User has no active certificate to renew"
+      });
+    }
+
+    const oldCertificate = user.activeCertificate;
+
+    // Delete old PDF file from filesystem
+    const oldFilePath = path.join(__dirname, '..', oldCertificate.downloadLink);
+    if (fs.existsSync(oldFilePath)) {
+      fs.unlinkSync(oldFilePath);
+    }
+
+    // Mark old certificate as PDF deleted (keep the record for history)
+    oldCertificate.pdfDeleted = true;
+    await oldCertificate.save();
+
+    // Generate new certificate PDF
+    const certificateData = await generateCertificatePDF(user);
+
+    // Create new certificate document with incremented renewal count
+    const newCertificate = new Certificate({
+      certificateNumber: certificateData.certificateNumber,
+      userId: user._id,
+      downloadLink: certificateData.downloadLink,
+      issueDate: certificateData.issueDate,
+      expiryDate: certificateData.expiryDate,
+      renewalCount: oldCertificate.renewalCount + 1,
+      pdfDeleted: false
+    });
+
+    await newCertificate.save();
+
+    // Update user's active certificate reference
+    user.activeCertificate = newCertificate._id;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Certificate renewed successfully",
+      certificate: {
+        certificateNumber: newCertificate.certificateNumber,
+        downloadLink: newCertificate.downloadLink,
+        renewalCount: newCertificate.renewalCount,
+        issueDate: newCertificate.issueDate,
+        expiryDate: newCertificate.expiryDate
+      },
+      previousCertificate: {
+        certificateNumber: oldCertificate.certificateNumber,
+        renewalCount: oldCertificate.renewalCount
+      }
+    });
+  } catch (error) {
+    console.error('Renew certificate error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   approveUser,
@@ -318,5 +410,6 @@ module.exports = {
   adminLogin,
   adminLogout,
   getCurrentAdmin,
-  changeAdminPassword
+  changeAdminPassword,
+  renewCertificate
 };

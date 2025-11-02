@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { toast } from 'react-toastify'
 
 const Users = () => {
   const [users, setUsers] = useState([])
@@ -72,14 +73,14 @@ const Users = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('User approved successfully!')
+        toast.success('User approved successfully!', { autoClose: 800 })
         fetchUsers()
       } else {
-        alert(data.message || 'Failed to approve user')
+        toast.error(data.message || 'Failed to approve user', { autoClose: 800 })
       }
     } catch (error) {
       console.error('Error approving user:', error)
-      alert('Failed to approve user')
+      toast.error('Failed to approve user', { autoClose: 800 })
     }
   }
 
@@ -92,7 +93,7 @@ const Users = () => {
 
   const handleSetPassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-      alert('Password must be at least 6 characters')
+      toast.warning('Password must be at least 6 characters', { autoClose: 800 })
       return
     }
 
@@ -108,16 +109,16 @@ const Users = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Password set successfully!')
+        toast.success('Password set successfully!', { autoClose: 800 })
         setShowPasswordModal(false)
         setNewPassword('')
         fetchUsers()
       } else {
-        alert(data.message || 'Failed to set password')
+        toast.error(data.message || 'Failed to set password', { autoClose: 800 })
       }
     } catch (error) {
       console.error('Error setting password:', error)
-      alert('Failed to set password')
+      toast.error('Failed to set password', { autoClose: 800 })
     }
   }
 
@@ -129,17 +130,17 @@ const Users = () => {
 
   // Send WhatsApp message
   const sendWhatsAppMessage = (user) => {
-    if (!user.certificateNumber || !user.certificateDownloadLink) {
-      alert('Certificate not generated yet. Please approve the user first.')
+    if (!user.activeCertificate || !user.activeCertificate.certificateNumber || !user.activeCertificate.downloadLink) {
+      toast.warning('Certificate not generated yet. Please approve the user first.', { autoClose: 800 })
       return
     }
 
-    const certificateUrl = `${BACKEND_URL}${user.certificateDownloadLink}`
+    const certificateUrl = `${BACKEND_URL}${user.activeCertificate.downloadLink}`
     const message = `Congratulations! 🎉
 
 You are now an approved member of ABCD (Agrawal Business and Community Development).
 
-Your Certificate Number: ${user.certificateNumber}
+Your Certificate Number: ${user.activeCertificate.certificateNumber}
 
 You can view and download your certificate here:
 ${certificateUrl}
@@ -244,9 +245,9 @@ ABCD Team`
                             <div className='font-semibold text-gray-800'>{user.fullName}</div>
                             <div className='text-xs text-gray-500'>Father: {user.fatherName}</div>
                             <div className='text-xs text-gray-500'>{user.address}</div>
-                            {user.certificateNumber && (
+                            {user.activeCertificate?.certificateNumber && (
                               <div className='text-xs text-blue-600 font-semibold mt-1'>
-                                Cert: {user.certificateNumber}
+                                Cert: {user.activeCertificate.certificateNumber}
                               </div>
                             )}
                           </div>
@@ -321,7 +322,7 @@ ABCD Team`
                           </a>
 
                           {/* WhatsApp Button */}
-                          {user.paymentVerified && user.certificateDownloadLink && (
+                          {user.paymentVerified && user.activeCertificate?.downloadLink && (
                             <button
                               onClick={() => sendWhatsAppMessage(user)}
                               className='p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition'
@@ -334,9 +335,9 @@ ABCD Team`
                           )}
 
                           {/* View Certificate PDF Button */}
-                          {user.paymentVerified && user.certificateDownloadLink && (
+                          {user.paymentVerified && user.activeCertificate?.downloadLink && !user.activeCertificate?.pdfDeleted && (
                             <a
-                              href={`${BACKEND_URL}${user.certificateDownloadLink}`}
+                              href={`${BACKEND_URL}${user.activeCertificate.downloadLink}`}
                               target='_blank'
                               rel='noopener noreferrer'
                               className='p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition'
@@ -397,8 +398,8 @@ ABCD Team`
                     <div className='text-center mt-1'>
                       <div className='font-bold text-gray-800 text-sm'>{user.fullName}</div>
                       <div className='text-xs text-gray-600'>Father: {user.fatherName}</div>
-                      {user.certificateNumber && (
-                        <div className='text-xs text-blue-600 font-semibold'>Cert: {user.certificateNumber}</div>
+                      {user.activeCertificate?.certificateNumber && (
+                        <div className='text-xs text-blue-600 font-semibold'>Cert: {user.activeCertificate.certificateNumber}</div>
                       )}
                       <div className='text-xs text-gray-700 mt-1'>{user.address}</div>
                     </div>
@@ -482,7 +483,7 @@ ABCD Team`
                     </a>
 
                     {/* WhatsApp Button */}
-                    {user.paymentVerified && user.certificateDownloadLink && (
+                    {user.paymentVerified && user.activeCertificate?.downloadLink && (
                       <button
                         onClick={() => sendWhatsAppMessage(user)}
                         className='p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 transition'
@@ -495,9 +496,9 @@ ABCD Team`
                     )}
 
                     {/* View Certificate PDF Button */}
-                    {user.paymentVerified && user.certificateDownloadLink && (
+                    {user.paymentVerified && user.activeCertificate?.downloadLink && !user.activeCertificate?.pdfDeleted && (
                       <a
-                        href={`${BACKEND_URL}${user.certificateDownloadLink}`}
+                        href={`${BACKEND_URL}${user.activeCertificate.downloadLink}`}
                         target='_blank'
                         rel='noopener noreferrer'
                         className='flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition text-xs font-medium'

@@ -5,12 +5,10 @@ const path = require('path');
 // Generate unique certificate number in format: YM-CG-{year}-{month}-{6-digit-number}
 // Example: YM-CG-2025-10-001001
 const generateCertificateNumber = async () => {
-  const User = require('../models/User');
+  const Certificate = require('../models/Certificate');
 
-  // Count total users with certificates
-  const certificateCount = await User.countDocuments({
-    certificateNumber: { $exists: true, $ne: null }
-  });
+  // Count total certificates issued
+  const certificateCount = await Certificate.countDocuments();
 
   // Get current year and month
   const now = new Date();
@@ -41,6 +39,13 @@ const generateCertificatePDF = async (user) => {
 
     // Generate unique certificate number
     const certificateNumber = await generateCertificateNumber();
+
+    // Generate referral code from last 5 digits of certificate number
+    // Example: YM-CG-2025-10-001001 -> CG01001
+    const certificateDigits = certificateNumber.split('-').pop(); // Gets "001001"
+    const last5Digits = certificateDigits.slice(-5); // Gets "01001"
+    const referralCode = `CG${last5Digits}`; // Creates "CG01001"
+
     const fileName = `certificate_${user._id}_${Date.now()}.pdf`;
     const filePath = path.join(certificatesDir, fileName);
 
@@ -165,6 +170,15 @@ const generateCertificatePDF = async (user) => {
           width: doc.page.width
         });
 
+      // Add referral code - HIGHLIGHTED with darker color
+      doc.fontSize(11)
+        .fillColor('#1e40af')
+        .font('Helvetica-Bold')
+        .text(`Referral Code: ${referralCode}`, 0, 380, {
+          align: 'center',
+          width: doc.page.width
+        });
+
       // Add issue date
       const issueDate = new Date().toLocaleDateString('en-IN', {
         day: '2-digit',
@@ -175,7 +189,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica')
-        .text(`Issued on: ${issueDate}`, 0, 385, {
+        .text(`Issued on: ${issueDate}`, 0, 400, {
           align: 'center',
           width: doc.page.width
         });
@@ -184,7 +198,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica-Bold')
-        .text('Valid till: 31 March 2027', 0, 398, {
+        .text('Valid till: 31 March 2027', 0, 415, {
           align: 'center',
           width: doc.page.width
         });
@@ -196,7 +210,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(10)
         .fillColor('#1e40af')
         .font('Helvetica-Bold')
-        .text('H.Q. Raipur', 0, 420, {
+        .text('H.Q. Raipur', 0, 435, {
           align: 'center',
           width: doc.page.width
         });
@@ -204,7 +218,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(9)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('Hanuman Market, Ramsagar Para, Raipur (CG) 492001', 0, 435, {
+        .text('Hanuman Market, Ramsagar Para, Raipur (CG) 492001', 0, 450, {
           align: 'center',
           width: doc.page.width
         });
@@ -294,6 +308,7 @@ const generateCertificatePDF = async (user) => {
         // Return the certificate details
         resolve({
           certificateNumber,
+          referralCode,
           fileName,
           filePath,
           downloadLink: `/uploads/certificates/${fileName}`,
