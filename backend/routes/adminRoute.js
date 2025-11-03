@@ -1,5 +1,5 @@
 const express = require("express");
-const { getAllUsers, approveUser, setUserPassword, adminLogin, adminLogout, getCurrentAdmin, changeAdminPassword } = require("../controllers/adminController");
+const { getAllUsers, approveUser, setUserPassword, adminLogin, adminLogout, getCurrentAdmin, changeAdminPassword, updateUser, deleteUser } = require("../controllers/adminController");
 const adminAuth = require("../middleware/adminAuth");
 const { adminLoginLimiter } = require("../middleware/adminRateLimit");
 
@@ -15,5 +15,7 @@ router.put("/change-password", adminAuth, changeAdminPassword);
 router.get("/users", adminAuth, getAllUsers);
 router.put("/users/:userId/approve", adminAuth, approveUser);
 router.put("/users/:userId/set-password", adminAuth, setUserPassword);
+router.put("/users/:userId", adminAuth, updateUser);
+router.delete("/users/:userId", adminAuth, deleteUser);
 
 module.exports = router;

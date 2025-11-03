@@ -403,6 +403,135 @@ const renewCertificate = async (req, res) => {
   }
 };
 
+// Update user details
+const updateUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updateData = req.body;
+
+    // Find user
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Fields that can be updated
+    const allowedFields = [
+      'fullName',
+      'mobile',
+      'email',
+      'gotra',
+      'city',
+      'address',
+      'relativeName',
+      'relationship',
+      'profilePicture',
+      'passportPhoto',
+      'utrNumber'
+    ];
+
+    // Update only allowed fields
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        user[field] = updateData[field];
+      }
+    });
+
+    await user.save();
+
+    // Return updated user without password
+    const updatedUser = await userModel.findById(userId)
+      .select('-password')
+      .populate('activeCertificate', 'certificateNumber downloadLink issueDate expiryDate renewalCount pdfDeleted');
+
+    return res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Update user error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Delete user
+const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find user
+    const user = await userModel.findById(userId).populate('activeCertificate');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Delete associated certificate PDF if exists
+    if (user.activeCertificate && !user.activeCertificate.pdfDeleted) {
+      const certificatePath = path.join(__dirname, '..', user.activeCertificate.downloadLink);
+      if (fs.existsSync(certificatePath)) {
+        fs.unlinkSync(certificatePath);
+      }
+    }
+
+    // Delete profile picture if exists
+    if (user.profilePicture) {
+      const profilePicPath = path.join(__dirname, '..', user.profilePicture);
+      if (fs.existsSync(profilePicPath)) {
+        fs.unlinkSync(profilePicPath);
+      }
+    }
+
+    // Delete passport photo if exists
+    if (user.passportPhoto) {
+      const passportPhotoPath = path.join(__dirname, '..', user.passportPhoto);
+      if (fs.existsSync(passportPhotoPath)) {
+        fs.unlinkSync(passportPhotoPath);
+      }
+    }
+
+    // Delete payment screenshot if exists
+    if (user.paymentScreenshot) {
+      const paymentScreenshotPath = path.join(__dirname, '..', user.paymentScreenshot);
+      if (fs.existsSync(paymentScreenshotPath)) {
+        fs.unlinkSync(paymentScreenshotPath);
+      }
+    }
+
+    // Delete all certificates associated with user
+    if (user.activeCertificate) {
+      await Certificate.deleteMany({ userId: user._id });
+    }
+
+    // Delete user from database
+    await userModel.findByIdAndDelete(userId);
+
+    console.log(`[ADMIN] User deleted: ${user.fullName} (${user.email})`);
+
+    return res.status(200).json({
+      success: true,
+      message: "User and associated data deleted successfully"
+    });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   approveUser,
@@ -411,5 +540,7 @@ module.exports = {
   adminLogout,
   getCurrentAdmin,
   changeAdminPassword,
-  renewCertificate
+  renewCertificate,
+  updateUser,
+  deleteUser
 };

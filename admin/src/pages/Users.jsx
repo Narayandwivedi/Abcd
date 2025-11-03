@@ -10,6 +10,19 @@ const Users = () => {
   const [newPassword, setNewPassword] = useState('')
   const [showPhotoModal, setShowPhotoModal] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editFormData, setEditFormData] = useState({
+    fullName: '',
+    mobile: '',
+    email: '',
+    gotra: '',
+    city: '',
+    address: '',
+    relativeName: '',
+    relationship: '',
+    passportPhoto: null,
+    utrNumber: ''
+  })
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -155,6 +168,138 @@ ABCD Team`
     const whatsappUrl = `https://web.whatsapp.com/send?phone=91${user.mobile}&text=${encodedMessage}`
 
     window.open(whatsappUrl, '_blank')
+  }
+
+  // Open edit modal
+  const openEditModal = (user) => {
+    setSelectedUser(user)
+    setEditFormData({
+      fullName: user.fullName || '',
+      mobile: user.mobile || '',
+      email: user.email || '',
+      gotra: user.gotra || '',
+      city: user.city || '',
+      address: user.address || '',
+      relativeName: user.relativeName || '',
+      relationship: user.relationship || 'S/O',
+      passportPhoto: null,
+      utrNumber: user.utrNumber || ''
+    })
+    setShowEditModal(true)
+  }
+
+  // Handle edit form input change
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  // Handle file upload for edit
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setEditFormData(prev => ({
+        ...prev,
+        passportPhoto: file
+      }))
+    }
+  }
+
+  // Submit edit user
+  const handleEditUser = async () => {
+    if (!editFormData.fullName || !editFormData.mobile) {
+      toast.warning('Name and mobile are required', { autoClose: 800 })
+      return
+    }
+
+    try {
+      // If there's a new photo, upload it first
+      let photoPath = null
+      if (editFormData.passportPhoto) {
+        const formData = new FormData()
+        formData.append('passportPhoto', editFormData.passportPhoto)
+
+        const uploadResponse = await fetch(`${BACKEND_URL}/api/user/upload-photo`, {
+          method: 'POST',
+          body: formData
+        })
+        const uploadData = await uploadResponse.json()
+
+        if (uploadData.success) {
+          photoPath = uploadData.passportPhoto
+        }
+      }
+
+      // Prepare update data
+      const updateData = {
+        fullName: editFormData.fullName,
+        mobile: editFormData.mobile,
+        email: editFormData.email,
+        gotra: editFormData.gotra,
+        city: editFormData.city,
+        address: editFormData.address,
+        relativeName: editFormData.relativeName,
+        relationship: editFormData.relationship,
+        utrNumber: editFormData.utrNumber
+      }
+
+      // Add photo path if uploaded
+      if (photoPath) {
+        updateData.passportPhoto = photoPath
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/admin/users/${selectedUser._id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData)
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('User updated successfully!', { autoClose: 800 })
+        setShowEditModal(false)
+        fetchUsers()
+      } else {
+        toast.error(data.message || 'Failed to update user', { autoClose: 800 })
+      }
+    } catch (error) {
+      console.error('Error updating user:', error)
+      toast.error('Failed to update user', { autoClose: 800 })
+    }
+  }
+
+  // Delete user
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`Are you sure you want to delete ${userName}? This action cannot be undone and will delete all associated data including certificates and photos.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('User deleted successfully!', { autoClose: 800 })
+        fetchUsers()
+      } else {
+        toast.error(data.message || 'Failed to delete user', { autoClose: 800 })
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      toast.error('Failed to delete user', { autoClose: 800 })
+    }
   }
 
   // Filter users based on search
@@ -380,6 +525,28 @@ ABCD Team`
                               Approve
                             </button>
                           )}
+
+                          {/* Edit Button */}
+                          <button
+                            onClick={() => openEditModal(user)}
+                            className='p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition'
+                            title='Edit User'
+                          >
+                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' />
+                            </svg>
+                          </button>
+
+                          {/* Delete Button */}
+                          <button
+                            onClick={() => handleDeleteUser(user._id, user.fullName)}
+                            className='p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition'
+                            title='Delete User'
+                          >
+                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                            </svg>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -389,127 +556,182 @@ ABCD Team`
             </div>
 
             {/* Mobile Card View */}
-            <div className='md:hidden divide-y divide-gray-200'>
+            <div className='md:hidden space-y-4 p-4'>
               {filteredUsers.map((user) => (
-                <div key={user._id} className='p-3 hover:bg-gray-50 transition'>
-                  {/* User Header */}
-                  <div className='flex flex-col items-center mb-2'>
-                    {user.passportPhoto ? (
-                      <img
-                        src={`${BACKEND_URL}/${user.passportPhoto}`}
-                        alt={user.fullName}
-                        onClick={() => handlePhotoClick(`${BACKEND_URL}/${user.passportPhoto}`)}
-                        className='w-12 h-12 rounded-full object-cover border-2 border-gray-200 cursor-pointer hover:opacity-80 transition'
-                      />
-                    ) : (
-                      <div className='w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm'>
-                        {user.fullName?.[0]?.toUpperCase()}
+                <div key={user._id} className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300'>
+                  {/* Card Header with Gradient Background */}
+                  <div className='bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 p-4'>
+                    <div className='flex items-start gap-3'>
+                      {/* Profile Photo with Ring */}
+                      <div className='relative flex-shrink-0'>
+                        {user.passportPhoto ? (
+                          <img
+                            src={`${BACKEND_URL}/${user.passportPhoto}`}
+                            alt={user.fullName}
+                            onClick={() => handlePhotoClick(`${BACKEND_URL}/${user.passportPhoto}`)}
+                            className='w-16 h-16 rounded-full object-cover border-4 border-white shadow-md cursor-pointer hover:scale-105 transition-transform duration-200'
+                          />
+                        ) : (
+                          <div className='w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md border-4 border-white'>
+                            {user.fullName?.[0]?.toUpperCase()}
+                          </div>
+                        )}
+                        {/* Status Indicator Dot */}
+                        {user.paymentVerified && (
+                          <div className='absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-3 border-white shadow-md flex items-center justify-center'>
+                            <svg className='w-3 h-3 text-white' fill='currentColor' viewBox='0 0 20 20'>
+                              <path fillRule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clipRule='evenodd' />
+                            </svg>
+                          </div>
+                        )}
                       </div>
-                    )}
-                    <div className='text-center mt-1'>
-                      <div className='font-bold text-gray-800 text-sm'>{user.fullName}</div>
-                      <div className='text-xs text-gray-600'>{user.relationship || 'S/O'} {user.relativeName}</div>
-                      {user.activeCertificate?.certificateNumber && (
-                        <div className='text-xs text-blue-600 font-semibold'>Cert: {user.activeCertificate.certificateNumber}</div>
-                      )}
-                      <div className='text-xs text-gray-700 mt-1'>{user.address}</div>
-                      {user.createdAt && (
-                        <div className='text-xs text-gray-500 mt-1'>
-                          Created: {new Date(user.createdAt).toLocaleDateString('en-IN', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+
+                      {/* User Info */}
+                      <div className='flex-1 min-w-0'>
+                        {/* Name and Action Buttons Row */}
+                        <div className='flex items-center justify-between gap-2 mb-0.5'>
+                          <h3 className='font-bold text-gray-900 text-xs leading-tight'>{user.fullName}</h3>
+                          <div className='flex gap-1 flex-shrink-0'>
+                            <button
+                              onClick={() => openEditModal(user)}
+                              className='p-1.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 shadow-sm border border-blue-200 transition-all duration-200 hover:shadow-md'
+                              title='Edit User'
+                            >
+                              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(user._id, user.fullName)}
+                              className='p-1.5 bg-white text-red-600 rounded-lg hover:bg-red-50 shadow-sm border border-red-200 transition-all duration-200 hover:shadow-md'
+                              title='Delete User'
+                            >
+                              <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
-                      )}
+                        <p className='text-xs text-gray-600 mb-0.5'>
+                          <span className='font-medium'>{user.relationship || 'S/O'}</span> {user.relativeName}
+                        </p>
+                        {user.activeCertificate?.certificateNumber && (
+                          <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold mb-0.5 whitespace-nowrap'>
+                            <svg className='w-3 h-3 flex-shrink-0' fill='currentColor' viewBox='0 0 20 20'>
+                              <path fillRule='evenodd' d='M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z' clipRule='evenodd' />
+                            </svg>
+                            <span className='whitespace-nowrap'>{user.activeCertificate.certificateNumber}</span>
+                          </div>
+                        )}
+                        <div className='flex items-start gap-1 text-xs text-gray-500'>
+                          <svg className='w-3 h-3 flex-shrink-0 mt-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
+                          </svg>
+                          <span className='text-left break-words'>{user.address}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* User Details */}
-                  <div className='space-y-1.5 mb-2'>
-
-                    {/* Mobile and Email in same row */}
-                    <div className='flex items-center justify-between gap-2 text-xs'>
-                      <a href={`tel:${user.mobile}`} className='text-blue-600 hover:text-blue-800 hover:underline font-medium'>
-                        {user.mobile}
+                  {/* Card Body */}
+                  <div className='p-4 space-y-3'>
+                    {/* Contact Info */}
+                    <div className='flex items-center justify-between gap-2 bg-gray-50 rounded-xl p-3'>
+                      <a href={`tel:${user.mobile}`} className='flex items-center gap-1.5 text-blue-600 hover:text-blue-700 font-medium text-xs group'>
+                        <div className='p-1.5 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition'>
+                          <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
+                          </svg>
+                        </div>
+                        <span className='whitespace-nowrap'>{user.mobile}</span>
                       </a>
                       {user.email && (
-                        <a href={`mailto:${user.email}`} className='text-blue-600 hover:text-blue-800 hover:underline truncate'>
+                        <a href={`mailto:${user.email}`} className='text-gray-600 hover:text-gray-800 text-xs truncate'>
                           {user.email}
                         </a>
                       )}
                     </div>
 
-                    {/* Gotra and Status in same row */}
+                    {/* Gotra & Payment Row */}
                     <div className='flex items-center justify-between gap-2'>
-                      <div className='flex items-center gap-1'>
-                        <span className='text-xs text-gray-500'>Gotra:</span>
-                        <span className='px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold'>
-                          {user.gotra}
-                        </span>
+                      <div className='flex items-center gap-1.5 bg-purple-50 px-2.5 py-2 rounded-xl'>
+                        <svg className='w-3.5 h-3.5 text-purple-600' fill='currentColor' viewBox='0 0 20 20'>
+                          <path d='M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z' />
+                        </svg>
+                        <span className='text-xs font-semibold text-purple-700'>{user.gotra}</span>
                       </div>
-                      <div className='flex items-center gap-1'>
-                        <span className='text-xs text-gray-500'>Status:</span>
-                        {user.paymentVerified ? (
-                          <span className='px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold'>
-                            Approved
-                          </span>
-                        ) : user.isRejected ? (
-                          <span className='px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-semibold'>
-                            Rejected
-                          </span>
-                        ) : (
-                          <span className='px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold'>
-                            Pending
-                          </span>
-                        )}
-                      </div>
+
+                      {/* Payment Info or Status */}
+                      {user.utrNumber ? (
+                        <div className='flex items-center gap-1.5 bg-orange-50 px-2.5 py-2 rounded-xl'>
+                          <svg className='w-3.5 h-3.5 text-orange-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
+                          </svg>
+                          <span className='text-xs font-semibold text-orange-700'>UTR: {user.utrNumber}</span>
+                        </div>
+                      ) : user.paymentScreenshot ? (
+                        <a
+                          href={`${BACKEND_URL}/${user.paymentScreenshot}`}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='flex items-center gap-1.5 bg-orange-50 px-2.5 py-2 rounded-xl hover:bg-orange-100 transition'
+                        >
+                          <svg className='w-3.5 h-3.5 text-orange-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
+                          </svg>
+                          <span className='text-xs font-semibold text-orange-700'>Screenshot</span>
+                        </a>
+                      ) : user.isRejected ? (
+                        <div className='flex items-center gap-1.5 px-2.5 py-2 bg-red-50 text-red-700 rounded-xl text-xs font-semibold'>
+                          <div className='w-2 h-2 bg-red-500 rounded-full'></div>
+                          Rejected
+                        </div>
+                      ) : (
+                        <div className='flex items-center gap-1.5 px-2.5 py-2 bg-yellow-50 text-yellow-700 rounded-xl text-xs font-semibold'>
+                          <div className='w-2 h-2 bg-yellow-500 rounded-full animate-pulse'></div>
+                          Pending
+                        </div>
+                      )}
                     </div>
 
-                    {/* UTR and Payment Screenshot in same row */}
-                    {(user.utrNumber || user.paymentScreenshot) && (
-                      <div className='flex items-center justify-between gap-2 text-xs'>
-                        {user.utrNumber && (
-                          <div className='text-gray-700'>
-                            <span className='text-gray-500'>UTR:</span> {user.utrNumber}
-                          </div>
-                        )}
-                        {user.paymentScreenshot && (
-                          <a
-                            href={`${BACKEND_URL}/${user.paymentScreenshot}`}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='text-blue-600 hover:underline'
-                          >
-                            View Payment
-                          </a>
-                        )}
+                    {/* Created Date */}
+                    {user.createdAt && (
+                      <div className='flex items-center gap-2 text-xs text-gray-500'>
+                        <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
+                        </svg>
+                        <span>
+                          Created: {new Date(user.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
                       </div>
                     )}
                   </div>
 
-                  {/* Actions */}
-                  <div className='flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-gray-200'>
-                    {/* Call Button */}
+                  {/* Action Buttons */}
+                  <div className='flex items-center gap-2 p-4 bg-gray-50 border-t border-gray-100 flex-wrap'>
+                    {/* Call */}
                     <a
                       href={`tel:${user.mobile}`}
-                      className='flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition text-xs font-medium'
-                      title='Call User'
+                      className='flex items-center gap-1.5 px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
                     >
-                      <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                         <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
                       </svg>
                       Call
                     </a>
 
-                    {/* WhatsApp Button */}
+                    {/* WhatsApp */}
                     {user.paymentVerified && user.activeCertificate?.downloadLink && (
                       <button
                         onClick={() => sendWhatsAppMessage(user)}
-                        className='p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 transition'
-                        title='Send WhatsApp'
+                        className='p-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm hover:shadow-md'
                       >
                         <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 24 24'>
                           <path d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z' />
@@ -517,41 +739,39 @@ ABCD Team`
                       </button>
                     )}
 
-                    {/* View Certificate PDF Button */}
+                    {/* Certificate */}
                     {user.paymentVerified && user.activeCertificate?.downloadLink && !user.activeCertificate?.pdfDeleted && (
                       <a
                         href={`${BACKEND_URL}${user.activeCertificate.downloadLink}`}
                         target='_blank'
                         rel='noopener noreferrer'
-                        className='flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition text-xs font-medium'
-                        title='View Certificate PDF'
+                        className='flex items-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
                       >
-                        <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z' />
+                        <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
                         </svg>
                         Cert
                       </a>
                     )}
 
-                    {/* Set Password Button */}
+                    {/* Password */}
                     <button
                       onClick={() => openPasswordModal(user)}
-                      className='flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition text-xs font-medium'
-                      title='Set Password'
+                      className='flex items-center gap-1.5 px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
                     >
-                      <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                         <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' />
                       </svg>
                       Pass
                     </button>
 
-                    {/* Approve Button */}
+                    {/* Approve */}
                     {!user.paymentVerified && !user.isRejected && (
                       <button
                         onClick={() => handleApprove(user._id)}
-                        className='flex-1 px-3 py-1 bg-blue-600 text-white rounded-md text-xs font-bold hover:bg-blue-700 transition'
+                        className='flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-xs font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
                       >
-                        Approve
+                        Approve Now
                       </button>
                     )}
                   </div>
@@ -616,6 +836,170 @@ ABCD Team`
               className='w-full h-auto max-h-[90vh] object-contain rounded-lg'
               onClick={(e) => e.stopPropagation()}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && selectedUser && (
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto'>
+          <div className='bg-white rounded-2xl p-6 max-w-2xl w-full my-8'>
+            <h2 className='text-2xl font-bold text-gray-800 mb-4'>Edit User</h2>
+            <p className='text-gray-600 mb-6'>
+              Editing: <strong>{selectedUser.fullName}</strong>
+            </p>
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'>
+              {/* Full Name */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Full Name *</label>
+                <input
+                  type='text'
+                  name='fullName'
+                  value={editFormData.fullName}
+                  onChange={handleEditFormChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              {/* Mobile */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Mobile *</label>
+                <input
+                  type='text'
+                  name='mobile'
+                  value={editFormData.mobile}
+                  onChange={handleEditFormChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Email</label>
+                <input
+                  type='email'
+                  name='email'
+                  value={editFormData.email}
+                  onChange={handleEditFormChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              {/* Gotra */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Gotra</label>
+                <input
+                  type='text'
+                  name='gotra'
+                  value={editFormData.gotra}
+                  onChange={handleEditFormChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              {/* City */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>City</label>
+                <input
+                  type='text'
+                  name='city'
+                  value={editFormData.city}
+                  onChange={handleEditFormChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              {/* Relationship */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Relationship</label>
+                <select
+                  name='relationship'
+                  value={editFormData.relationship}
+                  onChange={handleEditFormChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                >
+                  <option value='S/O'>S/O (Son of)</option>
+                  <option value='D/O'>D/O (Daughter of)</option>
+                  <option value='W/O'>W/O (Wife of)</option>
+                </select>
+              </div>
+
+              {/* Relative Name */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Relative Name</label>
+                <input
+                  type='text'
+                  name='relativeName'
+                  value={editFormData.relativeName}
+                  onChange={handleEditFormChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              {/* UTR Number */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>UTR Number</label>
+                <input
+                  type='text'
+                  name='utrNumber'
+                  value={editFormData.utrNumber}
+                  onChange={handleEditFormChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              {/* Address - Full Width */}
+              <div className='md:col-span-2'>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Address</label>
+                <textarea
+                  name='address'
+                  value={editFormData.address}
+                  onChange={handleEditFormChange}
+                  rows='2'
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              {/* Passport Photo Upload */}
+              <div className='md:col-span-2'>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Update Passport Photo</label>
+                <input
+                  type='file'
+                  accept='image/*'
+                  onChange={handleFileChange}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+                {editFormData.passportPhoto && (
+                  <p className='text-sm text-green-600 mt-2'>New photo selected: {editFormData.passportPhoto.name}</p>
+                )}
+                {selectedUser.passportPhoto && !editFormData.passportPhoto && (
+                  <div className='mt-2'>
+                    <p className='text-sm text-gray-600 mb-2'>Current photo:</p>
+                    <img
+                      src={`${BACKEND_URL}/${selectedUser.passportPhoto}`}
+                      alt='Current'
+                      className='w-24 h-24 rounded-lg object-cover border-2 border-gray-200'
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className='flex gap-3'>
+              <button
+                onClick={handleEditUser}
+                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition'
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition'
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
