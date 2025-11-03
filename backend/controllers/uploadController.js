@@ -1,209 +1,280 @@
 const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
-const User = require("../models/User");
+
+// ==========================================
+// UPLOAD + PROCESS FUNCTIONS (Combined)
+// ==========================================
 
 /**
- * Process and upload passport photo
- * Used during user signup
+ * Upload and process passport photo for user signup
+ * Handles upload and processing in one function
  */
-exports.processPassportPhoto = async (file) => {
+exports.handlePassportPhotoUpload = async (file) => {
+  console.log("📸 Starting passport photo upload and processing");
+
+  if (!file) {
+    throw new Error("No passport photo file provided");
+  }
+
+  console.log("File details:", {
+    originalname: file.originalname,
+    mimetype: file.mimetype,
+    size: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
+    tempPath: file.path
+  });
+
   try {
-    if (!file) {
-      throw new Error("No passport photo file provided");
+    // Verify file exists
+    if (!fs.existsSync(file.path)) {
+      throw new Error(`Uploaded file not found at: ${file.path}`);
     }
 
-    const uploadDir = path.join(__dirname, "..", "uploads", "passport-photos");
-
-    // Ensure directory exists
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // Setup output directory
+    const outputDir = path.resolve(__dirname, "..", "uploads", "passport-photos");
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    const webpFilename = `passport-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
-    const webpPath = path.join(uploadDir, webpFilename);
+    // Generate output filename
+    const outputFilename = `passport-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+    const outputPath = path.join(outputDir, outputFilename);
 
-    // Process image: resize and convert to WebP
+    console.log("Processing image...");
+    console.log("Input:", file.path);
+    console.log("Output:", outputPath);
+
+    // Process image with Sharp
     await sharp(file.path)
       .resize(400, 600, {
         fit: "inside",
-        withoutEnlargement: true,
+        withoutEnlargement: true
       })
-      .webp({
-        quality: 85,
-      })
-      .toFile(webpPath);
+      .webp({ quality: 85 })
+      .toFile(outputPath);
 
-    // Delete original uploaded file
-    fs.unlinkSync(file.path);
+    console.log("✅ Image processed successfully");
 
-    // Return relative path for database storage
-    return `upload/passport-photos/${webpFilename}`;
-  } catch (error) {
-    // Clean up files on error
-    if (file && fs.existsSync(file.path)) {
+    // Delete temp file
+    try {
       fs.unlinkSync(file.path);
+      console.log("🗑️ Temp file deleted");
+    } catch (err) {
+      console.warn("⚠️ Failed to delete temp file:", err.message);
     }
+
+    // Return relative path for database
+    const relativePath = `uploads/passport-photos/${outputFilename}`;
+    console.log("Saved at:", relativePath);
+
+    return relativePath;
+
+  } catch (error) {
+    console.error("❌ Error processing passport photo:", error);
+
+    // Cleanup temp file on error
+    try {
+      if (file.path && fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+      }
+    } catch (cleanupErr) {
+      console.warn("⚠️ Failed to cleanup temp file:", cleanupErr.message);
+    }
+
     throw new Error(`Failed to process passport photo: ${error.message}`);
   }
 };
 
 /**
- * Process and upload vendor photo
- * Used during vendor signup
+ * Upload and process payment screenshot for user signup
+ * Handles upload and processing in one function
  */
-exports.processVendorPhoto = async (file) => {
-  try {
-    if (!file) {
-      throw new Error("No vendor photo file provided");
-    }
+exports.handlePaymentScreenshotUpload = async (file) => {
+  console.log("💳 Starting payment screenshot upload and processing");
 
-    const uploadDir = path.join(__dirname, "..", "uploads", "vendor-photos");
-
-    // Ensure directory exists
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    const webpFilename = `vendor-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
-    const webpPath = path.join(uploadDir, webpFilename);
-
-    // Process image: resize and convert to WebP
-    await sharp(file.path)
-      .resize(400, 600, {
-        fit: "inside",
-        withoutEnlargement: true,
-      })
-      .webp({
-        quality: 85,
-      })
-      .toFile(webpPath);
-
-    // Delete original uploaded file
-    fs.unlinkSync(file.path);
-
-    // Return relative path for database storage
-    return `upload/vendor-photos/${webpFilename}`;
-  } catch (error) {
-    // Clean up files on error
-    if (file && fs.existsSync(file.path)) {
-      fs.unlinkSync(file.path);
-    }
-    throw new Error(`Failed to process vendor photo: ${error.message}`);
+  if (!file) {
+    throw new Error("No payment screenshot file provided");
   }
-};
 
-/**
- * Process and upload payment screenshot
- * Used during user signup
- */
-exports.processPaymentScreenshot = async (file) => {
+  console.log("File details:", {
+    originalname: file.originalname,
+    mimetype: file.mimetype,
+    size: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
+    tempPath: file.path
+  });
+
   try {
-    if (!file) {
-      throw new Error("No payment screenshot file provided");
+    // Verify file exists
+    if (!fs.existsSync(file.path)) {
+      throw new Error(`Uploaded file not found at: ${file.path}`);
     }
 
-    const uploadDir = path.join(__dirname, "..", "uploads", "payment-screenshots");
-
-    // Ensure directory exists
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // Setup output directory
+    const outputDir = path.resolve(__dirname, "..", "uploads", "payment-screenshots");
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    const webpFilename = `payment-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
-    const webpPath = path.join(uploadDir, webpFilename);
+    // Generate output filename
+    const outputFilename = `payment-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+    const outputPath = path.join(outputDir, outputFilename);
 
-    // Process image: resize and convert to WebP
+    console.log("Processing image...");
+    console.log("Input:", file.path);
+    console.log("Output:", outputPath);
+
+    // Process image with Sharp
     await sharp(file.path)
       .resize(1200, 1200, {
         fit: "inside",
-        withoutEnlargement: true,
+        withoutEnlargement: true
       })
-      .webp({
-        quality: 80,
-      })
-      .toFile(webpPath);
+      .webp({ quality: 80 })
+      .toFile(outputPath);
 
-    // Delete original uploaded file
-    fs.unlinkSync(file.path);
+    console.log("✅ Image processed successfully");
 
-    // Return relative path for database storage
-    return `upload/payment-screenshots/${webpFilename}`;
-  } catch (error) {
-    // Clean up files on error
-    if (file && fs.existsSync(file.path)) {
+    // Delete temp file
+    try {
       fs.unlinkSync(file.path);
+      console.log("🗑️ Temp file deleted");
+    } catch (err) {
+      console.warn("⚠️ Failed to delete temp file:", err.message);
     }
+
+    // Return relative path for database
+    const relativePath = `uploads/payment-screenshots/${outputFilename}`;
+    console.log("Saved at:", relativePath);
+
+    return relativePath;
+
+  } catch (error) {
+    console.error("❌ Error processing payment screenshot:", error);
+
+    // Cleanup temp file on error
+    try {
+      if (file.path && fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+      }
+    } catch (cleanupErr) {
+      console.warn("⚠️ Failed to cleanup temp file:", cleanupErr.message);
+    }
+
     throw new Error(`Failed to process payment screenshot: ${error.message}`);
   }
 };
 
 /**
- * Upload payment screenshot (API endpoint for authenticated users)
+ * Upload and process vendor photo for vendor signup
+ * Handles upload and processing in one function
  */
-exports.uploadPaymentScreenshot = async (req, res) => {
+exports.handleVendorPhotoUpload = async (file) => {
+  console.log("🏪 Starting vendor photo upload and processing");
+
+  if (!file) {
+    throw new Error("No vendor photo file provided");
+  }
+
+  console.log("File details:", {
+    originalname: file.originalname,
+    mimetype: file.mimetype,
+    size: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
+    tempPath: file.path
+  });
+
   try {
-    // Check if file was uploaded
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No file uploaded",
-      });
+    // Verify file exists
+    if (!fs.existsSync(file.path)) {
+      throw new Error(`Uploaded file not found at: ${file.path}`);
     }
 
-    const userId = req.user?.id; // Assuming you have auth middleware that adds user to req
-
-    if (!userId) {
-      // Delete uploaded file if user is not authenticated
-      fs.unlinkSync(req.file.path);
-      return res.status(401).json({
-        success: false,
-        message: "User not authenticated",
-      });
+    // Setup output directory
+    const outputDir = path.resolve(__dirname, "..", "uploads", "vendor-photos");
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // Process the payment screenshot
-    const relativePath = await this.processPaymentScreenshot(req.file);
+    // Generate output filename
+    const outputFilename = `vendor-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+    const outputPath = path.join(outputDir, outputFilename);
 
-    // Update user with payment screenshot path
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { paymentScreenshot: relativePath },
-      { new: true }
-    );
+    console.log("Processing image...");
+    console.log("Input:", file.path);
+    console.log("Output:", outputPath);
 
-    if (!user) {
-      // Delete uploaded file if user not found
-      const fullPath = path.join(__dirname, "..", relativePath);
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
-      }
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+    // Process image with Sharp
+    await sharp(file.path)
+      .resize(400, 600, {
+        fit: "inside",
+        withoutEnlargement: true
+      })
+      .webp({ quality: 85 })
+      .toFile(outputPath);
+
+    console.log("✅ Image processed successfully");
+
+    // Delete temp file
+    try {
+      fs.unlinkSync(file.path);
+      console.log("🗑️ Temp file deleted");
+    } catch (err) {
+      console.warn("⚠️ Failed to delete temp file:", err.message);
     }
 
-    const fullPath = path.join(__dirname, "..", relativePath);
-    res.status(200).json({
-      success: true,
-      message: "Payment screenshot uploaded successfully",
-      data: {
-        path: relativePath,
-        size: fs.statSync(fullPath).size,
-      },
-    });
+    // Return relative path for database
+    const relativePath = `uploads/vendor-photos/${outputFilename}`;
+    console.log("Saved at:", relativePath);
+
+    return relativePath;
+
   } catch (error) {
-    // Clean up file if it exists and there was an error
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    console.error("❌ Error processing vendor photo:", error);
+
+    // Cleanup temp file on error
+    try {
+      if (file.path && fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+      }
+    } catch (cleanupErr) {
+      console.warn("⚠️ Failed to cleanup temp file:", cleanupErr.message);
     }
 
-    console.error("Error uploading payment screenshot:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to upload payment screenshot",
-      error: error.message,
+    throw new Error(`Failed to process vendor photo: ${error.message}`);
+  }
+};
+
+// ==========================================
+// UTILITY FUNCTIONS
+// ==========================================
+
+/**
+ * Clean up temp files older than 1 hour
+ */
+exports.cleanupTempFiles = () => {
+  try {
+    const tempDir = path.resolve(__dirname, "..", "uploads", "temp");
+
+    if (!fs.existsSync(tempDir)) return;
+
+    const files = fs.readdirSync(tempDir);
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000;
+    let cleaned = 0;
+
+    files.forEach(file => {
+      const filePath = path.join(tempDir, file);
+      const stats = fs.statSync(filePath);
+
+      if (now - stats.mtimeMs > oneHour) {
+        fs.unlinkSync(filePath);
+        cleaned++;
+      }
     });
+
+    if (cleaned > 0) {
+      console.log(`🗑️ Cleaned up ${cleaned} old temp files`);
+    }
+  } catch (error) {
+    console.error("❌ Error cleaning temp files:", error.message);
   }
 };

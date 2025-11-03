@@ -1,8 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const vendorModel = require("../models/Vendor.js");
-const fs = require("fs");
-const { processVendorPhoto } = require("./uploadController");
+const { handleVendorPhotoUpload } = require("./uploadController");
 const { sendVendorSignupAlert } = require("../utils/telegramAlert");
 
 const handleVendorSignup = async (req, res) => {
@@ -45,11 +44,6 @@ const handleVendorSignup = async (req, res) => {
     });
 
     if (existingVendor) {
-      // Clean up uploaded files if exist
-      if (req.files && req.files.vendorPhoto && fs.existsSync(req.files.vendorPhoto[0].path)) {
-        fs.unlinkSync(req.files.vendorPhoto[0].path);
-      }
-
       if (email && existingVendor.email === email) {
         return res.status(400).json({
           success: false,
@@ -81,15 +75,14 @@ const handleVendorSignup = async (req, res) => {
     }
 
     // Process vendor photo if provided
-    if (req.files && req.files.vendorPhoto) {
+    if (req.files && req.files.vendorPhoto && req.files.vendorPhoto[0]) {
       try {
-        const vendorPhotoFile = req.files.vendorPhoto[0];
-        newVendorData.passportPhoto = await processVendorPhoto(vendorPhotoFile);
-      } catch (imageError) {
-        console.error("Vendor photo processing error:", imageError);
+        newVendorData.passportPhoto = await handleVendorPhotoUpload(req.files.vendorPhoto[0]);
+      } catch (error) {
+        console.error("Vendor photo upload error:", error);
         return res.status(500).json({
           success: false,
-          message: "Failed to process vendor photo"
+          message: error.message || "Failed to upload vendor photo"
         });
       }
     }
@@ -115,14 +108,7 @@ const handleVendorSignup = async (req, res) => {
       vendorData: vendorObj,
     });
   } catch (err) {
-    console.error("Vendor Signup Error:", err);
-    console.error("Error Stack:", err.stack);
-
-    // Clean up uploaded files if exist
-    if (req.files && req.files.vendorPhoto && fs.existsSync(req.files.vendorPhoto[0].path)) {
-      fs.unlinkSync(req.files.vendorPhoto[0].path);
-    }
-
+    console.error("❌ Vendor Signup Error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };

@@ -2,48 +2,45 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Ensure upload directories exist
-const paymentDir = path.join(__dirname, "..", "uploads", "payment-screenshots");
-const passportDir = path.join(__dirname, "..", "uploads", "passport-photos");
-const tempDir = path.join(__dirname, "..", "uploads", "temp");
+// Setup temp directory
+const tempDir = path.resolve(__dirname, "..", "uploads", "temp");
 
-[paymentDir, passportDir, tempDir].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+// Ensure temp directory exists
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+  console.log("✅ Created temp directory:", tempDir);
+}
+
+// Storage configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, tempDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `temp-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
   }
 });
 
-// File filter to accept only images
-const imageFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
+// File filter - only allow images
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|webp/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = allowedTypes.test(file.mimetype);
 
   if (mimetype && extname) {
     return cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed!"));
   }
+  cb(new Error("Only JPEG, JPG, PNG, and WebP images are allowed"));
 };
 
-// Temporary storage for all uploads (will be processed and moved)
-const tempStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, tempDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, "temp-" + uniqueSuffix + path.extname(file.originalname));
-  },
+// Multer configuration with 10MB limit
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: fileFilter
 });
 
-// Configure multer for general image uploads
-const upload = multer({
-  storage: tempStorage,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB max file size
-  },
-  fileFilter: imageFilter,
-});
+console.log("✅ Multer configured - Max file size: 10MB");
 
 module.exports = upload;

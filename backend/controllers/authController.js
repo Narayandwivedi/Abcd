@@ -2,16 +2,17 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.js");
 const { OAuth2Client } = require('google-auth-library');
-const fs = require("fs");
 const { sendLoginAlert, sendSignupAlert } = require("../utils/telegramAlert");
-const { processPassportPhoto, processPaymentScreenshot } = require("./uploadController");
+const { handlePassportPhotoUpload, handlePaymentScreenshotUpload } = require("./uploadController");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const handelUserSignup = async (req, res) => {
   try {
+    console.log("=== User Signup Request Started ===");
+
     if (!req.body || Object.keys(req.body).length === 0) {
-      return res.status(400).json({ success: false, message: "missing data" });
+      return res.status(400).json({ success: false, message: "Missing data" });
     }
 
     let { fullName, email, mobile, relativeName, relationship, address, gotra, city, utrNumber } = req.body;
@@ -67,16 +68,6 @@ const handelUserSignup = async (req, res) => {
     const existingUser = await userModel.findOne(query);
 
     if (existingUser) {
-      // Clean up uploaded files if exist
-      if (req.files) {
-        if (req.files.passportPhoto && fs.existsSync(req.files.passportPhoto[0].path)) {
-          fs.unlinkSync(req.files.passportPhoto[0].path);
-        }
-        if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
-          fs.unlinkSync(req.files.paymentImage[0].path);
-        }
-      }
-
       if (email && existingUser.email === email) {
         return res.status(400).json({
           success: false,
@@ -115,33 +106,27 @@ const handelUserSignup = async (req, res) => {
     }
 
     // Process passport photo (required)
-    if (req.files && req.files.passportPhoto) {
+    if (req.files && req.files.passportPhoto && req.files.passportPhoto[0]) {
       try {
-        const passportPhotoFile = req.files.passportPhoto[0];
-        newUserData.passportPhoto = await processPassportPhoto(passportPhotoFile);
-      } catch (imageError) {
-        console.error("Passport photo processing error:", imageError);
-        // Clean up files
-        if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
-          fs.unlinkSync(req.files.paymentImage[0].path);
-        }
+        newUserData.passportPhoto = await handlePassportPhotoUpload(req.files.passportPhoto[0]);
+      } catch (error) {
+        console.error("Passport photo upload error:", error);
         return res.status(500).json({
           success: false,
-          message: "Failed to process passport photo"
+          message: error.message || "Failed to upload passport photo"
         });
       }
     }
 
-    // Process payment screenshot if provided
-    if (req.files && req.files.paymentImage) {
+    // Process payment screenshot (optional)
+    if (req.files && req.files.paymentImage && req.files.paymentImage[0]) {
       try {
-        const paymentImageFile = req.files.paymentImage[0];
-        newUserData.paymentScreenshot = await processPaymentScreenshot(paymentImageFile);
-      } catch (imageError) {
-        console.error("Payment screenshot processing error:", imageError);
+        newUserData.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentImage[0]);
+      } catch (error) {
+        console.error("Payment screenshot upload error:", error);
         return res.status(500).json({
           success: false,
-          message: "Failed to process payment screenshot"
+          message: error.message || "Failed to upload payment screenshot"
         });
       }
     }
@@ -164,19 +149,7 @@ const handelUserSignup = async (req, res) => {
       userData: userObj,
     });
   } catch (err) {
-    console.error("Signup Error:", err);
-    console.error("Error Stack:", err.stack);
-
-    // Clean up uploaded files if exist
-    if (req.files) {
-      if (req.files.passportPhoto && fs.existsSync(req.files.passportPhoto[0].path)) {
-        fs.unlinkSync(req.files.passportPhoto[0].path);
-      }
-      if (req.files.paymentImage && fs.existsSync(req.files.paymentImage[0].path)) {
-        fs.unlinkSync(req.files.paymentImage[0].path);
-      }
-    }
-
+    console.error("❌ Signup Error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };

@@ -67,12 +67,14 @@ const Signup = () => {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
       if (!validTypes.includes(file.type)) {
         toast.error('Please upload a valid image (JPG, PNG, or WebP)')
+        e.target.value = '' // Clear the input
         return
       }
 
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         toast.error('Image size should be less than 10MB')
+        e.target.value = '' // Clear the input
         return
       }
 
@@ -97,12 +99,14 @@ const Signup = () => {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
       if (!validTypes.includes(file.type)) {
         toast.error('Please upload a valid image (JPG, PNG, or WebP)')
+        e.target.value = '' // Clear the input
         return
       }
 
-      // Validate file size (max 5MB for passport photo)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Photo size should be less than 5MB')
+      // Validate file size (max 10MB for passport photo)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Photo size should be less than 10MB')
+        e.target.value = '' // Clear the input
         return
       }
 
@@ -132,10 +136,54 @@ const Signup = () => {
     e.preventDefault()
     setLoading(true)
 
+    // Validate all required fields with specific error messages
+    if (!formData.fullName || !formData.fullName.trim()) {
+      toast.error('Full name is required')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.mobile || !formData.mobile.trim()) {
+      toast.error('Mobile number is required')
+      setLoading(false)
+      return
+    }
+
     // Validate mobile number (10 digits starting with 6-9)
     const mobileRegex = /^[6-9]\d{9}$/
     if (!mobileRegex.test(formData.mobile)) {
       toast.error('Please enter a valid 10-digit Indian mobile number')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.relationship) {
+      toast.error('Relationship is required')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.relativeName || !formData.relativeName.trim()) {
+      const relationshipLabel = formData.relationship === 'W/O' ? "Husband's name" : "Father's name"
+      toast.error(`${relationshipLabel} is required`)
+      setLoading(false)
+      return
+    }
+
+    if (!formData.address || !formData.address.trim()) {
+      toast.error('Address is required')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.city || !formData.city.trim()) {
+      toast.error('City is required')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.gotra) {
+      toast.error('Gotra is required')
       setLoading(false)
       return
     }

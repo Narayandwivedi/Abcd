@@ -57,12 +57,14 @@ const Signup = () => {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
       if (!validTypes.includes(file.type)) {
         toast.error('Please upload a valid image (JPG, PNG, or WebP)')
+        e.target.value = '' // Clear the input
         return
       }
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Photo size should be less than 5MB')
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Photo size should be less than 10MB')
+        e.target.value = '' // Clear the input
         return
       }
 

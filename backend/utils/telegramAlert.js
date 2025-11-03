@@ -45,10 +45,12 @@ const sendSignupAlert = async (userData) => {
     : "Not provided";
 
   // Format message with all user details
+  const relationshipLabel = userData.relationship === 'W/O' ? "Husband's Name" : userData.relationship === 'D/O' ? "Father's Name" : "Father's Name";
   const message = `🎉 NEW SIGNUP REGISTRATION
 
 👤 Full Name: ${userData.fullName || "N/A"}
-👨‍👦 Father's Name: ${userData.fatherName || "N/A"}
+👨‍👦 Relationship: ${userData.relationship || "N/A"}
+👨‍👦 ${relationshipLabel}: ${userData.relativeName || "N/A"}
 📱 Mobile: ${userData.mobile || "N/A"}
 📧 Email: ${userData.email || "Not provided"}
 🏛️ Gotra: ${userData.gotra || "N/A"}

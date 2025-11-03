@@ -13,10 +13,13 @@ const upload = require("../utils/multer");
 const router = express.Router();
 
 // User Authentication Routes
-router.post("/signup", upload.fields([
-  { name: 'passportPhoto', maxCount: 1 },
-  { name: 'paymentImage', maxCount: 1 }
-]), handelUserSignup);
+router.post("/signup",
+  upload.fields([
+    { name: 'passportPhoto', maxCount: 1 },
+    { name: 'paymentImage', maxCount: 1 }
+  ]),
+  handelUserSignup
+);
 router.post("/login", handelUserLogin);
 router.post("/logout", handleUserLogout);
 
