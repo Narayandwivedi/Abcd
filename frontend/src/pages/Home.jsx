@@ -8,6 +8,28 @@ const Home = () => {
   const [selectedCity, setSelectedCity] = useState('')
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024)
 
+  // Buy/Sell Lead Form States
+  const [showBuyForm, setShowBuyForm] = useState(false)
+  const [showSellForm, setShowSellForm] = useState(false)
+  const [buyLeadData, setBuyLeadData] = useState({ name: '', category: '' })
+  const [sellLeadData, setSellLeadData] = useState({ name: '', category: '' })
+
+  // Categories for dropdown
+  const categories = [
+    'Medicine',
+    'Services',
+    'Foods',
+    'Beverages',
+    'Grocery',
+    'Electronics',
+    'Fashion',
+    'Home & Living',
+    'Beauty',
+    'Books',
+    'Sports',
+    'Toys'
+  ]
+
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
@@ -25,9 +47,6 @@ const Home = () => {
     navigate(`/ad/${index + 1}`)
   }
 
-  const handleDealClick = (index) => {
-    navigate(`/deal/${index + 1}`)
-  }
   const adImages = [
     '/ad1.webp',
     '/ad2.webp',
@@ -47,33 +66,12 @@ const Home = () => {
     '/ad16.webp'
   ]
 
-  const dealImages = [
-    '/hot deals/deal1.jpg',
-    '/hot deals/deal2.jpg',
-    '/hot deals/deal3.jpg',
-    '/hot deals/deal4.jpg',
-    '/hot deals/deal5.jpg',
-    '/hot deals/deal6.jpg',
-    '/hot deals/deal7.jpg',
-    '/hot deals/deal8.jpg',
-    '/hot deals/deal9.png',
-    '/hot deals/deal10.png',
-    
-  ]
-
   // Ads slider state
   const [currentSlide, setCurrentSlide] = useState(adImages.length)
   const [isTransitioning, setIsTransitioning] = useState(true)
   const [isPaused, setIsPaused] = useState(false)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
-
-  // Hot Deals slider state
-  const [currentDealSlide, setCurrentDealSlide] = useState(dealImages.length)
-  const [isDealTransitioning, setIsDealTransitioning] = useState(true)
-  const [isDealPaused, setIsDealPaused] = useState(false)
-  const [dealTouchStart, setDealTouchStart] = useState(0)
-  const [dealTouchEnd, setDealTouchEnd] = useState(0)
 
   // Auto-slide functionality - infinite scroll to the right
   useEffect(() => {
@@ -154,71 +152,30 @@ const Home = () => {
     setIsPaused(false)
   }
 
-  // Hot Deals auto-slide functionality
-  useEffect(() => {
-    if (isDealPaused) return
-
-    const dealSlideInterval = setInterval(() => {
-      setCurrentDealSlide((prev) => prev + 1)
-    }, 2200)
-
-    return () => clearInterval(dealSlideInterval)
-  }, [isDealPaused])
-
-  // Hot Deals reset position for infinite loop
-  useEffect(() => {
-    if (currentDealSlide >= dealImages.length * 2) {
-      setTimeout(() => {
-        setIsDealTransitioning(false)
-        setCurrentDealSlide(dealImages.length)
-        setTimeout(() => setIsDealTransitioning(true), 50)
-      }, 500)
-    }
-    if (currentDealSlide < dealImages.length) {
-      setIsDealTransitioning(false)
-      setCurrentDealSlide(dealImages.length)
-      setTimeout(() => setIsDealTransitioning(true), 50)
-    }
-  }, [currentDealSlide, dealImages.length])
-
-  // Hot Deals touch handlers
-  const handleDealTouchStart = (e) => {
-    setDealTouchStart(e.targetTouches[0].clientX)
-    setIsDealPaused(true)
-  }
-
-  const handleDealTouchMove = (e) => {
-    setDealTouchEnd(e.targetTouches[0].clientX)
-  }
-
-  const handleDealTouchEnd = () => {
-    if (!dealTouchStart || !dealTouchEnd) {
-      setIsDealPaused(false)
+  // Buy Lead Form Handlers
+  const handleBuyLeadSubmit = (e) => {
+    e.preventDefault()
+    if (!buyLeadData.name || !buyLeadData.category) {
+      alert('Please fill all fields')
       return
     }
+    console.log('Buy Lead Submitted:', buyLeadData)
+    alert(`Buy Lead submitted!\nName: ${buyLeadData.name}\nCategory: ${buyLeadData.category}`)
+    setShowBuyForm(false)
+    setBuyLeadData({ name: '', category: '' })
+  }
 
-    const distance = dealTouchStart - dealTouchEnd
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
-
-    if (isLeftSwipe) {
-      setCurrentDealSlide((prev) => prev + 1)
-    } else if (isRightSwipe) {
-      setCurrentDealSlide((prev) => prev - 1)
+  // Sell Lead Form Handlers
+  const handleSellLeadSubmit = (e) => {
+    e.preventDefault()
+    if (!sellLeadData.name || !sellLeadData.category) {
+      alert('Please fill all fields')
+      return
     }
-
-    setDealTouchStart(0)
-    setDealTouchEnd(0)
-    setIsDealPaused(false)
-  }
-
-  // Hot Deals mouse handlers
-  const handleDealMouseDown = () => {
-    setIsDealPaused(true)
-  }
-
-  const handleDealMouseUp = () => {
-    setIsDealPaused(false)
+    console.log('Sell Lead Submitted:', sellLeadData)
+    alert(`Sell Lead submitted!\nName: ${sellLeadData.name}\nCategory: ${sellLeadData.category}`)
+    setShowSellForm(false)
+    setSellLeadData({ name: '', category: '' })
   }
 
   return (
@@ -263,50 +220,46 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Top Deals Section */}
-      <section className='py-1 pb-2 lg:py-2 lg:pb-3 bg-gray-100'>
+      {/* Buy/Sell Lead Buttons Section - Compact */}
+      <section className='py-1.5 md:py-2 bg-gradient-to-br from-blue-50 via-white to-green-50'>
         <div className='container mx-auto px-4'>
-          {/* Unified: Horizontal sliding carousel for both Mobile and Desktop */}
-          <div
-            className='relative mx-auto overflow-hidden cursor-grab active:cursor-grabbing max-w-7xl'
-            onTouchStart={handleDealTouchStart}
-            onTouchMove={handleDealTouchMove}
-            onTouchEnd={handleDealTouchEnd}
-            onMouseDown={handleDealMouseDown}
-            onMouseUp={handleDealMouseUp}
-            onMouseLeave={handleDealMouseUp}
-          >
-            <div
-              className='flex'
-              style={{
-                transform: `translateX(calc(-${currentDealSlide * (isDesktop ? 20 : 80)}%))`,
-                transition: isDealTransitioning ? 'transform 500ms ease-in-out' : 'none'
-              }}
+          <div className='max-w-3xl mx-auto grid grid-cols-2 gap-2 md:gap-3'>
+            {/* Buy Lead Button */}
+            <button
+              onClick={() => setShowBuyForm(true)}
+              className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
             >
-              {/* Render 3 sets of images for seamless infinite scrolling */}
-              {[...Array(3)].map((_, setIndex) =>
-                dealImages.map((deal, index) => (
-                  <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5 lg:px-2' style={{ width: isDesktop ? '20%' : '80%' }}>
-                    <div
-                      onClick={() => handleDealClick(index)}
-                      className='bg-white rounded-lg lg:rounded-xl shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1'
-                      style={{ height: isDesktop ? '160px' : '150px' }}
-                    >
-                      <img
-                        src={deal}
-                        alt={`Hot Deal ${index + 1}`}
-                        className='w-full h-full object-contain p-2'
-                      />
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+              <div className='flex items-center justify-center gap-1.5 md:gap-2'>
+                <svg className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' />
+                </svg>
+                <div className='text-left'>
+                  <h3 className='text-[11px] md:text-xs font-bold leading-tight'>Post Your Buy Lead</h3>
+                  <p className='text-[9px] md:text-[10px] text-blue-100 leading-tight'>आपको क्या खरीदना है</p>
+                </div>
+              </div>
+            </button>
+
+            {/* Sell Lead Button */}
+            <button
+              onClick={() => setShowSellForm(true)}
+              className='bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
+            >
+              <div className='flex items-center justify-center gap-1.5 md:gap-2'>
+                <svg className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+                </svg>
+                <div className='text-left'>
+                  <h3 className='text-[11px] md:text-xs font-bold leading-tight'>Post Your Sell Lead</h3>
+                  <p className='text-[9px] md:text-[10px] text-green-100 leading-tight'>आपको क्या बेचना है</p>
+                </div>
+              </div>
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Sponsored Ads Section - Row 2 */}
+      {/* Sponsored Ads Section */}
       <section className='pb-0 lg:pb-1 bg-white'>
         <div className='container mx-auto px-4'>
           {/* Unified: Horizontal sliding carousel for both Mobile and Desktop */}
@@ -370,6 +323,110 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Buy Lead Form Modal */}
+      {showBuyForm && (
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl'>
+            <div className='flex items-center justify-between mb-6'>
+              <h2 className='text-2xl font-bold text-gray-800'>Buy Lead Form</h2>
+              <button
+                onClick={() => setShowBuyForm(false)}
+                className='text-gray-500 hover:text-gray-700 transition'
+              >
+                <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleBuyLeadSubmit} className='space-y-4'>
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Your Name *</label>
+                <input
+                  type='text'
+                  value={buyLeadData.name}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, name: e.target.value })}
+                  className='w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  placeholder='Enter your name'
+                  required
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Product Category *</label>
+                <select
+                  value={buyLeadData.category}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, category: e.target.value })}
+                  className='w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  required
+                >
+                  <option value=''>Select Category</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type='submit'
+                className='w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition shadow-lg'
+              >
+                Confirm Buy Lead
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Sell Lead Form Modal */}
+      {showSellForm && (
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl'>
+            <div className='flex items-center justify-between mb-6'>
+              <h2 className='text-2xl font-bold text-gray-800'>Sell Lead Form</h2>
+              <button
+                onClick={() => setShowSellForm(false)}
+                className='text-gray-500 hover:text-gray-700 transition'
+              >
+                <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleSellLeadSubmit} className='space-y-4'>
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Your Name *</label>
+                <input
+                  type='text'
+                  value={sellLeadData.name}
+                  onChange={(e) => setSellLeadData({ ...sellLeadData, name: e.target.value })}
+                  className='w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent'
+                  placeholder='Enter your name'
+                  required
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Product Category *</label>
+                <select
+                  value={sellLeadData.category}
+                  onChange={(e) => setSellLeadData({ ...sellLeadData, category: e.target.value })}
+                  className='w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent'
+                  required
+                >
+                  <option value=''>Select Category</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type='submit'
+                className='w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition shadow-lg'
+              >
+                Confirm Sell Lead
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Shop Categories Section */}
       <section className='pt-1 pb-1 md:pt-3 md:pb-3 bg-gray-50'>
