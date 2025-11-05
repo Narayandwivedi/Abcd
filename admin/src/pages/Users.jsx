@@ -889,13 +889,32 @@ ABCD Team`
               {/* Gotra */}
               <div>
                 <label className='block text-sm font-semibold text-gray-700 mb-2'>Gotra</label>
-                <input
-                  type='text'
+                <select
                   name='gotra'
                   value={editFormData.gotra}
                   onChange={handleEditFormChange}
                   className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
+                >
+                  <option value=''>Select Gotra</option>
+                  <option value='Bansal'>Bansal</option>
+                  <option value='Kuchhal'>Kuchhal</option>
+                  <option value='Kansal'>Kansal</option>
+                  <option value='Bindal'>Bindal</option>
+                  <option value='Singhal'>Singhal</option>
+                  <option value='Jindal'>Jindal</option>
+                  <option value='Mittal'>Mittal</option>
+                  <option value='Garg'>Garg</option>
+                  <option value='Nangal'>Nangal</option>
+                  <option value='Mangal'>Mangal</option>
+                  <option value='Tayal'>Tayal</option>
+                  <option value='Tingal'>Tingal</option>
+                  <option value='Madhukul'>Madhukul</option>
+                  <option value='Goyal'>Goyal</option>
+                  <option value='Airan'>Airan</option>
+                  <option value='Goyan'>Goyan</option>
+                  <option value='Dharan'>Dharan</option>
+                  <option value='Bhandal'>Bhandal</option>
+                </select>
               </div>
 
               {/* City */}

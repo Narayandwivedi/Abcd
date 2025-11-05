@@ -5,7 +5,7 @@ const path = require("path");
 const userModel = require("../models/User.js");
 const Admin = require("../models/Admin.js");
 const Certificate = require("../models/Certificate.js");
-const { generateCertificatePDF } = require("../utils/generateCertificate.js");
+const { generateCertificatePDF, regenerateCertificatePDF } = require("../utils/generateCertificate.js");
 
 // Get all users (for admin)
 const getAllUsers = async (req, res) => {
@@ -409,8 +409,8 @@ const updateUser = async (req, res) => {
     const { userId } = req.params;
     const updateData = req.body;
 
-    // Find user
-    const user = await userModel.findById(userId);
+    // Find user with populated certificate
+    const user = await userModel.findById(userId).populate('activeCertificate');
 
     if (!user) {
       return res.status(404).json({
@@ -434,6 +434,17 @@ const updateUser = async (req, res) => {
       'utrNumber'
     ];
 
+    // Certificate-relevant fields that trigger certificate regeneration
+    const certificateFields = ['fullName', 'gotra', 'city', 'relativeName', 'relationship'];
+
+    // Check if any certificate-relevant field is being changed
+    let certificateNeedsRegeneration = false;
+    if (user.paymentVerified && user.activeCertificate) {
+      certificateNeedsRegeneration = certificateFields.some(field => {
+        return updateData[field] !== undefined && updateData[field] !== user[field];
+      });
+    }
+
     // Update only allowed fields
     allowedFields.forEach(field => {
       if (updateData[field] !== undefined) {
@@ -443,6 +454,34 @@ const updateUser = async (req, res) => {
 
     await user.save();
 
+    // Regenerate certificate if needed
+    if (certificateNeedsRegeneration && user.activeCertificate) {
+      try {
+        const oldCertificate = user.activeCertificate;
+
+        // Delete old PDF file from filesystem
+        const oldFilePath = path.join(__dirname, '..', oldCertificate.downloadLink);
+        if (fs.existsSync(oldFilePath)) {
+          fs.unlinkSync(oldFilePath);
+          console.log(`[ADMIN] Deleted old certificate PDF: ${oldFilePath}`);
+        }
+
+        // Regenerate certificate PDF with the same certificate number
+        const certificateData = await regenerateCertificatePDF(user, oldCertificate.certificateNumber);
+
+        // Update certificate document with new download link
+        oldCertificate.downloadLink = certificateData.downloadLink;
+        oldCertificate.pdfDeleted = false; // Mark as not deleted since we just created a new one
+        await oldCertificate.save();
+
+        console.log(`[ADMIN] Certificate regenerated for user ${user.fullName} with certificate number ${oldCertificate.certificateNumber}`);
+      } catch (certError) {
+        console.error('Certificate regeneration error:', certError);
+        // Don't fail the entire update if certificate regeneration fails
+        // Just log the error and continue
+      }
+    }
+
     // Return updated user without password
     const updatedUser = await userModel.findById(userId)
       .select('-password')
@@ -450,8 +489,11 @@ const updateUser = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "User updated successfully",
-      user: updatedUser
+      message: certificateNeedsRegeneration
+        ? "User updated successfully and certificate regenerated"
+        : "User updated successfully",
+      user: updatedUser,
+      certificateRegenerated: certificateNeedsRegeneration
     });
   } catch (error) {
     console.error('Update user error:', error);
