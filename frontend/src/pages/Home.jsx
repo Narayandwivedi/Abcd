@@ -14,6 +14,38 @@ const Home = () => {
   const [buyLeadData, setBuyLeadData] = useState({ name: '', category: '' })
   const [sellLeadData, setSellLeadData] = useState({ name: '', category: '' })
 
+  // Show Buy/Sell Leads States
+  const [showBuyLeads, setShowBuyLeads] = useState(false)
+  const [showSellLeads, setShowSellLeads] = useState(false)
+
+  // Sample Buy Leads Data
+  const sampleBuyLeads = [
+    'I need 5 kg Kaju Katli for Diwali celebrations',
+    'Looking for 2 BHK flat in Central Delhi',
+    'Need bulk order of 100 office chairs',
+    'Want to buy 50 kg organic vegetables daily',
+    'Looking for wedding photographer in Mumbai',
+    'Need 10 laptops for office setup',
+    'Looking for AC repair services urgently',
+    'Want to purchase branded shoes size 9',
+    'Need English tutor for class 10 student',
+    'Looking for catering services for 200 people'
+  ]
+
+  // Sample Sell Leads Data
+  const sampleSellLeads = [
+    '20% discount on AC - Today only! Limited stock',
+    'Fresh homemade sweets - Order now for Diwali',
+    'Brand new iPhone 15 Pro Max - 15% off',
+    'Premium leather sofa set - 30% discount',
+    'Professional photography services - Book now',
+    'Organic farm fresh vegetables - Free delivery',
+    'Luxury 3 BHK apartment for rent - Prime location',
+    'Designer ethnic wear - Flat 40% off',
+    'Web development services - Special offer',
+    'Gym membership - 50% off on annual plan'
+  ]
+
   // Categories for dropdown
   const categories = [
     'Medicine',
@@ -223,38 +255,78 @@ const Home = () => {
       {/* Buy/Sell Lead Buttons Section - Compact */}
       <section className='py-1.5 md:py-2 bg-gradient-to-br from-blue-50 via-white to-green-50'>
         <div className='container mx-auto px-4'>
-          <div className='max-w-3xl mx-auto grid grid-cols-2 gap-2 md:gap-3'>
-            {/* Buy Lead Button */}
-            <button
-              onClick={() => setShowBuyForm(true)}
-              className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
-            >
-              <div className='flex items-center justify-center gap-1.5 md:gap-2'>
-                <svg className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' />
-                </svg>
-                <div className='text-left'>
-                  <h3 className='text-[11px] md:text-xs font-bold leading-tight'>Post Your Buy Lead</h3>
-                  <p className='text-[9px] md:text-[10px] text-blue-100 leading-tight'>आपको क्या खरीदना है</p>
+          <div className='max-w-3xl mx-auto space-y-2'>
+            {/* Post Buy/Sell Lead Buttons Row */}
+            <div className='grid grid-cols-2 gap-2 md:gap-3'>
+              {/* Buy Lead Button */}
+              <button
+                onClick={() => setShowBuyForm(true)}
+                className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
+              >
+                <div className='flex items-center justify-center gap-1.5 md:gap-2'>
+                  <svg className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' />
+                  </svg>
+                  <div className='text-left'>
+                    <h3 className='text-[11px] md:text-xs font-bold leading-tight'>Post Your Buy Lead</h3>
+                    <p className='text-[9px] md:text-[10px] text-blue-100 leading-tight'>आपको क्या खरीदना है</p>
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
 
-            {/* Sell Lead Button */}
-            <button
-              onClick={() => setShowSellForm(true)}
-              className='bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
-            >
-              <div className='flex items-center justify-center gap-1.5 md:gap-2'>
-                <svg className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
-                </svg>
-                <div className='text-left'>
-                  <h3 className='text-[11px] md:text-xs font-bold leading-tight'>Post Your Sell Lead</h3>
-                  <p className='text-[9px] md:text-[10px] text-green-100 leading-tight'>आपको क्या बेचना है</p>
+              {/* Sell Lead Button */}
+              <button
+                onClick={() => setShowSellForm(true)}
+                className='bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
+              >
+                <div className='flex items-center justify-center gap-1.5 md:gap-2'>
+                  <svg className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+                  </svg>
+                  <div className='text-left'>
+                    <h3 className='text-[11px] md:text-xs font-bold leading-tight'>Post Your Sell Lead</h3>
+                    <p className='text-[9px] md:text-[10px] text-green-100 leading-tight'>आपको क्या बेचना है</p>
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
+            </div>
+
+            {/* See Buy/Sell Leads Buttons Row */}
+            <div className='grid grid-cols-2 gap-2 md:gap-3'>
+              {/* See Buy Leads Button */}
+              <button
+                onClick={() => setShowBuyLeads(true)}
+                className='bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
+              >
+                <div className='flex items-center justify-center gap-1.5 md:gap-2'>
+                  <svg className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
+                  </svg>
+                  <div className='text-left'>
+                    <h3 className='text-[11px] md:text-xs font-bold leading-tight'>See Buy Leads</h3>
+                    <p className='text-[9px] md:text-[10px] text-indigo-100 leading-tight'>खरीददार क्या चाहते हैं</p>
+                  </div>
+                </div>
+              </button>
+
+              {/* See Sell Leads Button */}
+              <button
+                onClick={() => setShowSellLeads(true)}
+                className='bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
+              >
+                <div className='flex items-center justify-center gap-1.5 md:gap-2'>
+                  <svg className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
+                  </svg>
+                  <div className='text-left'>
+                    <h3 className='text-[11px] md:text-xs font-bold leading-tight'>See Sell Leads</h3>
+                    <p className='text-[9px] md:text-[10px] text-orange-100 leading-tight'>विक्रेता क्या बेच रहे हैं</p>
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -548,6 +620,102 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Buy Leads Popup Modal */}
+      {showBuyLeads && (
+        <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4'>
+          <div className='bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-4 md:p-6 max-w-2xl w-full shadow-2xl h-[90vh] flex flex-col'>
+            <div className='flex items-center justify-between mb-4'>
+              <h2 className='text-2xl md:text-3xl font-bold text-indigo-800 flex items-center gap-2'>
+                <svg className='w-7 h-7' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' />
+                </svg>
+                Buy Leads
+              </h2>
+              <button
+                onClick={() => setShowBuyLeads(false)}
+                className='text-gray-500 hover:text-gray-700 transition bg-white rounded-full p-2 hover:bg-gray-100'
+              >
+                <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                </svg>
+              </button>
+            </div>
+            <div className='relative flex-1 overflow-hidden bg-white rounded-xl border-2 border-indigo-200 shadow-inner'>
+              <div className='absolute inset-0 overflow-y-auto scrollbar-hide'>
+                <div className='space-y-0 animate-scroll-continuous'>
+                  {[...sampleBuyLeads, ...sampleBuyLeads].map((lead, index) => (
+                    <div
+                      key={index}
+                      className='py-4 px-6 border-b border-indigo-100'
+                    >
+                      <div className='flex items-start gap-3'>
+                        <div className='bg-indigo-100 rounded-full p-2 flex-shrink-0'>
+                          <svg className='w-5 h-5 text-indigo-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' />
+                          </svg>
+                        </div>
+                        <p className='text-gray-800 font-medium text-sm md:text-base leading-relaxed'>{lead}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className='text-xs md:text-sm text-gray-500 text-center mt-4'>
+              Showing latest buyer requirements
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Sell Leads Popup Modal */}
+      {showSellLeads && (
+        <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4'>
+          <div className='bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4 md:p-6 max-w-2xl w-full shadow-2xl h-[90vh] flex flex-col'>
+            <div className='flex items-center justify-between mb-4'>
+              <h2 className='text-2xl md:text-3xl font-bold text-orange-800 flex items-center gap-2'>
+                <svg className='w-7 h-7' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+                </svg>
+                Sell Leads
+              </h2>
+              <button
+                onClick={() => setShowSellLeads(false)}
+                className='text-gray-500 hover:text-gray-700 transition bg-white rounded-full p-2 hover:bg-gray-100'
+              >
+                <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                </svg>
+              </button>
+            </div>
+            <div className='relative flex-1 overflow-hidden bg-white rounded-xl border-2 border-orange-200 shadow-inner'>
+              <div className='absolute inset-0 overflow-y-auto scrollbar-hide'>
+                <div className='space-y-0 animate-scroll-continuous'>
+                  {[...sampleSellLeads, ...sampleSellLeads].map((lead, index) => (
+                    <div
+                      key={index}
+                      className='py-4 px-6 border-b border-orange-100'
+                    >
+                      <div className='flex items-start gap-3'>
+                        <div className='bg-orange-100 rounded-full p-2 flex-shrink-0'>
+                          <svg className='w-5 h-5 text-orange-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
+                          </svg>
+                        </div>
+                        <p className='text-gray-800 font-medium text-sm md:text-base leading-relaxed'>{lead}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className='text-xs md:text-sm text-gray-500 text-center mt-4'>
+              Showing latest seller offers
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Fixed Buttons - Hidden on Mobile */}
       <div className='hidden md:block'>

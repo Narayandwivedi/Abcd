@@ -14,3 +14,27 @@
   display: inline-block;
   animation: marquee 20s linear infinite;
 }
+
+/* Slide Down Animation - Like Movie Credits */
+@keyframes scrollContinuous {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-scroll-continuous {
+  animation: scrollContinuous 30s linear infinite;
+}
+
+/* Hide scrollbar */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
