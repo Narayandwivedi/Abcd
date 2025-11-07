@@ -153,6 +153,23 @@ const handleVendorLogin = async (req, res) => {
 
     console.log('✓ Vendor found:', vendor.businessName || vendor.email);
 
+    // Check if vendor has a password set
+    if (!vendor.password) {
+      console.log('❌ No password set for vendor');
+      // Check if it's a Google OAuth vendor
+      if (vendor.authProvider === 'google') {
+        return res.status(401).json({
+          success: false,
+          message: "Please login using Google Sign-In",
+        });
+      }
+      // Vendor hasn't been activated/verified by admin yet
+      return res.status(401).json({
+        success: false,
+        message: "Your account is pending verification. Please wait for admin approval.",
+      });
+    }
+
     const isPassMatch = await bcrypt.compare(password, vendor.password);
     if (!isPassMatch) {
       console.log('❌ Password mismatch');

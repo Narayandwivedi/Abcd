@@ -319,22 +319,22 @@ ABCD Team`
       </div>
 
       {/* Stats */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-6 mb-8'>
-        <div className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
-          <div className='text-gray-600 text-sm font-medium mb-2'>Total Applications</div>
-          <div className='text-3xl font-black text-blue-600'>{stats.total}</div>
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-8'>
+        <div className='bg-white rounded-xl p-3 md:p-6 shadow-lg border border-gray-200'>
+          <div className='text-gray-600 text-xs md:text-sm font-medium mb-1 md:mb-2'>Total Applications</div>
+          <div className='text-xl md:text-3xl font-black text-blue-600'>{stats.total}</div>
         </div>
-        <div className='bg-white rounded-xl p-6 shadow-lg border border-yellow-200'>
-          <div className='text-gray-600 text-sm font-medium mb-2'>Pending Approval</div>
-          <div className='text-3xl font-black text-yellow-600'>{stats.pending}</div>
+        <div className='bg-white rounded-xl p-3 md:p-6 shadow-lg border border-yellow-200'>
+          <div className='text-gray-600 text-xs md:text-sm font-medium mb-1 md:mb-2'>Pending Approval</div>
+          <div className='text-xl md:text-3xl font-black text-yellow-600'>{stats.pending}</div>
         </div>
-        <div className='bg-white rounded-xl p-6 shadow-lg border border-green-200'>
-          <div className='text-gray-600 text-sm font-medium mb-2'>Approved</div>
-          <div className='text-3xl font-black text-green-600'>{stats.approved}</div>
+        <div className='bg-white rounded-xl p-3 md:p-6 shadow-lg border border-green-200'>
+          <div className='text-gray-600 text-xs md:text-sm font-medium mb-1 md:mb-2'>Approved</div>
+          <div className='text-xl md:text-3xl font-black text-green-600'>{stats.approved}</div>
         </div>
-        <div className='bg-white rounded-xl p-6 shadow-lg border border-red-200'>
-          <div className='text-gray-600 text-sm font-medium mb-2'>Rejected</div>
-          <div className='text-3xl font-black text-red-600'>{stats.rejected}</div>
+        <div className='bg-white rounded-xl p-3 md:p-6 shadow-lg border border-red-200'>
+          <div className='text-gray-600 text-xs md:text-sm font-medium mb-1 md:mb-2'>Rejected</div>
+          <div className='text-xl md:text-3xl font-black text-red-600'>{stats.rejected}</div>
         </div>
       </div>
 

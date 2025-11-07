@@ -190,6 +190,22 @@ const handelUserLogin = async (req, res) => {
       });
     }
 
+    // Check if user has a password set
+    if (!user.password) {
+      // Check if it's a Google OAuth user
+      if (user.authProvider === 'google') {
+        return res.status(401).json({
+          success: false,
+          message: "Please login using Google Sign-In",
+        });
+      }
+      // User hasn't been activated/verified by admin yet
+      return res.status(401).json({
+        success: false,
+        message: "Your account is pending verification. Please wait for admin approval.",
+      });
+    }
+
     const isPassMatch = await bcrypt.compare(password, user.password);
     if (!isPassMatch) {
       return res

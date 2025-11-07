@@ -1,36 +1,37 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import WhatsAppButton from '../component/WhatsAppButton'
 import CityDropdown from '../component/CityDropdown'
+import { AppContext } from '../context/AppContext'
+import { toast } from 'react-toastify'
 
 const Home = () => {
   const navigate = useNavigate()
+  const { isAuthenticated, user } = useContext(AppContext)
   const [selectedCity, setSelectedCity] = useState('')
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024)
 
   // Buy/Sell Lead Form States
   const [showBuyForm, setShowBuyForm] = useState(false)
   const [showSellForm, setShowSellForm] = useState(false)
-  const [buyLeadData, setBuyLeadData] = useState({ name: '', category: '' })
+  const [buyLeadData, setBuyLeadData] = useState({
+    name: '',
+    mobileNo: '',
+    townCity: '',
+    itemRequired: '',
+    majorCategory: '',
+    minorCategory: '',
+    qualityQuantityDesc: '',
+    priceRange: '',
+    deliveryAddress: ''
+  })
   const [sellLeadData, setSellLeadData] = useState({ name: '', category: '' })
 
   // Show Buy/Sell Leads States
   const [showBuyLeads, setShowBuyLeads] = useState(false)
   const [showSellLeads, setShowSellLeads] = useState(false)
-
-  // Sample Buy Leads Data
-  const sampleBuyLeads = [
-    'I need 5 kg Kaju Katli for Diwali celebrations',
-    'Looking for 2 BHK flat in Central Delhi',
-    'Need bulk order of 100 office chairs',
-    'Want to buy 50 kg organic vegetables daily',
-    'Looking for wedding photographer in Mumbai',
-    'Need 10 laptops for office setup',
-    'Looking for AC repair services urgently',
-    'Want to purchase branded shoes size 9',
-    'Need English tutor for class 10 student',
-    'Looking for catering services for 200 people'
-  ]
+  const [approvedBuyLeads, setApprovedBuyLeads] = useState([])
+  const [loadingLeads, setLoadingLeads] = useState(false)
 
   // Sample Sell Leads Data
   const sampleSellLeads = [
@@ -46,14 +47,44 @@ const Home = () => {
     'Gym membership - 50% off on annual plan'
   ]
 
+  // Fetch approved buy leads when modal opens
+  useEffect(() => {
+    if (showBuyLeads && approvedBuyLeads.length === 0) {
+      fetchApprovedBuyLeads()
+    }
+  }, [showBuyLeads])
+
+  const fetchApprovedBuyLeads = async () => {
+    try {
+      setLoadingLeads(true)
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+      const response = await fetch(`${BACKEND_URL}/api/buy-lead/approved`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        setApprovedBuyLeads(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching approved buy leads:', error)
+    } finally {
+      setLoadingLeads(false)
+    }
+  }
+
   // Categories for dropdown
-  const categories = [
+  const majorCategories = [
     'Medicine',
     'Services',
-    'Foods',
-    'Beverages',
+    'Food & Beverage',
     'Grocery',
     'Electronics',
+    'Hardware',
     'Fashion',
     'Home & Living',
     'Beauty',
@@ -61,6 +92,21 @@ const Home = () => {
     'Sports',
     'Toys'
   ]
+
+  const minorCategories = {
+    'Medicine': ['Prescription Drugs', 'Over-the-Counter', 'Medical Supplies', 'Ayurvedic', 'Homeopathic', 'Other'],
+    'Services': ['Repair', 'Cleaning', 'Photography', 'Catering', 'Tutoring', 'Event Management', 'Transport', 'Other'],
+    'Food & Beverage': ['Sweets & Snacks', 'Ready-to-Eat', 'Bakery Items', 'Soft Drinks', 'Juices', 'Tea/Coffee', 'Dairy Products', 'Other'],
+    'Grocery': ['Vegetables', 'Fruits', 'Pulses & Grains', 'Dry Fruits', 'Spices', 'Oils', 'Other'],
+    'Electronics': ['Mobile', 'Laptop', 'TV', 'Camera', 'Accessories', 'Home Appliances', 'Other'],
+    'Hardware': ['Building Materials', 'Tools', 'Plumbing', 'Electrical', 'Paint', 'Sanitary', 'Other'],
+    'Fashion': ['Men', 'Women', 'Kids', 'Ethnic Wear', 'Western Wear', 'Footwear', 'Accessories', 'Other'],
+    'Home & Living': ['Furniture', 'Decor', 'Kitchen', 'Bedding', 'Lighting', 'Other'],
+    'Beauty': ['Skincare', 'Haircare', 'Makeup', 'Fragrance', 'Salon Services', 'Other'],
+    'Books': ['Academic', 'Fiction', 'Non-Fiction', 'Children', 'Stationery', 'Other'],
+    'Sports': ['Cricket', 'Football', 'Gym Equipment', 'Outdoor', 'Fitness', 'Other'],
+    'Toys': ['Educational', 'Games', 'Dolls', 'Action Figures', 'Remote Control', 'Other']
+  }
 
   // Handle window resize
   useEffect(() => {
@@ -185,16 +231,49 @@ const Home = () => {
   }
 
   // Buy Lead Form Handlers
-  const handleBuyLeadSubmit = (e) => {
+  const handleBuyLeadSubmit = async (e) => {
     e.preventDefault()
-    if (!buyLeadData.name || !buyLeadData.category) {
-      alert('Please fill all fields')
+    if (!buyLeadData.name || !buyLeadData.mobileNo || !buyLeadData.townCity || !buyLeadData.itemRequired ||
+        !buyLeadData.majorCategory || !buyLeadData.minorCategory || !buyLeadData.qualityQuantityDesc ||
+        !buyLeadData.priceRange || !buyLeadData.deliveryAddress) {
+      toast.error('Please fill all required fields')
       return
     }
-    console.log('Buy Lead Submitted:', buyLeadData)
-    alert(`Buy Lead submitted!\nName: ${buyLeadData.name}\nCategory: ${buyLeadData.category}`)
-    setShowBuyForm(false)
-    setBuyLeadData({ name: '', category: '' })
+
+    try {
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+      const response = await fetch(`${BACKEND_URL}/api/buy-lead/create`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(buyLeadData)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Buy lead submitted successfully! It will be visible after admin approval.')
+        setShowBuyForm(false)
+        setBuyLeadData({
+          name: '',
+          mobileNo: '',
+          townCity: '',
+          itemRequired: '',
+          majorCategory: '',
+          minorCategory: '',
+          qualityQuantityDesc: '',
+          priceRange: '',
+          deliveryAddress: ''
+        })
+      } else {
+        toast.error(data.message || 'Failed to submit buy lead')
+      }
+    } catch (error) {
+      console.error('Error submitting buy lead:', error)
+      toast.error('Failed to submit buy lead. Please try again.')
+    }
   }
 
   // Sell Lead Form Handlers
@@ -208,6 +287,46 @@ const Home = () => {
     alert(`Sell Lead submitted!\nName: ${sellLeadData.name}\nCategory: ${sellLeadData.category}`)
     setShowSellForm(false)
     setSellLeadData({ name: '', category: '' })
+  }
+
+  // Get available minor categories based on selected major category
+  const getMinorCategories = () => {
+    if (buyLeadData.majorCategory && minorCategories[buyLeadData.majorCategory]) {
+      return minorCategories[buyLeadData.majorCategory]
+    }
+    return []
+  }
+
+  // Handle Buy Lead Button Click with Auth Check
+  const handleBuyLeadClick = () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to post a buy lead')
+      navigate('/login')
+      return
+    }
+    // Pre-fill form with user data
+    setBuyLeadData({
+      name: user?.name || user?.fullName || '',
+      mobileNo: user?.mobile || user?.phone || '',
+      townCity: user?.city || user?.town || '',
+      itemRequired: '',
+      majorCategory: '',
+      minorCategory: '',
+      qualityQuantityDesc: '',
+      priceRange: '',
+      deliveryAddress: user?.address || ''
+    })
+    setShowBuyForm(true)
+  }
+
+  // Handle Sell Lead Button Click with Auth Check
+  const handleSellLeadClick = () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to post a sell lead')
+      navigate('/login')
+      return
+    }
+    setShowSellForm(true)
   }
 
   return (
@@ -260,7 +379,7 @@ const Home = () => {
             <div className='grid grid-cols-2 gap-2 md:gap-3'>
               {/* Buy Lead Button */}
               <button
-                onClick={() => setShowBuyForm(true)}
+                onClick={handleBuyLeadClick}
                 className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
               >
                 <div className='flex items-center justify-center gap-1.5 md:gap-2'>
@@ -276,7 +395,7 @@ const Home = () => {
 
               {/* Sell Lead Button */}
               <button
-                onClick={() => setShowSellForm(true)}
+                onClick={handleSellLeadClick}
                 className='bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
               >
                 <div className='flex items-center justify-center gap-1.5 md:gap-2'>
@@ -291,9 +410,9 @@ const Home = () => {
               </button>
             </div>
 
-            {/* See Buy/Sell Leads Buttons Row */}
+            {/* See Buy/Sell Offers Buttons Row */}
             <div className='grid grid-cols-2 gap-2 md:gap-3'>
-              {/* See Buy Leads Button */}
+              {/* See Buy Offers Button */}
               <button
                 onClick={() => setShowBuyLeads(true)}
                 className='bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
@@ -304,13 +423,13 @@ const Home = () => {
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
                   </svg>
                   <div className='text-left'>
-                    <h3 className='text-[11px] md:text-xs font-bold leading-tight'>See Buy Leads</h3>
+                    <h3 className='text-[11px] md:text-xs font-bold leading-tight'>See Buy Offers</h3>
                     <p className='text-[9px] md:text-[10px] text-indigo-100 leading-tight'>खरीददार क्या चाहते हैं</p>
                   </div>
                 </div>
               </button>
 
-              {/* See Sell Leads Button */}
+              {/* See Sell Offers Button */}
               <button
                 onClick={() => setShowSellLeads(true)}
                 className='bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white py-2 md:py-2.5 px-2 md:px-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5'
@@ -321,7 +440,7 @@ const Home = () => {
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
                   </svg>
                   <div className='text-left'>
-                    <h3 className='text-[11px] md:text-xs font-bold leading-tight'>See Sell Leads</h3>
+                    <h3 className='text-[11px] md:text-xs font-bold leading-tight'>See Sell Offers</h3>
                     <p className='text-[9px] md:text-[10px] text-orange-100 leading-tight'>विक्रेता क्या बेच रहे हैं</p>
                   </div>
                 </div>
@@ -398,10 +517,11 @@ const Home = () => {
 
       {/* Buy Lead Form Modal */}
       {showBuyForm && (
-        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
-          <div className='bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl'>
-            <div className='flex items-center justify-between mb-6'>
-              <h2 className='text-2xl font-bold text-gray-800'>Buy Lead Form</h2>
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-2 md:p-4'>
+          <div className='bg-white rounded-xl md:rounded-2xl max-w-2xl w-full shadow-2xl max-h-[95vh] md:max-h-[90vh] flex flex-col'>
+            {/* Fixed Header */}
+            <div className='flex items-center justify-between p-4 md:p-6 border-b border-gray-200 flex-shrink-0'>
+              <h2 className='text-lg md:text-2xl font-bold text-gray-800'>Post Your Buy Lead</h2>
               <button
                 onClick={() => setShowBuyForm(false)}
                 className='text-gray-500 hover:text-gray-700 transition'
@@ -411,46 +531,151 @@ const Home = () => {
                 </svg>
               </button>
             </div>
-            <form onSubmit={handleBuyLeadSubmit} className='space-y-4'>
+
+            {/* Scrollable Form Content */}
+            <div className='overflow-y-auto flex-1 p-4 md:p-6'>
+              <form onSubmit={handleBuyLeadSubmit} className='space-y-2 md:space-y-4'>
+              {/* Name */}
               <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Your Name *</label>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Your Name *</label>
                 <input
                   type='text'
                   value={buyLeadData.name}
                   onChange={(e) => setBuyLeadData({ ...buyLeadData, name: e.target.value })}
-                  className='w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
                   placeholder='Enter your name'
                   required
                 />
               </div>
+
+              {/* Mobile Number */}
               <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Product Category *</label>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Mobile Number *</label>
+                <input
+                  type='tel'
+                  value={buyLeadData.mobileNo}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, mobileNo: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  placeholder='Enter your mobile number'
+                  pattern='[0-9]{10}'
+                  maxLength='10'
+                  required
+                />
+              </div>
+
+              {/* Town/City */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Town/City *</label>
+                <input
+                  type='text'
+                  value={buyLeadData.townCity}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, townCity: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  placeholder='Enter your city'
+                  required
+                />
+              </div>
+
+              {/* Item Required */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Item Required *</label>
+                <input
+                  type='text'
+                  value={buyLeadData.itemRequired}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, itemRequired: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  placeholder='What do you want to buy?'
+                  required
+                />
+              </div>
+
+              {/* Major Category */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Major Category *</label>
                 <select
-                  value={buyLeadData.category}
-                  onChange={(e) => setBuyLeadData({ ...buyLeadData, category: e.target.value })}
-                  className='w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  value={buyLeadData.majorCategory}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, majorCategory: e.target.value, minorCategory: '' })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
                   required
                 >
-                  <option value=''>Select Category</option>
-                  {categories.map((cat) => (
+                  <option value=''>Select Major Category</option>
+                  {majorCategories.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
               </div>
+
+              {/* Minor Category */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Minor Category *</label>
+                <select
+                  value={buyLeadData.minorCategory}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, minorCategory: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  required
+                  disabled={!buyLeadData.majorCategory}
+                >
+                  <option value=''>Select Minor Category</option>
+                  {getMinorCategories().map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Quality & Quantity Description */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Quality & Quantity Description *</label>
+                <textarea
+                  value={buyLeadData.qualityQuantityDesc}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, qualityQuantityDesc: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  placeholder='Describe the quality and quantity you need'
+                  rows='2'
+                  required
+                />
+              </div>
+
+              {/* Price Range */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Price Range *</label>
+                <input
+                  type='text'
+                  value={buyLeadData.priceRange}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, priceRange: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  placeholder='e.g., ₹1000 - ₹5000'
+                  required
+                />
+              </div>
+
+              {/* Delivery Address */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Delivery Address *</label>
+                <textarea
+                  value={buyLeadData.deliveryAddress}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, deliveryAddress: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  placeholder='Enter complete delivery address'
+                  rows='2'
+                  required
+                />
+              </div>
+
               <button
                 type='submit'
-                className='w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition shadow-lg'
+                className='w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 md:py-3 rounded-lg md:rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition shadow-lg text-sm md:text-base'
               >
-                Confirm Buy Lead
+                Submit Buy Lead
               </button>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Sell Lead Form Modal */}
       {showSellForm && (
-        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4'>
           <div className='bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl'>
             <div className='flex items-center justify-between mb-6'>
               <h2 className='text-2xl font-bold text-gray-800'>Sell Lead Form</h2>
@@ -484,7 +709,7 @@ const Home = () => {
                   required
                 >
                   <option value=''>Select Category</option>
-                  {categories.map((cat) => (
+                  {majorCategories.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
@@ -621,16 +846,16 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Buy Leads Popup Modal */}
+      {/* Buy Offers Popup Modal */}
       {showBuyLeads && (
-        <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4'>
-          <div className='bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-4 md:p-6 max-w-2xl w-full shadow-2xl h-[90vh] flex flex-col'>
+        <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4'>
+          <div className='bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-4 md:p-6 max-w-4xl w-full shadow-2xl h-[90vh] flex flex-col'>
             <div className='flex items-center justify-between mb-4'>
               <h2 className='text-2xl md:text-3xl font-bold text-indigo-800 flex items-center gap-2'>
                 <svg className='w-7 h-7' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' />
                 </svg>
-                Buy Leads
+                Buy Offers
               </h2>
               <button
                 onClick={() => setShowBuyLeads(false)}
@@ -642,43 +867,76 @@ const Home = () => {
               </button>
             </div>
             <div className='relative flex-1 overflow-hidden bg-white rounded-xl border-2 border-indigo-200 shadow-inner'>
-              <div className='absolute inset-0 overflow-y-auto scrollbar-hide'>
-                <div className='space-y-0 animate-scroll-continuous'>
-                  {[...sampleBuyLeads, ...sampleBuyLeads].map((lead, index) => (
-                    <div
-                      key={index}
-                      className='py-4 px-6 border-b border-indigo-100'
-                    >
-                      <div className='flex items-start gap-3'>
-                        <div className='bg-indigo-100 rounded-full p-2 flex-shrink-0'>
-                          <svg className='w-5 h-5 text-indigo-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' />
-                          </svg>
-                        </div>
-                        <p className='text-gray-800 font-medium text-sm md:text-base leading-relaxed'>{lead}</p>
-                      </div>
-                    </div>
-                  ))}
+              {loadingLeads ? (
+                <div className='flex items-center justify-center h-full'>
+                  <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4'></div>
+                    <p className='text-gray-600'>Loading buy offers...</p>
+                  </div>
                 </div>
-              </div>
+              ) : approvedBuyLeads.length === 0 ? (
+                <div className='flex items-center justify-center h-full'>
+                  <div className='text-center'>
+                    <svg className='w-16 h-16 text-gray-400 mx-auto mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4' />
+                    </svg>
+                    <p className='text-gray-600 font-medium'>No buy offers available yet</p>
+                    <p className='text-gray-500 text-sm mt-2'>Check back later for new buyer requirements</p>
+                  </div>
+                </div>
+              ) : (
+                <div className='absolute inset-0 overflow-y-auto p-4 md:p-6'>
+                  <div className='space-y-4'>
+                    {approvedBuyLeads.map((lead, index) => (
+                      <div
+                        key={lead._id}
+                        className='bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-xl border border-indigo-200 hover:shadow-md transition-shadow'
+                      >
+                        <p className='text-gray-800 text-sm md:text-base leading-relaxed'>
+                          <span className='font-bold text-indigo-700'>{index + 1}.</span>{' '}
+                          <span className='font-semibold'>{lead.name}</span>{' '}
+                          {lead.townCity && (
+                            <>
+                              <span className='text-gray-600'>- {lead.townCity}</span>{' '}
+                            </>
+                          )}
+                          <a href={`tel:${lead.mobileNo}`} className='text-blue-600 hover:text-blue-800 font-medium hover:underline'>
+                            {lead.mobileNo}
+                          </a>{' '}
+                          <span className='font-medium text-gray-900'>{lead.itemRequired}</span>{' '}
+                          <span className='text-gray-700'>{lead.majorCategory}</span>{' '}
+                          <span className='text-gray-600'>{lead.minorCategory}</span>{' '}
+                          <span className='text-gray-800'>{lead.qualityQuantityDesc}</span>{' '}
+                          {lead.priceRange && (
+                            <>
+                              <span className='text-green-700 font-semibold'>{lead.priceRange}</span>{' '}
+                            </>
+                          )}
+                          <span className='text-gray-600 italic'>{lead.deliveryAddress}</span>
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <p className='text-xs md:text-sm text-gray-500 text-center mt-4'>
-              Showing latest buyer requirements
+              Showing approved buyer requirements
             </p>
           </div>
         </div>
       )}
 
-      {/* Sell Leads Popup Modal */}
+      {/* Sell Offers Popup Modal */}
       {showSellLeads && (
-        <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4'>
+        <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4'>
           <div className='bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4 md:p-6 max-w-2xl w-full shadow-2xl h-[90vh] flex flex-col'>
             <div className='flex items-center justify-between mb-4'>
               <h2 className='text-2xl md:text-3xl font-bold text-orange-800 flex items-center gap-2'>
                 <svg className='w-7 h-7' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
                 </svg>
-                Sell Leads
+                Sell Offers
               </h2>
               <button
                 onClick={() => setShowSellLeads(false)}
@@ -717,10 +975,12 @@ const Home = () => {
         </div>
       )}
 
-      {/* Fixed Buttons - Hidden on Mobile */}
-      <div className='hidden md:block'>
-        <WhatsAppButton />
-      </div>
+      {/* Fixed Buttons - Hidden on Mobile and when popups are open */}
+      {!showBuyLeads && !showSellLeads && (
+        <div className='hidden md:block'>
+          <WhatsAppButton />
+        </div>
+      )}
     </div>
   )
 }
