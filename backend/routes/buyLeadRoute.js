@@ -20,8 +20,8 @@ const {
 // User Routes
 // ========================
 
-// Create a new buy lead (authenticated users only)
-router.post('/create', auth, createBuyLead);
+// Create a new buy lead (no authentication required)
+router.post('/create', createBuyLead);
 
 // Get user's own buy leads
 router.get('/my-leads', auth, getUserBuyLeads);

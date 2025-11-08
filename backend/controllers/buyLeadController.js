@@ -27,8 +27,8 @@ const createBuyLead = async (req, res) => {
       });
     }
 
-    // Get user ID from authenticated user
-    const userId = req.user._id;
+    // Get user ID from authenticated user (if available)
+    const userId = req.user ? req.user._id : null;
 
     // Create new buy lead
     const buyLead = new BuyLead({

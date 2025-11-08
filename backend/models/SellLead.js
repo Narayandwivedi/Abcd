@@ -1,44 +1,48 @@
 const mongoose = require("mongoose");
 
-const buyLeadSchema = new mongoose.Schema({
+const sellLeadSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: false,
   },
-  name: {
+  vendorName: {
+    type: String,
+    required: true,
+  },
+  vendorLocation: {
+    type: String,
+    required: true,
+  },
+  productServiceOffered: {
+    type: String,
+    required: true,
+  },
+  brand: {
+    type: String,
+    required: true,
+  },
+  modelDetail: {
+    type: String,
+    required: false,
+  },
+  mrpListPrice: {
+    type: String,
+    required: true,
+  },
+  specialOfferPrice: {
+    type: String,
+    required: true,
+  },
+  stockQtyAvailable: {
+    type: String,
+    required: true,
+  },
+  validity: {
     type: String,
     required: true,
   },
   mobileNo: {
-    type: String,
-    required: true,
-  },
-  townCity: {
-    type: String,
-    required: true,
-  },
-  itemRequired: {
-    type: String,
-    required: true,
-  },
-  majorCategory: {
-    type: String,
-    required: true,
-  },
-  minorCategory: {
-    type: String,
-    required: true,
-  },
-  qualityQuantityDesc: {
-    type: String,
-    required: true,
-  },
-  priceRange: {
-    type: String,
-    required: true,
-  },
-  deliveryAddress: {
     type: String,
     required: true,
   },
@@ -62,9 +66,9 @@ const buyLeadSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-buyLeadSchema.index({ status: 1, createdAt: -1 });
-buyLeadSchema.index({ userId: 1 });
+sellLeadSchema.index({ status: 1, createdAt: -1 });
+sellLeadSchema.index({ userId: 1 });
 
-const BuyLead = mongoose.model("BuyLead", buyLeadSchema);
+const SellLead = mongoose.model("SellLead", sellLeadSchema);
 
-module.exports = BuyLead;
+module.exports = SellLead;

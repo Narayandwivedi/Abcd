@@ -25,12 +25,24 @@ const Home = () => {
     priceRange: '',
     deliveryAddress: ''
   })
-  const [sellLeadData, setSellLeadData] = useState({ name: '', category: '' })
+  const [sellLeadData, setSellLeadData] = useState({
+    vendorName: '',
+    vendorLocation: '',
+    productServiceOffered: '',
+    brand: '',
+    modelDetail: '',
+    mrpListPrice: '',
+    specialOfferPrice: '',
+    stockQtyAvailable: '',
+    validity: '',
+    mobileNo: ''
+  })
 
   // Show Buy/Sell Leads States
   const [showBuyLeads, setShowBuyLeads] = useState(false)
   const [showSellLeads, setShowSellLeads] = useState(false)
   const [approvedBuyLeads, setApprovedBuyLeads] = useState([])
+  const [approvedSellLeads, setApprovedSellLeads] = useState([])
   const [loadingLeads, setLoadingLeads] = useState(false)
 
   // Sample Sell Leads Data
@@ -54,6 +66,13 @@ const Home = () => {
     }
   }, [showBuyLeads])
 
+  // Fetch approved sell leads when modal opens
+  useEffect(() => {
+    if (showSellLeads && approvedSellLeads.length === 0) {
+      fetchApprovedSellLeads()
+    }
+  }, [showSellLeads])
+
   const fetchApprovedBuyLeads = async () => {
     try {
       setLoadingLeads(true)
@@ -72,6 +91,29 @@ const Home = () => {
       }
     } catch (error) {
       console.error('Error fetching approved buy leads:', error)
+    } finally {
+      setLoadingLeads(false)
+    }
+  }
+
+  const fetchApprovedSellLeads = async () => {
+    try {
+      setLoadingLeads(true)
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+      const response = await fetch(`${BACKEND_URL}/api/sell-lead/approved`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        setApprovedSellLeads(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching approved sell leads:', error)
     } finally {
       setLoadingLeads(false)
     }
@@ -277,16 +319,50 @@ const Home = () => {
   }
 
   // Sell Lead Form Handlers
-  const handleSellLeadSubmit = (e) => {
+  const handleSellLeadSubmit = async (e) => {
     e.preventDefault()
-    if (!sellLeadData.name || !sellLeadData.category) {
-      alert('Please fill all fields')
+    if (!sellLeadData.vendorName || !sellLeadData.vendorLocation || !sellLeadData.productServiceOffered ||
+        !sellLeadData.brand || !sellLeadData.mrpListPrice || !sellLeadData.specialOfferPrice ||
+        !sellLeadData.stockQtyAvailable || !sellLeadData.validity || !sellLeadData.mobileNo) {
+      toast.error('Please fill all required fields')
       return
     }
-    console.log('Sell Lead Submitted:', sellLeadData)
-    alert(`Sell Lead submitted!\nName: ${sellLeadData.name}\nCategory: ${sellLeadData.category}`)
-    setShowSellForm(false)
-    setSellLeadData({ name: '', category: '' })
+
+    try {
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+      const response = await fetch(`${BACKEND_URL}/api/sell-lead/create`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sellLeadData)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Sell lead submitted successfully! It will be visible after admin approval.')
+        setShowSellForm(false)
+        setSellLeadData({
+          vendorName: '',
+          vendorLocation: '',
+          productServiceOffered: '',
+          brand: '',
+          modelDetail: '',
+          mrpListPrice: '',
+          specialOfferPrice: '',
+          stockQtyAvailable: '',
+          validity: '',
+          mobileNo: ''
+        })
+      } else {
+        toast.error(data.message || 'Failed to submit sell lead')
+      }
+    } catch (error) {
+      console.error('Error submitting sell lead:', error)
+      toast.error('Failed to submit sell lead. Please try again.')
+    }
   }
 
   // Get available minor categories based on selected major category
@@ -297,34 +373,68 @@ const Home = () => {
     return []
   }
 
-  // Handle Buy Lead Button Click with Auth Check
+  // Handle Buy Lead Button Click (No Auth Required)
   const handleBuyLeadClick = () => {
-    if (!isAuthenticated) {
-      toast.error('Please login to post a buy lead')
-      navigate('/login')
-      return
+    // Pre-fill form with user data if authenticated, otherwise show empty form
+    if (isAuthenticated && user) {
+      setBuyLeadData({
+        name: user?.name || user?.fullName || '',
+        mobileNo: user?.mobile || user?.phone || '',
+        townCity: user?.city || user?.town || '',
+        itemRequired: '',
+        majorCategory: '',
+        minorCategory: '',
+        qualityQuantityDesc: '',
+        priceRange: '',
+        deliveryAddress: user?.address || ''
+      })
+    } else {
+      // Empty form for non-authenticated users
+      setBuyLeadData({
+        name: '',
+        mobileNo: '',
+        townCity: '',
+        itemRequired: '',
+        majorCategory: '',
+        minorCategory: '',
+        qualityQuantityDesc: '',
+        priceRange: '',
+        deliveryAddress: ''
+      })
     }
-    // Pre-fill form with user data
-    setBuyLeadData({
-      name: user?.name || user?.fullName || '',
-      mobileNo: user?.mobile || user?.phone || '',
-      townCity: user?.city || user?.town || '',
-      itemRequired: '',
-      majorCategory: '',
-      minorCategory: '',
-      qualityQuantityDesc: '',
-      priceRange: '',
-      deliveryAddress: user?.address || ''
-    })
     setShowBuyForm(true)
   }
 
-  // Handle Sell Lead Button Click with Auth Check
+  // Handle Sell Lead Button Click (No Auth Required)
   const handleSellLeadClick = () => {
-    if (!isAuthenticated) {
-      toast.error('Please login to post a sell lead')
-      navigate('/login')
-      return
+    // Pre-fill form with user data if authenticated, otherwise show empty form
+    if (isAuthenticated && user) {
+      setSellLeadData({
+        vendorName: user?.name || user?.fullName || '',
+        vendorLocation: user?.city || user?.town || '',
+        productServiceOffered: '',
+        brand: '',
+        modelDetail: '',
+        mrpListPrice: '',
+        specialOfferPrice: '',
+        stockQtyAvailable: '',
+        validity: '',
+        mobileNo: user?.mobile || user?.phone || ''
+      })
+    } else {
+      // Empty form for non-authenticated users
+      setSellLeadData({
+        vendorName: '',
+        vendorLocation: '',
+        productServiceOffered: '',
+        brand: '',
+        modelDetail: '',
+        mrpListPrice: '',
+        specialOfferPrice: '',
+        stockQtyAvailable: '',
+        validity: '',
+        mobileNo: ''
+      })
     }
     setShowSellForm(true)
   }
@@ -566,13 +676,13 @@ const Home = () => {
               {/* Town/City */}
               <div>
                 <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Town/City *</label>
-                <input
-                  type='text'
+                <CityDropdown
                   value={buyLeadData.townCity}
-                  onChange={(e) => setBuyLeadData({ ...buyLeadData, townCity: e.target.value })}
-                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
-                  placeholder='Enter your city'
-                  required
+                  onChange={(city) => setBuyLeadData({ ...buyLeadData, townCity: city })}
+                  placeholder='Select your city'
+                  required={true}
+                  darkMode={false}
+                  className='border-2 border-gray-300 rounded-lg md:rounded-xl h-[42px] md:h-[50px]'
                 />
               </div>
 
@@ -675,10 +785,11 @@ const Home = () => {
 
       {/* Sell Lead Form Modal */}
       {showSellForm && (
-        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4'>
-          <div className='bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl'>
-            <div className='flex items-center justify-between mb-6'>
-              <h2 className='text-2xl font-bold text-gray-800'>Sell Lead Form</h2>
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-2 md:p-4'>
+          <div className='bg-white rounded-xl md:rounded-2xl max-w-2xl w-full shadow-2xl max-h-[95vh] md:max-h-[90vh] flex flex-col'>
+            {/* Fixed Header */}
+            <div className='flex items-center justify-between p-4 md:p-6 border-b border-gray-200 flex-shrink-0'>
+              <h2 className='text-lg md:text-2xl font-bold text-gray-800'>Post Your Sell Lead</h2>
               <button
                 onClick={() => setShowSellForm(false)}
                 className='text-gray-500 hover:text-gray-700 transition'
@@ -688,39 +799,149 @@ const Home = () => {
                 </svg>
               </button>
             </div>
-            <form onSubmit={handleSellLeadSubmit} className='space-y-4'>
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Your Name *</label>
-                <input
-                  type='text'
-                  value={sellLeadData.name}
-                  onChange={(e) => setSellLeadData({ ...sellLeadData, name: e.target.value })}
-                  className='w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent'
-                  placeholder='Enter your name'
-                  required
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Product Category *</label>
-                <select
-                  value={sellLeadData.category}
-                  onChange={(e) => setSellLeadData({ ...sellLeadData, category: e.target.value })}
-                  className='w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent'
-                  required
+
+            {/* Scrollable Form Content */}
+            <div className='overflow-y-auto flex-1 p-4 md:p-6'>
+              <form onSubmit={handleSellLeadSubmit} className='space-y-2 md:space-y-4'>
+                {/* Vendor Name */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Vendor Name *</label>
+                  <input
+                    type='text'
+                    value={sellLeadData.vendorName}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, vendorName: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='Enter vendor/business name'
+                    required
+                  />
+                </div>
+
+                {/* Vendor Location */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Vendor Location (Town/District) *</label>
+                  <CityDropdown
+                    value={sellLeadData.vendorLocation}
+                    onChange={(city) => setSellLeadData({ ...sellLeadData, vendorLocation: city })}
+                    placeholder='Select location'
+                    required={true}
+                    darkMode={false}
+                    className='border-2 border-gray-300 rounded-lg md:rounded-xl h-[42px] md:h-[50px]'
+                  />
+                </div>
+
+                {/* Mobile Number */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Mobile Number *</label>
+                  <input
+                    type='tel'
+                    value={sellLeadData.mobileNo}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, mobileNo: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='Enter mobile number'
+                    pattern='[0-9]{10}'
+                    maxLength='10'
+                    required
+                  />
+                </div>
+
+                {/* Product/Service Offered */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Product/Service Offered *</label>
+                  <input
+                    type='text'
+                    value={sellLeadData.productServiceOffered}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, productServiceOffered: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='What are you selling?'
+                    required
+                  />
+                </div>
+
+                {/* Brand */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Brand *</label>
+                  <input
+                    type='text'
+                    value={sellLeadData.brand}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, brand: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='Enter brand name'
+                    required
+                  />
+                </div>
+
+                {/* Model Detail (Optional) */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Model Detail</label>
+                  <input
+                    type='text'
+                    value={sellLeadData.modelDetail}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, modelDetail: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='Enter model (optional)'
+                  />
+                </div>
+
+                {/* MRP/List Price */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>MRP/List Price (Unit) *</label>
+                  <input
+                    type='text'
+                    value={sellLeadData.mrpListPrice}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, mrpListPrice: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='e.g., ₹5000'
+                    required
+                  />
+                </div>
+
+                {/* Special Offer Price */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Special Offer Price (Unit) *</label>
+                  <input
+                    type='text'
+                    value={sellLeadData.specialOfferPrice}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, specialOfferPrice: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='e.g., ₹4000'
+                    required
+                  />
+                </div>
+
+                {/* Stock Quantity Available */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Stock Quantity Available *</label>
+                  <input
+                    type='text'
+                    value={sellLeadData.stockQtyAvailable}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, stockQtyAvailable: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='e.g., 100 units'
+                    required
+                  />
+                </div>
+
+                {/* Validity */}
+                <div>
+                  <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Validity *</label>
+                  <input
+                    type='text'
+                    value={sellLeadData.validity}
+                    onChange={(e) => setSellLeadData({ ...sellLeadData, validity: e.target.value })}
+                    className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm'
+                    placeholder='e.g., Valid till 31st Dec 2024'
+                    required
+                  />
+                </div>
+
+                <button
+                  type='submit'
+                  className='w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-2.5 md:py-3 rounded-lg md:rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition shadow-lg text-sm md:text-base'
                 >
-                  <option value=''>Select Category</option>
-                  {majorCategories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-              <button
-                type='submit'
-                className='w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition shadow-lg'
-              >
-                Confirm Sell Lead
-              </button>
-            </form>
+                  Submit Sell Lead
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
@@ -885,35 +1106,75 @@ const Home = () => {
                   </div>
                 </div>
               ) : (
-                <div className='absolute inset-0 overflow-y-auto p-4 md:p-6'>
-                  <div className='space-y-4'>
+                <div className='absolute inset-0 overflow-y-auto p-2 md:p-4'>
+                  <div className='space-y-2'>
                     {approvedBuyLeads.map((lead, index) => (
                       <div
                         key={lead._id}
-                        className='bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-xl border border-indigo-200 hover:shadow-md transition-shadow'
+                        className='bg-white p-3 rounded-xl border border-indigo-200 hover:border-indigo-400 hover:shadow-lg transition-all active:scale-[0.98]'
                       >
-                        <p className='text-gray-800 text-sm md:text-base leading-relaxed'>
-                          <span className='font-bold text-indigo-700'>{index + 1}.</span>{' '}
-                          <span className='font-semibold'>{lead.name}</span>{' '}
-                          {lead.townCity && (
-                            <>
-                              <span className='text-gray-600'>- {lead.townCity}</span>{' '}
-                            </>
-                          )}
-                          <a href={`tel:${lead.mobileNo}`} className='text-blue-600 hover:text-blue-800 font-medium hover:underline'>
-                            {lead.mobileNo}
-                          </a>{' '}
-                          <span className='font-medium text-gray-900'>{lead.itemRequired}</span>{' '}
-                          <span className='text-gray-700'>{lead.majorCategory}</span>{' '}
-                          <span className='text-gray-600'>{lead.minorCategory}</span>{' '}
-                          <span className='text-gray-800'>{lead.qualityQuantityDesc}</span>{' '}
-                          {lead.priceRange && (
-                            <>
-                              <span className='text-green-700 font-semibold'>{lead.priceRange}</span>{' '}
-                            </>
-                          )}
-                          <span className='text-gray-600 italic'>{lead.deliveryAddress}</span>
-                        </p>
+                        {/* Compact Header */}
+                        <div className='flex items-center justify-between mb-2'>
+                          <div className='flex items-center gap-2 flex-1 min-w-0'>
+                            <div className='bg-gradient-to-br from-indigo-500 to-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0'>
+                              {index + 1}
+                            </div>
+                            <div className='min-w-0 flex-1'>
+                              <h3 className='font-bold text-sm text-gray-900 truncate'>{lead.name}</h3>
+                              <p className='text-xs text-gray-600 flex items-center gap-1'>
+                                <svg className='w-3 h-3 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
+                                </svg>
+                                <span className='truncate'>{lead.townCity}</span>
+                              </p>
+                            </div>
+                          </div>
+                          <a
+                            href={`tel:${lead.mobileNo}`}
+                            className='flex items-center gap-1 bg-green-500 text-white px-2 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0 ml-2 active:bg-green-600'
+                          >
+                            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
+                            </svg>
+                            <span className='hidden sm:inline'>Call</span>
+                          </a>
+                        </div>
+
+                        {/* Compact Product Info */}
+                        <div className='space-y-2'>
+                          <div className='bg-blue-50 p-2 rounded-lg'>
+                            <p className='text-xs text-blue-600 font-medium mb-0.5'>LOOKING FOR</p>
+                            <p className='text-sm font-bold text-gray-900'>{lead.itemRequired}</p>
+                          </div>
+
+                          {/* Inline Category & Budget */}
+                          <div className='flex flex-wrap gap-1.5 text-xs'>
+                            <span className='px-2 py-1 bg-purple-100 text-purple-700 rounded-md font-semibold'>
+                              {lead.majorCategory}
+                            </span>
+                            <span className='px-2 py-1 bg-indigo-100 text-indigo-700 rounded-md font-medium'>
+                              {lead.minorCategory}
+                            </span>
+                            {lead.priceRange && (
+                              <span className='px-2 py-1 bg-green-100 text-green-700 rounded-md font-semibold'>
+                                💰 {lead.priceRange}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Compact Details */}
+                          <p className='text-xs text-gray-700 leading-relaxed line-clamp-2'>
+                            {lead.qualityQuantityDesc}
+                          </p>
+
+                          {/* Compact Address */}
+                          <div className='flex items-start gap-1.5 text-xs text-gray-600 bg-orange-50 p-2 rounded-lg'>
+                            <svg className='w-3.5 h-3.5 text-orange-600 flex-shrink-0 mt-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
+                            </svg>
+                            <span className='line-clamp-1'>{lead.deliveryAddress}</span>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -930,7 +1191,7 @@ const Home = () => {
       {/* Sell Offers Popup Modal */}
       {showSellLeads && (
         <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4'>
-          <div className='bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4 md:p-6 max-w-2xl w-full shadow-2xl h-[90vh] flex flex-col'>
+          <div className='bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4 md:p-6 max-w-4xl w-full shadow-2xl h-[90vh] flex flex-col'>
             <div className='flex items-center justify-between mb-4'>
               <h2 className='text-2xl md:text-3xl font-bold text-orange-800 flex items-center gap-2'>
                 <svg className='w-7 h-7' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -948,28 +1209,123 @@ const Home = () => {
               </button>
             </div>
             <div className='relative flex-1 overflow-hidden bg-white rounded-xl border-2 border-orange-200 shadow-inner'>
-              <div className='absolute inset-0 overflow-y-auto scrollbar-hide'>
-                <div className='space-y-0 animate-scroll-continuous'>
-                  {[...sampleSellLeads, ...sampleSellLeads].map((lead, index) => (
-                    <div
-                      key={index}
-                      className='py-4 px-6 border-b border-orange-100'
-                    >
-                      <div className='flex items-start gap-3'>
-                        <div className='bg-orange-100 rounded-full p-2 flex-shrink-0'>
-                          <svg className='w-5 h-5 text-orange-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
-                          </svg>
-                        </div>
-                        <p className='text-gray-800 font-medium text-sm md:text-base leading-relaxed'>{lead}</p>
-                      </div>
-                    </div>
-                  ))}
+              {loadingLeads ? (
+                <div className='flex items-center justify-center h-full'>
+                  <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4'></div>
+                    <p className='text-gray-600'>Loading sell offers...</p>
+                  </div>
                 </div>
-              </div>
+              ) : approvedSellLeads.length === 0 ? (
+                <div className='flex items-center justify-center h-full'>
+                  <div className='text-center'>
+                    <svg className='w-16 h-16 text-gray-400 mx-auto mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
+                    </svg>
+                    <p className='text-gray-600 font-medium'>No sell offers available yet</p>
+                    <p className='text-gray-500 text-sm mt-2'>Check back later for new seller offers</p>
+                  </div>
+                </div>
+              ) : (
+                <div className='absolute inset-0 overflow-y-auto p-2 md:p-4'>
+                  <div className='space-y-2'>
+                    {approvedSellLeads.map((lead, index) => (
+                      <div
+                        key={lead._id}
+                        className='bg-white p-3 rounded-xl border border-orange-200 hover:border-orange-400 hover:shadow-lg transition-all active:scale-[0.98]'
+                      >
+                        {/* Compact Header */}
+                        <div className='flex items-center justify-between mb-2'>
+                          <div className='flex items-center gap-2 flex-1 min-w-0'>
+                            <div className='bg-gradient-to-br from-orange-500 to-amber-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0'>
+                              {index + 1}
+                            </div>
+                            <div className='min-w-0 flex-1'>
+                              <h3 className='font-bold text-sm text-gray-900 truncate'>{lead.vendorName}</h3>
+                              <p className='text-xs text-gray-600 flex items-center gap-1'>
+                                <svg className='w-3 h-3 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
+                                </svg>
+                                <span className='truncate'>{lead.vendorLocation}</span>
+                              </p>
+                            </div>
+                          </div>
+                          <a
+                            href={`tel:${lead.mobileNo}`}
+                            className='flex items-center gap-1 bg-green-500 text-white px-2 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0 ml-2 active:bg-green-600'
+                          >
+                            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
+                            </svg>
+                            <span className='hidden sm:inline'>Call</span>
+                          </a>
+                        </div>
+
+                        {/* Compact Product Info */}
+                        <div className='space-y-2'>
+                          <div className='bg-orange-50 p-2 rounded-lg'>
+                            <p className='text-xs text-orange-600 font-medium mb-0.5'>PRODUCT/SERVICE</p>
+                            <p className='text-sm font-bold text-gray-900'>{lead.productServiceOffered}</p>
+                          </div>
+
+                          {/* Brand & Model Tags */}
+                          <div className='flex flex-wrap gap-1.5 text-xs'>
+                            <span className='px-2 py-1 bg-purple-100 text-purple-700 rounded-md font-semibold'>
+                              🏷️ {lead.brand}
+                            </span>
+                            {lead.modelDetail && (
+                              <span className='px-2 py-1 bg-blue-100 text-blue-700 rounded-md font-medium'>
+                                📦 {lead.modelDetail}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Compact Pricing */}
+                          <div className='bg-gradient-to-r from-red-50 to-green-50 p-2.5 rounded-lg border border-orange-200'>
+                            <div className='flex items-center justify-between mb-1.5'>
+                              <div>
+                                <p className='text-xs text-gray-500 mb-0.5'>MRP</p>
+                                <p className='text-sm font-bold text-red-600 line-through'>{lead.mrpListPrice}</p>
+                              </div>
+                              <div className='text-right'>
+                                <p className='text-xs text-gray-500 mb-0.5'>OFFER</p>
+                                <p className='text-base font-bold text-green-600'>{lead.specialOfferPrice}</p>
+                              </div>
+                            </div>
+                            <div className='pt-1.5 border-t border-orange-200 flex items-center justify-between'>
+                              <span className='text-xs text-gray-600'>You Save</span>
+                              <span className='text-xs font-bold text-green-600'>
+                                {parseInt(lead.mrpListPrice.replace(/[^0-9]/g, '')) - parseInt(lead.specialOfferPrice.replace(/[^0-9]/g, '')) > 0
+                                  ? '₹' + (parseInt(lead.mrpListPrice.replace(/[^0-9]/g, '')) - parseInt(lead.specialOfferPrice.replace(/[^0-9]/g, '')))
+                                  : 'Best Price'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Compact Stock & Validity */}
+                          <div className='flex gap-1.5 text-xs'>
+                            <div className='flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-md flex-1'>
+                              <svg className='w-3.5 h-3.5 text-blue-600 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' />
+                              </svg>
+                              <span className='text-blue-700 font-semibold truncate'>Stock: {lead.stockQtyAvailable}</span>
+                            </div>
+                            <div className='flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md flex-1'>
+                              <svg className='w-3.5 h-3.5 text-yellow-600 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
+                              </svg>
+                              <span className='text-yellow-700 font-medium truncate'>{lead.validity}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <p className='text-xs md:text-sm text-gray-500 text-center mt-4'>
-              Showing latest seller offers
+              Showing approved seller offers
             </p>
           </div>
         </div>
