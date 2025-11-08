@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const BuyLead = require('./models/BuyLead');
 const SellLead = require('./models/SellLead');
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URL;
 
 // Dummy data arrays
 const cities = [
