@@ -1107,72 +1107,96 @@ const Home = () => {
                 </div>
               ) : (
                 <div className='absolute inset-0 overflow-y-auto p-2 md:p-4'>
-                  <div className='space-y-2'>
+                  <div className='space-y-2.5'>
                     {approvedBuyLeads.map((lead, index) => (
                       <div
                         key={lead._id}
-                        className='bg-white p-3 rounded-xl border border-indigo-200 hover:border-indigo-400 hover:shadow-lg transition-all active:scale-[0.98]'
+                        className='bg-gradient-to-br from-white to-indigo-50 p-3 rounded-xl border-2 border-indigo-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all active:scale-[0.99]'
                       >
-                        {/* Compact Header */}
-                        <div className='flex items-center justify-between mb-2'>
-                          <div className='flex items-center gap-2 flex-1 min-w-0'>
-                            <div className='bg-gradient-to-br from-indigo-500 to-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0'>
-                              {index + 1}
+                        {/* Header with Call Button */}
+                        <div className='flex items-center justify-between mb-2.5 pb-2 border-b border-indigo-100'>
+                          <div className='flex items-center gap-2'>
+                            <div className='bg-gradient-to-br from-indigo-500 to-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shadow-md'>
+                              #{index + 1}
                             </div>
-                            <div className='min-w-0 flex-1'>
-                              <h3 className='font-bold text-sm text-gray-900 truncate'>{lead.name}</h3>
-                              <p className='text-xs text-gray-600 flex items-center gap-1'>
-                                <svg className='w-3 h-3 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
-                                </svg>
-                                <span className='truncate'>{lead.townCity}</span>
-                              </p>
+                            <div>
+                              <p className='text-xs text-indigo-600 font-semibold'>BUY REQUEST</p>
+                              <p className='text-[10px] text-gray-500'>Posted by buyer</p>
                             </div>
                           </div>
                           <a
                             href={`tel:${lead.mobileNo}`}
-                            className='flex items-center gap-1 bg-green-500 text-white px-2 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0 ml-2 active:bg-green-600'
+                            className='flex items-center gap-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-md active:shadow-sm active:scale-95 transition-all'
                           >
-                            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
                             </svg>
-                            <span className='hidden sm:inline'>Call</span>
+                            <span>CALL</span>
                           </a>
                         </div>
 
-                        {/* Compact Product Info */}
-                        <div className='space-y-2'>
+                        {/* Structured Details Grid */}
+                        <div className='space-y-1.5'>
+                          {/* Buyer Name */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Buyer Name</span>
+                            <span className='text-xs font-bold text-gray-900'>{lead.name}</span>
+                          </div>
+
+                          {/* Buyer City */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Buyer City</span>
+                            <span className='text-xs font-semibold text-indigo-700'>{lead.townCity}</span>
+                          </div>
+
+                          {/* Mobile */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Mobile</span>
+                            <a href={`tel:${lead.mobileNo}`} className='text-xs font-bold text-blue-600'>{lead.mobileNo}</a>
+                          </div>
+
+                          {/* Divider */}
+                          <div className='border-t border-indigo-100 my-2'></div>
+
+                          {/* Product Required */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Product</span>
+                            <span className='text-xs font-bold text-gray-900 line-clamp-1'>{lead.itemRequired}</span>
+                          </div>
+
+                          {/* Category */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Category</span>
+                            <span className='text-xs font-semibold text-purple-700'>{lead.majorCategory}</span>
+                          </div>
+
+                          {/* Sub Category */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Sub Category</span>
+                            <span className='text-xs font-semibold text-purple-600'>{lead.minorCategory}</span>
+                          </div>
+
+                          {/* Expected Price */}
+                          {lead.priceRange && (
+                            <div className='flex items-center gap-2'>
+                              <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Budget</span>
+                              <span className='text-xs font-bold text-green-600'>💰 {lead.priceRange}</span>
+                            </div>
+                          )}
+
+                          {/* Divider */}
+                          <div className='border-t border-indigo-100 my-2'></div>
+
+                          {/* Requirements */}
                           <div className='bg-blue-50 p-2 rounded-lg'>
-                            <p className='text-xs text-blue-600 font-medium mb-0.5'>LOOKING FOR</p>
-                            <p className='text-sm font-bold text-gray-900'>{lead.itemRequired}</p>
+                            <p className='text-[10px] font-bold text-blue-600 uppercase mb-1'>Requirements</p>
+                            <p className='text-xs text-gray-700 leading-relaxed'>{lead.qualityQuantityDesc}</p>
                           </div>
 
-                          {/* Inline Category & Budget */}
-                          <div className='flex flex-wrap gap-1.5 text-xs'>
-                            <span className='px-2 py-1 bg-purple-100 text-purple-700 rounded-md font-semibold'>
-                              {lead.majorCategory}
-                            </span>
-                            <span className='px-2 py-1 bg-indigo-100 text-indigo-700 rounded-md font-medium'>
-                              {lead.minorCategory}
-                            </span>
-                            {lead.priceRange && (
-                              <span className='px-2 py-1 bg-green-100 text-green-700 rounded-md font-semibold'>
-                                💰 {lead.priceRange}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Compact Details */}
-                          <p className='text-xs text-gray-700 leading-relaxed line-clamp-2'>
-                            {lead.qualityQuantityDesc}
-                          </p>
-
-                          {/* Compact Address */}
-                          <div className='flex items-start gap-1.5 text-xs text-gray-600 bg-orange-50 p-2 rounded-lg'>
-                            <svg className='w-3.5 h-3.5 text-orange-600 flex-shrink-0 mt-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
-                            </svg>
-                            <span className='line-clamp-1'>{lead.deliveryAddress}</span>
+                          {/* Delivery Address */}
+                          <div className='bg-orange-50 p-2 rounded-lg'>
+                            <p className='text-[10px] font-bold text-orange-600 uppercase mb-1'>Delivery Address</p>
+                            <p className='text-xs text-gray-700 leading-relaxed'>{lead.deliveryAddress}</p>
                           </div>
                         </div>
                       </div>
@@ -1228,73 +1252,95 @@ const Home = () => {
                 </div>
               ) : (
                 <div className='absolute inset-0 overflow-y-auto p-2 md:p-4'>
-                  <div className='space-y-2'>
+                  <div className='space-y-2.5'>
                     {approvedSellLeads.map((lead, index) => (
                       <div
                         key={lead._id}
-                        className='bg-white p-3 rounded-xl border border-orange-200 hover:border-orange-400 hover:shadow-lg transition-all active:scale-[0.98]'
+                        className='bg-gradient-to-br from-white to-orange-50 p-3 rounded-xl border-2 border-orange-200 hover:border-orange-400 shadow-sm hover:shadow-md transition-all active:scale-[0.99]'
                       >
-                        {/* Compact Header */}
-                        <div className='flex items-center justify-between mb-2'>
-                          <div className='flex items-center gap-2 flex-1 min-w-0'>
-                            <div className='bg-gradient-to-br from-orange-500 to-amber-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0'>
-                              {index + 1}
+                        {/* Header with Call Button */}
+                        <div className='flex items-center justify-between mb-2.5 pb-2 border-b border-orange-100'>
+                          <div className='flex items-center gap-2'>
+                            <div className='bg-gradient-to-br from-orange-500 to-amber-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shadow-md'>
+                              #{index + 1}
                             </div>
-                            <div className='min-w-0 flex-1'>
-                              <h3 className='font-bold text-sm text-gray-900 truncate'>{lead.vendorName}</h3>
-                              <p className='text-xs text-gray-600 flex items-center gap-1'>
-                                <svg className='w-3 h-3 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
-                                </svg>
-                                <span className='truncate'>{lead.vendorLocation}</span>
-                              </p>
+                            <div>
+                              <p className='text-xs text-orange-600 font-semibold'>SELL OFFER</p>
+                              <p className='text-[10px] text-gray-500'>Posted by seller</p>
                             </div>
                           </div>
                           <a
                             href={`tel:${lead.mobileNo}`}
-                            className='flex items-center gap-1 bg-green-500 text-white px-2 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0 ml-2 active:bg-green-600'
+                            className='flex items-center gap-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-md active:shadow-sm active:scale-95 transition-all'
                           >
-                            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
                             </svg>
-                            <span className='hidden sm:inline'>Call</span>
+                            <span>CALL</span>
                           </a>
                         </div>
 
-                        {/* Compact Product Info */}
-                        <div className='space-y-2'>
-                          <div className='bg-orange-50 p-2 rounded-lg'>
-                            <p className='text-xs text-orange-600 font-medium mb-0.5'>PRODUCT/SERVICE</p>
-                            <p className='text-sm font-bold text-gray-900'>{lead.productServiceOffered}</p>
+                        {/* Structured Details Grid */}
+                        <div className='space-y-1.5'>
+                          {/* Vendor Name */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Vendor Name</span>
+                            <span className='text-xs font-bold text-gray-900'>{lead.vendorName}</span>
                           </div>
 
-                          {/* Brand & Model Tags */}
-                          <div className='flex flex-wrap gap-1.5 text-xs'>
-                            <span className='px-2 py-1 bg-purple-100 text-purple-700 rounded-md font-semibold'>
-                              🏷️ {lead.brand}
-                            </span>
-                            {lead.modelDetail && (
-                              <span className='px-2 py-1 bg-blue-100 text-blue-700 rounded-md font-medium'>
-                                📦 {lead.modelDetail}
-                              </span>
-                            )}
+                          {/* Vendor Location */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Location</span>
+                            <span className='text-xs font-semibold text-orange-700'>{lead.vendorLocation}</span>
                           </div>
 
-                          {/* Compact Pricing */}
-                          <div className='bg-gradient-to-r from-red-50 to-green-50 p-2.5 rounded-lg border border-orange-200'>
-                            <div className='flex items-center justify-between mb-1.5'>
+                          {/* Mobile */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Mobile</span>
+                            <a href={`tel:${lead.mobileNo}`} className='text-xs font-bold text-blue-600'>{lead.mobileNo}</a>
+                          </div>
+
+                          {/* Divider */}
+                          <div className='border-t border-orange-100 my-2'></div>
+
+                          {/* Product/Service */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Product</span>
+                            <span className='text-xs font-bold text-gray-900 line-clamp-1'>{lead.productServiceOffered}</span>
+                          </div>
+
+                          {/* Brand */}
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Brand</span>
+                            <span className='text-xs font-semibold text-purple-700'>🏷️ {lead.brand}</span>
+                          </div>
+
+                          {/* Model */}
+                          {lead.modelDetail && (
+                            <div className='flex items-center gap-2'>
+                              <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Model</span>
+                              <span className='text-xs font-semibold text-purple-600'>{lead.modelDetail}</span>
+                            </div>
+                          )}
+
+                          {/* Divider */}
+                          <div className='border-t border-orange-100 my-2'></div>
+
+                          {/* Pricing Box */}
+                          <div className='bg-gradient-to-r from-red-50 via-orange-50 to-green-50 p-2.5 rounded-lg border-2 border-orange-200'>
+                            <div className='grid grid-cols-2 gap-2 mb-2'>
                               <div>
-                                <p className='text-xs text-gray-500 mb-0.5'>MRP</p>
+                                <p className='text-[10px] font-bold text-gray-500 uppercase mb-0.5'>MRP</p>
                                 <p className='text-sm font-bold text-red-600 line-through'>{lead.mrpListPrice}</p>
                               </div>
                               <div className='text-right'>
-                                <p className='text-xs text-gray-500 mb-0.5'>OFFER</p>
+                                <p className='text-[10px] font-bold text-gray-500 uppercase mb-0.5'>Special Offer</p>
                                 <p className='text-base font-bold text-green-600'>{lead.specialOfferPrice}</p>
                               </div>
                             </div>
-                            <div className='pt-1.5 border-t border-orange-200 flex items-center justify-between'>
-                              <span className='text-xs text-gray-600'>You Save</span>
-                              <span className='text-xs font-bold text-green-600'>
+                            <div className='pt-2 border-t border-orange-200 flex items-center justify-between'>
+                              <span className='text-xs text-gray-600 font-semibold'>💰 You Save</span>
+                              <span className='text-sm font-bold text-green-600'>
                                 {parseInt(lead.mrpListPrice.replace(/[^0-9]/g, '')) - parseInt(lead.specialOfferPrice.replace(/[^0-9]/g, '')) > 0
                                   ? '₹' + (parseInt(lead.mrpListPrice.replace(/[^0-9]/g, '')) - parseInt(lead.specialOfferPrice.replace(/[^0-9]/g, '')))
                                   : 'Best Price'}
@@ -1302,19 +1348,15 @@ const Home = () => {
                             </div>
                           </div>
 
-                          {/* Compact Stock & Validity */}
-                          <div className='flex gap-1.5 text-xs'>
-                            <div className='flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-md flex-1'>
-                              <svg className='w-3.5 h-3.5 text-blue-600 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' />
-                              </svg>
-                              <span className='text-blue-700 font-semibold truncate'>Stock: {lead.stockQtyAvailable}</span>
+                          {/* Stock & Validity */}
+                          <div className='grid grid-cols-2 gap-2'>
+                            <div className='bg-blue-50 p-2 rounded-lg border border-blue-200'>
+                              <p className='text-[10px] font-bold text-blue-600 uppercase mb-0.5'>Stock Available</p>
+                              <p className='text-xs font-bold text-gray-900'>{lead.stockQtyAvailable}</p>
                             </div>
-                            <div className='flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md flex-1'>
-                              <svg className='w-3.5 h-3.5 text-yellow-600 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
-                              </svg>
-                              <span className='text-yellow-700 font-medium truncate'>{lead.validity}</span>
+                            <div className='bg-yellow-50 p-2 rounded-lg border border-yellow-200'>
+                              <p className='text-[10px] font-bold text-yellow-600 uppercase mb-0.5'>Valid Till</p>
+                              <p className='text-xs font-bold text-gray-900 line-clamp-1'>{lead.validity}</p>
                             </div>
                           </div>
                         </div>
