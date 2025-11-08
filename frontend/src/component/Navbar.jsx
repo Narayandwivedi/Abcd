@@ -32,7 +32,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div className='container mx-auto px-3 md:px-4 py-1.5 md:py-3 flex justify-between items-center'>
+      <div className='container mx-auto px-3 md:px-4 py-1.5 md:py-2 flex justify-between items-center'>
         {/* Logo */}
         <Logo3 />
 
