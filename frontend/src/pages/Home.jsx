@@ -167,6 +167,27 @@ const Home = () => {
     navigate(`/ad/${index + 1}`)
   }
 
+  // Format date to readable format with full date and time
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+
+    // Format time
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    const displayHours = hours % 12 || 12
+    const displayMinutes = minutes < 10 ? '0' + minutes : minutes
+    const timeString = `${displayHours}:${displayMinutes} ${ampm}`
+
+    // Format date
+    const day = date.getDate()
+    const month = date.toLocaleDateString('en-US', { month: 'short' })
+    const year = date.getFullYear()
+
+    // Always show full date and time
+    return `${day} ${month} ${year} at ${timeString}`
+  }
+
   const adImages = [
     '/ad1.webp',
     '/ad2.webp',
@@ -1135,6 +1156,19 @@ const Home = () => {
                           </a>
                         </div>
 
+                        {/* Posted On */}
+                        {lead.createdAt && (
+                          <div className='mb-2 bg-indigo-50 px-2 py-1.5 rounded-lg border border-indigo-200'>
+                            <div className='flex items-center gap-1.5'>
+                              <svg className='w-3.5 h-3.5 text-indigo-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
+                              </svg>
+                              <span className='text-[10px] font-bold text-indigo-600 uppercase'>Posted on:</span>
+                              <span className='text-xs font-semibold text-gray-700'>{formatDate(lead.createdAt)}</span>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Structured Details Grid */}
                         <div className='space-y-1.5'>
                           {/* Buyer Name */}
@@ -1215,9 +1249,9 @@ const Home = () => {
       {/* Sell Offers Popup Modal */}
       {showSellLeads && (
         <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4'>
-          <div className='bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4 md:p-6 max-w-4xl w-full shadow-2xl h-[90vh] flex flex-col'>
+          <div className='bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-4 md:p-6 max-w-4xl w-full shadow-2xl h-[90vh] flex flex-col'>
             <div className='flex items-center justify-between mb-4'>
-              <h2 className='text-2xl md:text-3xl font-bold text-orange-800 flex items-center gap-2'>
+              <h2 className='text-2xl md:text-3xl font-bold text-indigo-800 flex items-center gap-2'>
                 <svg className='w-7 h-7' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
                 </svg>
@@ -1232,11 +1266,11 @@ const Home = () => {
                 </svg>
               </button>
             </div>
-            <div className='relative flex-1 overflow-hidden bg-white rounded-xl border-2 border-orange-200 shadow-inner'>
+            <div className='relative flex-1 overflow-hidden bg-white rounded-xl border-2 border-indigo-200 shadow-inner'>
               {loadingLeads ? (
                 <div className='flex items-center justify-center h-full'>
                   <div className='text-center'>
-                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4'></div>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4'></div>
                     <p className='text-gray-600'>Loading sell offers...</p>
                   </div>
                 </div>
@@ -1256,16 +1290,16 @@ const Home = () => {
                     {approvedSellLeads.map((lead, index) => (
                       <div
                         key={lead._id}
-                        className='bg-gradient-to-br from-white to-orange-50 p-3 rounded-xl border-2 border-orange-200 hover:border-orange-400 shadow-sm hover:shadow-md transition-all active:scale-[0.99]'
+                        className='bg-gradient-to-br from-white to-indigo-50 p-3 rounded-xl border-2 border-indigo-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all active:scale-[0.99]'
                       >
                         {/* Header with Call Button */}
-                        <div className='flex items-center justify-between mb-2.5 pb-2 border-b border-orange-100'>
+                        <div className='flex items-center justify-between mb-2.5 pb-2 border-b border-indigo-100'>
                           <div className='flex items-center gap-2'>
-                            <div className='bg-gradient-to-br from-orange-500 to-amber-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shadow-md'>
+                            <div className='bg-gradient-to-br from-indigo-500 to-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shadow-md'>
                               #{index + 1}
                             </div>
                             <div>
-                              <p className='text-xs text-orange-600 font-semibold'>SELL OFFER</p>
+                              <p className='text-xs text-indigo-600 font-semibold'>SELL OFFER</p>
                               <p className='text-[10px] text-gray-500'>Posted by seller</p>
                             </div>
                           </div>
@@ -1280,6 +1314,19 @@ const Home = () => {
                           </a>
                         </div>
 
+                        {/* Posted On */}
+                        {lead.createdAt && (
+                          <div className='mb-2 bg-indigo-50 px-2 py-1.5 rounded-lg border border-indigo-200'>
+                            <div className='flex items-center gap-1.5'>
+                              <svg className='w-3.5 h-3.5 text-indigo-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
+                              </svg>
+                              <span className='text-[10px] font-bold text-indigo-600 uppercase'>Posted on:</span>
+                              <span className='text-xs font-semibold text-gray-700'>{formatDate(lead.createdAt)}</span>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Structured Details Grid */}
                         <div className='space-y-1.5'>
                           {/* Vendor Name */}
@@ -1291,7 +1338,7 @@ const Home = () => {
                           {/* Vendor Location */}
                           <div className='flex items-center gap-2'>
                             <span className='text-[10px] font-bold text-gray-500 uppercase w-20 flex-shrink-0'>Location</span>
-                            <span className='text-xs font-semibold text-orange-700'>{lead.vendorLocation}</span>
+                            <span className='text-xs font-semibold text-indigo-700'>{lead.vendorLocation}</span>
                           </div>
 
                           {/* Mobile */}
@@ -1301,7 +1348,7 @@ const Home = () => {
                           </div>
 
                           {/* Divider */}
-                          <div className='border-t border-orange-100 my-2'></div>
+                          <div className='border-t border-indigo-100 my-2'></div>
 
                           {/* Product/Service */}
                           <div className='flex items-center gap-2'>
@@ -1324,10 +1371,10 @@ const Home = () => {
                           )}
 
                           {/* Divider */}
-                          <div className='border-t border-orange-100 my-2'></div>
+                          <div className='border-t border-indigo-100 my-2'></div>
 
                           {/* Pricing Box */}
-                          <div className='bg-gradient-to-r from-red-50 via-orange-50 to-green-50 p-2.5 rounded-lg border-2 border-orange-200'>
+                          <div className='bg-gradient-to-r from-red-50 via-amber-50 to-green-50 p-2.5 rounded-lg border-2 border-indigo-200'>
                             <div className='grid grid-cols-2 gap-2 mb-2'>
                               <div>
                                 <p className='text-[10px] font-bold text-gray-500 uppercase mb-0.5'>MRP</p>
@@ -1338,7 +1385,7 @@ const Home = () => {
                                 <p className='text-base font-bold text-green-600'>{lead.specialOfferPrice}</p>
                               </div>
                             </div>
-                            <div className='pt-2 border-t border-orange-200 flex items-center justify-between'>
+                            <div className='pt-2 border-t border-indigo-200 flex items-center justify-between'>
                               <span className='text-xs text-gray-600 font-semibold'>💰 You Save</span>
                               <span className='text-sm font-bold text-green-600'>
                                 {parseInt(lead.mrpListPrice.replace(/[^0-9]/g, '')) - parseInt(lead.specialOfferPrice.replace(/[^0-9]/g, '')) > 0
