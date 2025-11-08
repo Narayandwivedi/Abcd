@@ -86,15 +86,15 @@ const generateBuyLeads = () => {
       name: names[i],
       townCity: cities[i],
       mobileNo: mobileNumbers[i],
-      requirement: requirements[i],
-      category: category,
-      subCategory: subCategory,
+      itemRequired: requirements[i],
+      majorCategory: category,
+      minorCategory: subCategory,
+      qualityQuantityDesc: `High quality ${subCategory.toLowerCase()}, quantity: ${randomNumber(10, 100)} units`,
+      priceRange: `₹${randomNumber(10000, 100000)} - ₹${randomNumber(100000, 500000)}`,
+      deliveryAddress: `${randomItem(['Plot 12', 'Site 45', 'Building A', 'Ward 8'])}, ${cities[i]}, Chhattisgarh`,
       status: 'approved',
       approvedBy: null,
-      approvedAt: new Date(),
-      rejectedBy: null,
-      rejectedAt: null,
-      rejectionReason: null
+      approvedAt: new Date()
     });
   }
 
@@ -123,10 +123,7 @@ const generateSellLeads = () => {
       mobileNo: mobileNumbers[i],
       status: 'approved',
       approvedBy: null,
-      approvedAt: new Date(),
-      rejectedBy: null,
-      rejectedAt: null,
-      rejectionReason: null
+      approvedAt: new Date()
     });
   }
 
