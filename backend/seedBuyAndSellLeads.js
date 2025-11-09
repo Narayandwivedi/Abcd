@@ -12,9 +12,9 @@ const cities = [
 ];
 
 const names = [
-  'Rahul Kumar', 'Amit Sharma', 'Priya Verma', 'Suresh Patel',
-  'Deepak Singh', 'Anjali Gupta', 'Rajesh Yadav', 'Pooja Dubey',
-  'Vikram Sahu', 'Neha Jain'
+  'Rahul Agrawal', 'Amit Mittal', 'Priya Bansal', 'Suresh Singhal',
+  'Deepak Jindal', 'Anjali Goyal', 'Rajesh Agrawal', 'Pooja Mittal',
+  'Vikram Bansal', 'Neha Singhal'
 ];
 
 const vendorNames = [
