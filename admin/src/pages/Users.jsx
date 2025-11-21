@@ -21,7 +21,8 @@ const Users = () => {
     relativeName: '',
     relationship: '',
     passportPhoto: null,
-    utrNumber: ''
+    utrNumber: '',
+    referredBy: ''
   })
   const [stats, setStats] = useState({
     total: 0,
@@ -29,6 +30,7 @@ const Users = () => {
     approved: 0,
     rejected: 0
   })
+  const [referralStatus, setReferralStatus] = useState({ valid: null, name: '', city: '' })
 
   // const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
@@ -183,9 +185,11 @@ ABCD Team`
       relativeName: user.relativeName || '',
       relationship: user.relationship || 'S/O',
       passportPhoto: null,
-      utrNumber: user.utrNumber || ''
+      utrNumber: user.utrNumber || '',
+      referredBy: user.referredBy || ''
     })
     setShowEditModal(true)
+    setReferralStatus({ valid: null, name: '', city: '' })
   }
 
   // Handle edit form input change
@@ -208,11 +212,47 @@ ABCD Team`
     }
   }
 
+  // Validate referral code for edit form
+  const handleReferralChange = async (value) => {
+    const code = value.toUpperCase().slice(0, 7)
+    setEditFormData(prev => ({ ...prev, referredBy: code }))
+
+    if (code.length === 7) {
+      const referralRegex = /^[A-Za-z]{2}[0-9]{5}$/
+      if (referralRegex.test(code)) {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/auth/validate-referral/${code}`)
+          const data = await response.json()
+          if (data.success) {
+            setReferralStatus({ valid: true, name: data.fullName, city: data.city })
+          } else {
+            setReferralStatus({ valid: false, name: '', city: '' })
+          }
+        } catch (error) {
+          setReferralStatus({ valid: false, name: '', city: '' })
+        }
+      } else {
+        setReferralStatus({ valid: false, name: '', city: '' })
+      }
+    } else {
+      setReferralStatus({ valid: null, name: '', city: '' })
+    }
+  }
+
   // Submit edit user
   const handleEditUser = async () => {
     if (!editFormData.fullName || !editFormData.mobile) {
       toast.warning('Name and mobile are required', { autoClose: 800 })
       return
+    }
+
+    // Validate referral code format if provided (2 letters + 5 digits = 7 chars)
+    if (editFormData.referredBy && editFormData.referredBy.trim()) {
+      const referralRegex = /^[A-Za-z]{2}[0-9]{5}$/
+      if (!referralRegex.test(editFormData.referredBy.trim())) {
+        toast.warning('Referral code must be 2 letters followed by 5 digits (e.g., CG00006)', { autoClose: 2000 })
+        return
+      }
     }
 
     try {
@@ -243,7 +283,8 @@ ABCD Team`
         address: editFormData.address,
         relativeName: editFormData.relativeName,
         relationship: editFormData.relationship,
-        utrNumber: editFormData.utrNumber
+        utrNumber: editFormData.utrNumber,
+        referredBy: editFormData.referredBy
       }
 
       // Add photo path if uploaded
@@ -966,6 +1007,26 @@ ABCD Team`
                   onChange={handleEditFormChange}
                   className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                 />
+              </div>
+
+              {/* Referred By */}
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Referred By (e.g., CG00006)</label>
+                <input
+                  type='text'
+                  name='referredBy'
+                  value={editFormData.referredBy}
+                  onChange={(e) => handleReferralChange(e.target.value)}
+                  maxLength={7}
+                  placeholder='e.g., CG00006'
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+                {referralStatus.valid === true && (
+                  <p className='text-green-600 text-xs mt-1'>{referralStatus.name} - {referralStatus.city}</p>
+                )}
+                {referralStatus.valid === false && (
+                  <p className='text-red-600 text-xs mt-1'>Wrong referral code</p>
+                )}
               </div>
 
               {/* Address - Full Width */}

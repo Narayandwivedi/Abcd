@@ -15,7 +15,7 @@ const handelUserSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
 
-    let { fullName, email, mobile, relativeName, relationship, address, gotra, city, utrNumber } = req.body;
+    let { fullName, email, mobile, relativeName, relationship, address, gotra, city, utrNumber, referredBy } = req.body;
 
     // Trim input fields
     fullName = fullName?.trim();
@@ -98,6 +98,10 @@ const handelUserSignup = async (req, res) => {
 
     if (city) {
       newUserData.city = city;
+    }
+
+    if (referredBy) {
+      newUserData.referredBy = referredBy.trim();
     }
 
     // Add UTR number if provided
@@ -499,6 +503,31 @@ const handleGoogleAuth = async (req, res) => {
   }
 };
 
+// Validate referral code and return user name & city
+const validateReferralCode = async (req, res) => {
+  try {
+    const { referralCode } = req.params;
+
+    if (!referralCode || referralCode.length !== 7) {
+      return res.status(400).json({ success: false, message: "Invalid referral code" });
+    }
+
+    const user = await userModel.findOne({ referralCode: referralCode.toUpperCase() }).select('fullName city');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Referral code not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      fullName: user.fullName,
+      city: user.city || 'N/A'
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   handelUserSignup,
   handelUserLogin,
@@ -507,4 +536,5 @@ module.exports = {
   submitResetPassOTP,
   isloggedin,
   handleGoogleAuth,
+  validateReferralCode,
 };

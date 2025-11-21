@@ -15,6 +15,19 @@ const Vendors = () => {
     approved: 0,
     rejected: 0
   })
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createForm, setCreateForm] = useState({
+    ownerName: '',
+    businessName: '',
+    mobile: '',
+    email: '',
+    city: '',
+    category: '',
+    subCategory: '',
+    membershipCategory: '',
+    password: ''
+  })
+  const [creating, setCreating] = useState(false)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -155,6 +168,56 @@ ABCD Team`
     window.open(whatsappUrl, '_blank')
   }
 
+  // Create vendor handler
+  const handleCreateVendor = async () => {
+    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.city || !createForm.category || !createForm.subCategory || !createForm.membershipCategory) {
+      alert('Please fill all required fields')
+      return
+    }
+
+    if (createForm.mobile.length !== 10) {
+      alert('Mobile number must be exactly 10 digits')
+      return
+    }
+
+    try {
+      setCreating(true)
+      const response = await fetch(`${BACKEND_URL}/api/admin/vendors`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(createForm),
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        alert('Vendor created successfully!')
+        setShowCreateModal(false)
+        setCreateForm({
+          ownerName: '',
+          businessName: '',
+          mobile: '',
+          email: '',
+          city: '',
+          category: '',
+          subCategory: '',
+          membershipCategory: '',
+          password: ''
+        })
+        fetchVendors()
+      } else {
+        alert(data.message || 'Failed to create vendor')
+      }
+    } catch (error) {
+      console.error('Error creating vendor:', error)
+      alert('Failed to create vendor')
+    } finally {
+      setCreating(false)
+    }
+  }
+
   // Filter vendors based on search
   const filteredVendors = vendors.filter(vendor =>
     vendor.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -170,6 +233,15 @@ ABCD Team`
           <h1 className='text-2xl md:text-3xl font-black text-gray-800 mb-1 md:mb-2'>Vendor Applications</h1>
           <p className='text-sm md:text-base text-gray-600'>Manage vendor registrations and approvals</p>
         </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className='flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition shadow-lg'
+        >
+          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 4v16m8-8H4' />
+          </svg>
+          <span className='hidden md:inline'>Create Vendor</span>
+        </button>
       </div>
 
       {/* Stats */}
@@ -642,6 +714,133 @@ ABCD Team`
               className='w-full h-auto max-h-[90vh] object-contain rounded-lg'
               onClick={(e) => e.stopPropagation()}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Create Vendor Modal */}
+      {showCreateModal && (
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto'>
+            <h2 className='text-2xl font-bold text-gray-800 mb-4'>Create New Vendor</h2>
+
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Owner Name *</label>
+                <input
+                  type='text'
+                  value={createForm.ownerName}
+                  onChange={(e) => setCreateForm({...createForm, ownerName: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Business Name *</label>
+                <input
+                  type='text'
+                  value={createForm.businessName}
+                  onChange={(e) => setCreateForm({...createForm, businessName: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Mobile * (10 digits)</label>
+                <input
+                  type='tel'
+                  maxLength={10}
+                  value={createForm.mobile}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 10)
+                    setCreateForm({...createForm, mobile: val})
+                  }}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Email</label>
+                <input
+                  type='email'
+                  value={createForm.email}
+                  onChange={(e) => setCreateForm({...createForm, email: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>City *</label>
+                <input
+                  type='text'
+                  value={createForm.city}
+                  onChange={(e) => setCreateForm({...createForm, city: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Category *</label>
+                <input
+                  type='text'
+                  value={createForm.category}
+                  onChange={(e) => setCreateForm({...createForm, category: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Sub Category *</label>
+                <input
+                  type='text'
+                  value={createForm.subCategory}
+                  onChange={(e) => setCreateForm({...createForm, subCategory: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Category *</label>
+                <select
+                  value={createForm.membershipCategory}
+                  onChange={(e) => setCreateForm({...createForm, membershipCategory: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                >
+                  <option value=''>Select Membership</option>
+                  <option value='Bronze'>Bronze</option>
+                  <option value='Silver'>Silver</option>
+                  <option value='Gold'>Gold</option>
+                  <option value='Diamond'>Diamond</option>
+                  <option value='Platinum'>Platinum</option>
+                </select>
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Password (min 6 chars)</label>
+                <input
+                  type='text'
+                  value={createForm.password}
+                  onChange={(e) => setCreateForm({...createForm, password: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+            </div>
+
+            <div className='flex gap-3 mt-6'>
+              <button
+                onClick={handleCreateVendor}
+                disabled={creating}
+                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50'
+              >
+                {creating ? 'Creating...' : 'Create Vendor'}
+              </button>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition'
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

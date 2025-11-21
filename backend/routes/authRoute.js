@@ -7,6 +7,7 @@ const {
   submitResetPassOTP,
   isloggedin,
   handleGoogleAuth,
+  validateReferralCode,
 } = require("../controllers/authController.js");
 const upload = require("../utils/multer");
 
@@ -32,5 +33,8 @@ router.post("/reset-password", submitResetPassOTP);
 
 // Check Authentication Status
 router.get("/status", isloggedin);
+
+// Validate Referral Code
+router.get("/validate-referral/:referralCode", validateReferralCode);
 
 module.exports = router;

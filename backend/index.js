@@ -26,6 +26,7 @@ const subAdminRoute = require('./routes/subAdminRoute')
 const adminSubAdminRoute = require('./routes/adminSubAdminRoute')
 const buyLeadRoute = require('./routes/buyLeadRoute')
 const sellLeadRoute = require('./routes/sellLeadRoute')
+const exportRoute = require('./routes/exportRoute')
 
 // CORS configuration
 const corsOptions = {
@@ -63,6 +64,7 @@ app.use('/api/search',searchRoute)
 app.use('/api/upload',uploadRoute)
 app.use('/api/buy-lead',buyLeadRoute)
 app.use('/api/sell-lead',sellLeadRoute)
+app.use('/api/admin/export',exportRoute)
 
 
 // server listen - only after DB connection

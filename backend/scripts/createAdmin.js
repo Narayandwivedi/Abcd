@@ -48,8 +48,7 @@ async function createAdmin() {
     console.log('\nConnecting to database...');
 
     // Connect to MongoDB
-    const { connectToDb } = require('../utils/mongodb');
-    await connectToDb();
+    await mongoose.connect('mongodb://127.0.0.1:27017/abcd');
 
     console.log('Database connected successfully!');
 

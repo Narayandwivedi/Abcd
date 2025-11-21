@@ -21,12 +21,14 @@ const Signup = () => {
     gotra: '',
     passportPhoto: null,
     utrNumber: '',
-    paymentImage: null
+    paymentImage: null,
+    referredBy: ''
   })
   const [loading, setLoading] = useState(false)
   const [previewImage, setPreviewImage] = useState(null)
   const [previewPassportPhoto, setPreviewPassportPhoto] = useState(null)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [referralStatus, setReferralStatus] = useState({ valid: null, name: '', city: '' })
 
   // UPI ID for payment
   const UPI_ID = '222716826030217@cnrb'
@@ -132,6 +134,33 @@ const Signup = () => {
     })
   }
 
+  // Validate referral code
+  const handleReferralChange = async (e) => {
+    const value = e.target.value.toUpperCase().slice(0, 7)
+    setFormData({ ...formData, referredBy: value })
+
+    if (value.length === 7) {
+      const referralRegex = /^[A-Za-z]{2}[0-9]{5}$/
+      if (referralRegex.test(value)) {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/auth/validate-referral/${value}`)
+          const data = await response.json()
+          if (data.success) {
+            setReferralStatus({ valid: true, name: data.fullName, city: data.city })
+          } else {
+            setReferralStatus({ valid: false, name: '', city: '' })
+          }
+        } catch (error) {
+          setReferralStatus({ valid: false, name: '', city: '' })
+        }
+      } else {
+        setReferralStatus({ valid: false, name: '', city: '' })
+      }
+    } else {
+      setReferralStatus({ valid: null, name: '', city: '' })
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -202,6 +231,16 @@ const Signup = () => {
       return
     }
 
+    // Validate referral code format if provided (2 letters + 5 digits = 7 chars)
+    if (formData.referredBy && formData.referredBy.trim()) {
+      const referralRegex = /^[A-Za-z]{2}[0-9]{5}$/
+      if (!referralRegex.test(formData.referredBy.trim())) {
+        toast.error('Referral code must be 2 letters followed by 5 digits (e.g., CG00006)')
+        setLoading(false)
+        return
+      }
+    }
+
     try {
       // Create FormData for multipart/form-data
       const submitData = new FormData()
@@ -216,6 +255,7 @@ const Signup = () => {
       if (formData.passportPhoto) submitData.append('passportPhoto', formData.passportPhoto)
       if (formData.utrNumber) submitData.append('utrNumber', formData.utrNumber)
       if (formData.paymentImage) submitData.append('paymentImage', formData.paymentImage)
+      if (formData.referredBy) submitData.append('referredBy', formData.referredBy)
 
       const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
         method: 'POST',
@@ -241,7 +281,8 @@ const Signup = () => {
           gotra: '',
           passportPhoto: null,
           utrNumber: '',
-          paymentImage: null
+          paymentImage: null,
+          referredBy: ''
         })
         setPreviewImage(null)
         setPreviewPassportPhoto(null)
@@ -457,6 +498,31 @@ const Signup = () => {
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207' />
                 </svg>
               </div>
+            </div>
+
+            {/* Referred By Field */}
+            <div>
+              <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>Referred By (Optional)</label>
+              <div className='relative'>
+                <input
+                  type='text'
+                  name='referredBy'
+                  value={formData.referredBy}
+                  onChange={handleReferralChange}
+                  maxLength={7}
+                  className='w-full px-3 md:px-4 py-2 md:py-3 pl-9 md:pl-11 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm'
+                  placeholder='e.g., CG00006'
+                />
+                <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' />
+                </svg>
+              </div>
+              {referralStatus.valid === true && (
+                <p className='text-green-400 text-xs mt-1'>{referralStatus.name} - {referralStatus.city}</p>
+              )}
+              {referralStatus.valid === false && (
+                <p className='text-red-400 text-xs mt-1'>Wrong referral code</p>
+              )}
             </div>
 
             {/* Passport Size Photo Upload */}

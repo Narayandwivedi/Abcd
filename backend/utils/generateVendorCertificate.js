@@ -284,11 +284,11 @@ const generateVendorCertificatePDF = async (vendor) => {
           width: 115
         });
 
-      // Add terms & conditions text at LEFT BOTTOM CORNER - MOVED LOWER
+      // Add terms & conditions text at LEFT BOTTOM CORNER
       doc.fontSize(7)
         .fillColor('#6b7280')
         .font('Helvetica-Oblique')
-        .text('Subject to Terms & Conditions', 40, 550, {
+        .text('Subject to Terms & Conditions', 40, 538, {
           align: 'left'
         });
 

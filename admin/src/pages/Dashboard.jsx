@@ -1,10 +1,191 @@
+import { useState } from 'react'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import * as XLSX from 'xlsx'
+
 const Dashboard = () => {
+  const [exporting, setExporting] = useState(false)
+  const [exportOptions, setExportOptions] = useState({
+    users: false,
+    vendors: false,
+    buyLeads: false,
+    sellLeads: false
+  })
+  const [showExportModal, setShowExportModal] = useState(false)
+
+  const handleCheckboxChange = (key) => {
+    setExportOptions(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const selectAll = () => {
+    setExportOptions({ users: true, vendors: true, buyLeads: true, sellLeads: true })
+  }
+
+  const deselectAll = () => {
+    setExportOptions({ users: false, vendors: false, buyLeads: false, sellLeads: false })
+  }
+
+  const downloadFile = (data, filename, type) => {
+    if (type === 'json') {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+    } else if (type === 'excel') {
+      const ws = XLSX.utils.json_to_sheet(data)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Data')
+      XLSX.writeFile(wb, filename)
+    }
+  }
+
+  const flattenObject = (obj, prefix = '') => {
+    const flattened = {}
+    for (const key in obj) {
+      if (obj[key] === null || obj[key] === undefined) {
+        flattened[prefix + key] = ''
+      } else if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+        Object.assign(flattened, flattenObject(obj[key], prefix + key + '_'))
+      } else if (Array.isArray(obj[key])) {
+        flattened[prefix + key] = obj[key].join(', ')
+      } else {
+        flattened[prefix + key] = obj[key]
+      }
+    }
+    return flattened
+  }
+
+  const handleExport = async (format) => {
+    const selected = Object.entries(exportOptions).filter(([_, v]) => v).map(([k]) => k)
+    if (selected.length === 0) {
+      toast.error('Please select at least one data type to export')
+      return
+    }
+
+    setExporting(true)
+    const timestamp = new Date().toISOString().split('T')[0]
+
+    try {
+      const endpoints = {
+        users: '/api/admin/export/users',
+        vendors: '/api/admin/export/vendors',
+        buyLeads: '/api/admin/export/buy-leads',
+        sellLeads: '/api/admin/export/sell-leads'
+      }
+
+      for (const key of selected) {
+        try {
+          toast.info(`Exporting ${key}...`)
+          const response = await axios.get(endpoints[key])
+          if (response.data.success && response.data.data.length > 0) {
+            const data = response.data.data
+            if (format === 'json') {
+              downloadFile(data, `${key}_${timestamp}.json`, 'json')
+            } else {
+              const flatData = data.map(item => flattenObject(item))
+              downloadFile(flatData, `${key}_${timestamp}.xlsx`, 'excel')
+            }
+            toast.success(`${key} exported successfully (${response.data.count} records)`)
+          } else {
+            toast.warning(`No data found for ${key}`)
+          }
+        } catch (err) {
+          toast.error(`Failed to export ${key}: ${err.response?.data?.message || err.message}`)
+        }
+      }
+    } finally {
+      setExporting(false)
+      setShowExportModal(false)
+    }
+  }
+
   return (
     <div className='p-6'>
-      <div className='mb-8'>
-        <h1 className='text-3xl font-black text-gray-800 mb-2'>Dashboard</h1>
-        <p className='text-gray-600'>Overview of your ABCD platform</p>
+      <div className='mb-8 flex justify-between items-start'>
+        <div>
+          <h1 className='text-3xl font-black text-gray-800 mb-2'>Dashboard</h1>
+          <p className='text-gray-600'>Overview of your ABCD platform</p>
+        </div>
+        <button
+          onClick={() => setShowExportModal(true)}
+          className='bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition flex items-center gap-2'
+        >
+          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12' />
+          </svg>
+          Export Data
+        </button>
       </div>
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
+          <div className='bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl'>
+            <h2 className='text-2xl font-bold text-gray-800 mb-4'>Export Data</h2>
+
+            <div className='mb-4'>
+              <div className='flex gap-2 mb-3'>
+                <button onClick={selectAll} className='text-sm text-blue-600 hover:underline'>Select All</button>
+                <span className='text-gray-400'>|</span>
+                <button onClick={deselectAll} className='text-sm text-gray-600 hover:underline'>Deselect All</button>
+              </div>
+
+              <div className='space-y-3'>
+                {[
+                  { key: 'users', label: 'All Users', icon: '👥' },
+                  { key: 'vendors', label: 'All Vendors', icon: '🏪' },
+                  { key: 'buyLeads', label: 'All Buy Leads', icon: '🛒' },
+                  { key: 'sellLeads', label: 'All Sell Leads', icon: '💰' }
+                ].map(({ key, label, icon }) => (
+                  <label key={key} className='flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition'>
+                    <input
+                      type='checkbox'
+                      checked={exportOptions[key]}
+                      onChange={() => handleCheckboxChange(key)}
+                      className='w-5 h-5 text-blue-600 rounded'
+                    />
+                    <span className='text-xl'>{icon}</span>
+                    <span className='font-medium text-gray-700'>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className='flex gap-3 mt-6'>
+              <button
+                onClick={() => handleExport('excel')}
+                disabled={exporting}
+                className='flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition disabled:opacity-50 flex items-center justify-center gap-2'
+              >
+                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
+                </svg>
+                {exporting ? 'Exporting...' : 'Export Excel'}
+              </button>
+              <button
+                onClick={() => handleExport('json')}
+                disabled={exporting}
+                className='flex-1 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2'
+              >
+                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' />
+                </svg>
+                {exporting ? 'Exporting...' : 'Export JSON'}
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowExportModal(false)}
+              className='w-full mt-3 py-2 text-gray-600 hover:text-gray-800 transition'
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>

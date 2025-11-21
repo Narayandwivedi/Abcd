@@ -431,7 +431,8 @@ const updateUser = async (req, res) => {
       'relationship',
       'profilePicture',
       'passportPhoto',
-      'utrNumber'
+      'utrNumber',
+      'referredBy'
     ];
 
     // Certificate-relevant fields that trigger certificate regeneration
