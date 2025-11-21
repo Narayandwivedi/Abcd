@@ -883,202 +883,225 @@ ABCD Team`
 
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
-        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto'>
-          <div className='bg-white rounded-2xl p-6 max-w-2xl w-full my-8'>
-            <h2 className='text-2xl font-bold text-gray-800 mb-4'>Edit User</h2>
-            <p className='text-gray-600 mb-6'>
-              Editing: <strong>{selectedUser.fullName}</strong>
-            </p>
-
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'>
-              {/* Full Name */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Full Name *</label>
-                <input
-                  type='text'
-                  name='fullName'
-                  value={editFormData.fullName}
-                  onChange={handleEditFormChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
+        <div className='fixed inset-0 bg-black/50 z-50 overflow-y-auto'>
+          <div className='min-h-screen px-3 py-4 md:p-4 flex items-start md:items-center justify-center'>
+            <div className='bg-white rounded-2xl w-full max-w-2xl shadow-2xl'>
+              {/* Modal Header - Sticky on mobile */}
+              <div className='sticky top-0 bg-white rounded-t-2xl border-b border-gray-100 p-4 md:p-6 z-10'>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <h2 className='text-xl md:text-2xl font-bold text-gray-800'>Edit User</h2>
+                    <p className='text-sm text-gray-600 mt-1'>
+                      Editing: <strong>{selectedUser.fullName}</strong>
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowEditModal(false)}
+                    className='p-2 hover:bg-gray-100 rounded-full transition'
+                  >
+                    <svg className='w-6 h-6 text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
-              {/* Mobile */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Mobile *</label>
-                <input
-                  type='text'
-                  name='mobile'
-                  value={editFormData.mobile}
-                  onChange={handleEditFormChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Email</label>
-                <input
-                  type='email'
-                  name='email'
-                  value={editFormData.email}
-                  onChange={handleEditFormChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              {/* Gotra */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Gotra</label>
-                <select
-                  name='gotra'
-                  value={editFormData.gotra}
-                  onChange={handleEditFormChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                >
-                  <option value=''>Select Gotra</option>
-                  <option value='Bansal'>Bansal</option>
-                  <option value='Kuchhal'>Kuchhal</option>
-                  <option value='Kansal'>Kansal</option>
-                  <option value='Bindal'>Bindal</option>
-                  <option value='Singhal'>Singhal</option>
-                  <option value='Jindal'>Jindal</option>
-                  <option value='Mittal'>Mittal</option>
-                  <option value='Garg'>Garg</option>
-                  <option value='Nangal'>Nangal</option>
-                  <option value='Mangal'>Mangal</option>
-                  <option value='Tayal'>Tayal</option>
-                  <option value='Tingal'>Tingal</option>
-                  <option value='Madhukul'>Madhukul</option>
-                  <option value='Goyal'>Goyal</option>
-                  <option value='Airan'>Airan</option>
-                  <option value='Goyan'>Goyan</option>
-                  <option value='Dharan'>Dharan</option>
-                  <option value='Bhandal'>Bhandal</option>
-                </select>
-              </div>
-
-              {/* City */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>City</label>
-                <input
-                  type='text'
-                  name='city'
-                  value={editFormData.city}
-                  onChange={handleEditFormChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              {/* Relationship */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Relationship</label>
-                <select
-                  name='relationship'
-                  value={editFormData.relationship}
-                  onChange={handleEditFormChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                >
-                  <option value='S/O'>S/O (Son of)</option>
-                  <option value='D/O'>D/O (Daughter of)</option>
-                  <option value='W/O'>W/O (Wife of)</option>
-                </select>
-              </div>
-
-              {/* Relative Name */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Relative Name</label>
-                <input
-                  type='text'
-                  name='relativeName'
-                  value={editFormData.relativeName}
-                  onChange={handleEditFormChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              {/* UTR Number */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>UTR Number</label>
-                <input
-                  type='text'
-                  name='utrNumber'
-                  value={editFormData.utrNumber}
-                  onChange={handleEditFormChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              {/* Referred By */}
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Referred By (e.g., CG00006)</label>
-                <input
-                  type='text'
-                  name='referredBy'
-                  value={editFormData.referredBy}
-                  onChange={(e) => handleReferralChange(e.target.value)}
-                  maxLength={7}
-                  placeholder='e.g., CG00006'
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-                {referralStatus.valid === true && (
-                  <p className='text-green-600 text-xs mt-1'>{referralStatus.name} - {referralStatus.city}</p>
-                )}
-                {referralStatus.valid === false && (
-                  <p className='text-red-600 text-xs mt-1'>Wrong referral code</p>
-                )}
-              </div>
-
-              {/* Address - Full Width */}
-              <div className='md:col-span-2'>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Address</label>
-                <textarea
-                  name='address'
-                  value={editFormData.address}
-                  onChange={handleEditFormChange}
-                  rows='2'
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              {/* Passport Photo Upload */}
-              <div className='md:col-span-2'>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Update Passport Photo</label>
-                <input
-                  type='file'
-                  accept='image/*'
-                  onChange={handleFileChange}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-                {editFormData.passportPhoto && (
-                  <p className='text-sm text-green-600 mt-2'>New photo selected: {editFormData.passportPhoto.name}</p>
-                )}
-                {selectedUser.passportPhoto && !editFormData.passportPhoto && (
-                  <div className='mt-2'>
-                    <p className='text-sm text-gray-600 mb-2'>Current photo:</p>
-                    <img
-                      src={`${BACKEND_URL}/${selectedUser.passportPhoto}`}
-                      alt='Current'
-                      className='w-24 h-24 rounded-lg object-cover border-2 border-gray-200'
+              {/* Modal Body - Scrollable */}
+              <div className='p-4 md:p-6 max-h-[70vh] md:max-h-[75vh] overflow-y-auto'>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4'>
+                  {/* Full Name */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Full Name *</label>
+                    <input
+                      type='text'
+                      name='fullName'
+                      value={editFormData.fullName}
+                      onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
                     />
                   </div>
-                )}
-              </div>
-            </div>
 
-            <div className='flex gap-3'>
-              <button
-                onClick={handleEditUser}
-                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition'
-              >
-                Save Changes
-              </button>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition'
-              >
-                Cancel
-              </button>
+                  {/* Mobile */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Mobile *</label>
+                    <input
+                      type='text'
+                      name='mobile'
+                      value={editFormData.mobile}
+                      onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Email</label>
+                    <input
+                      type='email'
+                      name='email'
+                      value={editFormData.email}
+                      onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Gotra */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Gotra</label>
+                    <select
+                      name='gotra'
+                      value={editFormData.gotra}
+                      onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
+                    >
+                      <option value=''>Select Gotra</option>
+                      <option value='Bansal'>Bansal</option>
+                      <option value='Kuchhal'>Kuchhal</option>
+                      <option value='Kansal'>Kansal</option>
+                      <option value='Bindal'>Bindal</option>
+                      <option value='Singhal'>Singhal</option>
+                      <option value='Jindal'>Jindal</option>
+                      <option value='Mittal'>Mittal</option>
+                      <option value='Garg'>Garg</option>
+                      <option value='Nangal'>Nangal</option>
+                      <option value='Mangal'>Mangal</option>
+                      <option value='Tayal'>Tayal</option>
+                      <option value='Tingal'>Tingal</option>
+                      <option value='Madhukul'>Madhukul</option>
+                      <option value='Goyal'>Goyal</option>
+                      <option value='Airan'>Airan</option>
+                      <option value='Goyan'>Goyan</option>
+                      <option value='Dharan'>Dharan</option>
+                      <option value='Bhandal'>Bhandal</option>
+                    </select>
+                  </div>
+
+                  {/* City */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>City</label>
+                    <input
+                      type='text'
+                      name='city'
+                      value={editFormData.city}
+                      onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Relationship */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Relationship</label>
+                    <select
+                      name='relationship'
+                      value={editFormData.relationship}
+                      onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
+                    >
+                      <option value='S/O'>S/O (Son of)</option>
+                      <option value='D/O'>D/O (Daughter of)</option>
+                      <option value='W/O'>W/O (Wife of)</option>
+                    </select>
+                  </div>
+
+                  {/* Relative Name */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Relative Name</label>
+                    <input
+                      type='text'
+                      name='relativeName'
+                      value={editFormData.relativeName}
+                      onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* UTR Number */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>UTR Number</label>
+                    <input
+                      type='text'
+                      name='utrNumber'
+                      value={editFormData.utrNumber}
+                      onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Referred By */}
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Referred By (e.g., CG00006)</label>
+                    <input
+                      type='text'
+                      name='referredBy'
+                      value={editFormData.referredBy}
+                      onChange={(e) => handleReferralChange(e.target.value)}
+                      maxLength={7}
+                      placeholder='e.g., CG00006'
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                    {referralStatus.valid === true && (
+                      <p className='text-green-600 text-xs mt-1'>{referralStatus.name} - {referralStatus.city}</p>
+                    )}
+                    {referralStatus.valid === false && (
+                      <p className='text-red-600 text-xs mt-1'>Wrong referral code</p>
+                    )}
+                  </div>
+
+                  {/* Address - Full Width */}
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Address</label>
+                    <textarea
+                      name='address'
+                      value={editFormData.address}
+                      onChange={handleEditFormChange}
+                      rows='2'
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Passport Photo Upload */}
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Update Passport Photo</label>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleFileChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                    {editFormData.passportPhoto && (
+                      <p className='text-xs text-green-600 mt-2'>New photo selected: {editFormData.passportPhoto.name}</p>
+                    )}
+                    {selectedUser.passportPhoto && !editFormData.passportPhoto && (
+                      <div className='mt-2'>
+                        <p className='text-xs text-gray-600 mb-2'>Current photo:</p>
+                        <img
+                          src={`${BACKEND_URL}/${selectedUser.passportPhoto}`}
+                          alt='Current'
+                          className='w-20 h-20 md:w-24 md:h-24 rounded-lg object-cover border-2 border-gray-200'
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer - Sticky on mobile */}
+              <div className='sticky bottom-0 bg-white rounded-b-2xl border-t border-gray-100 p-4 md:p-6'>
+                <div className='flex gap-3'>
+                  <button
+                    onClick={handleEditUser}
+                    className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition text-sm md:text-base'
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={() => setShowEditModal(false)}
+                    className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition text-sm md:text-base'
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
