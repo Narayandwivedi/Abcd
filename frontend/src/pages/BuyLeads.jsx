@@ -1,15 +1,45 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import CityDropdown from '../component/CityDropdown'
 
 const BuyLeads = () => {
   const navigate = useNavigate()
   const [approvedBuyLeads, setApprovedBuyLeads] = useState([])
+  const [filteredBuyLeads, setFilteredBuyLeads] = useState([])
   const [loadingLeads, setLoadingLeads] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedCity, setSelectedCity] = useState('')
+
+  // Categories list
+  const categories = [
+    'Advocates', 'Automobiles', 'Beauty parlour', 'Books n stationery', 'Catering',
+    'CCTV', 'Chartered accountants', 'Clothing', 'Digital marketing', 'Doctors',
+    'Education n training', 'Electrical', 'Electronics', 'Engineers', 'Fruits n Veg',
+    'Furniture', 'Grocery', 'Hardware', 'Home appliances', 'Home service',
+    'Hospital', 'Hotel', 'Interior decorators', 'Logistics n courier', 'Marble and tiles',
+    'Medicine', 'Pathology', 'Properties', 'Restaurent', 'Sports',
+    'Telecommunication', 'Tour n Travels', 'Tuition and coaching', 'Web solutions'
+  ]
 
   useEffect(() => {
     fetchApprovedBuyLeads()
   }, [])
+
+  // Filter leads when filters change
+  useEffect(() => {
+    let filtered = [...approvedBuyLeads]
+
+    if (selectedCategory) {
+      filtered = filtered.filter(lead => lead.majorCategory === selectedCategory)
+    }
+
+    if (selectedCity) {
+      filtered = filtered.filter(lead => lead.townCity === selectedCity)
+    }
+
+    setFilteredBuyLeads(filtered)
+  }, [approvedBuyLeads, selectedCategory, selectedCity])
 
   const fetchApprovedBuyLeads = async () => {
     try {
@@ -26,6 +56,7 @@ const BuyLeads = () => {
 
       if (data.success) {
         setApprovedBuyLeads(data.data)
+        setFilteredBuyLeads(data.data)
       }
     } catch (error) {
       console.error('Error fetching approved buy leads:', error)
@@ -33,6 +64,11 @@ const BuyLeads = () => {
     } finally {
       setLoadingLeads(false)
     }
+  }
+
+  const handleClearFilters = () => {
+    setSelectedCategory('')
+    setSelectedCity('')
   }
 
   const formatDate = (dateString) => {
@@ -127,6 +163,56 @@ View more leads at: ${window.location.origin}/buy-leads`
         </div>
       </div>
 
+      {/* Filters Section */}
+      <div className='bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-indigo-200'>
+        <div className='container mx-auto px-4 py-3 md:py-4'>
+          <div className='w-full md:w-[90%] mx-auto'>
+            <div className='flex flex-col md:flex-row gap-3 items-stretch md:items-center'>
+              {/* Category Filter */}
+              <div className='flex-1'>
+                <label className='block text-xs font-semibold text-indigo-700 mb-1.5'>Filter by Category</label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className='w-full px-3 py-2 md:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-white'
+                >
+                  <option value=''>All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* City Filter */}
+              <div className='flex-1'>
+                <label className='block text-xs font-semibold text-indigo-700 mb-1.5'>Filter by City</label>
+                <CityDropdown
+                  value={selectedCity}
+                  onChange={setSelectedCity}
+                  placeholder='All Cities'
+                  darkMode={false}
+                />
+              </div>
+
+              {/* Clear Filters Button */}
+              {(selectedCategory || selectedCity) && (
+                <div className='flex items-end'>
+                  <button
+                    onClick={handleClearFilters}
+                    className='w-full md:w-auto px-4 py-2 md:py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg font-semibold hover:from-gray-700 hover:to-gray-800 transition-all shadow-md text-sm flex items-center justify-center gap-2'
+                  >
+                    <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                    </svg>
+                    Clear Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Content */}
       <div className='container mx-auto px-4 py-4 md:py-6'>
         <div className='w-full md:w-[90%] mx-auto'>
@@ -137,23 +223,27 @@ View more leads at: ${window.location.origin}/buy-leads`
                 <p className='text-gray-600'>Loading buy offers...</p>
               </div>
             </div>
-          ) : approvedBuyLeads.length === 0 ? (
+          ) : filteredBuyLeads.length === 0 ? (
             <div className='flex items-center justify-center h-96 bg-white rounded-2xl shadow-lg'>
               <div className='text-center'>
                 <svg className='w-16 h-16 text-gray-400 mx-auto mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4' />
                 </svg>
-                <p className='text-gray-600 font-medium'>No buy offers available yet</p>
-                <p className='text-gray-500 text-sm mt-2'>Check back later for new buyer requirements</p>
+                <p className='text-gray-600 font-medium'>
+                  {approvedBuyLeads.length === 0 ? 'No buy offers available yet' : 'No buy offers match your filters'}
+                </p>
+                <p className='text-gray-500 text-sm mt-2'>
+                  {approvedBuyLeads.length === 0 ? 'Check back later for new buyer requirements' : 'Try adjusting your filters to see more results'}
+                </p>
               </div>
             </div>
           ) : (
             <>
               <p className='text-sm md:text-base text-gray-600 mb-3 md:mb-4'>
-                Showing {approvedBuyLeads.length} approved buyer requirement{approvedBuyLeads.length !== 1 ? 's' : ''}
+                Showing {filteredBuyLeads.length} of {approvedBuyLeads.length} approved buyer requirement{approvedBuyLeads.length !== 1 ? 's' : ''}
               </p>
               <div className='space-y-3 md:space-y-2.5'>
-                {approvedBuyLeads.map((lead, index) => (
+                {filteredBuyLeads.map((lead, index) => (
                   <div
                     key={lead._id}
                     className='bg-gradient-to-br from-white to-indigo-50 p-3 md:p-3 rounded-xl border-2 border-indigo-200 hover:border-indigo-400 shadow-md hover:shadow-lg transition-all'

@@ -575,6 +575,132 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Create user (admin) - bypasses payment requirement
+const createUser = async (req, res) => {
+  try {
+    const { fullName, mobile, email, gotra, city, address, relativeName, relationship, referredBy, password } = req.body;
+
+    // Validate required fields
+    if (!fullName || !mobile || !gotra || !address || !relativeName) {
+      return res.status(400).json({
+        success: false,
+        message: "Full name, mobile, gotra, address, and relative name are required"
+      });
+    }
+
+    // Validate passport photo is uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Passport photo is required"
+      });
+    }
+
+    // Check if user already exists by mobile or email
+    const existingUser = await userModel.findOne({
+      $or: [
+        { mobile },
+        ...(email ? [{ email }] : [])
+      ]
+    });
+
+    if (existingUser) {
+      if (existingUser.mobile === mobile) {
+        return res.status(400).json({
+          success: false,
+          message: "User with this mobile number already exists"
+        });
+      }
+      if (email && existingUser.email === email) {
+        return res.status(400).json({
+          success: false,
+          message: "User with this email already exists"
+        });
+      }
+    }
+
+    // Process passport photo upload
+    const { handlePassportPhotoUpload } = require("../controllers/uploadController");
+    const passportPhotoPath = await handlePassportPhotoUpload(req.file);
+
+    // Create user data
+    const userData = {
+      fullName: fullName.toUpperCase(),
+      mobile,
+      gotra,
+      address: address.toUpperCase(),
+      relativeName: relativeName.toUpperCase(),
+      relationship: relationship || 'S/O',
+      passportPhoto: passportPhotoPath,
+      paymentVerified: true,  // Admin-created users are auto-verified
+      isVerified: true
+    };
+
+    // Add optional fields if provided
+    if (email) {
+      userData.email = email;
+    }
+
+    if (city) {
+      userData.city = city.toUpperCase();
+    }
+
+    if (referredBy) {
+      userData.referredBy = referredBy.trim().toUpperCase();
+    }
+
+    // Hash password if provided
+    if (password && password.length >= 6) {
+      const salt = await bcrypt.genSalt(10);
+      userData.password = await bcrypt.hash(password, salt);
+    }
+
+    // Create user
+    const user = await userModel.create(userData);
+
+    // Generate certificate automatically
+    const certificateData = await generateCertificatePDF(user);
+
+    // Create certificate document
+    const certificate = new Certificate({
+      certificateNumber: certificateData.certificateNumber,
+      userId: user._id,
+      downloadLink: certificateData.downloadLink,
+      issueDate: certificateData.issueDate,
+      expiryDate: certificateData.expiryDate,
+      renewalCount: 0
+    });
+
+    await certificate.save();
+
+    // Update user with certificate reference and referral code
+    user.activeCertificate = certificate._id;
+    user.referralCode = certificateData.referralCode;
+    await user.save();
+
+    console.log(`[ADMIN] User created: ${user.fullName} (${user.mobile})`);
+
+    return res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        mobile: user.mobile,
+        email: user.email,
+        certificateNumber: certificate.certificateNumber,
+        referralCode: user.referralCode
+      }
+    });
+  } catch (error) {
+    console.error('Create user error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   approveUser,
@@ -585,5 +711,6 @@ module.exports = {
   changeAdminPassword,
   renewCertificate,
   updateUser,
-  deleteUser
+  deleteUser,
+  createUser
 };

@@ -27,6 +27,7 @@ const adminSubAdminRoute = require('./routes/adminSubAdminRoute')
 const buyLeadRoute = require('./routes/buyLeadRoute')
 const sellLeadRoute = require('./routes/sellLeadRoute')
 const exportRoute = require('./routes/exportRoute')
+const cityRoute = require('./routes/cityRoute')
 
 // CORS configuration
 const corsOptions = {
@@ -65,6 +66,7 @@ app.use('/api/upload',uploadRoute)
 app.use('/api/buy-lead',buyLeadRoute)
 app.use('/api/sell-lead',sellLeadRoute)
 app.use('/api/admin/export',exportRoute)
+app.use('/api/cities',cityRoute)
 
 
 // server listen - only after DB connection

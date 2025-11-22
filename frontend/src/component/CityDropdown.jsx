@@ -1,13 +1,47 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { cityList } from '../assets/citylist'
 
 const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select your City', required = false, darkMode = false }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [cities, setCities] = useState([])
+  const [loading, setLoading] = useState(false)
   const dropdownRef = useRef(null)
 
-  // Sort cities alphabetically
-  const sortedCities = [...cityList].sort((a, b) => a.localeCompare(b))
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
+  // Fetch all cities from API
+  const fetchAllCities = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(
+        `${BACKEND_URL}/api/cities?page=1&limit=500&sortBy=city`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      const result = await response.json()
+
+      if (result.success) {
+        const cityNames = result.data.map(c => c.city)
+        setCities(cityNames)
+      }
+    } catch (error) {
+      console.error('Error fetching cities:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Initial load when dropdown opens
+  useEffect(() => {
+    if (isOpen && cities.length === 0) {
+      fetchAllCities()
+    }
+  }, [isOpen])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -22,15 +56,9 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
   }, [])
 
   // Filter cities based on search query
-  const getFilteredCities = () => {
-    if (!searchQuery.trim()) return sortedCities
-
-    return sortedCities.filter((city) =>
-      city.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }
-
-  const filteredCities = getFilteredCities()
+  const filteredCities = cities.filter((city) =>
+    city.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   const handleCitySelect = (city) => {
     onChange(city.toUpperCase())
@@ -38,10 +66,32 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
     setSearchQuery('')
   }
 
+  const handleClearSelection = (e) => {
+    e.stopPropagation()
+    onChange('')
+  }
+
   const displayValue = value || placeholder
 
   return (
     <div ref={dropdownRef} className='relative'>
+      {/* Custom Scrollbar Styles */}
+      <style>{`
+        .scrollbar-custom::-webkit-scrollbar {
+          width: 6px;
+        }
+        .scrollbar-custom::-webkit-scrollbar-track {
+          background: ${darkMode ? '#374151' : '#f3f4f6'};
+          border-radius: 4px;
+        }
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+          background: ${darkMode ? '#6b7280' : '#9ca3af'};
+          border-radius: 4px;
+        }
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+          background: ${darkMode ? '#9ca3af' : '#6b7280'};
+        }
+      `}</style>
       {/* Dropdown Trigger */}
       <div
         onClick={() => setIsOpen(!isOpen)}
@@ -52,14 +102,27 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
         } border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm cursor-pointer flex items-center justify-between ${className}`}
       >
         <span className={`truncate pr-2 ${!value ? 'text-gray-400' : ''}`}>{displayValue}</span>
-        <svg
-          className={`w-4 h-4 md:w-5 md:h-5 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
-          fill='none'
-          stroke='currentColor'
-          viewBox='0 0 24 24'
-        >
-          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-        </svg>
+        <div className='flex items-center gap-1'>
+          {value && (
+            <button
+              onClick={handleClearSelection}
+              className='p-1 hover:bg-gray-200 rounded-full transition-colors'
+              title='Clear selection'
+            >
+              <svg className='w-4 h-4 text-gray-500 hover:text-gray-700' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+              </svg>
+            </button>
+          )}
+          <svg
+            className={`w-4 h-4 md:w-5 md:h-5 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+          </svg>
+        </div>
       </div>
 
       {/* Location Icon */}
@@ -99,11 +162,24 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
           </div>
 
           {/* Cities List */}
-          <div className='overflow-y-auto max-h-80'>
-            {filteredCities.length > 0 ? (
+          <div
+            className='overflow-y-auto max-h-80 scroll-smooth scrollbar-custom'
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: darkMode ? '#6b7280 #374151' : '#9ca3af #f3f4f6'
+            }}
+          >
+            {loading ? (
+              <div className='px-3 md:px-4 py-8 text-center'>
+                <div className='inline-block w-8 h-8 border-3 border-purple-600 border-t-transparent rounded-full animate-spin mb-2'></div>
+                <p className={`text-xs md:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Loading cities...
+                </p>
+              </div>
+            ) : filteredCities.length > 0 ? (
               filteredCities.map((city, index) => (
                 <div
-                  key={index}
+                  key={`${city}-${index}`}
                   onClick={() => handleCitySelect(city)}
                   className={`px-3 md:px-4 py-2 md:py-2.5 cursor-pointer transition-colors text-xs md:text-sm ${
                     value === city

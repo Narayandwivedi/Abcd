@@ -31,6 +31,21 @@ const Users = () => {
     rejected: 0
   })
   const [referralStatus, setReferralStatus] = useState({ valid: null, name: '', city: '' })
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createFormData, setCreateFormData] = useState({
+    fullName: '',
+    mobile: '',
+    email: '',
+    gotra: '',
+    city: '',
+    address: '',
+    relativeName: '',
+    relationship: 'S/O',
+    passportPhoto: null,
+    referredBy: '',
+    password: ''
+  })
+  const [creating, setCreating] = useState(false)
 
   // const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
@@ -350,6 +365,92 @@ ABCD Team`
     user.mobile?.toString().includes(searchTerm)
   )
 
+  // Handle create form input change
+  const handleCreateFormChange = (e) => {
+    const { name, value } = e.target
+    setCreateFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  // Handle file upload for create
+  const handleCreateFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setCreateFormData(prev => ({
+        ...prev,
+        passportPhoto: file
+      }))
+    }
+  }
+
+  // Submit create user
+  const handleCreateUser = async () => {
+    if (!createFormData.fullName || !createFormData.mobile || !createFormData.gotra || !createFormData.address || !createFormData.relativeName) {
+      toast.warning('Please fill all required fields', { autoClose: 800 })
+      return
+    }
+
+    if (!createFormData.passportPhoto) {
+      toast.warning('Passport photo is required', { autoClose: 800 })
+      return
+    }
+
+    try {
+      setCreating(true)
+
+      // Create FormData with all fields including file
+      const formData = new FormData()
+      formData.append('fullName', createFormData.fullName)
+      formData.append('mobile', createFormData.mobile)
+      formData.append('gotra', createFormData.gotra)
+      formData.append('address', createFormData.address)
+      formData.append('relativeName', createFormData.relativeName)
+      formData.append('relationship', createFormData.relationship)
+      formData.append('passportPhoto', createFormData.passportPhoto)
+
+      // Add optional fields if provided
+      if (createFormData.email) formData.append('email', createFormData.email)
+      if (createFormData.city) formData.append('city', createFormData.city)
+      if (createFormData.referredBy) formData.append('referredBy', createFormData.referredBy)
+      if (createFormData.password) formData.append('password', createFormData.password)
+
+      const response = await fetch(`${BACKEND_URL}/api/admin/users`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData  // Don't set Content-Type header, browser will set it with boundary
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('User created successfully!', { autoClose: 800 })
+        setShowCreateModal(false)
+        setCreateFormData({
+          fullName: '',
+          mobile: '',
+          email: '',
+          gotra: '',
+          city: '',
+          address: '',
+          relativeName: '',
+          relationship: 'S/O',
+          passportPhoto: null,
+          referredBy: '',
+          password: ''
+        })
+        fetchUsers()
+      } else {
+        toast.error(data.message || 'Failed to create user', { autoClose: 800 })
+      }
+    } catch (error) {
+      console.error('Error creating user:', error)
+      toast.error('Failed to create user', { autoClose: 800 })
+    } finally {
+      setCreating(false)
+    }
+  }
+
   return (
     <div className='p-6'>
       <div className='mb-8 flex items-center justify-between'>
@@ -357,6 +458,15 @@ ABCD Team`
           <h1 className='text-2xl md:text-3xl font-black text-gray-800 mb-1 md:mb-2'>User Applications</h1>
           <p className='text-sm md:text-base text-gray-600'>Manage user registrations and approvals</p>
         </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className='flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition shadow-lg'
+        >
+          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 4v16m8-8H4' />
+          </svg>
+          <span className='hidden md:inline'>Create User</span>
+        </button>
       </div>
 
       {/* Stats */}
@@ -1096,6 +1206,222 @@ ABCD Team`
                   </button>
                   <button
                     onClick={() => setShowEditModal(false)}
+                    className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition text-sm md:text-base'
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create User Modal */}
+      {showCreateModal && (
+        <div className='fixed inset-0 bg-black/50 z-50 overflow-y-auto'>
+          <div className='min-h-screen px-3 py-4 md:p-4 flex items-start md:items-center justify-center'>
+            <div className='bg-white rounded-2xl w-full max-w-2xl shadow-2xl'>
+              {/* Modal Header - Sticky on mobile */}
+              <div className='sticky top-0 bg-white rounded-t-2xl border-b border-gray-100 p-4 md:p-6 z-10'>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <h2 className='text-xl md:text-2xl font-bold text-gray-800'>Create New User</h2>
+                    <p className='text-sm text-gray-600 mt-1'>Add a new user without payment requirement</p>
+                  </div>
+                  <button
+                    onClick={() => setShowCreateModal(false)}
+                    className='p-2 hover:bg-gray-100 rounded-full transition'
+                  >
+                    <svg className='w-6 h-6 text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Body - Scrollable */}
+              <div className='p-4 md:p-6 max-h-[70vh] md:max-h-[75vh] overflow-y-auto'>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4'>
+                  {/* Full Name */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Full Name *</label>
+                    <input
+                      type='text'
+                      name='fullName'
+                      value={createFormData.fullName}
+                      onChange={handleCreateFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Mobile */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Mobile * (10 digits)</label>
+                    <input
+                      type='tel'
+                      name='mobile'
+                      maxLength={10}
+                      value={createFormData.mobile}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 10)
+                        setCreateFormData(prev => ({ ...prev, mobile: val }))
+                      }}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Email</label>
+                    <input
+                      type='email'
+                      name='email'
+                      value={createFormData.email}
+                      onChange={handleCreateFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Gotra */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Gotra *</label>
+                    <select
+                      name='gotra'
+                      value={createFormData.gotra}
+                      onChange={handleCreateFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
+                    >
+                      <option value=''>Select Gotra</option>
+                      <option value='Bansal'>Bansal</option>
+                      <option value='Kuchhal'>Kuchhal</option>
+                      <option value='Kansal'>Kansal</option>
+                      <option value='Bindal'>Bindal</option>
+                      <option value='Singhal'>Singhal</option>
+                      <option value='Jindal'>Jindal</option>
+                      <option value='Mittal'>Mittal</option>
+                      <option value='Garg'>Garg</option>
+                      <option value='Nangal'>Nangal</option>
+                      <option value='Mangal'>Mangal</option>
+                      <option value='Tayal'>Tayal</option>
+                      <option value='Tingal'>Tingal</option>
+                      <option value='Madhukul'>Madhukul</option>
+                      <option value='Goyal'>Goyal</option>
+                      <option value='Airan'>Airan</option>
+                      <option value='Goyan'>Goyan</option>
+                      <option value='Dharan'>Dharan</option>
+                      <option value='Bhandal'>Bhandal</option>
+                    </select>
+                  </div>
+
+                  {/* City */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>City</label>
+                    <input
+                      type='text'
+                      name='city'
+                      value={createFormData.city}
+                      onChange={handleCreateFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Relationship */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Relationship *</label>
+                    <select
+                      name='relationship'
+                      value={createFormData.relationship}
+                      onChange={handleCreateFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
+                    >
+                      <option value='S/O'>S/O (Son of)</option>
+                      <option value='D/O'>D/O (Daughter of)</option>
+                      <option value='W/O'>W/O (Wife of)</option>
+                    </select>
+                  </div>
+
+                  {/* Relative Name */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Relative Name *</label>
+                    <input
+                      type='text'
+                      name='relativeName'
+                      value={createFormData.relativeName}
+                      onChange={handleCreateFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Referred By */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Referred By (e.g., CG00006)</label>
+                    <input
+                      type='text'
+                      name='referredBy'
+                      value={createFormData.referredBy}
+                      onChange={(e) => {
+                        const val = e.target.value.toUpperCase().slice(0, 7)
+                        setCreateFormData(prev => ({ ...prev, referredBy: val }))
+                      }}
+                      maxLength={7}
+                      placeholder='e.g., CG00006'
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Password */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Password (min 6 chars)</label>
+                    <input
+                      type='text'
+                      name='password'
+                      value={createFormData.password}
+                      onChange={handleCreateFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Address - Full Width */}
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Address *</label>
+                    <textarea
+                      name='address'
+                      value={createFormData.address}
+                      onChange={handleCreateFormChange}
+                      rows='2'
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* Passport Photo Upload */}
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Passport Photo *</label>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleCreateFileChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                    {createFormData.passportPhoto && (
+                      <p className='text-xs text-green-600 mt-2'>Photo selected: {createFormData.passportPhoto.name}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer - Sticky on mobile */}
+              <div className='sticky bottom-0 bg-white rounded-b-2xl border-t border-gray-100 p-4 md:p-6'>
+                <div className='flex gap-3'>
+                  <button
+                    onClick={handleCreateUser}
+                    disabled={creating}
+                    className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition text-sm md:text-base disabled:opacity-50'
+                  >
+                    {creating ? 'Creating...' : 'Create User'}
+                  </button>
+                  <button
+                    onClick={() => setShowCreateModal(false)}
                     className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition text-sm md:text-base'
                   >
                     Cancel

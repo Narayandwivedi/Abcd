@@ -8,7 +8,9 @@ import {
   MapPin,
   Loader2,
   ArrowLeft,
-  CheckCircle
+  CheckCircle,
+  Globe,
+  Share2
 } from 'lucide-react'
 import GoogleLogin from '../components/GoogleLogin'
 import { AppContext } from '../context/AppContext'
@@ -29,6 +31,8 @@ const Signup = () => {
     membershipCategory: '',
     category: '',
     subCategory: '',
+    websiteUrl: '',
+    socialUrl: '',
     vendorPhoto: null
   })
   const [previewPhoto, setPreviewPhoto] = useState(null)
@@ -122,6 +126,8 @@ const Signup = () => {
       submitData.append('subCategory', formData.subCategory)
       if (formData.membershipCategory) submitData.append('membershipCategory', formData.membershipCategory)
       if (formData.email) submitData.append('email', formData.email)
+      if (formData.websiteUrl) submitData.append('websiteUrl', formData.websiteUrl)
+      if (formData.socialUrl) submitData.append('socialUrl', formData.socialUrl)
       if (formData.vendorPhoto) submitData.append('vendorPhoto', formData.vendorPhoto)
 
       const result = await signup(submitData)
@@ -141,6 +147,8 @@ const Signup = () => {
           membershipCategory: '',
           category: '',
           subCategory: '',
+          websiteUrl: '',
+          socialUrl: '',
           vendorPhoto: null
         })
         setPreviewPhoto(null)
@@ -320,6 +328,42 @@ const Signup = () => {
                   onChange={handleChange}
                   className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
                   placeholder='vendor@example.com (optional)'
+                />
+              </div>
+            </div>
+
+            {/* Website URL */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                Website URL <span className='text-gray-500'>(Optional)</span>
+              </label>
+              <div className='relative'>
+                <Globe className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                <input
+                  type='url'
+                  name='websiteUrl'
+                  value={formData.websiteUrl}
+                  onChange={handleChange}
+                  className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
+                  placeholder='https://www.yourbusiness.com (optional)'
+                />
+              </div>
+            </div>
+
+            {/* Social Media URL */}
+            <div>
+              <label className='block text-sm font-bold text-gray-700 mb-2'>
+                Social Media URL <span className='text-gray-500'>(Optional)</span>
+              </label>
+              <div className='relative'>
+                <Share2 className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                <input
+                  type='url'
+                  name='socialUrl'
+                  value={formData.socialUrl}
+                  onChange={handleChange}
+                  className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
+                  placeholder='https://facebook.com/yourbusiness (optional)'
                 />
               </div>
             </div>

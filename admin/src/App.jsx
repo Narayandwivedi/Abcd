@@ -18,6 +18,7 @@ import Settings from './pages/Settings'
 import SubAdmin from './pages/SubAdmin'
 import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
+import Cities from './pages/Cities'
 import { useAdminAuth } from './context/AdminAuthContext'
 
 function AdminLayout({ children }) {
@@ -172,6 +173,16 @@ function AppRoutes() {
           <ProtectedRoute>
             <AdminLayout>
               <SellLeads />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/cities'
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <Cities />
             </AdminLayout>
           </ProtectedRoute>
         }

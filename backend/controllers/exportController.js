@@ -52,7 +52,6 @@ const exportVendors = async (req, res) => {
 const exportBuyLeads = async (req, res) => {
   try {
     const buyLeads = await BuyLead.find()
-      .populate('user', 'fullName email mobile')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -74,7 +73,6 @@ const exportBuyLeads = async (req, res) => {
 const exportSellLeads = async (req, res) => {
   try {
     const sellLeads = await SellLead.find()
-      .populate('user', 'fullName email mobile')
       .sort({ createdAt: -1 })
       .lean();
 

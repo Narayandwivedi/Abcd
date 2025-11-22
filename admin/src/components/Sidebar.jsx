@@ -86,6 +86,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       path: '/sell-leads',
       description: 'Manage Sell Leads'
     },
+    {
+      name: 'Cities',
+      icon: '🏙️',
+      path: '/cities',
+      description: 'Manage Cities'
+    },
     // {
     //   name: 'Products',
     //   icon: '📦',

@@ -10,7 +10,7 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, city, membershipCategory, category, subCategory } = req.body;
+    let { email, mobile, ownerName, businessName, city, membershipCategory, category, subCategory, websiteUrl, socialUrl } = req.body;
 
     // Trim input fields
     email = email?.trim();
@@ -20,6 +20,8 @@ const handleVendorSignup = async (req, res) => {
     membershipCategory = membershipCategory?.trim();
     category = category?.trim();
     subCategory = subCategory?.trim();
+    websiteUrl = websiteUrl?.trim();
+    socialUrl = socialUrl?.trim();
 
     if (!mobile || !ownerName || !businessName || !city || !category || !subCategory || !membershipCategory) {
       return res.status(400).json({ success: false, message: "Mobile, owner name, business name, city, category, sub-category, and membership category are required" });
@@ -72,6 +74,16 @@ const handleVendorSignup = async (req, res) => {
     // Add optional email field
     if (email) {
       newVendorData.email = email;
+    }
+
+    // Add optional website URL field
+    if (websiteUrl) {
+      newVendorData.websiteUrl = websiteUrl;
+    }
+
+    // Add optional social URL field
+    if (socialUrl) {
+      newVendorData.socialUrl = socialUrl;
     }
 
     // Process vendor photo if provided

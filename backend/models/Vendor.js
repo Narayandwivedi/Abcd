@@ -54,6 +54,12 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  websiteUrl: {
+    type: String,
+  },
+  socialUrl: {
+    type: String,
+  },
   authProvider: {
     type: String,
     enum: ['local', 'google'],
@@ -89,20 +95,11 @@ const vendorSchema = new mongoose.Schema({
     default: false,
   },
 
-  // Certificate Fields
-  certificateNumber: {
-    type: String,
-    unique: true,
-    sparse: true, // Allow null for vendors without certificates
-  },
-  certificateDownloadLink: {
-    type: String,
-  },
-  certificateIssueDate: {
-    type: Date,
-  },
-  certificateExpiryDate: {
-    type: Date,
+  // Active certificate reference (current certificate with PDF)
+  activeCertificate: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Certificate',
+    default: null,
   },
 
 }, { timestamps: true });
