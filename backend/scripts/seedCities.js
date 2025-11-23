@@ -2,7 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const City = require('../models/City');
 
-const MONGODB_URI = process.env.MONGO_URL;
+const MONGODB_URI = process.env.MONGO_URL||'mongodb://127.0.0.1:27017/abcd';
 
 // Import citylist data from frontend
 const cityListByDistrict = {
