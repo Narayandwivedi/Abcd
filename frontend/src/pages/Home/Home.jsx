@@ -18,6 +18,8 @@ const Home = () => {
   const { isAuthenticated, user } = useContext(AppContext)
   const [selectedCity, setSelectedCity] = useState('')
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024)
+  const [categories, setCategories] = useState([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
 
   // Buy/Sell Lead Form States
   const [showBuyForm, setShowBuyForm] = useState(false)
@@ -46,44 +48,46 @@ const Home = () => {
     mobileNo: ''
   })
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
-  // Categories with icons (alphabetically sorted)
-  const categories = [
-    { name: 'Advocates', icon: Scale },
-    { name: 'Automobiles', icon: Car },
-    { name: 'Beauty parlour', icon: Scissors },
-    { name: 'Books n stationery', icon: BookOpen },
-    { name: 'Catering', icon: UtensilsCrossed },
-    { name: 'CCTV', icon: Camera },
-    { name: 'Chartered accountants', icon: Calculator },
-    { name: 'Clothing', icon: Shirt },
-    { name: 'Digital marketing', icon: Megaphone },
-    { name: 'Doctors', icon: Stethoscope },
-    { name: 'Education n training', icon: GraduationCap },
-    { name: 'Electrical', icon: Zap },
-    { name: 'Electronics', icon: Smartphone },
-    { name: 'Engineers', icon: HardHat },
-    { name: 'Fruits n Veg', icon: Apple },
-    { name: 'Furniture', icon: Sofa },
-    { name: 'Grocery', icon: ShoppingCart },
-    { name: 'Hardware', icon: Wrench },
-    { name: 'Home appliances', icon: Refrigerator },
-    { name: 'Home service', icon: HomeIcon },
-    { name: 'Hospital', icon: Building2 },
-    { name: 'Hotel', icon: Hotel },
-    { name: 'Interior decorators', icon: Paintbrush },
-    { name: 'Logistics n courier', icon: Truck },
-    { name: 'Marble and tiles', icon: Grid3X3 },
-    { name: 'Medicine', icon: Pill },
-    { name: 'Pathology', icon: FlaskConical },
-    { name: 'Properties', icon: Building },
-    { name: 'Restaurent', icon: UtensilsCrossed },
-    { name: 'Sports', icon: Trophy },
-    { name: 'Telecommunication', icon: Phone },
-    { name: 'Tour n Travels', icon: Plane },
-    { name: 'Tuition and coaching', icon: School },
-    { name: 'Web solutions', icon: Globe }
-  ]
+  // Icon mapping - Map icon names from database to Lucide React components
+  const iconMap = {
+    Scale, Car, Scissors, BookOpen, UtensilsCrossed, Camera, Calculator, Shirt,
+    Megaphone, Stethoscope, GraduationCap, Zap, Smartphone, HardHat, Apple,
+    Sofa, ShoppingCart, Wrench, Refrigerator, HomeIcon, Building2, Hotel,
+    Paintbrush, Truck, Grid3X3, Pill, FlaskConical, Building, Trophy,
+    Phone, Plane, School, Globe
+  }
+
+  // Fetch categories from database
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true)
+        const response = await fetch(`${BACKEND_URL}/api/categories`)
+        const data = await response.json()
+
+        if (data.success) {
+          // Map database categories to include icon components
+          const mappedCategories = data.categories.map(cat => ({
+            name: cat.name,
+            icon: iconMap[cat.icon] || ShoppingCart, // Fallback to ShoppingCart if icon not found
+            slug: cat.slug,
+            subcategories: cat.subcategories
+          }))
+          setCategories(mappedCategories)
+        } else {
+          console.error('Failed to load categories')
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [BACKEND_URL])
 
   // Handle window resize
   useEffect(() => {
@@ -319,48 +323,9 @@ const Home = () => {
 
   return (
     <div className='min-h-screen bg-gray-50'>
-      {/* Search Bar Section */}
-      <section className='bg-white shadow-sm md:shadow-md sticky top-0 z-40 border-b border-gray-200'>
-        <div className='container mx-auto px-3 md:px-4 py-1 md:py-4'>
-          <div className='max-w-6xl mx-auto'>
-            <div className='flex flex-row gap-1.5 md:gap-4 items-stretch md:items-center'>
-              {/* City Selector - 40% width on Mobile, Second on Desktop */}
-              <div className='w-[40%] md:w-auto md:min-w-[180px] md:order-2'>
-                <CityDropdown
-                  value={selectedCity}
-                  onChange={setSelectedCity}
-                  placeholder='Select City'
-                  darkMode={false}
-                  className='h-[32px] md:h-[38px]'
-                />
-              </div>
-
-              {/* Search Input - 60% width on Mobile, First on Desktop */}
-              <div className='relative w-[60%] md:flex-1 md:order-1'>
-                <input
-                  type='text'
-                  placeholder='products, services , vendors'
-                  className='w-full px-3 py-1.5 pl-9 pr-20 md:px-5 md:py-2.5 md:pl-12 md:pr-28 rounded-lg md:rounded-xl border md:border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-500 placeholder:text-xs md:placeholder:text-sm shadow-sm md:shadow-lg text-xs md:text-sm h-[32px] md:h-auto'
-                />
-                <svg
-                  className='absolute left-2.5 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
-                </svg>
-                <button className='absolute right-1.5 md:right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-1 md:px-5 md:py-2 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-sm md:shadow-md text-xs md:text-sm'>
-                  Search
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Buy/Sell Lead Buttons Section - Compact */}
-      <section className='py-1.5 md:py-2 bg-gradient-to-br from-blue-50 via-white to-green-50'>
+      <section className='py-1.5 mt-2 md:py-2 bg-gradient-to-br from-blue-50 via-white to-green-50'>
         <div className='container mx-auto px-4'>
           <div className='max-w-3xl mx-auto space-y-2'>
             {/* Post Buy/Sell Lead Buttons Row */}
@@ -525,26 +490,47 @@ const Home = () => {
         <div className='container mx-auto px-3 md:px-4'>
           <div className='text-center mb-1 md:mb-6'>
             <h2 className='text-sm md:text-3xl font-bold text-gray-800'>
-              Shop by Category
+              Vendors by Category
             </h2>
           </div>
 
           <div className='grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 md:gap-3 max-w-7xl mx-auto'>
-            {categories.map((category) => {
-              const IconComponent = category.icon
-              return (
+            {categoriesLoading ? (
+              // Loading skeleton
+              Array.from({ length: 24 }).map((_, index) => (
                 <div
-                  key={category.name}
-                  onClick={() => handleCategoryClick(category.name)}
-                  className='group bg-white p-2 md:p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 hover:border-blue-400 cursor-pointer'
+                  key={index}
+                  className='bg-gray-100 p-2 md:p-3 rounded-lg shadow-sm animate-pulse'
                 >
                   <div className='flex flex-col items-center'>
-                    <IconComponent className='w-5 h-5 md:w-7 md:h-7 text-blue-600 mb-1 group-hover:scale-110 transition-transform' />
-                    <h3 className='text-center font-medium text-gray-800 text-[8px] md:text-xs leading-tight'>{category.name}</h3>
+                    <div className='w-5 h-5 md:w-7 md:h-7 bg-gray-300 rounded-full mb-1'></div>
+                    <div className='w-12 md:w-16 h-2 md:h-3 bg-gray-300 rounded'></div>
                   </div>
                 </div>
-              )
-            })}
+              ))
+            ) : categories.length === 0 ? (
+              // No categories found
+              <div className='col-span-4 md:col-span-5 lg:col-span-6 text-center py-8'>
+                <p className='text-gray-500'>No categories available</p>
+              </div>
+            ) : (
+              // Display categories
+              categories.map((category) => {
+                const IconComponent = category.icon
+                return (
+                  <div
+                    key={category.name}
+                    onClick={() => handleCategoryClick(category.name)}
+                    className='group bg-white p-2 md:p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 hover:border-blue-400 cursor-pointer'
+                  >
+                    <div className='flex flex-col items-center'>
+                      <IconComponent className='w-5 h-5 md:w-7 md:h-7 text-blue-600 mb-1 group-hover:scale-110 transition-transform' />
+                      <h3 className='text-center font-medium text-gray-800 text-[8px] md:text-xs leading-tight'>{category.name}</h3>
+                    </div>
+                  </div>
+                )
+              })
+            )}
           </div>
         </div>
       </section>

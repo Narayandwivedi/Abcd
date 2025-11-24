@@ -33,7 +33,7 @@ const getAllCities = async (req, res) => {
 
     // Fetch cities with pagination
     const cities = await City.find(query)
-      .select('district city')
+      .select('state district city')
       .sort({ [sortBy]: 1 })
       .skip(skip)
       .limit(parsedLimit)
@@ -74,14 +74,15 @@ const getAllCitiesAdmin = async (req, res) => {
       query = {
         $or: [
           { city: { $regex: search, $options: 'i' } },
-          { district: { $regex: search, $options: 'i' } }
+          { district: { $regex: search, $options: 'i' } },
+          { state: { $regex: search, $options: 'i' } }
         ]
       };
     }
 
     const cities = await City.find(query)
       .sort({ [sortBy]: order === 'desc' ? -1 : 1 })
-      .select('district city isActive createdAt updatedAt');
+      .select('state district city isActive createdAt updatedAt');
 
     // Group by district for summary
     const summary = cities.reduce((acc, city) => {
@@ -167,18 +168,19 @@ const getCitiesByDistrict = async (req, res) => {
 // Create new city (admin)
 const createCity = async (req, res) => {
   try {
-    const { district, city } = req.body;
+    const { state, district, city } = req.body;
 
     // Validate required fields
-    if (!district || !city) {
+    if (!state || !district || !city) {
       return res.status(400).json({
         success: false,
-        message: "District and city are required"
+        message: "State, district and city are required"
       });
     }
 
     // Check if city already exists in the district
     const existingCity = await City.findOne({
+      state: state.trim(),
       district: district.trim(),
       city: city.trim()
     });
@@ -186,18 +188,19 @@ const createCity = async (req, res) => {
     if (existingCity) {
       return res.status(400).json({
         success: false,
-        message: "City already exists in this district"
+        message: "City already exists in this state and district"
       });
     }
 
     // Create new city
     const newCity = await City.create({
+      state: state.trim(),
       district: district.trim(),
       city: city.trim(),
       isActive: true
     });
 
-    console.log(`[ADMIN] City created: ${newCity.city} in ${newCity.district}`);
+    console.log(`[ADMIN] City created: ${newCity.city} in ${newCity.district}, ${newCity.state}`);
 
     return res.status(201).json({
       success: true,
@@ -217,7 +220,7 @@ const createCity = async (req, res) => {
 const updateCity = async (req, res) => {
   try {
     const { cityId } = req.params;
-    const { district, city, isActive } = req.body;
+    const { state, district, city, isActive } = req.body;
 
     // Find city
     const existingCity = await City.findById(cityId);
@@ -229,10 +232,11 @@ const updateCity = async (req, res) => {
       });
     }
 
-    // Check if new combination already exists (if changing district or city name)
-    if (district || city) {
+    // Check if new combination already exists (if changing state, district or city name)
+    if (state || district || city) {
       const duplicateCity = await City.findOne({
         _id: { $ne: cityId },
+        state: state ? state.trim() : existingCity.state,
         district: district ? district.trim() : existingCity.district,
         city: city ? city.trim() : existingCity.city
       });
@@ -240,19 +244,20 @@ const updateCity = async (req, res) => {
       if (duplicateCity) {
         return res.status(400).json({
           success: false,
-          message: "City with this name already exists in the district"
+          message: "City with this name already exists in the state and district"
         });
       }
     }
 
     // Update fields
+    if (state) existingCity.state = state.trim();
     if (district) existingCity.district = district.trim();
     if (city) existingCity.city = city.trim();
     if (isActive !== undefined) existingCity.isActive = isActive;
 
     await existingCity.save();
 
-    console.log(`[ADMIN] City updated: ${existingCity.city} in ${existingCity.district}`);
+    console.log(`[ADMIN] City updated: ${existingCity.city} in ${existingCity.district}, ${existingCity.state}`);
 
     return res.status(200).json({
       success: true,

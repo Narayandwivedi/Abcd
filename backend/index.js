@@ -28,6 +28,7 @@ const buyLeadRoute = require('./routes/buyLeadRoute')
 const sellLeadRoute = require('./routes/sellLeadRoute')
 const exportRoute = require('./routes/exportRoute')
 const cityRoute = require('./routes/cityRoute')
+const categoryRoute = require('./routes/categoryRoute')
 
 // CORS configuration
 const corsOptions = {
@@ -67,6 +68,7 @@ app.use('/api/buy-lead',buyLeadRoute)
 app.use('/api/sell-lead',sellLeadRoute)
 app.use('/api/admin/export',exportRoute)
 app.use('/api/cities',cityRoute)
+app.use('/api/categories',categoryRoute)
 
 
 // server listen - only after DB connection

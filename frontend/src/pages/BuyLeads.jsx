@@ -35,7 +35,37 @@ const BuyLeads = () => {
     }
 
     if (selectedCity) {
-      filtered = filtered.filter(lead => lead.townCity === selectedCity)
+      // Extract district name (part after hyphen)
+      const districtMatch = selectedCity.match(/-(.+)$/i)
+      const districtName = districtMatch ? districtMatch[1] : null
+
+      filtered = filtered.filter(lead => {
+        if (!lead.townCity) return false
+
+        const leadCity = lead.townCity.toUpperCase()
+        const filterCity = selectedCity.toUpperCase()
+
+        // Exact match
+        if (leadCity === filterCity) return true
+
+        // If district exists, match any city ending with "-[district]"
+        if (districtName) {
+          const districtPattern = new RegExp(`-${districtName}$`, 'i')
+          return districtPattern.test(lead.townCity)
+        }
+
+        return false
+      })
+
+      // Sort: exact matches first, then district matches
+      filtered.sort((a, b) => {
+        const aExact = a.townCity && a.townCity.toUpperCase() === selectedCity.toUpperCase()
+        const bExact = b.townCity && b.townCity.toUpperCase() === selectedCity.toUpperCase()
+
+        if (aExact && !bExact) return -1
+        if (!aExact && bExact) return 1
+        return 0
+      })
     }
 
     setFilteredBuyLeads(filtered)
@@ -167,14 +197,14 @@ View more leads at: ${window.location.origin}/buy-leads`
       <div className='bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-indigo-200'>
         <div className='container mx-auto px-4 py-3 md:py-4'>
           <div className='w-full md:w-[90%] mx-auto'>
-            <div className='flex flex-col md:flex-row gap-3 items-stretch md:items-center'>
+            <div className='flex flex-row gap-2 md:gap-3 items-end'>
               {/* Category Filter */}
               <div className='flex-1'>
-                <label className='block text-xs font-semibold text-indigo-700 mb-1.5'>Filter by Category</label>
+                <label className='block text-[10px] md:text-xs font-semibold text-indigo-700 mb-1 md:mb-1.5'>Category</label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className='w-full px-3 py-2 md:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-white'
+                  className='w-full px-2 md:px-3 py-2 md:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-xs md:text-sm bg-white'
                 >
                   <option value=''>All Categories</option>
                   {categories.map((category) => (
@@ -185,7 +215,7 @@ View more leads at: ${window.location.origin}/buy-leads`
 
               {/* City Filter */}
               <div className='flex-1'>
-                <label className='block text-xs font-semibold text-indigo-700 mb-1.5'>Filter by City</label>
+                <label className='block text-[10px] md:text-xs font-semibold text-indigo-700 mb-1 md:mb-1.5'>City</label>
                 <CityDropdown
                   value={selectedCity}
                   onChange={setSelectedCity}
@@ -199,12 +229,13 @@ View more leads at: ${window.location.origin}/buy-leads`
                 <div className='flex items-end'>
                   <button
                     onClick={handleClearFilters}
-                    className='w-full md:w-auto px-4 py-2 md:py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg font-semibold hover:from-gray-700 hover:to-gray-800 transition-all shadow-md text-sm flex items-center justify-center gap-2'
+                    className='px-3 md:px-4 py-2 md:py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg font-semibold hover:from-gray-700 hover:to-gray-800 transition-all shadow-md text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 whitespace-nowrap'
+                    title='Clear Filters'
                   >
-                    <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <svg className='w-3 h-3 md:w-4 md:h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
                     </svg>
-                    Clear Filters
+                    <span className='hidden md:inline'>Clear</span>
                   </button>
                 </div>
               )}

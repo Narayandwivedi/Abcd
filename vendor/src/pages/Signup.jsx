@@ -21,6 +21,9 @@ const Signup = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [categories, setCategories] = useState([])
+  const [subcategories, setSubcategories] = useState([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
 
   const [formData, setFormData] = useState({
     ownerName: '',
@@ -38,6 +41,8 @@ const Signup = () => {
   const [previewPhoto, setPreviewPhoto] = useState(null)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
   // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) {
@@ -45,12 +50,48 @@ const Signup = () => {
     }
   }, [isAuthenticated, navigate])
 
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true)
+        const response = await fetch(`${BACKEND_URL}/api/categories`)
+        const data = await response.json()
+
+        if (data.success) {
+          setCategories(data.categories || [])
+        } else {
+          toast.error('Failed to load categories')
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+        toast.error('Failed to load categories')
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [BACKEND_URL])
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    })
+
+    // Handle category change - populate subcategories
+    if (name === 'category') {
+      const selectedCategory = categories.find(cat => cat.name === value)
+      setSubcategories(selectedCategory ? selectedCategory.subcategories : [])
+      setFormData({
+        ...formData,
+        category: value,
+        subCategory: '' // Reset subcategory when category changes
+      })
+    } else {
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : value
+      })
+    }
     setError('')
   }
 
@@ -377,22 +418,21 @@ const Signup = () => {
                 name='category'
                 value={formData.category}
                 onChange={handleChange}
-                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer'
+                disabled={categoriesLoading}
+                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                <option value=''>Select Business Category</option>
-                <option value='Retail'>Retail</option>
-                <option value='Wholesale'>Wholesale</option>
-                <option value='Manufacturing'>Manufacturing</option>
-                <option value='Services'>Services</option>
-                <option value='Food & Beverage'>Food & Beverage</option>
-                <option value='Healthcare'>Healthcare</option>
-                <option value='Technology'>Technology</option>
-                <option value='Construction'>Construction</option>
-                <option value='Education'>Education</option>
-                <option value='Transportation'>Transportation</option>
-                <option value='Real Estate'>Real Estate</option>
-                <option value='Other'>Other</option>
+                <option value=''>
+                  {categoriesLoading ? 'Loading categories...' : 'Select Business Category'}
+                </option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
               </select>
+              <p className='text-xs text-gray-500 mt-1'>
+                Select the main category for your business
+              </p>
             </div>
 
             {/* Business Sub-Category */}
@@ -400,14 +440,31 @@ const Signup = () => {
               <label className='block text-sm font-bold text-gray-700 mb-2'>
                 Business Sub-Category <span className='text-red-500'>*</span>
               </label>
-              <input
-                type='text'
+              <select
                 name='subCategory'
                 value={formData.subCategory}
                 onChange={handleChange}
-                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
-                placeholder='e.g., Grocery Store, Electronics, etc.'
-              />
+                disabled={!formData.category || subcategories.length === 0}
+                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                <option value=''>
+                  {!formData.category
+                    ? 'Select a category first'
+                    : subcategories.length === 0
+                    ? 'No subcategories available'
+                    : 'Select Business Sub-Category'}
+                </option>
+                {subcategories.map((subcat) => (
+                  <option key={subcat._id} value={subcat.name}>
+                    {subcat.name}
+                  </option>
+                ))}
+              </select>
+              <p className='text-xs text-gray-500 mt-1'>
+                {formData.category
+                  ? `Select the specific type under ${formData.category}`
+                  : 'Choose a category to see subcategories'}
+              </p>
             </div>
 
             {/* Membership Category Selection */}

@@ -8,7 +8,7 @@ const Cities = () => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedCity, setSelectedCity] = useState(null)
-  const [formData, setFormData] = useState({ district: '', city: '' })
+  const [formData, setFormData] = useState({ state: '', district: '', city: '' })
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, districts: 0 })
   const [sortBy, setSortBy] = useState('city')
   const [sortOrder, setSortOrder] = useState('asc')
@@ -57,8 +57,8 @@ const Cities = () => {
   const handleAddCity = async (e) => {
     e.preventDefault()
 
-    if (!formData.district.trim() || !formData.city.trim()) {
-      toast.warning('District and city are required')
+    if (!formData.state.trim() || !formData.district.trim() || !formData.city.trim()) {
+      toast.warning('State, district and city are required')
       return
     }
 
@@ -76,7 +76,7 @@ const Cities = () => {
       if (data.success) {
         toast.success('City added successfully!')
         setShowAddModal(false)
-        setFormData({ district: '', city: '' })
+        setFormData({ state: '', district: '', city: '' })
         fetchCities()
       } else {
         toast.error(data.message || 'Failed to add city')
@@ -90,8 +90,8 @@ const Cities = () => {
   const handleEditCity = async (e) => {
     e.preventDefault()
 
-    if (!formData.district.trim() || !formData.city.trim()) {
-      toast.warning('District and city are required')
+    if (!formData.state.trim() || !formData.district.trim() || !formData.city.trim()) {
+      toast.warning('State, district and city are required')
       return
     }
 
@@ -110,7 +110,7 @@ const Cities = () => {
         toast.success('City updated successfully!')
         setShowEditModal(false)
         setSelectedCity(null)
-        setFormData({ district: '', city: '' })
+        setFormData({ state: '', district: '', city: '' })
         fetchCities()
       } else {
         toast.error(data.message || 'Failed to update city')
@@ -171,14 +171,15 @@ const Cities = () => {
 
   const openEditModal = (city) => {
     setSelectedCity(city)
-    setFormData({ district: city.district, city: city.city })
+    setFormData({ state: city.state, district: city.district, city: city.city })
     setShowEditModal(true)
   }
 
   const filteredCities = cities.filter(
     city =>
       city.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      city.district.toLowerCase().includes(searchTerm.toLowerCase())
+      city.district.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (city.state && city.state.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
   const handleSort = (field) => {
@@ -224,7 +225,7 @@ const Cities = () => {
           <div className='flex-1'>
             <input
               type='text'
-              placeholder='Search by city or district...'
+              placeholder='Search by city, district or state...'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -232,7 +233,7 @@ const Cities = () => {
           </div>
           <button
             onClick={() => {
-              setFormData({ district: '', city: '' })
+              setFormData({ state: '', district: '', city: '' })
               setShowAddModal(true)
             }}
             className='bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition shadow-md flex items-center justify-center gap-2'
@@ -276,6 +277,17 @@ const Cities = () => {
                     )}
                   </div>
                 </th>
+                <th
+                  className='px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase cursor-pointer hover:bg-gray-100'
+                  onClick={() => handleSort('state')}
+                >
+                  <div className='flex items-center gap-1'>
+                    State
+                    {sortBy === 'state' && (
+                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </div>
+                </th>
                 <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase'>
                   Status
                 </th>
@@ -287,7 +299,7 @@ const Cities = () => {
             <tbody className='divide-y divide-gray-200'>
               {loading ? (
                 <tr>
-                  <td colSpan='5' className='px-4 py-8 text-center text-gray-500'>
+                  <td colSpan='6' className='px-4 py-8 text-center text-gray-500'>
                     <div className='flex items-center justify-center'>
                       <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
                       <span className='ml-3'>Loading cities...</span>
@@ -296,7 +308,7 @@ const Cities = () => {
                 </tr>
               ) : filteredCities.length === 0 ? (
                 <tr>
-                  <td colSpan='5' className='px-4 py-8 text-center text-gray-500'>
+                  <td colSpan='6' className='px-4 py-8 text-center text-gray-500'>
                     {searchTerm ? 'No cities found matching your search' : 'No cities available'}
                   </td>
                 </tr>
@@ -306,6 +318,7 @@ const Cities = () => {
                     <td className='px-4 py-3 text-sm text-gray-600'>{index + 1}</td>
                     <td className='px-4 py-3 text-sm font-semibold text-gray-800'>{city.city}</td>
                     <td className='px-4 py-3 text-sm text-gray-600'>{city.district}</td>
+                    <td className='px-4 py-3 text-sm text-gray-600'>{city.state || 'N/A'}</td>
                     <td className='px-4 py-3'>
                       <button
                         onClick={() => handleToggleStatus(city._id)}
@@ -360,6 +373,17 @@ const Cities = () => {
               </button>
             </div>
             <form onSubmit={handleAddCity} className='space-y-4'>
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>State</label>
+                <input
+                  type='text'
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  placeholder='Enter state name'
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  required
+                />
+              </div>
               <div>
                 <label className='block text-sm font-semibold text-gray-700 mb-2'>District</label>
                 <input
@@ -421,6 +445,17 @@ const Cities = () => {
               </button>
             </div>
             <form onSubmit={handleEditCity} className='space-y-4'>
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>State</label>
+                <input
+                  type='text'
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  placeholder='Enter state name'
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  required
+                />
+              </div>
               <div>
                 <label className='block text-sm font-semibold text-gray-700 mb-2'>District</label>
                 <input

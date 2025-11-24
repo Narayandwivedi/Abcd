@@ -5,7 +5,9 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
   const [searchQuery, setSearchQuery] = useState('')
   const [cities, setCities] = useState([])
   const [loading, setLoading] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const dropdownRef = useRef(null)
+  const citiesListRef = useRef(null)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -73,8 +75,68 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
 
   const displayValue = value || placeholder
 
+  // Reset highlighted index when search query changes or dropdown closes
+  useEffect(() => {
+    setHighlightedIndex(-1)
+  }, [searchQuery])
+
+  // Reset highlighted index when dropdown closes
+  useEffect(() => {
+    if (!isOpen) {
+      setHighlightedIndex(-1)
+    }
+  }, [isOpen])
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e) => {
+    if (!isOpen) return
+
+    const itemCount = filteredCities.length
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setHighlightedIndex((prev) => {
+          const nextIndex = prev < itemCount - 1 ? prev + 1 : prev
+          scrollToHighlighted(nextIndex)
+          return nextIndex
+        })
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setHighlightedIndex((prev) => {
+          const nextIndex = prev > 0 ? prev - 1 : 0
+          scrollToHighlighted(nextIndex)
+          return nextIndex
+        })
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (highlightedIndex >= 0 && highlightedIndex < itemCount) {
+          handleCitySelect(filteredCities[highlightedIndex])
+        }
+        break
+      case 'Escape':
+        e.preventDefault()
+        setIsOpen(false)
+        break
+      default:
+        break
+    }
+  }
+
+  // Scroll to highlighted item
+  const scrollToHighlighted = (index) => {
+    if (citiesListRef.current) {
+      const items = citiesListRef.current.children
+      if (items[index]) {
+        items[index].scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      }
+    }
+  }
+
   return (
-    <div ref={dropdownRef} className='relative'>
+    <div ref={dropdownRef} className='relative' onKeyDown={handleKeyDown}>
       {/* Custom Scrollbar Styles */}
       <style>{`
         .scrollbar-custom::-webkit-scrollbar {
@@ -163,6 +225,7 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
 
           {/* Cities List */}
           <div
+            ref={citiesListRef}
             className='overflow-y-auto max-h-80 scroll-smooth scrollbar-custom'
             style={{
               scrollbarWidth: 'thin',
@@ -181,11 +244,16 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
                 <div
                   key={`${city}-${index}`}
                   onClick={() => handleCitySelect(city)}
+                  onMouseEnter={() => setHighlightedIndex(index)}
                   className={`px-3 md:px-4 py-2 md:py-2.5 cursor-pointer transition-colors text-xs md:text-sm ${
                     value === city
                       ? darkMode
                         ? 'bg-purple-600 text-white'
                         : 'bg-purple-100 text-purple-800'
+                      : highlightedIndex === index
+                      ? darkMode
+                        ? 'bg-gray-700 text-white'
+                        : 'bg-gray-100 text-gray-900'
                       : darkMode
                       ? 'text-gray-200 hover:bg-gray-700'
                       : 'text-gray-700 hover:bg-gray-50'

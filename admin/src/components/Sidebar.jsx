@@ -92,6 +92,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       path: '/cities',
       description: 'Manage Cities'
     },
+    {
+      name: 'Categories',
+      icon: '📂',
+      path: '/categories',
+      description: 'Manage Categories'
+    },
     // {
     //   name: 'Products',
     //   icon: '📦',
@@ -103,12 +109,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     //   icon: '🛒',
     //   path: '/orders',
     //   description: 'Customer Orders'
-    // },
-    // {
-    //   name: 'Categories',
-    //   icon: '📂',
-    //   path: '/categories',
-    //   description: 'Product Categories'
     // },
     // {
     //   name: 'Payments',
