@@ -98,6 +98,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       path: '/categories',
       description: 'Manage Categories'
     },
+    {
+      name: 'Ads',
+      icon: '📢',
+      path: '/ads',
+      description: 'Manage Advertisements'
+    },
     // {
     //   name: 'Products',
     //   icon: '📦',

@@ -2,6 +2,7 @@ const express = require("express");
 const { getAllUsers, approveUser, setUserPassword, adminLogin, adminLogout, getCurrentAdmin, changeAdminPassword, updateUser, deleteUser, createUser } = require("../controllers/adminController");
 const { getAllCitiesAdmin, createCity, updateCity, deleteCity, toggleCityStatus } = require("../controllers/cityController");
 const { getAllCategoriesAdmin, createCategory, updateCategory, deleteCategory, toggleCategoryStatus, addSubcategory, updateSubcategory, deleteSubcategory } = require("../controllers/categoryController");
+const { getAllAds, createAd, updateAd, deleteAd, toggleAdApproval, toggleAdVisibility } = require("../controllers/adController");
 const adminAuth = require("../middleware/adminAuth");
 const { adminLoginLimiter } = require("../middleware/adminRateLimit");
 const upload = require("../utils/multer");
@@ -40,5 +41,13 @@ router.patch("/categories/:categoryId/toggle-status", adminAuth, toggleCategoryS
 router.post("/categories/:categoryId/subcategories", adminAuth, addSubcategory);
 router.put("/categories/:categoryId/subcategories/:subcategoryId", adminAuth, updateSubcategory);
 router.delete("/categories/:categoryId/subcategories/:subcategoryId", adminAuth, deleteSubcategory);
+
+// Ad management routes
+router.get("/ads", adminAuth, getAllAds);
+router.post("/ads", adminAuth, upload.single('adImg'), createAd);
+router.put("/ads/:adId", adminAuth, upload.single('adImg'), updateAd);
+router.delete("/ads/:adId", adminAuth, deleteAd);
+router.patch("/ads/:adId/toggle-approval", adminAuth, toggleAdApproval);
+router.patch("/ads/:adId/toggle-visibility", adminAuth, toggleAdVisibility);
 
 module.exports = router;
