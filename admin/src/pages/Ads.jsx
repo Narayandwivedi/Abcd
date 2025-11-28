@@ -376,26 +376,11 @@ const Ads = () => {
         </div>
       </div>
 
-      {/* Results Count & Debug Info */}
-      {!loading && (
-        <div className='mb-4'>
-          <div className='text-sm text-gray-600'>
-            Showing <span className='font-semibold text-gray-800'>{filteredAds.length}</span> ad(s)
-          </div>
-          <div className='text-xs text-gray-500 mt-1'>
-            Debug: Total fetched: {ads.length}, Filter: {filterTab}, Search: "{searchTerm || 'none'}"
-          </div>
+      {/* Results Count */}
+      {!loading && filteredAds.length > 0 && (
+        <div className='mb-4 text-sm text-gray-600'>
+          Showing <span className='font-semibold text-gray-800'>{filteredAds.length}</span> ad(s)
         </div>
-      )}
-
-      {/* Debug: Show raw ads data */}
-      {!loading && ads.length > 0 && (
-        <details className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
-          <summary className='cursor-pointer font-semibold text-yellow-800'>🐛 Debug: View Raw Ads Data ({ads.length} ads)</summary>
-          <pre className='mt-2 text-xs overflow-auto max-h-60 bg-white p-2 rounded'>
-            {JSON.stringify(ads, null, 2)}
-          </pre>
-        </details>
       )}
 
       {/* Ads Grid */}
