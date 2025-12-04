@@ -28,6 +28,11 @@ const SubAdmin = () => {
       canDeleteVendors: false,
       canApproveVendors: false,
       canManageContent: false,
+      canViewAds: false,
+      canCreateAds: false,
+      canEditAds: false,
+      canDeleteAds: false,
+      canApproveAds: false,
       canViewSettings: false,
       canEditSettings: false
     }
@@ -90,6 +95,11 @@ const SubAdmin = () => {
         canDeleteVendors: false,
         canApproveVendors: false,
         canManageContent: false,
+        canViewAds: false,
+        canCreateAds: false,
+        canEditAds: false,
+        canDeleteAds: false,
+        canApproveAds: false,
         canViewSettings: false,
         canEditSettings: false
       }
@@ -319,6 +329,13 @@ const SubAdmin = () => {
       { key: 'canEditVendors', label: 'Edit Vendors' },
       { key: 'canDeleteVendors', label: 'Delete Vendors' },
       { key: 'canApproveVendors', label: 'Approve Vendors' }
+    ],
+    'Ad Management': [
+      { key: 'canViewAds', label: 'View Ads' },
+      { key: 'canCreateAds', label: 'Create Ads' },
+      { key: 'canEditAds', label: 'Edit Ads' },
+      { key: 'canDeleteAds', label: 'Delete Ads' },
+      { key: 'canApproveAds', label: 'Approve Ads' }
     ],
     'Content & Settings': [
       { key: 'canManageContent', label: 'Manage Content' },

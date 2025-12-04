@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Users from './pages/Users'
 import Vendors from './pages/Vendors'
+import Ads from './pages/Ads'
 
 function App() {
   return (
@@ -39,6 +40,16 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Vendors />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/ads'
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Ads />
                 </Layout>
               </ProtectedRoute>
             }

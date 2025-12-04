@@ -54,6 +54,16 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       })
     }
 
+    // Ads menu - show only if has ad view permission
+    if (subAdmin?.permissions?.canViewAds) {
+      items.push({
+        name: 'Ads',
+        icon: '📢',
+        path: '/ads',
+        description: 'Manage Ads'
+      })
+    }
+
     return items
   }
 

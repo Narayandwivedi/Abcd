@@ -69,6 +69,28 @@ const subAdminSchema = new mongoose.Schema({
       default: false,
     },
 
+    // Ad Management
+    canViewAds: {
+      type: Boolean,
+      default: false,
+    },
+    canCreateAds: {
+      type: Boolean,
+      default: false,
+    },
+    canEditAds: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteAds: {
+      type: Boolean,
+      default: false,
+    },
+    canApproveAds: {
+      type: Boolean,
+      default: false,
+    },
+
     // Settings
     canViewSettings: {
       type: Boolean,
