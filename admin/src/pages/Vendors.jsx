@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import CityDropdown from '../components/CityDropdown'
+import MultiCategorySelector from '../components/MultiCategorySelector'
 
 const Vendors = () => {
   const [vendors, setVendors] = useState([])
@@ -22,14 +24,18 @@ const Vendors = () => {
     mobile: '',
     email: '',
     city: '',
-    category: '',
-    subCategory: '',
+    businessCategories: [],
     membershipCategory: '',
     password: ''
   })
   const [creating, setCreating] = useState(false)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
+  // Debug logging for createForm
+  useEffect(() => {
+    console.log('Vendors - createForm changed:', createForm)
+  }, [createForm])
 
   // Fetch all vendors
   useEffect(() => {
@@ -141,18 +147,18 @@ const Vendors = () => {
 
   // Send WhatsApp message
   const sendWhatsAppMessage = (vendor) => {
-    if (!vendor.certificateNumber || !vendor.certificateDownloadLink) {
+    if (!vendor.activeCertificate?.certificateNumber || !vendor.activeCertificate?.downloadLink) {
       alert('Certificate not generated yet. Please approve the vendor first.')
       return
     }
 
-    const certificateUrl = `${BACKEND_URL}${vendor.certificateDownloadLink}`
+    const certificateUrl = `${BACKEND_URL}${vendor.activeCertificate?.downloadLink}`
     const message = `Congratulations! 🎉
 
 You are now an approved ABCD Vendor.
 
 Business: ${vendor.businessName}
-Your Certificate Number: ${vendor.certificateNumber}
+Your Certificate Number: ${vendor.activeCertificate?.certificateNumber}
 
 You can view and download your certificate here:
 ${certificateUrl}
@@ -170,8 +176,8 @@ ABCD Team`
 
   // Create vendor handler
   const handleCreateVendor = async () => {
-    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.city || !createForm.category || !createForm.subCategory || !createForm.membershipCategory) {
-      alert('Please fill all required fields')
+    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipCategory) {
+      alert('Please fill all required fields including at least one category and subcategory')
       return
     }
 
@@ -201,8 +207,7 @@ ABCD Team`
           mobile: '',
           email: '',
           city: '',
-          category: '',
-          subCategory: '',
+          businessCategories: [],
           membershipCategory: '',
           password: ''
         })
@@ -316,9 +321,9 @@ ABCD Team`
                             <div className='font-semibold text-gray-800'>{vendor.businessName}</div>
                             <div className='text-xs text-gray-500'>Owner: {vendor.ownerName}</div>
                             <div className='text-xs text-gray-500'>{vendor.city || 'N/A'}</div>
-                            {vendor.certificateNumber && (
+                            {vendor.activeCertificate?.certificateNumber && (
                               <div className='text-xs text-blue-600 font-semibold mt-1'>
-                                Cert: {vendor.certificateNumber}
+                                Cert: {vendor.activeCertificate?.certificateNumber}
                               </div>
                             )}
                           </div>
@@ -344,8 +349,19 @@ ABCD Team`
                       </td>
                       <td className='px-6 py-4'>
                         <div className='space-y-1'>
-                          <div className='text-sm font-semibold text-gray-800'>{vendor.category || 'N/A'}</div>
-                          <div className='text-xs text-gray-500'>{vendor.subCategory || 'N/A'}</div>
+                          {vendor.businessCategories && vendor.businessCategories.length > 0 ? (
+                            <div className='flex flex-wrap gap-1'>
+                              {vendor.businessCategories.map((bc, idx) => (
+                                <div key={idx} className='text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md'>
+                                  <span className='font-semibold'>{bc.categoryName}</span>
+                                  <span className='mx-1'>→</span>
+                                  <span>{bc.subcategoryName}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className='text-sm text-gray-500'>No categories</div>
+                          )}
                           {vendor.membershipCategory && (
                             <span className='inline-block px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold mt-1'>
                               {vendor.membershipCategory}
@@ -399,7 +415,7 @@ ABCD Team`
                           </a>
 
                           {/* WhatsApp Button */}
-                          {vendor.paymentVerified && vendor.certificateDownloadLink && (
+                          {vendor.paymentVerified && vendor.activeCertificate?.downloadLink && (
                             <button
                               onClick={() => sendWhatsAppMessage(vendor)}
                               className='p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition'
@@ -412,13 +428,13 @@ ABCD Team`
                           )}
 
                           {/* View Certificate PDF Button */}
-                          {vendor.paymentVerified && vendor.certificateDownloadLink && (
+                          {vendor.paymentVerified && vendor.activeCertificate && vendor.activeCertificate.downloadLink && (
                             <a
-                              href={`${BACKEND_URL}${vendor.certificateDownloadLink}`}
+                              href={`${BACKEND_URL}${vendor.activeCertificate.downloadLink}`}
                               target='_blank'
                               rel='noopener noreferrer'
                               className='p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition'
-                              title='View Certificate PDF'
+                              title={`View Certificate (${vendor.activeCertificate.certificateNumber})`}
                             >
                               <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z' />
@@ -489,12 +505,12 @@ ABCD Team`
                       <div className='flex-1 min-w-0'>
                         <h3 className='font-bold text-gray-900 text-sm leading-tight mb-0.5'>{vendor.businessName}</h3>
                         <p className='text-xs text-gray-600 mb-0.5'>Owner: {vendor.ownerName}</p>
-                        {vendor.certificateNumber && (
+                        {vendor.activeCertificate?.certificateNumber && (
                           <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold mb-0.5'>
                             <svg className='w-3 h-3 flex-shrink-0' fill='currentColor' viewBox='0 0 20 20'>
                               <path fillRule='evenodd' d='M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z' clipRule='evenodd' />
                             </svg>
-                            <span>{vendor.certificateNumber}</span>
+                            <span>{vendor.activeCertificate?.certificateNumber}</span>
                           </div>
                         )}
                         <div className='flex items-start gap-1 text-xs text-gray-500'>
@@ -527,14 +543,29 @@ ABCD Team`
                       )}
                     </div>
 
-                    {/* Category & Status Row */}
-                    <div className='flex items-center justify-between gap-2'>
-                      <div className='flex items-center gap-1.5 bg-purple-50 px-2.5 py-2 rounded-xl'>
-                        <svg className='w-3.5 h-3.5 text-purple-600' fill='currentColor' viewBox='0 0 20 20'>
-                          <path d='M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z' />
-                        </svg>
-                        <span className='text-xs font-semibold text-purple-700'>{vendor.category || 'N/A'}</span>
+                    {/* Categories Row */}
+                    {vendor.businessCategories && vendor.businessCategories.length > 0 && (
+                      <div className='flex flex-wrap gap-1.5'>
+                        {vendor.businessCategories.slice(0, 2).map((bc, idx) => (
+                          <div key={idx} className='flex items-center gap-1 bg-purple-50 px-2.5 py-1.5 rounded-lg'>
+                            <svg className='w-3 h-3 text-purple-600' fill='currentColor' viewBox='0 0 20 20'>
+                              <path d='M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z' />
+                            </svg>
+                            <span className='text-xs font-semibold text-purple-700'>{bc.categoryName}</span>
+                            <span className='text-xs text-purple-500'>→</span>
+                            <span className='text-xs text-purple-600'>{bc.subcategoryName}</span>
+                          </div>
+                        ))}
+                        {vendor.businessCategories.length > 2 && (
+                          <div className='flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium'>
+                            +{vendor.businessCategories.length - 2} more
+                          </div>
+                        )}
                       </div>
+                    )}
+
+                    {/* Status Row */}
+                    <div className='flex items-center justify-between gap-2 mt-2'>
 
                       {/* Status Badge */}
                       {vendor.paymentVerified ? (
@@ -606,7 +637,7 @@ ABCD Team`
                     </a>
 
                     {/* WhatsApp */}
-                    {vendor.paymentVerified && vendor.certificateDownloadLink && (
+                    {vendor.paymentVerified && vendor.activeCertificate?.downloadLink && (
                       <button
                         onClick={() => sendWhatsAppMessage(vendor)}
                         className='p-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm hover:shadow-md'
@@ -618,9 +649,9 @@ ABCD Team`
                     )}
 
                     {/* Certificate */}
-                    {vendor.paymentVerified && vendor.certificateDownloadLink && (
+                    {vendor.paymentVerified && vendor.activeCertificate?.downloadLink && (
                       <a
-                        href={`${BACKEND_URL}${vendor.certificateDownloadLink}`}
+                        href={`${BACKEND_URL}${vendor.activeCertificate?.downloadLink}`}
                         target='_blank'
                         rel='noopener noreferrer'
                         className='flex items-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
@@ -769,35 +800,17 @@ ABCD Team`
                 />
               </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>City *</label>
-                <input
-                  type='text'
-                  value={createForm.city}
-                  onChange={(e) => setCreateForm({...createForm, city: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+              <CityDropdown
+                value={createForm.city}
+                onChange={(city) => setCreateForm({...createForm, city})}
+                required
+              />
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Category *</label>
-                <input
-                  type='text'
-                  value={createForm.category}
-                  onChange={(e) => setCreateForm({...createForm, category: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Sub Category *</label>
-                <input
-                  type='text'
-                  value={createForm.subCategory}
-                  onChange={(e) => setCreateForm({...createForm, subCategory: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+              <MultiCategorySelector
+                value={createForm.businessCategories}
+                onChange={(businessCategories) => setCreateForm({...createForm, businessCategories})}
+                required
+              />
 
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Category *</label>

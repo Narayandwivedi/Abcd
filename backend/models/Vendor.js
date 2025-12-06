@@ -46,14 +46,27 @@ const vendorSchema = new mongoose.Schema({
     enum: ['Bronze', 'Silver', 'Gold', 'Diamond', 'Platinum'],
     required: true,
   },
-  category: {
-    type: String,
-    required: true,
-  },
-  subCategory: {
-    type: String,
-    required: true,
-  },
+
+  // Business Categories - Flattened structure for easier querying
+  businessCategories: [{
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
+    subcategoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    categoryName: {
+      type: String,
+      required: true,
+    },
+    subcategoryName: {
+      type: String,
+      required: true,
+    },
+  }],
   websiteUrl: {
     type: String,
   },
@@ -98,7 +111,7 @@ const vendorSchema = new mongoose.Schema({
   // Active certificate reference (current certificate with PDF)
   activeCertificate: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Certificate',
+    ref: 'VendorCertificate',
     default: null,
   },
 

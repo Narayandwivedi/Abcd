@@ -4,39 +4,50 @@ const path = require('path');
 
 // Generate unique certificate number in format: VM-CG-YYYY-MM-00101
 const generateVendorCertificateNumber = async () => {
-  const Vendor = require('../models/Vendor');
+  const VendorCertificate = require('../models/VendorCertificate');
 
   // Get current year and month
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
 
-  // Count total vendors with certificates
-  const certificateCount = await Vendor.countDocuments({
-    certificateNumber: { $exists: true, $ne: null }
-  });
+  // Get the last certificate number to increment from
+  const lastCertificate = await VendorCertificate.findOne()
+    .sort({ createdAt: -1 })
+    .select('certificateNumber');
 
-  // Generate certificate number starting from 00101
-  // Format: VM-CG-YYYY-MM-0010 (fixed) + incrementing number (1, 2, 3...)
-  const incrementingNumber = certificateCount + 1;
-  const certificateNumber = `VM-CG-${year}-${month}-0010${incrementingNumber}`;
+  let incrementingNumber = 101; // Start from 00101 if no certificates exist
+
+  if (lastCertificate && lastCertificate.certificateNumber) {
+    // Extract the number part from the last certificate (e.g., "VM-CG-2025-12-00101" -> 101)
+    const lastNumberMatch = lastCertificate.certificateNumber.match(/(\d+)$/);
+    if (lastNumberMatch) {
+      const lastNumber = parseInt(lastNumberMatch[1]);
+      incrementingNumber = lastNumber + 1;
+    }
+  }
+
+  // Generate certificate number
+  // Format: VM-CG-YYYY-MM-00101, VM-CG-YYYY-MM-00102, etc.
+  const certificateNumber = `VM-CG-${year}-${month}-${String(incrementingNumber).padStart(5, '0')}`;
 
   return certificateNumber;
 };
 
 // Generate vendor certificate PDF
-const generateVendorCertificatePDF = async (vendor) => {
+// If certificateNumber is provided, use it (for regeneration), otherwise generate new one
+const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = null) => {
   try {
-    // Create certificates directory if it doesn't exist
-    const certificatesDir = path.join(__dirname, '..', 'uploads', 'certificates');
-    if (!fs.existsSync(certificatesDir)) {
-      fs.mkdirSync(certificatesDir, { recursive: true });
+    // Create vendor certificates directory if it doesn't exist
+    const vendorCertificatesDir = path.join(__dirname, '..', 'uploads', 'vendor-certificates');
+    if (!fs.existsSync(vendorCertificatesDir)) {
+      fs.mkdirSync(vendorCertificatesDir, { recursive: true });
     }
 
-    // Generate unique certificate number
-    const certificateNumber = await generateVendorCertificateNumber();
+    // Use existing certificate number or generate new one
+    const certificateNumber = existingCertificateNumber || await generateVendorCertificateNumber();
     const fileName = `ABCD_VENDOR_CERTIFICATE_${certificateNumber}.pdf`;
-    const filePath = path.join(certificatesDir, fileName);
+    const filePath = path.join(vendorCertificatesDir, fileName);
 
     return new Promise((resolve, reject) => {
 
@@ -301,7 +312,7 @@ const generateVendorCertificatePDF = async (vendor) => {
           certificateNumber,
           fileName,
           filePath,
-          downloadLink: `/uploads/certificates/${fileName}`,
+          downloadLink: `/uploads/vendor-certificates/${fileName}`,
           issueDate: new Date(),
           expiryDate: new Date('2027-03-31')
         });

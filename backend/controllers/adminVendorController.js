@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const vendorModel = require("../models/Vendor.js");
+const VendorCertificate = require("../models/VendorCertificate.js");
 const { generateVendorCertificatePDF } = require("../utils/generateVendorCertificate.js");
 
 // Get all vendors (for admin)
@@ -7,6 +8,7 @@ const getAllVendors = async (req, res) => {
   try {
     const vendors = await vendorModel.find()
       .select('-password')
+      .populate('activeCertificate', 'certificateNumber downloadLink issueDate expiryDate renewalCount status pdfDeleted')
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -39,14 +41,26 @@ const approveVendor = async (req, res) => {
     // Generate certificate PDF
     const certificateData = await generateVendorCertificatePDF(vendor);
 
-    // Update payment verification status and certificate details
+    // Create certificate document
+    const certificate = new VendorCertificate({
+      certificateNumber: certificateData.certificateNumber,
+      vendorId: vendor._id,
+      downloadLink: certificateData.downloadLink,
+      issueDate: certificateData.issueDate,
+      expiryDate: certificateData.expiryDate,
+      renewalCount: 0,
+      status: 'active'
+    });
+
+    await certificate.save();
+
+    // Update payment verification status and certificate reference
     vendor.paymentVerified = true;
     vendor.isVerified = true;
-    vendor.certificateNumber = certificateData.certificateNumber;
-    vendor.certificateDownloadLink = certificateData.downloadLink;
-    vendor.certificateIssueDate = certificateData.issueDate;
-    vendor.certificateExpiryDate = certificateData.expiryDate;
+    vendor.activeCertificate = certificate._id;
     await vendor.save();
+
+    console.log(`[ADMIN] Vendor approved and certificate generated: ${vendor.businessName} - ${certificate.certificateNumber}`);
 
     return res.status(200).json({
       success: true,
@@ -57,9 +71,13 @@ const approveVendor = async (req, res) => {
         ownerName: vendor.ownerName,
         email: vendor.email,
         mobile: vendor.mobile,
-        paymentVerified: vendor.paymentVerified,
-        certificateNumber: vendor.certificateNumber,
-        certificateDownloadLink: vendor.certificateDownloadLink
+        paymentVerified: vendor.paymentVerified
+      },
+      certificate: {
+        certificateNumber: certificate.certificateNumber,
+        downloadLink: certificate.downloadLink,
+        issueDate: certificate.issueDate,
+        expiryDate: certificate.expiryDate
       }
     });
   } catch (error) {
@@ -117,13 +135,13 @@ const setVendorPassword = async (req, res) => {
 // Create vendor (admin)
 const createVendor = async (req, res) => {
   try {
-    const { ownerName, businessName, mobile, email, city, category, subCategory, membershipCategory, password } = req.body;
+    const { ownerName, businessName, mobile, email, city, businessCategories, membershipCategory, password } = req.body;
 
     // Validate required fields
-    if (!ownerName || !businessName || !mobile || !city || !category || !subCategory || !membershipCategory) {
+    if (!ownerName || !businessName || !mobile || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided"
+        message: "All required fields must be provided including at least one category and subcategory"
       });
     }
 
@@ -136,20 +154,34 @@ const createVendor = async (req, res) => {
       });
     }
 
+    // Check if email is provided and already exists
+    if (email && email.trim()) {
+      const existingEmail = await vendorModel.findOne({ email: email.trim() });
+      if (existingEmail) {
+        return res.status(400).json({
+          success: false,
+          message: "Vendor with this email already exists"
+        });
+      }
+    }
+
     // Create vendor data
     const vendorData = {
       ownerName,
       businessName,
       mobile,
-      email: email || undefined,
       city,
-      category,
-      subCategory,
+      businessCategories,
       membershipCategory,
       paymentVerified: true,
       isVerified: true,
       isMobileVerified: true
     };
+
+    // Only add email if it's provided and not empty
+    if (email && email.trim()) {
+      vendorData.email = email.trim();
+    }
 
     // Hash password if provided
     if (password && password.length >= 6) {
@@ -161,11 +193,25 @@ const createVendor = async (req, res) => {
 
     // Generate certificate
     const certificateData = await generateVendorCertificatePDF(vendor);
-    vendor.certificateNumber = certificateData.certificateNumber;
-    vendor.certificateDownloadLink = certificateData.downloadLink;
-    vendor.certificateIssueDate = certificateData.issueDate;
-    vendor.certificateExpiryDate = certificateData.expiryDate;
+
+    // Create certificate document
+    const certificate = new VendorCertificate({
+      certificateNumber: certificateData.certificateNumber,
+      vendorId: vendor._id,
+      downloadLink: certificateData.downloadLink,
+      issueDate: certificateData.issueDate,
+      expiryDate: certificateData.expiryDate,
+      renewalCount: 0,
+      status: 'active'
+    });
+
+    await certificate.save();
+
+    // Update vendor with certificate reference
+    vendor.activeCertificate = certificate._id;
     await vendor.save();
+
+    console.log(`[ADMIN] Vendor created with certificate: ${vendor.businessName} - ${certificate.certificateNumber}`);
 
     return res.status(201).json({
       success: true,
@@ -174,8 +220,13 @@ const createVendor = async (req, res) => {
         _id: vendor._id,
         businessName: vendor.businessName,
         ownerName: vendor.ownerName,
-        mobile: vendor.mobile,
-        certificateNumber: vendor.certificateNumber
+        mobile: vendor.mobile
+      },
+      certificate: {
+        certificateNumber: certificate.certificateNumber,
+        downloadLink: certificate.downloadLink,
+        issueDate: certificate.issueDate,
+        expiryDate: certificate.expiryDate
       }
     });
   } catch (error) {
