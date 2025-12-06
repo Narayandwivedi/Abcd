@@ -13,6 +13,7 @@ import {
   Share2
 } from 'lucide-react'
 import GoogleLogin from '../components/GoogleLogin'
+import MultiCategorySelector from '../components/MultiCategorySelector'
 import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 
@@ -21,9 +22,6 @@ const Signup = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [categories, setCategories] = useState([])
-  const [subcategories, setSubcategories] = useState([])
-  const [categoriesLoading, setCategoriesLoading] = useState(true)
 
   const [formData, setFormData] = useState({
     ownerName: '',
@@ -32,8 +30,7 @@ const Signup = () => {
     mobile: '',
     city: '',
     membershipCategory: '',
-    category: '',
-    subCategory: '',
+    businessCategories: [],
     websiteUrl: '',
     socialUrl: '',
     vendorPhoto: null
@@ -50,48 +47,13 @@ const Signup = () => {
     }
   }, [isAuthenticated, navigate])
 
-  // Fetch categories on component mount
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setCategoriesLoading(true)
-        const response = await fetch(`${BACKEND_URL}/api/categories`)
-        const data = await response.json()
-
-        if (data.success) {
-          setCategories(data.categories || [])
-        } else {
-          toast.error('Failed to load categories')
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-        toast.error('Failed to load categories')
-      } finally {
-        setCategoriesLoading(false)
-      }
-    }
-
-    fetchCategories()
-  }, [BACKEND_URL])
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
 
-    // Handle category change - populate subcategories
-    if (name === 'category') {
-      const selectedCategory = categories.find(cat => cat.name === value)
-      setSubcategories(selectedCategory ? selectedCategory.subcategories : [])
-      setFormData({
-        ...formData,
-        category: value,
-        subCategory: '' // Reset subcategory when category changes
-      })
-    } else {
-      setFormData({
-        ...formData,
-        [name]: type === 'checkbox' ? checked : value
-      })
-    }
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value
+    })
     setError('')
   }
 
@@ -132,8 +94,8 @@ const Signup = () => {
     setError('')
 
     // Validation
-    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.city || !formData.category || !formData.subCategory) {
-      setError('Please fill in all required fields')
+    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.city || formData.businessCategories.length === 0) {
+      setError('Please fill in all required fields including at least one category and subcategory')
       return
     }
 
@@ -163,8 +125,7 @@ const Signup = () => {
       submitData.append('businessName', formData.businessName)
       submitData.append('mobile', formData.mobile)
       submitData.append('city', formData.city)
-      submitData.append('category', formData.category)
-      submitData.append('subCategory', formData.subCategory)
+      submitData.append('businessCategories', JSON.stringify(formData.businessCategories))
       if (formData.membershipCategory) submitData.append('membershipCategory', formData.membershipCategory)
       if (formData.email) submitData.append('email', formData.email)
       if (formData.websiteUrl) submitData.append('websiteUrl', formData.websiteUrl)
@@ -186,8 +147,7 @@ const Signup = () => {
           mobile: '',
           city: '',
           membershipCategory: '',
-          category: '',
-          subCategory: '',
+          businessCategories: [],
           websiteUrl: '',
           socialUrl: '',
           vendorPhoto: null
@@ -409,63 +369,15 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Business Category */}
-            <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2'>
-                Business Category <span className='text-red-500'>*</span>
-              </label>
-              <select
-                name='category'
-                value={formData.category}
-                onChange={handleChange}
-                disabled={categoriesLoading}
-                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
-              >
-                <option value=''>
-                  {categoriesLoading ? 'Loading categories...' : 'Select Business Category'}
-                </option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat.name}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-              <p className='text-xs text-gray-500 mt-1'>
-                Select the main category for your business
-              </p>
-            </div>
-
-            {/* Business Sub-Category */}
-            <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2'>
-                Business Sub-Category <span className='text-red-500'>*</span>
-              </label>
-              <select
-                name='subCategory'
-                value={formData.subCategory}
-                onChange={handleChange}
-                disabled={!formData.category || subcategories.length === 0}
-                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
-              >
-                <option value=''>
-                  {!formData.category
-                    ? 'Select a category first'
-                    : subcategories.length === 0
-                    ? 'No subcategories available'
-                    : 'Select Business Sub-Category'}
-                </option>
-                {subcategories.map((subcat) => (
-                  <option key={subcat._id} value={subcat.name}>
-                    {subcat.name}
-                  </option>
-                ))}
-              </select>
-              <p className='text-xs text-gray-500 mt-1'>
-                {formData.category
-                  ? `Select the specific type under ${formData.category}`
-                  : 'Choose a category to see subcategories'}
-              </p>
-            </div>
+            {/* Business Categories & Subcategories */}
+            <MultiCategorySelector
+              value={formData.businessCategories}
+              onChange={(businessCategories) => {
+                setFormData({ ...formData, businessCategories })
+                setError('')
+              }}
+              required
+            />
 
             {/* Membership Category Selection */}
             <div>

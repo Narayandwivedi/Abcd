@@ -29,6 +29,17 @@ const Vendors = () => {
     password: ''
   })
   const [creating, setCreating] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editForm, setEditForm] = useState({
+    ownerName: '',
+    businessName: '',
+    mobile: '',
+    email: '',
+    city: '',
+    businessCategories: [],
+    membershipCategory: ''
+  })
+  const [editing, setEditing] = useState(false)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -223,6 +234,70 @@ ABCD Team`
     }
   }
 
+  // Open edit modal with vendor data
+  const openEditModal = (vendor) => {
+    setSelectedVendor(vendor)
+    setEditForm({
+      ownerName: vendor.ownerName || '',
+      businessName: vendor.businessName || '',
+      mobile: vendor.mobile || '',
+      email: vendor.email || '',
+      city: vendor.city || '',
+      businessCategories: vendor.businessCategories || [],
+      membershipCategory: vendor.membershipCategory || ''
+    })
+    setShowEditModal(true)
+  }
+
+  // Handle edit vendor
+  const handleEditVendor = async () => {
+    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipCategory) {
+      alert('Please fill all required fields including at least one category and subcategory')
+      return
+    }
+
+    if (editForm.mobile.toString().length !== 10) {
+      alert('Mobile number must be exactly 10 digits')
+      return
+    }
+
+    try {
+      setEditing(true)
+      const response = await fetch(`${BACKEND_URL}/api/admin/vendors/${selectedVendor._id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editForm),
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        alert('Vendor updated successfully!')
+        setShowEditModal(false)
+        setSelectedVendor(null)
+        setEditForm({
+          ownerName: '',
+          businessName: '',
+          mobile: '',
+          email: '',
+          city: '',
+          businessCategories: [],
+          membershipCategory: ''
+        })
+        fetchVendors()
+      } else {
+        alert(data.message || 'Failed to update vendor')
+      }
+    } catch (error) {
+      console.error('Error updating vendor:', error)
+      alert('Failed to update vendor')
+    } finally {
+      setEditing(false)
+    }
+  }
+
   // Filter vendors based on search
   const filteredVendors = vendors.filter(vendor =>
     vendor.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -403,6 +478,17 @@ ABCD Team`
                       </td>
                       <td className='px-6 py-4'>
                         <div className='flex items-center gap-3 flex-wrap'>
+                          {/* Edit Button */}
+                          <button
+                            onClick={() => openEditModal(vendor)}
+                            className='p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition'
+                            title='Edit Vendor'
+                          >
+                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' />
+                            </svg>
+                          </button>
+
                           {/* Call Button */}
                           <a
                             href={`tel:${vendor.mobile}`}
@@ -625,6 +711,17 @@ ABCD Team`
 
                   {/* Action Buttons */}
                   <div className='flex items-center gap-2 p-4 bg-gray-50 border-t border-gray-100 flex-wrap'>
+                    {/* Edit */}
+                    <button
+                      onClick={() => openEditModal(vendor)}
+                      className='flex items-center gap-1.5 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
+                    >
+                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' />
+                      </svg>
+                      Edit
+                    </button>
+
                     {/* Call */}
                     <a
                       href={`tel:${vendor.mobile}`}
@@ -849,6 +946,108 @@ ABCD Team`
               </button>
               <button
                 onClick={() => setShowCreateModal(false)}
+                className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition'
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Vendor Modal */}
+      {showEditModal && selectedVendor && (
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto'>
+            <h2 className='text-2xl font-bold text-gray-800 mb-4'>Edit Vendor</h2>
+
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Owner Name *</label>
+                <input
+                  type='text'
+                  value={editForm.ownerName}
+                  onChange={(e) => setEditForm({...editForm, ownerName: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Business Name *</label>
+                <input
+                  type='text'
+                  value={editForm.businessName}
+                  onChange={(e) => setEditForm({...editForm, businessName: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Mobile * (10 digits)</label>
+                <input
+                  type='tel'
+                  maxLength={10}
+                  value={editForm.mobile}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 10)
+                    setEditForm({...editForm, mobile: val})
+                  }}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Email</label>
+                <input
+                  type='email'
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                />
+              </div>
+
+              <CityDropdown
+                value={editForm.city}
+                onChange={(city) => setEditForm({...editForm, city})}
+                required
+              />
+
+              <MultiCategorySelector
+                value={editForm.businessCategories}
+                onChange={(businessCategories) => setEditForm({...editForm, businessCategories})}
+                required
+              />
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Category *</label>
+                <select
+                  value={editForm.membershipCategory}
+                  onChange={(e) => setEditForm({...editForm, membershipCategory: e.target.value})}
+                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                >
+                  <option value=''>Select Membership</option>
+                  <option value='Bronze'>Bronze</option>
+                  <option value='Silver'>Silver</option>
+                  <option value='Gold'>Gold</option>
+                  <option value='Diamond'>Diamond</option>
+                  <option value='Platinum'>Platinum</option>
+                </select>
+              </div>
+            </div>
+
+            <div className='flex gap-3 mt-6'>
+              <button
+                onClick={handleEditVendor}
+                disabled={editing}
+                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50'
+              >
+                {editing ? 'Updating...' : 'Update Vendor'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setSelectedVendor(null)
+                }}
                 className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition'
               >
                 Cancel

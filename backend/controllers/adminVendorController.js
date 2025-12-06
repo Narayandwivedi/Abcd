@@ -238,9 +238,93 @@ const createVendor = async (req, res) => {
   }
 };
 
+// Update vendor (admin)
+const updateVendor = async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+    const { ownerName, businessName, mobile, email, city, businessCategories, membershipCategory } = req.body;
+
+    // Validate required fields
+    if (!ownerName || !businessName || !mobile || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be provided including at least one category and subcategory"
+      });
+    }
+
+    const vendor = await vendorModel.findById(vendorId);
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found"
+      });
+    }
+
+    // Check if mobile is being changed and if it already exists
+    if (mobile !== vendor.mobile) {
+      const existingMobile = await vendorModel.findOne({ mobile, _id: { $ne: vendorId } });
+      if (existingMobile) {
+        return res.status(400).json({
+          success: false,
+          message: "Mobile number already exists"
+        });
+      }
+    }
+
+    // Check if email is provided and already exists (excluding current vendor)
+    if (email && email.trim()) {
+      const existingEmail = await vendorModel.findOne({ email: email.trim(), _id: { $ne: vendorId } });
+      if (existingEmail) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already exists"
+        });
+      }
+    }
+
+    // Update vendor data
+    vendor.ownerName = ownerName;
+    vendor.businessName = businessName;
+    vendor.mobile = mobile;
+    vendor.city = city;
+    vendor.businessCategories = businessCategories;
+    vendor.membershipCategory = membershipCategory;
+
+    // Update email if provided
+    if (email && email.trim()) {
+      vendor.email = email.trim();
+    } else {
+      vendor.email = undefined; // Remove email if not provided
+    }
+
+    await vendor.save();
+
+    console.log(`[ADMIN] Vendor updated: ${vendor.businessName}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "Vendor updated successfully",
+      vendor: {
+        _id: vendor._id,
+        businessName: vendor.businessName,
+        ownerName: vendor.ownerName,
+        mobile: vendor.mobile
+      }
+    });
+  } catch (error) {
+    console.error('Update vendor error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllVendors,
   approveVendor,
   setVendorPassword,
-  createVendor
+  createVendor,
+  updateVendor
 };

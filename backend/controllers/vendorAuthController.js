@@ -10,7 +10,16 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, city, membershipCategory, category, subCategory, websiteUrl, socialUrl } = req.body;
+    let { email, mobile, ownerName, businessName, city, membershipCategory, businessCategories, websiteUrl, socialUrl } = req.body;
+
+    // Parse businessCategories if it's a string (from FormData)
+    if (typeof businessCategories === 'string') {
+      try {
+        businessCategories = JSON.parse(businessCategories);
+      } catch (e) {
+        return res.status(400).json({ success: false, message: "Invalid business categories format" });
+      }
+    }
 
     // Trim input fields
     email = email?.trim();
@@ -18,13 +27,11 @@ const handleVendorSignup = async (req, res) => {
     businessName = businessName?.trim();
     city = city?.trim();
     membershipCategory = membershipCategory?.trim();
-    category = category?.trim();
-    subCategory = subCategory?.trim();
     websiteUrl = websiteUrl?.trim();
     socialUrl = socialUrl?.trim();
 
-    if (!mobile || !ownerName || !businessName || !city || !category || !subCategory || !membershipCategory) {
-      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, city, category, sub-category, and membership category are required" });
+    if (!mobile || !ownerName || !businessName || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
+      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, city, at least one category-subcategory pair, and membership category are required" });
     }
 
     // Validate Indian mobile number
@@ -65,8 +72,7 @@ const handleVendorSignup = async (req, res) => {
       ownerName,
       businessName,
       city, // Required field
-      category,
-      subCategory,
+      businessCategories,
       membershipCategory, // Required field
       isBusinessApplicationSubmitted: true, // Skip business form, go directly to pending approval
     };
