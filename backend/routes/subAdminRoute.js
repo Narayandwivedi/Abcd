@@ -11,6 +11,8 @@ const {
   toggleAdApproval,
   toggleAdVisibility
 } = require("../controllers/subAdminController");
+const { getAllUsers, approveUser } = require("../controllers/adminController");
+const { getAllVendors, approveVendor } = require("../controllers/adminVendorController");
 const { subAdminAuth, checkPermission } = require("../middleware/subAdminAuth");
 const upload = require("../utils/multer");
 
@@ -23,6 +25,14 @@ router.post("/login", subAdminLogin);
 router.post("/logout", subAdminAuth, subAdminLogout);
 router.get("/me", subAdminAuth, getCurrentSubAdmin);
 router.put("/change-password", subAdminAuth, changeSubAdminPassword);
+
+// User management routes (require specific permissions)
+router.get("/users", subAdminAuth, checkPermission('canViewUsers'), getAllUsers);
+router.put("/users/:userId/approve", subAdminAuth, checkPermission('canApproveUsers'), approveUser);
+
+// Vendor management routes (require specific permissions)
+router.get("/vendors", subAdminAuth, checkPermission('canViewVendors'), getAllVendors);
+router.put("/vendors/:vendorId/approve", subAdminAuth, checkPermission('canApproveVendors'), approveVendor);
 
 // Ad management routes (require specific permissions)
 router.get("/ads", subAdminAuth, checkPermission('canViewAds'), getAllAds);

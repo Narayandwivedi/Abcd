@@ -17,7 +17,7 @@ const Vendors = () => {
   const fetchVendors = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${BACKEND_URL}/api/admin/vendors`, {
+      const response = await axios.get(`${BACKEND_URL}/api/subadmin/vendors`, {
         withCredentials: true
       })
       if (response.data.success) {
@@ -40,7 +40,7 @@ const Vendors = () => {
     if (!window.confirm('Are you sure you want to approve this vendor?')) return
 
     try {
-      const response = await axios.put(`${BACKEND_URL}/api/admin/vendors/${vendorId}/approve`, {}, {
+      const response = await axios.put(`${BACKEND_URL}/api/subadmin/vendors/${vendorId}/approve`, {}, {
         withCredentials: true
       })
       if (response.data.success) {

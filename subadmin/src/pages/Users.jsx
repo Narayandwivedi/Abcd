@@ -20,7 +20,7 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${BACKEND_URL}/api/admin/users`, {
+      const response = await axios.get(`${BACKEND_URL}/api/subadmin/users`, {
         withCredentials: true
       })
       if (response.data.success) {
@@ -43,7 +43,7 @@ const Users = () => {
     if (!window.confirm('Are you sure you want to approve this user?')) return
 
     try {
-      const response = await axios.put(`${BACKEND_URL}/api/admin/users/${userId}/approve`, {}, {
+      const response = await axios.put(`${BACKEND_URL}/api/subadmin/users/${userId}/approve`, {}, {
         withCredentials: true
       })
       if (response.data.success) {

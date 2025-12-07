@@ -22,7 +22,7 @@ const Dashboard = () => {
 
       // Fetch users if has permission
       if (hasUserPermission) {
-        const userResponse = await axios.get(`${BACKEND_URL}/api/admin/users`, {
+        const userResponse = await axios.get(`${BACKEND_URL}/api/subadmin/users`, {
           withCredentials: true
         })
         if (userResponse.data.success) {
@@ -32,7 +32,7 @@ const Dashboard = () => {
 
       // Fetch vendors if has permission
       if (hasVendorPermission) {
-        const vendorResponse = await axios.get(`${BACKEND_URL}/api/admin/vendors`, {
+        const vendorResponse = await axios.get(`${BACKEND_URL}/api/subadmin/vendors`, {
           withCredentials: true
         })
         if (vendorResponse.data.success) {

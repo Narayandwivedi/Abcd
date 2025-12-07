@@ -56,7 +56,7 @@ const Ads = () => {
 
   const fetchVendors = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/admin/users`, {
+      const response = await axios.get(`${BACKEND_URL}/api/subadmin/users`, {
         withCredentials: true
       })
 
