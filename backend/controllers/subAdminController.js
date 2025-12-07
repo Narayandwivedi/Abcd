@@ -69,29 +69,15 @@ const subAdminLogin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // Set cookie
-    const cookieOptions = {
+    // Set cookie (matching admin configuration)
+    res.cookie("subAdminToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/'
-    };
-
-    // Don't set domain in development (localhost)
-    if (process.env.NODE_ENV === "production") {
-      cookieOptions.domain = '.abcdvyapar.com';
-    }
-
-    res.cookie("subAdminToken", token, cookieOptions);
-
-    console.log(`[SUBADMIN LOGIN] Cookie set with options:`, {
-      httpOnly: cookieOptions.httpOnly,
-      secure: cookieOptions.secure,
-      sameSite: cookieOptions.sameSite,
-      domain: cookieOptions.domain,
-      path: cookieOptions.path
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
+
+    console.log(`[SUBADMIN LOGIN] Cookie set with sameSite: strict`);
 
     return res.status(200).json({
       success: true,
