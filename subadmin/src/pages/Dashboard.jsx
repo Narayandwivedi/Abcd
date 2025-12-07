@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useApp } from '../context/AppContext'
-import api from '../config/axios'
+import axios from 'axios'
 
 const Dashboard = () => {
   const { subAdmin } = useApp()
@@ -8,6 +8,7 @@ const Dashboard = () => {
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
   const hasUserPermission = subAdmin?.permissions?.canViewUsers
   const hasVendorPermission = subAdmin?.permissions?.canViewVendors
 
@@ -21,7 +22,9 @@ const Dashboard = () => {
 
       // Fetch users if has permission
       if (hasUserPermission) {
-        const userResponse = await api.get('/api/admin/users')
+        const userResponse = await axios.get(`${BACKEND_URL}/api/admin/users`, {
+          withCredentials: true
+        })
         if (userResponse.data.success) {
           setUsers(userResponse.data.users)
         }
@@ -29,7 +32,9 @@ const Dashboard = () => {
 
       // Fetch vendors if has permission
       if (hasVendorPermission) {
-        const vendorResponse = await api.get('/api/admin/vendors')
+        const vendorResponse = await axios.get(`${BACKEND_URL}/api/admin/vendors`, {
+          withCredentials: true
+        })
         if (vendorResponse.data.success) {
           setVendors(vendorResponse.data.vendors)
         }

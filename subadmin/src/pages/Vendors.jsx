@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useApp } from '../context/AppContext'
-import api from '../config/axios'
+import axios from 'axios'
 
 const Vendors = () => {
   const { subAdmin } = useApp()
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
   useEffect(() => {
     fetchVendors()
@@ -15,7 +17,9 @@ const Vendors = () => {
   const fetchVendors = async () => {
     try {
       setLoading(true)
-      const response = await api.get('/api/admin/vendors')
+      const response = await axios.get(`${BACKEND_URL}/api/admin/vendors`, {
+        withCredentials: true
+      })
       if (response.data.success) {
         setVendors(response.data.vendors)
       }
@@ -36,7 +40,9 @@ const Vendors = () => {
     if (!window.confirm('Are you sure you want to approve this vendor?')) return
 
     try {
-      const response = await api.put(`/api/admin/vendors/${vendorId}/approve`)
+      const response = await axios.put(`${BACKEND_URL}/api/admin/vendors/${vendorId}/approve`, {}, {
+        withCredentials: true
+      })
       if (response.data.success) {
         alert('Vendor approved successfully!')
         fetchVendors()

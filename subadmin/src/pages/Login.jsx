@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import api from '../config/axios'
+import axios from 'axios'
 
 const Login = () => {
   const [identifier, setIdentifier] = useState('')
@@ -10,6 +10,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
   const { setSubAdmin } = useApp()
   const navigate = useNavigate()
 
@@ -19,9 +20,11 @@ const Login = () => {
     setLoading(true)
 
     try {
-      const response = await api.post('/api/subadmin/login', {
+      const response = await axios.post(`${BACKEND_URL}/api/subadmin/login`, {
         identifier,
         password
+      }, {
+        withCredentials: true
       })
 
       if (response.data.success) {

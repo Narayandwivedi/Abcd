@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
-import api from '../config/axios'
+import axios from 'axios'
 
 const Ads = () => {
   const [ads, setAds] = useState([])
@@ -32,7 +32,9 @@ const Ads = () => {
   const fetchAds = async () => {
     try {
       setLoading(true)
-      const response = await api.get('/api/subadmin/ads')
+      const response = await axios.get(`${BACKEND_URL}/api/subadmin/ads`, {
+        withCredentials: true
+      })
 
       if (response.data.success) {
         setAds(response.data.ads)
@@ -54,7 +56,9 @@ const Ads = () => {
 
   const fetchVendors = async () => {
     try {
-      const response = await api.get('/api/admin/users')
+      const response = await axios.get(`${BACKEND_URL}/api/admin/users`, {
+        withCredentials: true
+      })
 
       if (response.data.success) {
         setVendors(response.data.users.filter(u => u.paymentVerified))
@@ -107,7 +111,8 @@ const Ads = () => {
       if (formData.link) formDataToSend.append('link', formData.link)
       formDataToSend.append('displayOrder', formData.displayOrder)
 
-      const response = await api.post('/api/subadmin/ads', formDataToSend, {
+      const response = await axios.post(`${BACKEND_URL}/api/subadmin/ads`, formDataToSend, {
+        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -143,7 +148,8 @@ const Ads = () => {
       if (formData.link) formDataToSend.append('link', formData.link)
       formDataToSend.append('displayOrder', formData.displayOrder)
 
-      const response = await api.put(`/api/subadmin/ads/${selectedAd._id}`, formDataToSend, {
+      const response = await axios.put(`${BACKEND_URL}/api/subadmin/ads/${selectedAd._id}`, formDataToSend, {
+        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -171,7 +177,9 @@ const Ads = () => {
     if (!window.confirm('Are you sure you want to delete this ad?')) return
 
     try {
-      const response = await api.delete(`/api/subadmin/ads/${adId}`)
+      const response = await axios.delete(`${BACKEND_URL}/api/subadmin/ads/${adId}`, {
+        withCredentials: true
+      })
 
       if (response.data.success) {
         toast.success('Ad deleted successfully!')
@@ -191,7 +199,9 @@ const Ads = () => {
 
   const handleToggleApproval = async (adId) => {
     try {
-      const response = await api.patch(`/api/subadmin/ads/${adId}/toggle-approval`)
+      const response = await axios.patch(`${BACKEND_URL}/api/subadmin/ads/${adId}/toggle-approval`, {}, {
+        withCredentials: true
+      })
 
       if (response.data.success) {
         toast.success(response.data.message)
@@ -211,7 +221,9 @@ const Ads = () => {
 
   const handleToggleVisibility = async (adId) => {
     try {
-      const response = await api.patch(`/api/subadmin/ads/${adId}/toggle-visibility`)
+      const response = await axios.patch(`${BACKEND_URL}/api/subadmin/ads/${adId}/toggle-visibility`, {}, {
+        withCredentials: true
+      })
 
       if (response.data.success) {
         toast.success(response.data.message)

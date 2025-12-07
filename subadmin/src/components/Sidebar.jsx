@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import api from '../config/axios'
+import axios from 'axios'
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation()
@@ -9,9 +9,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const { subAdmin, setSubAdmin } = useApp()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
   const handleLogout = async () => {
     try {
-      await api.post('/api/subadmin/logout')
+      await axios.post(`${BACKEND_URL}/api/subadmin/logout`, {}, {
+        withCredentials: true
+      })
       setSubAdmin(null)
       navigate('/login')
     } catch (error) {

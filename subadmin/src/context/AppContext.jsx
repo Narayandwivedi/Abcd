@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import api from '../config/axios'
+import axios from 'axios'
 
 const AppContext = createContext()
 
@@ -15,6 +15,8 @@ export const AppProvider = ({ children }) => {
   const [subAdmin, setSubAdmin] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
   // Check if sub-admin is already logged in on mount
   useEffect(() => {
     checkAuth()
@@ -22,7 +24,9 @@ export const AppProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await api.get('/api/subadmin/me')
+      const response = await axios.get(`${BACKEND_URL}/api/subadmin/me`, {
+        withCredentials: true
+      })
       if (response.data.success) {
         setSubAdmin(response.data.subAdmin)
       } else {

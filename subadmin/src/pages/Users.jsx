@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useApp } from '../context/AppContext'
 import { toast } from 'react-toastify'
-import api from '../config/axios'
+import axios from 'axios'
 
 const Users = () => {
   const { subAdmin } = useApp()
@@ -20,7 +20,9 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const response = await api.get('/api/admin/users')
+      const response = await axios.get(`${BACKEND_URL}/api/admin/users`, {
+        withCredentials: true
+      })
       if (response.data.success) {
         setUsers(response.data.users)
       }
@@ -41,7 +43,9 @@ const Users = () => {
     if (!window.confirm('Are you sure you want to approve this user?')) return
 
     try {
-      const response = await api.put(`/api/admin/users/${userId}/approve`)
+      const response = await axios.put(`${BACKEND_URL}/api/admin/users/${userId}/approve`, {}, {
+        withCredentials: true
+      })
       if (response.data.success) {
         toast.success('User approved successfully!')
         fetchUsers()
@@ -155,11 +159,11 @@ const Users = () => {
               {filteredUsers.map((user) => (
                 <div key={user._id} className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300'>
                   {/* Card Header with Gradient Background */}
-                  <div className='bg-gradient-to-r from-purple-50 via-blue-50 to-pink-50 p-4'>
+                  <div className='bg-gradient-to-r- from-purple-50 via-blue-50 to-pink-50 p-4'>
                     <div className='flex items-start gap-3'>
                       {/* Profile Photo with Ring */}
                       <div className='flex flex-col items-center gap-2'>
-                        <div className='relative flex-shrink-0'>
+                        <div className='relative shrink-0'>
                           {user.passportPhoto ? (
                             <img
                               src={`${BACKEND_URL}/${user.passportPhoto}`}
@@ -168,7 +172,7 @@ const Users = () => {
                               className='w-16 h-16 rounded-full object-cover border-4 border-white shadow-md cursor-pointer hover:scale-105 transition-transform duration-200'
                             />
                           ) : (
-                            <div className='w-16 h-16 bg-gradient-to-br from-purple-500 via-blue-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md border-4 border-white'>
+                            <div className='w-16 h-16 bg-gradient-to-br- from-purple-500 via-blue-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md border-4 border-white'>
                               {user.fullName?.[0]?.toUpperCase()}
                             </div>
                           )}
@@ -204,14 +208,14 @@ const Users = () => {
                         </p>
                         {user.activeCertificate?.certificateNumber && (
                           <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold mb-0.5 whitespace-nowrap'>
-                            <svg className='w-3 h-3 flex-shrink-0' fill='currentColor' viewBox='0 0 20 20'>
+                            <svg className='w-3 h-3 shrink-0' fill='currentColor' viewBox='0 0 20 20'>
                               <path fillRule='evenodd' d='M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z' clipRule='evenodd' />
                             </svg>
                             <span className='whitespace-nowrap'>{user.activeCertificate.certificateNumber}</span>
                           </div>
                         )}
                         <div className='flex items-start gap-1 text-xs text-gray-500'>
-                          <svg className='w-3 h-3 flex-shrink-0 mt-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <svg className='w-3 h-3 shrink-0 mt-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
                           </svg>
@@ -329,7 +333,7 @@ const Users = () => {
                     {!user.paymentVerified && !user.isRejected && subAdmin?.permissions?.canApproveUsers && (
                       <button
                         onClick={() => handleApprove(user._id)}
-                        className='flex-1 px-3 py-2 bg-gradient-to-r from-purple-600 to-blue-700 text-white rounded-lg text-xs font-bold hover:from-purple-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
+                        className='flex-1 px-3 py-2 bg-gradient-to-r- from-purple-600 to-blue-700 text-white rounded-lg text-xs font-bold hover:from-purple-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
                       >
                         Approve Now
                       </button>
