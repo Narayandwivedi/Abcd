@@ -4,14 +4,20 @@ const SubAdmin = require("../models/SubAdmin.js");
 // Middleware to verify sub-admin authentication
 const subAdminAuth = async (req, res, next) => {
   try {
+    console.log('[SUBADMIN AUTH] All cookies:', req.cookies);
+    console.log('[SUBADMIN AUTH] Headers:', req.headers.cookie);
+
     const token = req.cookies.subAdminToken;
 
     if (!token) {
+      console.log('[SUBADMIN AUTH] ❌ No token found in cookies');
       return res.status(401).json({
         success: false,
         message: "Unauthorized - No token provided"
       });
     }
+
+    console.log('[SUBADMIN AUTH] ✅ Token found, verifying...');
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const subAdmin = await SubAdmin.findById(decoded.subAdminId);
