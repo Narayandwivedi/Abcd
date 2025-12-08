@@ -1,7 +1,9 @@
 const express = require("express");
 const {
   getAllCities,
+  getStates,
   getDistricts,
+  getCitiesByState,
   getCitiesByDistrict
 } = require("../controllers/cityController");
 
@@ -11,8 +13,14 @@ const router = express.Router();
 // GET /api/cities?page=1&limit=10&search=raipur
 router.get("/", getAllCities);
 
+// GET /api/cities/states - Get all states
+router.get("/states", getStates);
+
 // GET /api/cities/districts - Get all districts
 router.get("/districts", getDistricts);
+
+// GET /api/cities/state/:state - Get cities by specific state
+router.get("/state/:state", getCitiesByState);
 
 // GET /api/cities/district/:district - Get cities by specific district
 router.get("/district/:district", getCitiesByDistrict);

@@ -10,7 +10,7 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, city, membershipCategory, businessCategories, websiteUrl, socialUrl } = req.body;
+    let { email, mobile, ownerName, businessName, state, city, membershipCategory, businessCategories, websiteUrl, socialUrl } = req.body;
 
     // Parse businessCategories if it's a string (from FormData)
     if (typeof businessCategories === 'string') {
@@ -25,13 +25,14 @@ const handleVendorSignup = async (req, res) => {
     email = email?.trim();
     ownerName = ownerName?.trim();
     businessName = businessName?.trim();
+    state = state?.trim();
     city = city?.trim();
     membershipCategory = membershipCategory?.trim();
     websiteUrl = websiteUrl?.trim();
     socialUrl = socialUrl?.trim();
 
-    if (!mobile || !ownerName || !businessName || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
-      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, city, at least one category-subcategory pair, and membership category are required" });
+    if (!mobile || !ownerName || !businessName || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
+      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, state, city, at least one category-subcategory pair, and membership category are required" });
     }
 
     // Validate Indian mobile number
@@ -71,6 +72,7 @@ const handleVendorSignup = async (req, res) => {
       mobile,
       ownerName,
       businessName,
+      state, // Required field
       city, // Required field
       businessCategories,
       membershipCategory, // Required field

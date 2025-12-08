@@ -114,6 +114,28 @@ const getAllCitiesAdmin = async (req, res) => {
   }
 };
 
+// Get states list
+const getStates = async (req, res) => {
+  try {
+    const states = await City.distinct('state');
+
+    // Sort alphabetically
+    states.sort();
+
+    return res.status(200).json({
+      success: true,
+      count: states.length,
+      states
+    });
+  } catch (error) {
+    console.error('Get states error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 // Get districts list
 const getDistricts = async (req, res) => {
   try {
@@ -129,6 +151,33 @@ const getDistricts = async (req, res) => {
     });
   } catch (error) {
     console.error('Get districts error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Get cities by state
+const getCitiesByState = async (req, res) => {
+  try {
+    const { state } = req.params;
+
+    const cities = await City.find({
+      state,
+      isActive: true
+    })
+    .select('city district')
+    .sort({ city: 1 });
+
+    return res.status(200).json({
+      success: true,
+      state,
+      count: cities.length,
+      cities
+    });
+  } catch (error) {
+    console.error('Get cities by state error:', error);
     return res.status(500).json({
       success: false,
       message: error.message
@@ -340,7 +389,9 @@ const toggleCityStatus = async (req, res) => {
 module.exports = {
   getAllCities,
   getAllCitiesAdmin,
+  getStates,
   getDistricts,
+  getCitiesByState,
   getCitiesByDistrict,
   createCity,
   updateCity,

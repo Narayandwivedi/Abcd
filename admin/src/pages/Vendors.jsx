@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import CityDropdown from '../components/CityDropdown'
+import StateCitySelector from '../components/StateCitySelector'
 import MultiCategorySelector from '../components/MultiCategorySelector'
 
 const Vendors = () => {
@@ -23,6 +23,7 @@ const Vendors = () => {
     businessName: '',
     mobile: '',
     email: '',
+    state: '',
     city: '',
     businessCategories: [],
     membershipCategory: '',
@@ -35,6 +36,7 @@ const Vendors = () => {
     businessName: '',
     mobile: '',
     email: '',
+    state: '',
     city: '',
     businessCategories: [],
     membershipCategory: ''
@@ -187,8 +189,8 @@ ABCD Team`
 
   // Create vendor handler
   const handleCreateVendor = async () => {
-    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipCategory) {
-      alert('Please fill all required fields including at least one category and subcategory')
+    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.state || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipCategory) {
+      alert('Please fill all required fields including state, city, and at least one category and subcategory')
       return
     }
 
@@ -217,6 +219,7 @@ ABCD Team`
           businessName: '',
           mobile: '',
           email: '',
+          state: '',
           city: '',
           businessCategories: [],
           membershipCategory: '',
@@ -242,6 +245,7 @@ ABCD Team`
       businessName: vendor.businessName || '',
       mobile: vendor.mobile || '',
       email: vendor.email || '',
+      state: vendor.state || '',
       city: vendor.city || '',
       businessCategories: vendor.businessCategories || [],
       membershipCategory: vendor.membershipCategory || ''
@@ -251,8 +255,8 @@ ABCD Team`
 
   // Handle edit vendor
   const handleEditVendor = async () => {
-    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipCategory) {
-      alert('Please fill all required fields including at least one category and subcategory')
+    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.state || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipCategory) {
+      alert('Please fill all required fields including state, city, and at least one category and subcategory')
       return
     }
 
@@ -282,6 +286,7 @@ ABCD Team`
           businessName: '',
           mobile: '',
           email: '',
+          state: '',
           city: '',
           businessCategories: [],
           membershipCategory: ''
@@ -395,7 +400,9 @@ ABCD Team`
                           <div>
                             <div className='font-semibold text-gray-800'>{vendor.businessName}</div>
                             <div className='text-xs text-gray-500'>Owner: {vendor.ownerName}</div>
-                            <div className='text-xs text-gray-500'>{vendor.city || 'N/A'}</div>
+                            <div className='text-xs text-gray-500'>
+                              {vendor.city || 'N/A'}{vendor.state ? `, ${vendor.state}` : ''}
+                            </div>
                             {vendor.activeCertificate?.certificateNumber && (
                               <div className='text-xs text-blue-600 font-semibold mt-1'>
                                 Cert: {vendor.activeCertificate?.certificateNumber}
@@ -604,7 +611,9 @@ ABCD Team`
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
                           </svg>
-                          <span className='text-left break-words'>{vendor.city || 'N/A'}</span>
+                          <span className='text-left break-words'>
+                            {vendor.city || 'N/A'}{vendor.state ? `, ${vendor.state}` : ''}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -897,9 +906,11 @@ ABCD Team`
                 />
               </div>
 
-              <CityDropdown
-                value={createForm.city}
-                onChange={(city) => setCreateForm({...createForm, city})}
+              <StateCitySelector
+                stateValue={createForm.state}
+                cityValue={createForm.city}
+                onStateChange={(state) => setCreateForm({...createForm, state})}
+                onCityChange={(city) => setCreateForm({...createForm, city})}
                 required
               />
 
@@ -1006,9 +1017,11 @@ ABCD Team`
                 />
               </div>
 
-              <CityDropdown
-                value={editForm.city}
-                onChange={(city) => setEditForm({...editForm, city})}
+              <StateCitySelector
+                stateValue={editForm.state}
+                cityValue={editForm.city}
+                onStateChange={(state) => setEditForm({...editForm, state})}
+                onCityChange={(city) => setEditForm({...editForm, city})}
                 required
               />
 

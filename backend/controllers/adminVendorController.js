@@ -135,13 +135,13 @@ const setVendorPassword = async (req, res) => {
 // Create vendor (admin)
 const createVendor = async (req, res) => {
   try {
-    const { ownerName, businessName, mobile, email, city, businessCategories, membershipCategory, password } = req.body;
+    const { ownerName, businessName, mobile, email, state, city, businessCategories, membershipCategory, password } = req.body;
 
     // Validate required fields
-    if (!ownerName || !businessName || !mobile || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
+    if (!ownerName || !businessName || !mobile || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided including at least one category and subcategory"
+        message: "All required fields must be provided including state, city, at least one category and subcategory"
       });
     }
 
@@ -170,6 +170,7 @@ const createVendor = async (req, res) => {
       ownerName,
       businessName,
       mobile,
+      state,
       city,
       businessCategories,
       membershipCategory,
@@ -242,13 +243,13 @@ const createVendor = async (req, res) => {
 const updateVendor = async (req, res) => {
   try {
     const { vendorId } = req.params;
-    const { ownerName, businessName, mobile, email, city, businessCategories, membershipCategory } = req.body;
+    const { ownerName, businessName, mobile, email, state, city, businessCategories, membershipCategory } = req.body;
 
     // Validate required fields
-    if (!ownerName || !businessName || !mobile || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
+    if (!ownerName || !businessName || !mobile || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided including at least one category and subcategory"
+        message: "All required fields must be provided including state, city, at least one category and subcategory"
       });
     }
 
@@ -287,6 +288,7 @@ const updateVendor = async (req, res) => {
     vendor.ownerName = ownerName;
     vendor.businessName = businessName;
     vendor.mobile = mobile;
+    vendor.state = state;
     vendor.city = city;
     vendor.businessCategories = businessCategories;
     vendor.membershipCategory = membershipCategory;

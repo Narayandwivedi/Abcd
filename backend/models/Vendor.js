@@ -37,6 +37,10 @@ const vendorSchema = new mongoose.Schema({
   passportPhoto: {
     type: String,
   },
+  state: {
+    type: String,
+    required: true,
+  },
   city: {
     type: String,
     required: true,
