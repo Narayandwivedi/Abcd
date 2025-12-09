@@ -58,6 +58,10 @@ const Navbar = () => {
             Contact
             <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300'></span>
           </Link>
+          <Link to='/vouchers' className='text-gray-700 font-medium hover:text-blue-600 transition-colors relative group'>
+            Vouchers
+            <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300'></span>
+          </Link>
 
           {/* Desktop Contact Icons - Stacked Vertically */}
           <div className='flex flex-col gap-2'>
@@ -172,6 +176,13 @@ const Navbar = () => {
               className='block text-gray-700 font-medium hover:text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors'
             >
               Contact
+            </Link>
+            <Link
+              to='/vouchers'
+              onClick={() => setShowMobileMenu(false)}
+              className='block text-gray-700 font-medium hover:text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors'
+            >
+              Vouchers
             </Link>
 
             {/* Mobile Auth Section - Hidden, using bottom nav instead */}

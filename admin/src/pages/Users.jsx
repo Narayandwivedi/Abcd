@@ -1063,13 +1063,46 @@ ABCD Team`
                       Pass
                     </button>
 
-                    {/* Approve */}
-                    {!user.paymentVerified && !user.isRejected && (
+                    {/* Approve - Show for pending OR rejected users */}
+                    {!user.paymentVerified && (
                       <button
                         onClick={() => handleApprove(user._id)}
                         className='flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-xs font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
                       >
-                        Approve Now
+                        {user.isRejected ? 'Re-Approve' : 'Approve Now'}
+                      </button>
+                    )}
+
+                    {/* Reject - Only show for pending (not rejected) */}
+                    {!user.paymentVerified && !user.isRejected && (
+                      <button
+                        onClick={() => handleReject(user._id, user.fullName)}
+                        className='flex-1 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-xs font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
+                      >
+                        Reject
+                      </button>
+                    )}
+
+                    {/* Toggle Status - Only show for approved users (not rejected) */}
+                    {!user.isRejected && (
+                      <button
+                        onClick={() => handleToggleStatus(user._id, user.isActive)}
+                        className={`p-2 rounded-lg transition shadow-sm hover:shadow-md ${
+                          user.isActive
+                            ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                        title={user.isActive ? 'Deactivate User' : 'Activate User'}
+                      >
+                        {user.isActive ? (
+                          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' />
+                          </svg>
+                        ) : (
+                          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
+                          </svg>
+                        )}
                       </button>
                     )}
                   </div>

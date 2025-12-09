@@ -18,3 +18,7 @@ logs/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Database Backups
+backups/
+temp-backup/

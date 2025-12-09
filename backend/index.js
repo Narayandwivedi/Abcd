@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const path = require('path');
 const { connectToDb } = require('./utils/mongodb');
+const { scheduleBackupJobs } = require('./jobs/dataBackup');
 
 const app = express()
 const PORT = process.env.PORT
@@ -80,4 +81,8 @@ connectToDb().then(() => {
     app.listen(PORT, () => {
         console.log(`Server activated at port ${PORT}`);
     });
+
+    // Schedule automated backup jobs
+    scheduleBackupJobs();
+    console.log('✅ Automated backup jobs initialized');
 });

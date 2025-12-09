@@ -19,6 +19,7 @@ import AdDetail from './pages/AdDetail'
 import Download from './pages/Download'
 import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
+import Vouchers from './pages/Vouchers'
 
 const App = () => {
   const location = useLocation()
@@ -37,6 +38,7 @@ const App = () => {
           <Route path='/download' element={<Download />} />
           <Route path='/buy-leads' element={<BuyLeads />} />
           <Route path='/sell-leads' element={<SellLeads />} />
+          <Route path='/vouchers' element={<Vouchers />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
           <Route path='/contact' element={<Contact />} />
