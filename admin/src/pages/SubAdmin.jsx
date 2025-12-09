@@ -33,6 +33,13 @@ const SubAdmin = () => {
       canEditAds: false,
       canDeleteAds: false,
       canApproveAds: false,
+      canViewBlogs: false,
+      canCreateBlogs: false,
+      canEditBlogs: false,
+      canDeleteBlogs: false,
+      canPublishBlogs: false,
+      canViewChats: false,
+      canReplyChats: false,
       canViewSettings: false,
       canEditSettings: false
     }
@@ -100,6 +107,13 @@ const SubAdmin = () => {
         canEditAds: false,
         canDeleteAds: false,
         canApproveAds: false,
+        canViewBlogs: false,
+        canCreateBlogs: false,
+        canEditBlogs: false,
+        canDeleteBlogs: false,
+        canPublishBlogs: false,
+        canViewChats: false,
+        canReplyChats: false,
         canViewSettings: false,
         canEditSettings: false
       }
@@ -336,6 +350,17 @@ const SubAdmin = () => {
       { key: 'canEditAds', label: 'Edit Ads' },
       { key: 'canDeleteAds', label: 'Delete Ads' },
       { key: 'canApproveAds', label: 'Approve Ads' }
+    ],
+    'Blog Management': [
+      { key: 'canViewBlogs', label: 'View Blogs' },
+      { key: 'canCreateBlogs', label: 'Create Blogs' },
+      { key: 'canEditBlogs', label: 'Edit Blogs' },
+      { key: 'canDeleteBlogs', label: 'Delete Blogs' },
+      { key: 'canPublishBlogs', label: 'Publish Blogs' }
+    ],
+    'Chat Management': [
+      { key: 'canViewChats', label: 'View Chats' },
+      { key: 'canReplyChats', label: 'Reply to Chats' }
     ],
     'Content & Settings': [
       { key: 'canManageContent', label: 'Manage Content' },

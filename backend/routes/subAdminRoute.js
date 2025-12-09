@@ -13,6 +13,16 @@ const {
 } = require("../controllers/subAdminController");
 const { getAllUsers, approveUser } = require("../controllers/adminController");
 const { getAllVendors, approveVendor } = require("../controllers/adminVendorController");
+const {
+  getAllBlogsAdmin,
+  getBlogByIdAdmin,
+  createBlog,
+  updateBlog,
+  deleteBlog,
+  publishBlog,
+  unpublishBlog,
+  toggleFeatured
+} = require("../controllers/blogController");
 const { subAdminAuth, checkPermission } = require("../middleware/subAdminAuth");
 const upload = require("../utils/multer");
 
@@ -41,5 +51,15 @@ router.put("/ads/:adId", subAdminAuth, checkPermission('canEditAds'), upload.sin
 router.delete("/ads/:adId", subAdminAuth, checkPermission('canDeleteAds'), deleteAd);
 router.patch("/ads/:adId/toggle-approval", subAdminAuth, checkPermission('canApproveAds'), toggleAdApproval);
 router.patch("/ads/:adId/toggle-visibility", subAdminAuth, checkPermission('canEditAds'), toggleAdVisibility);
+
+// Blog management routes (require specific permissions)
+router.get("/blogs", subAdminAuth, checkPermission('canViewBlogs'), getAllBlogsAdmin);
+router.get("/blogs/:blogId", subAdminAuth, checkPermission('canViewBlogs'), getBlogByIdAdmin);
+router.post("/blogs", subAdminAuth, checkPermission('canCreateBlogs'), createBlog);
+router.put("/blogs/:blogId", subAdminAuth, checkPermission('canEditBlogs'), updateBlog);
+router.delete("/blogs/:blogId", subAdminAuth, checkPermission('canDeleteBlogs'), deleteBlog);
+router.patch("/blogs/:blogId/publish", subAdminAuth, checkPermission('canPublishBlogs'), publishBlog);
+router.patch("/blogs/:blogId/unpublish", subAdminAuth, checkPermission('canPublishBlogs'), unpublishBlog);
+router.patch("/blogs/:blogId/toggle-featured", subAdminAuth, checkPermission('canEditBlogs'), toggleFeatured);
 
 module.exports = router;

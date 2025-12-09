@@ -75,14 +75,23 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Join as Member - Mobile Only */}
-          <div className='md:hidden flex items-center justify-center'>
+          {/* Join Buttons - Mobile Only (Stacked) */}
+          <div className='md:hidden flex flex-col gap-3'>
+            {/* Join as Buyer */}
             <Link to='/signup' className='block'>
-              <div className='bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-3 py-2 rounded-lg font-bold text-center animate-pulse shadow-lg'>
-                <p className='text-[11px] leading-tight'>Join as a Member</p>
+              <div className='relative bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse'>
+                <p className='text-[11px] leading-tight'>Join as Buyer</p>
                 <p className='text-sm font-extrabold'>@₹499/year</p>
               </div>
             </Link>
+
+            {/* Join as Vendor */}
+            <a href='https://vendor.abcdvyapar.com/signup' className='block'>
+              <div className='relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse'>
+                <p className='text-[11px] leading-tight'>Join as Vendor</p>
+                <p className='text-sm font-extrabold'>Register Now</p>
+              </div>
+            </a>
           </div>
         </div>
 

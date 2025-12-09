@@ -32,6 +32,9 @@ const exportRoute = require('./routes/exportRoute')
 const cityRoute = require('./routes/cityRoute')
 const categoryRoute = require('./routes/categoryRoute')
 const adRoute = require('./routes/adRoute')
+const blogRoute = require('./routes/blogRoute')
+const chatRoute = require('./routes/chatRoute')
+const userChatRoute = require('./routes/userChatRoute')
 
 // CORS configuration
 const corsOptions = {
@@ -74,6 +77,9 @@ app.use('/api/admin/export',exportRoute)
 app.use('/api/cities',cityRoute)
 app.use('/api/categories',categoryRoute)
 app.use('/api/ads',adRoute)
+app.use('/api/blogs',blogRoute)
+app.use('/api/chats',chatRoute)
+app.use('/api/user/chat',userChatRoute)
 
 
 // server listen - only after DB connection

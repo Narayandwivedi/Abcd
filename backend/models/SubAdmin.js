@@ -91,6 +91,38 @@ const subAdminSchema = new mongoose.Schema({
       default: false,
     },
 
+    // Blog Management
+    canViewBlogs: {
+      type: Boolean,
+      default: false,
+    },
+    canCreateBlogs: {
+      type: Boolean,
+      default: false,
+    },
+    canEditBlogs: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteBlogs: {
+      type: Boolean,
+      default: false,
+    },
+    canPublishBlogs: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Chat Management
+    canViewChats: {
+      type: Boolean,
+      default: false,
+    },
+    canReplyChats: {
+      type: Boolean,
+      default: false,
+    },
+
     // Settings
     canViewSettings: {
       type: Boolean,

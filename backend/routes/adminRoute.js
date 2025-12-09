@@ -3,6 +3,7 @@ const { getAllUsers, approveUser, rejectUser, toggleUserStatus, setUserPassword,
 const { getAllCitiesAdmin, createCity, updateCity, deleteCity, toggleCityStatus } = require("../controllers/cityController");
 const { getAllCategoriesAdmin, createCategory, updateCategory, deleteCategory, toggleCategoryStatus, addSubcategory, updateSubcategory, deleteSubcategory } = require("../controllers/categoryController");
 const { getAllAds, createAd, updateAd, deleteAd, toggleAdApproval, toggleAdVisibility } = require("../controllers/adController");
+const { getAllBlogsAdmin, getBlogByIdAdmin, createBlog, updateBlog, deleteBlog, publishBlog, unpublishBlog, toggleFeatured } = require("../controllers/blogController");
 const adminAuth = require("../middleware/adminAuth");
 const { adminLoginLimiter } = require("../middleware/adminRateLimit");
 const upload = require("../utils/multer");
@@ -51,5 +52,15 @@ router.put("/ads/:adId", adminAuth, upload.single('adImg'), updateAd);
 router.delete("/ads/:adId", adminAuth, deleteAd);
 router.patch("/ads/:adId/toggle-approval", adminAuth, toggleAdApproval);
 router.patch("/ads/:adId/toggle-visibility", adminAuth, toggleAdVisibility);
+
+// Blog management routes
+router.get("/blogs", adminAuth, getAllBlogsAdmin);
+router.get("/blogs/:blogId", adminAuth, getBlogByIdAdmin);
+router.post("/blogs", adminAuth, createBlog);
+router.put("/blogs/:blogId", adminAuth, updateBlog);
+router.delete("/blogs/:blogId", adminAuth, deleteBlog);
+router.patch("/blogs/:blogId/publish", adminAuth, publishBlog);
+router.patch("/blogs/:blogId/unpublish", adminAuth, unpublishBlog);
+router.patch("/blogs/:blogId/toggle-featured", adminAuth, toggleFeatured);
 
 module.exports = router;
