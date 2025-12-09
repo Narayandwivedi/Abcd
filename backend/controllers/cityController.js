@@ -98,10 +98,15 @@ const getAllCitiesAdmin = async (req, res) => {
       return acc;
     }, {});
 
+    // Get unique states count
+    const uniqueStates = [...new Set(cities.map(city => city.state))];
+    const stateCount = uniqueStates.length;
+
     return res.status(200).json({
       success: true,
       count: cities.length,
       districtCount: Object.keys(summary).length,
+      stateCount,
       summary,
       cities
     });
@@ -227,11 +232,16 @@ const createCity = async (req, res) => {
       });
     }
 
-    // Check if city already exists in the district
+    // Normalize to lowercase for consistent storage
+    const normalizedState = state.trim().toLowerCase();
+    const normalizedDistrict = district.trim().toLowerCase();
+    const normalizedCity = city.trim().toLowerCase();
+
+    // Check if city already exists (will also be caught by MongoDB unique index)
     const existingCity = await City.findOne({
-      state: state.trim(),
-      district: district.trim(),
-      city: city.trim()
+      state: normalizedState,
+      district: normalizedDistrict,
+      city: normalizedCity
     });
 
     if (existingCity) {
@@ -241,11 +251,11 @@ const createCity = async (req, res) => {
       });
     }
 
-    // Create new city
+    // Create new city with normalized (lowercase) values
     const newCity = await City.create({
-      state: state.trim(),
-      district: district.trim(),
-      city: city.trim(),
+      state: normalizedState,
+      district: normalizedDistrict,
+      city: normalizedCity,
       isActive: true
     });
 
@@ -258,6 +268,16 @@ const createCity = async (req, res) => {
     });
   } catch (error) {
     console.error('Create city error:', error);
+
+    // Handle MongoDB duplicate key error
+    if (error.code === 11000) {
+      const duplicateField = Object.keys(error.keyPattern || {}).join(', ');
+      return res.status(400).json({
+        success: false,
+        message: "City already exists for this district and state"
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: error.message
@@ -283,11 +303,15 @@ const updateCity = async (req, res) => {
 
     // Check if new combination already exists (if changing state, district or city name)
     if (state || district || city) {
+      const newState = state ? state.trim().toLowerCase() : existingCity.state;
+      const newDistrict = district ? district.trim().toLowerCase() : existingCity.district;
+      const newCity = city ? city.trim().toLowerCase() : existingCity.city;
+
       const duplicateCity = await City.findOne({
         _id: { $ne: cityId },
-        state: state ? state.trim() : existingCity.state,
-        district: district ? district.trim() : existingCity.district,
-        city: city ? city.trim() : existingCity.city
+        state: newState,
+        district: newDistrict,
+        city: newCity
       });
 
       if (duplicateCity) {
@@ -298,10 +322,10 @@ const updateCity = async (req, res) => {
       }
     }
 
-    // Update fields
-    if (state) existingCity.state = state.trim();
-    if (district) existingCity.district = district.trim();
-    if (city) existingCity.city = city.trim();
+    // Update fields with normalized (lowercase) values
+    if (state) existingCity.state = state.trim().toLowerCase();
+    if (district) existingCity.district = district.trim().toLowerCase();
+    if (city) existingCity.city = city.trim().toLowerCase();
     if (isActive !== undefined) existingCity.isActive = isActive;
 
     await existingCity.save();
@@ -315,6 +339,15 @@ const updateCity = async (req, res) => {
     });
   } catch (error) {
     console.error('Update city error:', error);
+
+    // Handle MongoDB duplicate key error
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "City already exists for this district and state"
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: error.message

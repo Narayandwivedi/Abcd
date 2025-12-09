@@ -9,7 +9,7 @@ const Cities = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedCity, setSelectedCity] = useState(null)
   const [formData, setFormData] = useState({ state: '', district: '', city: '' })
-  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, districts: 0 })
+  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, districts: 0, states: 0 })
   const [sortBy, setSortBy] = useState('city')
   const [sortOrder, setSortOrder] = useState('asc')
 
@@ -36,7 +36,7 @@ const Cities = () => {
 
       if (data.success) {
         setCities(data.cities)
-        calculateStats(data.cities, data.districtCount)
+        calculateStats(data.cities, data.districtCount, data.stateCount)
       }
     } catch (error) {
       console.error('Error fetching cities:', error)
@@ -46,12 +46,12 @@ const Cities = () => {
     }
   }
 
-  const calculateStats = (cityList, districtCount) => {
+  const calculateStats = (cityList, districtCount, stateCount) => {
     const total = cityList.length
     const active = cityList.filter(c => c.isActive).length
     const inactive = cityList.filter(c => !c.isActive).length
 
-    setStats({ total, active, inactive, districts: districtCount })
+    setStats({ total, active, inactive, districts: districtCount, states: stateCount || 0 })
   }
 
   const handleAddCity = async (e) => {
@@ -200,7 +200,7 @@ const Cities = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6'>
+      <div className='grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-4 md:mb-6'>
         <div className='bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-xl shadow-lg'>
           <div className='text-xs md:text-sm font-semibold opacity-90'>Total Cities</div>
           <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.total}</div>
@@ -214,6 +214,10 @@ const Cities = () => {
           <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.inactive}</div>
         </div>
         <div className='bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-xl shadow-lg'>
+          <div className='text-xs md:text-sm font-semibold opacity-90'>States</div>
+          <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.states}</div>
+        </div>
+        <div className='bg-gradient-to-br from-pink-500 to-pink-600 text-white p-4 rounded-xl shadow-lg'>
           <div className='text-xs md:text-sm font-semibold opacity-90'>Districts</div>
           <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.districts}</div>
         </div>
@@ -316,9 +320,9 @@ const Cities = () => {
                 filteredCities.map((city, index) => (
                   <tr key={city._id} className='hover:bg-gray-50 transition-colors'>
                     <td className='px-4 py-3 text-sm text-gray-600'>{index + 1}</td>
-                    <td className='px-4 py-3 text-sm font-semibold text-gray-800'>{city.city}</td>
-                    <td className='px-4 py-3 text-sm text-gray-600'>{city.district}</td>
-                    <td className='px-4 py-3 text-sm text-gray-600'>{city.state || 'N/A'}</td>
+                    <td className='px-4 py-3 text-sm font-semibold text-gray-800 capitalize'>{city.city}</td>
+                    <td className='px-4 py-3 text-sm text-gray-600 capitalize'>{city.district}</td>
+                    <td className='px-4 py-3 text-sm text-gray-600 capitalize'>{city.state || 'N/A'}</td>
                     <td className='px-4 py-3'>
                       <button
                         onClick={() => handleToggleStatus(city._id)}
