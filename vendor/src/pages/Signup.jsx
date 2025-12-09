@@ -28,6 +28,7 @@ const Signup = () => {
     businessName: '',
     email: '',
     mobile: '',
+    state: '',
     city: '',
     membershipCategory: '',
     businessCategories: [],
@@ -37,8 +38,16 @@ const Signup = () => {
   })
   const [previewPhoto, setPreviewPhoto] = useState(null)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [availableStates, setAvailableStates] = useState([])
+  const [availableCities, setAvailableCities] = useState([])
+  const [loadingCities, setLoadingCities] = useState(false)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
+  // Fetch states on component mount
+  useEffect(() => {
+    fetchStates()
+  }, [])
 
   // Redirect if already logged in
   useEffect(() => {
@@ -46,6 +55,61 @@ const Signup = () => {
       navigate('/')
     }
   }, [isAuthenticated, navigate])
+
+  // Fetch all unique states from database
+  const fetchStates = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/states`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        setAvailableStates(data.states.sort())
+      }
+    } catch (error) {
+      console.error('Error fetching states:', error)
+    }
+  }
+
+  // Fetch cities when state is selected
+  const fetchCitiesByState = async (selectedState) => {
+    if (!selectedState) {
+      setAvailableCities([])
+      return
+    }
+
+    try {
+      setLoadingCities(true)
+      const response = await fetch(`${BACKEND_URL}/api/cities/state/${selectedState}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        setAvailableCities(data.cities)
+      }
+    } catch (error) {
+      console.error('Error fetching cities:', error)
+      toast.error('Failed to load cities')
+    } finally {
+      setLoadingCities(false)
+    }
+  }
+
+  // Handle state change
+  const handleStateChange = (e) => {
+    const selectedState = e.target.value
+    setFormData({ ...formData, state: selectedState, city: '' })
+    setError('')
+    fetchCitiesByState(selectedState)
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -94,8 +158,8 @@ const Signup = () => {
     setError('')
 
     // Validation
-    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.city || formData.businessCategories.length === 0) {
-      setError('Please fill in all required fields including at least one category and subcategory')
+    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.state || !formData.city || formData.businessCategories.length === 0) {
+      setError('Please fill in all required fields including state, city, and at least one category and subcategory')
       return
     }
 
@@ -124,6 +188,7 @@ const Signup = () => {
       submitData.append('ownerName', formData.ownerName)
       submitData.append('businessName', formData.businessName)
       submitData.append('mobile', formData.mobile)
+      submitData.append('state', formData.state)
       submitData.append('city', formData.city)
       submitData.append('businessCategories', JSON.stringify(formData.businessCategories))
       if (formData.membershipCategory) submitData.append('membershipCategory', formData.membershipCategory)
@@ -145,6 +210,7 @@ const Signup = () => {
           businessName: '',
           email: '',
           mobile: '',
+          state: '',
           city: '',
           membershipCategory: '',
           businessCategories: [],
@@ -153,6 +219,7 @@ const Signup = () => {
           vendorPhoto: null
         })
         setPreviewPhoto(null)
+        setAvailableCities([])
 
         // Redirect to abcdvyapar.com after 8 seconds
         setTimeout(() => {
@@ -264,56 +331,56 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* City */}
+            {/* State */}
             <div>
               <label className='block text-sm font-bold text-gray-700 mb-2'>
-                City <span className='text-red-500'>*</span>
+                State <span className='text-red-500'>*</span>
               </label>
               <div className='relative'>
                 <MapPin className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
                 <select
-                  name='city'
-                  value={formData.city}
-                  onChange={handleChange}
-                  className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer'
+                  name='state'
+                  value={formData.state}
+                  onChange={handleStateChange}
+                  className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer capitalize'
                 >
-                  <option value=''>Select your District</option>
-                  <option value='Balod'>Balod</option>
-                  <option value='Baloda Bazar'>Baloda Bazar</option>
-                  <option value='Balrampur'>Balrampur</option>
-                  <option value='Bastar'>Bastar</option>
-                  <option value='Bemetara'>Bemetara</option>
-                  <option value='Bijapur'>Bijapur</option>
-                  <option value='Bilaspur'>Bilaspur</option>
-                  <option value='Dantewada'>Dantewada</option>
-                  <option value='Dhamtari'>Dhamtari</option>
-                  <option value='Durg'>Durg</option>
-                  <option value='Gariaband'>Gariaband</option>
-                  <option value='Gaurela-Pendra-Marwahi'>Gaurela-Pendra-Marwahi</option>
-                  <option value='Janjgir-Champa'>Janjgir-Champa</option>
-                  <option value='Jashpur'>Jashpur</option>
-                  <option value='Kanker'>Kanker</option>
-                  <option value='Kawardha'>Kawardha (Kabirdham)</option>
-                  <option value='Khairagarh-Chhuikhadan-Gandai'>Khairagarh-Chhuikhadan-Gandai</option>
-                  <option value='Kondagaon'>Kondagaon</option>
-                  <option value='Korba'>Korba</option>
-                  <option value='Korea'>Korea (Koriya)</option>
-                  <option value='Mahasamund'>Mahasamund</option>
-                  <option value='Manendragarh-Chirmiri-Bharatpur'>Manendragarh-Chirmiri-Bharatpur</option>
-                  <option value='Mohla-Manpur-Ambagarh Chouki'>Mohla-Manpur-Ambagarh Chouki</option>
-                  <option value='Mungeli'>Mungeli</option>
-                  <option value='Narayanpur'>Narayanpur</option>
-                  <option value='Raigarh'>Raigarh</option>
-                  <option value='Raipur'>Raipur</option>
-                  <option value='Rajnandgaon'>Rajnandgaon</option>
-                  <option value='Sakti'>Sakti</option>
-                  <option value='Sarangarh-Bilaigarh'>Sarangarh-Bilaigarh</option>
-                  <option value='Sukma'>Sukma</option>
-                  <option value='Surajpur'>Surajpur</option>
-                  <option value='Surguja'>Surguja</option>
+                  <option value=''>Select State</option>
+                  {availableStates.map((state) => (
+                    <option key={state} value={state} className='capitalize'>
+                      {state}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
+
+            {/* City */}
+            {formData.state && (
+              <div>
+                <label className='block text-sm font-bold text-gray-700 mb-2'>
+                  City <span className='text-red-500'>*</span>
+                </label>
+                <div className='relative'>
+                  <MapPin className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <select
+                    name='city'
+                    value={formData.city}
+                    onChange={handleChange}
+                    disabled={loadingCities || availableCities.length === 0}
+                    className='w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer capitalize disabled:opacity-50 disabled:cursor-not-allowed'
+                  >
+                    <option value=''>
+                      {loadingCities ? 'Loading cities...' : availableCities.length === 0 ? 'No cities available' : 'Select City'}
+                    </option>
+                    {availableCities.map((city) => (
+                      <option key={city} value={city} className='capitalize'>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
 
             {/* Email */}
             <div>

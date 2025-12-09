@@ -1,5 +1,5 @@
 const express = require("express");
-const { getAllUsers, approveUser, setUserPassword, adminLogin, adminLogout, getCurrentAdmin, changeAdminPassword, updateUser, deleteUser, createUser } = require("../controllers/adminController");
+const { getAllUsers, approveUser, rejectUser, toggleUserStatus, setUserPassword, adminLogin, adminLogout, getCurrentAdmin, changeAdminPassword, updateUser, deleteUser, createUser } = require("../controllers/adminController");
 const { getAllCitiesAdmin, createCity, updateCity, deleteCity, toggleCityStatus } = require("../controllers/cityController");
 const { getAllCategoriesAdmin, createCategory, updateCategory, deleteCategory, toggleCategoryStatus, addSubcategory, updateSubcategory, deleteSubcategory } = require("../controllers/categoryController");
 const { getAllAds, createAd, updateAd, deleteAd, toggleAdApproval, toggleAdVisibility } = require("../controllers/adController");
@@ -19,7 +19,9 @@ router.put("/change-password", adminAuth, changeAdminPassword);
 router.get("/users", adminAuth, getAllUsers);
 router.post("/users", adminAuth, upload.single('passportPhoto'), createUser);
 router.put("/users/:userId/approve", adminAuth, approveUser);
+router.put("/users/:userId/reject", adminAuth, rejectUser);
 router.put("/users/:userId/set-password", adminAuth, setUserPassword);
+router.patch("/users/:userId/toggle-status", adminAuth, toggleUserStatus);
 router.put("/users/:userId", adminAuth, updateUser);
 router.delete("/users/:userId", adminAuth, deleteUser);
 

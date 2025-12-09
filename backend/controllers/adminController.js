@@ -60,6 +60,8 @@ const approveUser = async (req, res) => {
     // Update user with certificate reference and referral code
     user.paymentVerified = true;
     user.isVerified = true;
+    user.isRejected = false; // Clear rejection status if re-approving
+    user.rejectionReason = undefined; // Clear rejection reason
     user.activeCertificate = certificate._id;
     user.referralCode = certificateData.referralCode;
     await user.save();
@@ -701,9 +703,91 @@ const createUser = async (req, res) => {
   }
 };
 
+// Reject user
+const rejectUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { reason } = req.body;
+
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Update user rejection status
+    user.isRejected = true;
+    user.paymentVerified = false;
+    user.isVerified = false;
+    user.rejectionReason = reason || 'Application rejected by admin';
+    await user.save();
+
+    console.log(`[ADMIN] User rejected: ${user.fullName}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "User application rejected successfully",
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        isRejected: user.isRejected
+      }
+    });
+  } catch (error) {
+    console.error('Reject user error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Toggle user active status
+const toggleUserStatus = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Toggle the isActive status
+    user.isActive = !user.isActive;
+    await user.save();
+
+    console.log(`[ADMIN] User status toggled: ${user.fullName} - ${user.isActive ? 'Active' : 'Inactive'}`);
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        isActive: user.isActive
+      }
+    });
+  } catch (error) {
+    console.error('Toggle user status error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   approveUser,
+  rejectUser,
+  toggleUserStatus,
   setUserPassword,
   adminLogin,
   adminLogout,

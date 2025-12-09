@@ -57,6 +57,8 @@ const approveVendor = async (req, res) => {
     // Update payment verification status and certificate reference
     vendor.paymentVerified = true;
     vendor.isVerified = true;
+    vendor.isRejected = false; // Clear rejection status if re-approving
+    vendor.rejectionReason = undefined; // Clear rejection reason
     vendor.activeCertificate = certificate._id;
     await vendor.save();
 
@@ -323,10 +325,130 @@ const updateVendor = async (req, res) => {
   }
 };
 
+// Toggle vendor active status
+const toggleVendorStatus = async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+
+    const vendor = await vendorModel.findById(vendorId);
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found"
+      });
+    }
+
+    // Toggle the isActive status
+    vendor.isActive = !vendor.isActive;
+    await vendor.save();
+
+    console.log(`[ADMIN] Vendor status toggled: ${vendor.businessName} - ${vendor.isActive ? 'Active' : 'Inactive'}`);
+
+    return res.status(200).json({
+      success: true,
+      message: `Vendor ${vendor.isActive ? 'activated' : 'deactivated'} successfully`,
+      vendor: {
+        _id: vendor._id,
+        businessName: vendor.businessName,
+        isActive: vendor.isActive
+      }
+    });
+  } catch (error) {
+    console.error('Toggle vendor status error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Delete vendor
+const deleteVendor = async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+
+    const vendor = await vendorModel.findById(vendorId);
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found"
+      });
+    }
+
+    const businessName = vendor.businessName;
+
+    // Delete the vendor
+    await vendorModel.findByIdAndDelete(vendorId);
+
+    // Optionally delete associated certificates
+    await VendorCertificate.deleteMany({ vendorId });
+
+    console.log(`[ADMIN] Vendor deleted: ${businessName}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "Vendor deleted successfully"
+    });
+  } catch (error) {
+    console.error('Delete vendor error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Reject vendor
+const rejectVendor = async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+    const { reason } = req.body;
+
+    const vendor = await vendorModel.findById(vendorId);
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found"
+      });
+    }
+
+    // Update vendor rejection status
+    vendor.isRejected = true;
+    vendor.paymentVerified = false;
+    vendor.isVerified = false;
+    vendor.rejectionReason = reason || 'Application rejected by admin';
+    await vendor.save();
+
+    console.log(`[ADMIN] Vendor rejected: ${vendor.businessName}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "Vendor application rejected successfully",
+      vendor: {
+        _id: vendor._id,
+        businessName: vendor.businessName,
+        isRejected: vendor.isRejected
+      }
+    });
+  } catch (error) {
+    console.error('Reject vendor error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllVendors,
   approveVendor,
+  rejectVendor,
   setVendorPassword,
   createVendor,
-  updateVendor
+  updateVendor,
+  toggleVendorStatus,
+  deleteVendor
 };

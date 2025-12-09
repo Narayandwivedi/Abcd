@@ -6,6 +6,7 @@ const Vendors = () => {
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState('all') // all, pending, approved, rejected
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [selectedVendor, setSelectedVendor] = useState(null)
   const [newPassword, setNewPassword] = useState('')
@@ -303,13 +304,107 @@ ABCD Team`
     }
   }
 
-  // Filter vendors based on search
-  const filteredVendors = vendors.filter(vendor =>
-    vendor.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vendor.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vendor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vendor.mobile?.toString().includes(searchTerm)
-  )
+  // Toggle vendor active status
+  const handleToggleStatus = async (vendorId, currentStatus) => {
+    const action = currentStatus ? 'deactivate' : 'activate'
+    if (!window.confirm(`Are you sure you want to ${action} this vendor?`)) return
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/vendors/${vendorId}/toggle-status`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        alert(data.message)
+        fetchVendors()
+      } else {
+        alert(data.message || 'Failed to toggle vendor status')
+      }
+    } catch (error) {
+      console.error('Error toggling vendor status:', error)
+      alert('Failed to toggle vendor status')
+    }
+  }
+
+  // Delete vendor
+  const handleDeleteVendor = async (vendorId, businessName) => {
+    if (!window.confirm(`Are you sure you want to DELETE "${businessName}"? This action cannot be undone!`)) return
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/vendors/${vendorId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        alert('Vendor deleted successfully!')
+        fetchVendors()
+      } else {
+        alert(data.message || 'Failed to delete vendor')
+      }
+    } catch (error) {
+      console.error('Error deleting vendor:', error)
+      alert('Failed to delete vendor')
+    }
+  }
+
+  // Reject vendor
+  const handleReject = async (vendorId, businessName) => {
+    const reason = window.prompt(`Enter rejection reason for "${businessName}":`)
+    if (!reason || reason.trim() === '') return
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/vendors/${vendorId}/reject`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reason: reason.trim() }),
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        alert('Vendor application rejected successfully!')
+        fetchVendors()
+      } else {
+        alert(data.message || 'Failed to reject vendor')
+      }
+    } catch (error) {
+      console.error('Error rejecting vendor:', error)
+      alert('Failed to reject vendor')
+    }
+  }
+
+  // Filter vendors based on search and status
+  const filteredVendors = vendors.filter(vendor => {
+    // Search filter
+    const matchesSearch = vendor.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vendor.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vendor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vendor.mobile?.toString().includes(searchTerm)
+
+    // Status filter
+    let matchesStatus = true
+    if (filterStatus === 'pending') {
+      matchesStatus = !vendor.paymentVerified && !vendor.isRejected
+    } else if (filterStatus === 'approved') {
+      matchesStatus = vendor.paymentVerified
+    } else if (filterStatus === 'rejected') {
+      matchesStatus = vendor.isRejected
+    }
+
+    return matchesSearch && matchesStatus
+  })
 
   return (
     <div className='p-6'>
@@ -351,7 +446,52 @@ ABCD Team`
 
       {/* Vendors Table */}
       <div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden'>
-        <div className='p-6 border-b border-gray-200'>
+        <div className='p-6 border-b border-gray-200 space-y-4'>
+          {/* Filter Buttons */}
+          <div className='flex flex-wrap gap-2'>
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterStatus === 'all'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All ({stats.total})
+            </button>
+            <button
+              onClick={() => setFilterStatus('pending')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterStatus === 'pending'
+                  ? 'bg-yellow-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Pending ({stats.pending})
+            </button>
+            <button
+              onClick={() => setFilterStatus('approved')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterStatus === 'approved'
+                  ? 'bg-green-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Approved ({stats.approved})
+            </button>
+            <button
+              onClick={() => setFilterStatus('rejected')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterStatus === 'rejected'
+                  ? 'bg-red-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Rejected ({stats.rejected})
+            </button>
+          </div>
+
+          {/* Search Bar */}
           <input
             type='text'
             placeholder='Search vendors by business name, owner, email, or mobile...'
@@ -546,15 +686,59 @@ ABCD Team`
                             </svg>
                           </button>
 
-                          {/* Approve Button */}
-                          {!vendor.paymentVerified && !vendor.isRejected && (
+                          {/* Approve Button - Show for pending OR rejected vendors */}
+                          {!vendor.paymentVerified && (
                             <button
                               onClick={() => handleApprove(vendor._id)}
                               className='px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-200 transition'
                             >
-                              Approve
+                              {vendor.isRejected ? 'Re-Approve' : 'Approve'}
                             </button>
                           )}
+
+                          {/* Reject Button - Only show for pending (not rejected) */}
+                          {!vendor.paymentVerified && !vendor.isRejected && (
+                            <button
+                              onClick={() => handleReject(vendor._id, vendor.businessName)}
+                              className='px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-semibold hover:bg-red-200 transition'
+                            >
+                              Reject
+                            </button>
+                          )}
+
+                          {/* Toggle Active/Inactive Button - Only show for approved vendors (not rejected) */}
+                          {!vendor.isRejected && (
+                            <button
+                              onClick={() => handleToggleStatus(vendor._id, vendor.isActive)}
+                              className={`p-2 rounded-lg transition ${
+                                vendor.isActive
+                                  ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                              title={vendor.isActive ? 'Deactivate Vendor' : 'Activate Vendor'}
+                            >
+                              {vendor.isActive ? (
+                                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' />
+                                </svg>
+                              ) : (
+                                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
+                                </svg>
+                              )}
+                            </button>
+                          )}
+
+                          {/* Delete Button */}
+                          <button
+                            onClick={() => handleDeleteVendor(vendor._id, vendor.businessName)}
+                            className='p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition'
+                            title='Delete Vendor'
+                          >
+                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                            </svg>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -780,15 +964,64 @@ ABCD Team`
                       Pass
                     </button>
 
-                    {/* Approve */}
-                    {!vendor.paymentVerified && !vendor.isRejected && (
+                    {/* Approve - Show for pending OR rejected vendors */}
+                    {!vendor.paymentVerified && (
                       <button
                         onClick={() => handleApprove(vendor._id)}
                         className='flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-xs font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
                       >
-                        Approve Now
+                        {vendor.isRejected ? 'Re-Approve' : 'Approve Now'}
                       </button>
                     )}
+
+                    {/* Reject - Only show for pending (not rejected) */}
+                    {!vendor.paymentVerified && !vendor.isRejected && (
+                      <button
+                        onClick={() => handleReject(vendor._id, vendor.businessName)}
+                        className='flex-1 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-xs font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
+                      >
+                        Reject
+                      </button>
+                    )}
+
+                    {/* Toggle Status - Only show for approved vendors (not rejected) */}
+                    {!vendor.isRejected && (
+                      <button
+                        onClick={() => handleToggleStatus(vendor._id, vendor.isActive)}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all shadow-sm hover:shadow-md text-xs font-semibold ${
+                          vendor.isActive
+                            ? 'bg-orange-500 text-white hover:bg-orange-600'
+                            : 'bg-gray-500 text-white hover:bg-gray-600'
+                        }`}
+                      >
+                        {vendor.isActive ? (
+                          <>
+                            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 715.636 5.636m12.728 12.728L5.636 5.636' />
+                            </svg>
+                            Inactive
+                          </>
+                        ) : (
+                          <>
+                            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
+                            </svg>
+                            Active
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {/* Delete */}
+                    <button
+                      onClick={() => handleDeleteVendor(vendor._id, vendor.businessName)}
+                      className='flex items-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
+                    >
+                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                      </svg>
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}

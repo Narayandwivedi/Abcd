@@ -12,11 +12,53 @@ const Cities = () => {
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, districts: 0, states: 0 })
   const [sortBy, setSortBy] = useState('city')
   const [sortOrder, setSortOrder] = useState('asc')
+  const [availableStates, setAvailableStates] = useState([])
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
+  // Complete list of Indian states and union territories
+  const INDIAN_STATES = [
+    'andaman and nicobar islands',
+    'andhra pradesh',
+    'arunachal pradesh',
+    'assam',
+    'bihar',
+    'chandigarh',
+    'chhattisgarh',
+    'dadra and nagar haveli and daman and diu',
+    'delhi',
+    'goa',
+    'gujarat',
+    'haryana',
+    'himachal pradesh',
+    'jammu and kashmir',
+    'jharkhand',
+    'karnataka',
+    'kerala',
+    'ladakh',
+    'lakshadweep',
+    'madhya pradesh',
+    'maharashtra',
+    'manipur',
+    'meghalaya',
+    'mizoram',
+    'nagaland',
+    'odisha',
+    'puducherry',
+    'punjab',
+    'rajasthan',
+    'sikkim',
+    'tamil nadu',
+    'telangana',
+    'tripura',
+    'uttar pradesh',
+    'uttarakhand',
+    'west bengal'
+  ]
+
   useEffect(() => {
     fetchCities()
+    fetchStates()
   }, [sortBy, sortOrder])
 
   const fetchCities = async () => {
@@ -52,6 +94,11 @@ const Cities = () => {
     const inactive = cityList.filter(c => !c.isActive).length
 
     setStats({ total, active, inactive, districts: districtCount, states: stateCount || 0 })
+  }
+
+  const fetchStates = () => {
+    // Use the predefined list of Indian states (already sorted alphabetically)
+    setAvailableStates(INDIAN_STATES)
   }
 
   const handleAddCity = async (e) => {
@@ -379,37 +426,52 @@ const Cities = () => {
             <form onSubmit={handleAddCity} className='space-y-4'>
               <div>
                 <label className='block text-sm font-semibold text-gray-700 mb-2'>State</label>
-                <input
-                  type='text'
+                <select
                   value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  placeholder='Enter state name'
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value, district: '', city: '' })}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 capitalize'
                   required
-                />
+                >
+                  <option value=''>Select State</option>
+                  {availableStates.map((state) => (
+                    <option key={state} value={state} className='capitalize'>
+                      {state}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>District</label>
-                <input
-                  type='text'
-                  value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                  placeholder='Enter district name'
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  required
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>City</label>
-                <input
-                  type='text'
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder='Enter city name'
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  required
-                />
-              </div>
+
+              {formData.state && (
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                    Enter District Name in <span className='capitalize text-blue-600'>{formData.state}</span>
+                  </label>
+                  <input
+                    type='text'
+                    value={formData.district}
+                    onChange={(e) => setFormData({ ...formData, district: e.target.value, city: '' })}
+                    placeholder={`Enter district name in ${formData.state}`}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 capitalize'
+                    required
+                  />
+                </div>
+              )}
+
+              {formData.state && formData.district && (
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                    Enter City Name in <span className='capitalize text-blue-600'>{formData.district}, {formData.state}</span>
+                  </label>
+                  <input
+                    type='text'
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    placeholder={`Enter city name in ${formData.district}`}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 capitalize'
+                    required
+                  />
+                </div>
+              )}
               <div className='flex gap-3 mt-6'>
                 <button
                   type='button'
@@ -451,37 +513,52 @@ const Cities = () => {
             <form onSubmit={handleEditCity} className='space-y-4'>
               <div>
                 <label className='block text-sm font-semibold text-gray-700 mb-2'>State</label>
-                <input
-                  type='text'
+                <select
                   value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  placeholder='Enter state name'
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value, district: '', city: '' })}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 capitalize'
                   required
-                />
+                >
+                  <option value=''>Select State</option>
+                  {availableStates.map((state) => (
+                    <option key={state} value={state} className='capitalize'>
+                      {state}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>District</label>
-                <input
-                  type='text'
-                  value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                  placeholder='Enter district name'
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  required
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>City</label>
-                <input
-                  type='text'
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder='Enter city name'
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  required
-                />
-              </div>
+
+              {formData.state && (
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                    Enter District Name in <span className='capitalize text-blue-600'>{formData.state}</span>
+                  </label>
+                  <input
+                    type='text'
+                    value={formData.district}
+                    onChange={(e) => setFormData({ ...formData, district: e.target.value, city: '' })}
+                    placeholder={`Enter district name in ${formData.state}`}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 capitalize'
+                    required
+                  />
+                </div>
+              )}
+
+              {formData.state && formData.district && (
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                    Enter City Name in <span className='capitalize text-blue-600'>{formData.district}, {formData.state}</span>
+                  </label>
+                  <input
+                    type='text'
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    placeholder={`Enter city name in ${formData.district}`}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 capitalize'
+                    required
+                  />
+                </div>
+              )}
               <div className='flex gap-3 mt-6'>
                 <button
                   type='button'

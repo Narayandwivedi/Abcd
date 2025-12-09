@@ -5,6 +5,7 @@ const Users = () => {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState('all') // all, pending, approved, rejected
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [newPassword, setNewPassword] = useState('')
@@ -111,6 +112,61 @@ const Users = () => {
     } catch (error) {
       console.error('Error approving user:', error)
       toast.error('Failed to approve user', { autoClose: 800 })
+    }
+  }
+
+  // Reject user
+  const handleReject = async (userId, fullName) => {
+    const reason = window.prompt(`Enter rejection reason for "${fullName}":`)
+    if (!reason || reason.trim() === '') return
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/users/${userId}/reject`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reason: reason.trim() }),
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('User application rejected successfully!', { autoClose: 800 })
+        fetchUsers()
+      } else {
+        toast.error(data.message || 'Failed to reject user', { autoClose: 800 })
+      }
+    } catch (error) {
+      console.error('Error rejecting user:', error)
+      toast.error('Failed to reject user', { autoClose: 800 })
+    }
+  }
+
+  // Toggle user active status
+  const handleToggleStatus = async (userId, currentStatus) => {
+    const action = currentStatus ? 'deactivate' : 'activate'
+    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/users/${userId}/toggle-status`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success(data.message, { autoClose: 800 })
+        fetchUsers()
+      } else {
+        toast.error(data.message || 'Failed to toggle user status', { autoClose: 800 })
+      }
+    } catch (error) {
+      console.error('Error toggling user status:', error)
+      toast.error('Failed to toggle user status', { autoClose: 800 })
     }
   }
 
@@ -359,11 +415,24 @@ ABCD Team`
   }
 
   // Filter users based on search
-  const filteredUsers = users.filter(user =>
-    user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.mobile?.toString().includes(searchTerm)
-  )
+  const filteredUsers = users.filter(user => {
+    // Search filter
+    const matchesSearch = user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.mobile?.toString().includes(searchTerm)
+
+    // Status filter
+    let matchesStatus = true
+    if (filterStatus === 'pending') {
+      matchesStatus = !user.paymentVerified && !user.isRejected
+    } else if (filterStatus === 'approved') {
+      matchesStatus = user.paymentVerified
+    } else if (filterStatus === 'rejected') {
+      matchesStatus = user.isRejected
+    }
+
+    return matchesSearch && matchesStatus
+  })
 
   // Handle create form input change
   const handleCreateFormChange = (e) => {
@@ -491,7 +560,52 @@ ABCD Team`
 
       {/* Users Table */}
       <div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden'>
-        <div className='p-6 border-b border-gray-200'>
+        <div className='p-6 border-b border-gray-200 space-y-4'>
+          {/* Filter Buttons */}
+          <div className='flex flex-wrap gap-2'>
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterStatus === 'all'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All ({stats.total})
+            </button>
+            <button
+              onClick={() => setFilterStatus('pending')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterStatus === 'pending'
+                  ? 'bg-yellow-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Pending ({stats.pending})
+            </button>
+            <button
+              onClick={() => setFilterStatus('approved')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterStatus === 'approved'
+                  ? 'bg-green-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Approved ({stats.approved})
+            </button>
+            <button
+              onClick={() => setFilterStatus('rejected')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterStatus === 'rejected'
+                  ? 'bg-red-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Rejected ({stats.rejected})
+            </button>
+          </div>
+
+          {/* Search Bar */}
           <input
             type='text'
             placeholder='Search users by name, email, or mobile...'
@@ -667,13 +781,46 @@ ABCD Team`
                             </svg>
                           </button>
 
-                          {/* Approve Button */}
-                          {!user.paymentVerified && !user.isRejected && (
+                          {/* Approve Button - Show for pending OR rejected users */}
+                          {!user.paymentVerified && (
                             <button
                               onClick={() => handleApprove(user._id)}
                               className='px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-200 transition'
                             >
-                              Approve
+                              {user.isRejected ? 'Re-Approve' : 'Approve'}
+                            </button>
+                          )}
+
+                          {/* Reject Button - Only show for pending (not rejected) */}
+                          {!user.paymentVerified && !user.isRejected && (
+                            <button
+                              onClick={() => handleReject(user._id, user.fullName)}
+                              className='px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-semibold hover:bg-red-200 transition'
+                            >
+                              Reject
+                            </button>
+                          )}
+
+                          {/* Toggle Status Button - Only show for approved users (not rejected) */}
+                          {!user.isRejected && (
+                            <button
+                              onClick={() => handleToggleStatus(user._id, user.isActive)}
+                              className={`p-2 rounded-lg transition ${
+                                user.isActive
+                                  ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                              title={user.isActive ? 'Deactivate User' : 'Activate User'}
+                            >
+                              {user.isActive ? (
+                                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' />
+                                </svg>
+                              ) : (
+                                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
+                                </svg>
+                              )}
                             </button>
                           )}
 

@@ -169,17 +169,20 @@ const getCitiesByState = async (req, res) => {
     const { state } = req.params;
 
     const cities = await City.find({
-      state,
+      state: state.toLowerCase(),
       isActive: true
     })
-    .select('city district')
+    .select('city')
     .sort({ city: 1 });
+
+    // Extract unique city names
+    const cityNames = [...new Set(cities.map(c => c.city))];
 
     return res.status(200).json({
       success: true,
       state,
-      count: cities.length,
-      cities
+      count: cityNames.length,
+      cities: cityNames
     });
   } catch (error) {
     console.error('Get cities by state error:', error);

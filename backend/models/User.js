@@ -88,6 +88,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  rejectionReason: {
+    type: String,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
   // Active certificate reference (current certificate with PDF)
   activeCertificate: {
     type: mongoose.Schema.Types.ObjectId,
