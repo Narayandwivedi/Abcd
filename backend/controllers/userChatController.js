@@ -1,6 +1,40 @@
 const Chat = require("../models/Chat");
 const User = require("../models/User");
 
+// Helper: Calculate unread count by user (messages from admin/subadmin not read)
+const getUnreadByUser = (messages) => {
+  return messages.filter(msg =>
+    (msg.senderType === 'admin' || msg.senderType === 'subadmin') && !msg.isRead
+  ).length;
+};
+
+// Helper: Get last message from messages array
+const getLastMessage = (messages) => {
+  if (messages.length === 0) return null;
+  const last = messages[messages.length - 1];
+  return {
+    message: last.message,
+    senderType: last.senderType,
+    senderName: last.senderName,
+    timestamp: last.timestamp
+  };
+};
+
+// Helper: Get who's handling (last admin/subadmin who replied)
+const getHandledBy = (messages) => {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i];
+    if (msg.senderType === 'admin' || msg.senderType === 'subadmin') {
+      return {
+        id: msg.senderId,
+        type: msg.senderType,
+        name: msg.senderName
+      };
+    }
+  }
+  return null;
+};
+
 // Get or create user's chat
 const getUserChat = async (req, res) => {
   try {
@@ -8,30 +42,49 @@ const getUserChat = async (req, res) => {
 
     // Find existing chat or create new one
     let chat = await Chat.findOne({ userId })
-      .populate('userId', 'fullName mobile email')
-      .populate('handledBy');
+      .populate('userId', 'fullName mobile email');
 
     if (!chat) {
       // Create new chat for user
       chat = await Chat.create({
         userId,
         messages: [],
-        status: 'active'
+        status: 'pending' // Pending until admin replies
       });
 
       chat = await Chat.findById(chat._id)
         .populate('userId', 'fullName mobile email');
     }
 
-    // Mark as read by user
-    if (chat.unreadByUser > 0) {
-      chat.unreadByUser = 0;
+    // Mark admin/subadmin messages as read by user
+    let hasChanges = false;
+    chat.messages.forEach(msg => {
+      if ((msg.senderType === 'admin' || msg.senderType === 'subadmin') && !msg.isRead) {
+        msg.isRead = true;
+        msg.readAt = new Date();
+        hasChanges = true;
+      }
+    });
+
+    if (hasChanges) {
       await chat.save();
+      // Reload to get updated data
+      chat = await Chat.findById(chat._id)
+        .populate('userId', 'fullName mobile email');
     }
+
+    // Add computed fields
+    const chatObj = chat.toObject();
+    const responseChat = {
+      ...chatObj,
+      unreadByUser: getUnreadByUser(chat.messages),
+      lastMessage: getLastMessage(chat.messages),
+      handledBy: getHandledBy(chat.messages)
+    };
 
     res.status(200).json({
       success: true,
-      chat
+      chat: responseChat
     });
   } catch (error) {
     console.error("Error fetching user chat:", error);
@@ -73,7 +126,7 @@ const sendMessage = async (req, res) => {
       chat = await Chat.create({
         userId,
         messages: [],
-        status: 'active'
+        status: 'pending' // Pending until admin replies
       });
     }
 
@@ -83,26 +136,31 @@ const sendMessage = async (req, res) => {
       senderName: user.fullName,
       senderId: userId,
       message: message.trim(),
-      timestamp: new Date()
+      timestamp: new Date(),
+      isRead: false
     });
 
-    chat.lastMessage = message.trim();
-    chat.lastMessageAt = new Date();
-    chat.unreadByAdmin += 1;
-    chat.status = 'active';
-
+    // Keep status as is (pending if no admin replied, active if admin already replied)
     await chat.save();
 
     const updatedChat = await Chat.findById(chat._id)
-      .populate('userId', 'fullName mobile email')
-      .populate('handledBy');
+      .populate('userId', 'fullName mobile email');
+
+    // Add computed fields
+    const chatObj = updatedChat.toObject();
+    const responseChat = {
+      ...chatObj,
+      unreadByUser: getUnreadByUser(updatedChat.messages),
+      lastMessage: getLastMessage(updatedChat.messages),
+      handledBy: getHandledBy(updatedChat.messages)
+    };
 
     console.log(`[CHAT] Message sent by user: ${user.fullName} (ID: ${userId})`);
 
     res.status(200).json({
       success: true,
       message: "Message sent successfully",
-      chat: updatedChat
+      chat: responseChat
     });
   } catch (error) {
     console.error("Error sending message:", error);
@@ -121,7 +179,14 @@ const getUnreadCount = async (req, res) => {
 
     const chat = await Chat.findOne({ userId });
 
-    const unreadCount = chat ? chat.unreadByUser : 0;
+    if (!chat) {
+      return res.status(200).json({
+        success: true,
+        unreadCount: 0
+      });
+    }
+
+    const unreadCount = getUnreadByUser(chat.messages);
 
     res.status(200).json({
       success: true,

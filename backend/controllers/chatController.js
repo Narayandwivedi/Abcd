@@ -3,6 +3,45 @@ const User = require("../models/User");
 const Admin = require("../models/Admin");
 const SubAdmin = require("../models/SubAdmin");
 
+// Helper: Calculate unread count by admin (messages from user not read)
+const getUnreadByAdmin = (messages) => {
+  return messages.filter(msg => msg.senderType === 'user' && !msg.isRead).length;
+};
+
+// Helper: Calculate unread count by user (messages from admin/subadmin not read)
+const getUnreadByUser = (messages) => {
+  return messages.filter(msg =>
+    (msg.senderType === 'admin' || msg.senderType === 'subadmin') && !msg.isRead
+  ).length;
+};
+
+// Helper: Get last message from messages array
+const getLastMessage = (messages) => {
+  if (messages.length === 0) return null;
+  const last = messages[messages.length - 1];
+  return {
+    message: last.message,
+    senderType: last.senderType,
+    senderName: last.senderName,
+    timestamp: last.timestamp
+  };
+};
+
+// Helper: Get who's handling (last admin/subadmin who replied)
+const getHandledBy = (messages) => {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i];
+    if (msg.senderType === 'admin' || msg.senderType === 'subadmin') {
+      return {
+        id: msg.senderId,
+        type: msg.senderType,
+        name: msg.senderName
+      };
+    }
+  }
+  return null;
+};
+
 // Get all chats (Admin/SubAdmin with permission)
 const getAllChats = async (req, res) => {
   try {
@@ -32,16 +71,26 @@ const getAllChats = async (req, res) => {
 
     const chats = await Chat.find(query)
       .populate('userId', 'fullName mobile email')
-      .populate('handledBy')
-      .sort({ lastMessageAt: -1 })
+      .sort({ createdAt: -1 }) // Sort by creation time
       .skip(skip)
       .limit(limit);
 
     const total = await Chat.countDocuments(query);
 
+    // Add computed fields to each chat
+    const chatsWithMetadata = chats.map(chat => {
+      const chatObj = chat.toObject();
+      return {
+        ...chatObj,
+        unreadByAdmin: getUnreadByAdmin(chat.messages),
+        lastMessage: getLastMessage(chat.messages),
+        handledBy: getHandledBy(chat.messages)
+      };
+    });
+
     res.status(200).json({
       success: true,
-      chats,
+      chats: chatsWithMetadata,
       pagination: {
         total,
         page,
@@ -58,14 +107,13 @@ const getAllChats = async (req, res) => {
   }
 };
 
-// Get single chat by ID - Auto-assigns to whoever opens it
+// Get single chat by ID
 const getChatById = async (req, res) => {
   try {
     const { chatId } = req.params;
 
     const chat = await Chat.findById(chatId)
-      .populate('userId', 'fullName mobile email gotra city')
-      .populate('handledBy');
+      .populate('userId', 'fullName mobile email gotra city');
 
     if (!chat) {
       return res.status(404).json({
@@ -74,39 +122,33 @@ const getChatById = async (req, res) => {
       });
     }
 
-    // Auto-assign to whoever opens the chat
-    let handlerId, handlerModel, handlerName;
+    // Mark user messages as read by admin/subadmin
+    let hasChanges = false;
+    chat.messages.forEach(msg => {
+      if (msg.senderType === 'user' && !msg.isRead) {
+        msg.isRead = true;
+        msg.readAt = new Date();
+        hasChanges = true;
+      }
+    });
 
-    if (req.adminId) {
-      const admin = await Admin.findById(req.adminId);
-      handlerId = req.adminId;
-      handlerModel = 'Admin';
-      handlerName = admin.fullName;
-    } else if (req.subAdminId) {
-      const subAdmin = await SubAdmin.findById(req.subAdminId);
-      handlerId = req.subAdminId;
-      handlerModel = 'SubAdmin';
-      handlerName = subAdmin.fullName;
+    if (hasChanges) {
+      await chat.save();
     }
 
-    // Assign chat to this person if not already assigned
-    if (!chat.handledBy) {
-      chat.handledBy = handlerId;
-      chat.handlerModel = handlerModel;
-      chat.handlerName = handlerName;
-    }
-
-    // Mark as read by admin
-    chat.unreadByAdmin = 0;
-    await chat.save();
-
-    const updatedChat = await Chat.findById(chatId)
-      .populate('userId', 'fullName mobile email gotra city')
-      .populate('handledBy');
+    // Add computed fields
+    const chatObj = chat.toObject();
+    const responseChat = {
+      ...chatObj,
+      unreadByAdmin: getUnreadByAdmin(chat.messages),
+      unreadByUser: getUnreadByUser(chat.messages),
+      lastMessage: getLastMessage(chat.messages),
+      handledBy: getHandledBy(chat.messages)
+    };
 
     res.status(200).json({
       success: true,
-      chat: updatedChat
+      chat: responseChat
     });
   } catch (error) {
     console.error("Error fetching chat:", error);
@@ -166,26 +208,36 @@ const replyToChat = async (req, res) => {
       senderName,
       senderId,
       message: message.trim(),
-      timestamp: new Date()
+      timestamp: new Date(),
+      isRead: false
     });
 
-    chat.lastMessage = message.trim();
-    chat.lastMessageAt = new Date();
-    chat.unreadByUser += 1;
-    chat.status = 'active';
+    // Update status to active if it was pending
+    if (chat.status === 'pending') {
+      chat.status = 'active';
+    }
 
     await chat.save();
 
     const updatedChat = await Chat.findById(chatId)
-      .populate('userId', 'fullName mobile email')
-      .populate('handledBy');
+      .populate('userId', 'fullName mobile email');
+
+    // Add computed fields
+    const chatObj = updatedChat.toObject();
+    const responseChat = {
+      ...chatObj,
+      unreadByAdmin: getUnreadByAdmin(updatedChat.messages),
+      unreadByUser: getUnreadByUser(updatedChat.messages),
+      lastMessage: getLastMessage(updatedChat.messages),
+      handledBy: getHandledBy(updatedChat.messages)
+    };
 
     console.log(`[CHAT] Reply sent by ${senderType}: ${senderName} (ID: ${senderId})`);
 
     res.status(200).json({
       success: true,
       message: "Reply sent successfully",
-      chat: updatedChat
+      chat: responseChat
     });
   } catch (error) {
     console.error("Error replying to chat:", error);
@@ -203,10 +255,10 @@ const updateChatStatus = async (req, res) => {
     const { chatId } = req.params;
     const { status } = req.body;
 
-    if (!['active', 'closed'].includes(status)) {
+    if (!['pending', 'active', 'closed'].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid status"
+        message: "Invalid status. Must be pending, active, or closed"
       });
     }
 
@@ -223,15 +275,24 @@ const updateChatStatus = async (req, res) => {
     await chat.save();
 
     const updatedChat = await Chat.findById(chatId)
-      .populate('userId', 'fullName mobile email')
-      .populate('handledBy');
+      .populate('userId', 'fullName mobile email');
+
+    // Add computed fields
+    const chatObj = updatedChat.toObject();
+    const responseChat = {
+      ...chatObj,
+      unreadByAdmin: getUnreadByAdmin(updatedChat.messages),
+      unreadByUser: getUnreadByUser(updatedChat.messages),
+      lastMessage: getLastMessage(updatedChat.messages),
+      handledBy: getHandledBy(updatedChat.messages)
+    };
 
     console.log(`[CHAT] Status updated to ${status}`);
 
     res.status(200).json({
       success: true,
       message: "Chat status updated successfully",
-      chat: updatedChat
+      chat: responseChat
     });
   } catch (error) {
     console.error("Error updating chat status:", error);
@@ -247,17 +308,26 @@ const updateChatStatus = async (req, res) => {
 const getChatStats = async (req, res) => {
   try {
     const totalChats = await Chat.countDocuments();
+    const pendingChats = await Chat.countDocuments({ status: 'pending' });
     const activeChats = await Chat.countDocuments({ status: 'active' });
     const closedChats = await Chat.countDocuments({ status: 'closed' });
-    const unreadChats = await Chat.countDocuments({ unreadByAdmin: { $gt: 0 } });
+
+    // Calculate unread count by checking all chats
+    const allChats = await Chat.find({ status: { $in: ['pending', 'active'] } }).select('messages');
+    let unreadCount = 0;
+
+    allChats.forEach(chat => {
+      unreadCount += getUnreadByAdmin(chat.messages);
+    });
 
     res.status(200).json({
       success: true,
       stats: {
         total: totalChats,
+        pending: pendingChats,
         active: activeChats,
         closed: closedChats,
-        unread: unreadChats
+        unread: unreadCount
       }
     });
   } catch (error) {

@@ -17,6 +17,7 @@ const Certificate = require('../models/Certificate');
 const VendorCertificate = require('../models/VendorCertificate');
 const City = require('../models/City');
 const Blog = require('../models/Blog');
+const Chat = require('../models/Chat');
 
 // Backup configuration
 const BACKUP_EMAIL = process.env.BACKUP_EMAIL || 'your-email@example.com'; // Add this to your .env file
@@ -198,6 +199,7 @@ const performBackup = async () => {
       exportModelData(VendorCertificate, 'vendor-certificates.json'),
       exportModelData(City, 'cities.json'),
       exportModelData(Blog, 'blogs.json'),
+      exportModelData(Chat, 'chats.json'),
     ]);
 
     // Create ZIP archive
