@@ -6,7 +6,6 @@ const messageSchema = new mongoose.Schema({
     type: String,
     enum: ['user', 'admin', 'subadmin'],
     required: true,
-    index: true
   },
   senderName: {
     type: String,
