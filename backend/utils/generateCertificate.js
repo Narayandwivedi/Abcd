@@ -144,11 +144,12 @@ const generateCertificatePDF = async (user) => {
           width: doc.page.width
         });
 
-      // Add city
+      // Add location
+      const locationString = `${user.state || 'N/A'} - ${user.district || 'N/A'} - ${user.city || 'N/A'}`;
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(`City: ${user.city || 'N/A'}`, 0, 321, {
+        .text(locationString.toUpperCase(), 0, 321, {
           align: 'center',
           width: doc.page.width
         });
@@ -442,11 +443,12 @@ const regenerateCertificatePDF = async (user, existingCertificateNumber) => {
           width: doc.page.width
         });
 
-      // Add city
+      // Add location
+      const locationString = `${user.state || 'N/A'} - ${user.district || 'N/A'} - ${user.city || 'N/A'}`;
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(`City: ${user.city || 'N/A'}`, 0, 321, {
+        .text(locationString.toUpperCase(), 0, 321, {
           align: 'center',
           width: doc.page.width
         });
