@@ -17,7 +17,6 @@ const Users = () => {
     mobile: '',
     email: '',
     gotra: '',
-    city: '',
     address: '',
     relativeName: '',
     relationship: '',
@@ -38,7 +37,6 @@ const Users = () => {
     mobile: '',
     email: '',
     gotra: '',
-    city: '',
     address: '',
     relativeName: '',
     relationship: 'S/O',
@@ -48,13 +46,126 @@ const Users = () => {
   })
   const [creating, setCreating] = useState(false)
 
+  const [createStates, setCreateStates] = useState([])
+  const [createDistricts, setCreateDistricts] = useState([])
+  const [createCities, setCreateCities] = useState([])
+  const [createSelectedState, setCreateSelectedState] = useState('')
+  const [createSelectedDistrict, setCreateSelectedDistrict] = useState('')
+  const [createSelectedCity, setCreateSelectedCity] = useState('')
+
+  // State for Edit Modal Location Dropdowns
+  const [editStates, setEditStates] = useState([])
+  const [editDistricts, setEditDistricts] = useState([])
+  const [editCities, setEditCities] = useState([])
+  const [editSelectedState, setEditSelectedState] = useState('')
+  const [editSelectedDistrict, setEditSelectedDistrict] = useState('')
+  const [editSelectedCity, setEditSelectedCity] = useState('')
+
   // const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
   // Fetch all users
   useEffect(() => {
     fetchUsers()
+    fetchCreateStates() // for create modal
+    fetchEditStates() // for edit modal
   }, [])
+
+  // Fetch states for create modal
+  const fetchCreateStates = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/states`)
+      const data = await response.json()
+      if (data.success) {
+        setCreateStates(data.states)
+      }
+    } catch (error) {
+      console.error('Error fetching create states:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (createSelectedState) {
+      const fetchDistricts = async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/cities/districts/${createSelectedState}`)
+          const data = await response.json()
+          if (data.success) {
+            setCreateDistricts(data.districts)
+          }
+        } catch (error) {
+          console.error('Error fetching create districts:', error)
+        }
+      }
+      fetchDistricts()
+    }
+  }, [createSelectedState, BACKEND_URL])
+
+  useEffect(() => {
+    if (createSelectedDistrict) {
+      const fetchCities = async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/cities/district/${createSelectedDistrict}`)
+          const data = await response.json()
+          if (data.success) {
+            setCreateCities(data.cities)
+          }
+        } catch (error) {
+          console.error('Error fetching create cities:', error)
+        }
+      }
+      fetchCities()
+    }
+  }, [createSelectedDistrict, BACKEND_URL])
+
+  // Fetch states for edit modal
+  const fetchEditStates = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/states`)
+      const data = await response.json()
+      if (data.success) {
+        setEditStates(data.states)
+      }
+    } catch (error) {
+      console.error('Error fetching edit states:', error)
+    }
+  }
+
+  // Fetch districts for edit modal when editSelectedState changes
+  useEffect(() => {
+    if (editSelectedState) {
+      const fetchDistricts = async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/cities/districts/${editSelectedState}`)
+          const data = await response.json()
+          if (data.success) {
+            setEditDistricts(data.districts)
+          }
+        } catch (error) {
+          console.error('Error fetching edit districts:', error)
+        }
+      }
+      fetchDistricts()
+    }
+  }, [editSelectedState, BACKEND_URL])
+
+  // Fetch cities for edit modal when editSelectedDistrict changes
+  useEffect(() => {
+    if (editSelectedDistrict) {
+      const fetchCities = async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/cities/district/${editSelectedDistrict}`)
+          const data = await response.json()
+          if (data.success) {
+            setEditCities(data.cities)
+          }
+        } catch (error) {
+          console.error('Error fetching edit cities:', error)
+        }
+      }
+      fetchCities()
+    }
+  }, [editSelectedDistrict, BACKEND_URL])
 
   const fetchUsers = async () => {
     try {
@@ -244,14 +355,13 @@ ABCD Team`
   }
 
   // Open edit modal
-  const openEditModal = (user) => {
+  const openEditModal = async (user) => {
     setSelectedUser(user)
     setEditFormData({
       fullName: user.fullName || '',
       mobile: user.mobile || '',
       email: user.email || '',
       gotra: user.gotra || '',
-      city: user.city || '',
       address: user.address || '',
       relativeName: user.relativeName || '',
       relationship: user.relationship || 'S/O',
@@ -259,6 +369,35 @@ ABCD Team`
       utrNumber: user.utrNumber || '',
       referredBy: user.referredBy || ''
     })
+
+    const state = user.state?.toLowerCase() || '';
+    const district = user.district?.toLowerCase() || '';
+    const city = user.city?.toLowerCase() || '';
+
+    setEditSelectedState(state);
+    setEditSelectedDistrict(district);
+    setEditSelectedCity(city);
+
+    if (state) {
+      const response = await fetch(`${BACKEND_URL}/api/cities/districts/${state}`);
+      const data = await response.json();
+      if (data.success) {
+        setEditDistricts(data.districts);
+      }
+    } else {
+      setEditDistricts([]);
+    }
+
+    if (district) {
+      const response = await fetch(`${BACKEND_URL}/api/cities/district/${district}`);
+      const data = await response.json();
+      if (data.success) {
+        setEditCities(data.cities);
+      }
+    } else {
+      setEditCities([]);
+    }
+
     setShowEditModal(true)
     setReferralStatus({ valid: null, name: '', city: '' })
   }
@@ -350,12 +489,14 @@ ABCD Team`
         mobile: editFormData.mobile,
         email: editFormData.email,
         gotra: editFormData.gotra,
-        city: editFormData.city,
         address: editFormData.address,
         relativeName: editFormData.relativeName,
         relationship: editFormData.relationship,
         utrNumber: editFormData.utrNumber,
-        referredBy: editFormData.referredBy
+        referredBy: editFormData.referredBy,
+        state: editSelectedState,
+        district: editSelectedDistrict,
+        city: editSelectedCity
       }
 
       // Add photo path if uploaded
@@ -461,6 +602,11 @@ ABCD Team`
       return
     }
 
+    if (!createSelectedCity) {
+      toast.warning('Please select a state, district, and city', { autoClose: 800 })
+      return
+    }
+
     if (!createFormData.passportPhoto) {
       toast.warning('Passport photo is required', { autoClose: 800 })
       return
@@ -478,10 +624,12 @@ ABCD Team`
       formData.append('relativeName', createFormData.relativeName)
       formData.append('relationship', createFormData.relationship)
       formData.append('passportPhoto', createFormData.passportPhoto)
+      formData.append('state', createSelectedState)
+      formData.append('district', createSelectedDistrict)
+      formData.append('city', createSelectedCity)
 
       // Add optional fields if provided
       if (createFormData.email) formData.append('email', createFormData.email)
-      if (createFormData.city) formData.append('city', createFormData.city)
       if (createFormData.referredBy) formData.append('referredBy', createFormData.referredBy)
       if (createFormData.password) formData.append('password', createFormData.password)
 
@@ -500,7 +648,6 @@ ABCD Team`
           mobile: '',
           email: '',
           gotra: '',
-          city: '',
           address: '',
           relativeName: '',
           relationship: 'S/O',
@@ -508,6 +655,9 @@ ABCD Team`
           referredBy: '',
           password: ''
         })
+        setCreateSelectedState('')
+        setCreateSelectedDistrict('')
+        setCreateSelectedCity('')
         fetchUsers()
       } else {
         toast.error(data.message || 'Failed to create user', { autoClose: 800 })
@@ -655,6 +805,11 @@ ABCD Team`
                             <div className='font-semibold text-gray-800'>{user.fullName}</div>
                             <div className='text-xs text-gray-500'>{user.relationship || 'S/O'} {user.relativeName}</div>
                             <div className='text-xs text-gray-500'>{user.address}</div>
+                            {user.state && user.district && user.city && (
+                              <div className='text-xs text-gray-500'>
+                                {user.state}, {user.district}, {user.city}
+                              </div>
+                            )}
                             {user.activeCertificate?.certificateNumber && (
                               <div className='text-xs text-blue-600 font-semibold mt-1'>
                                 Cert: {user.activeCertificate.certificateNumber}
@@ -908,6 +1063,15 @@ ABCD Team`
                           </svg>
                           <span className='text-left break-words'>{user.address}</span>
                         </div>
+                        {user.state && user.district && user.city && (
+                          <div className='flex items-start gap-1 text-xs text-gray-500'>
+                            <svg className='w-3 h-3 flex-shrink-0 mt-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
+                            </svg>
+                            <span className='text-left break-words'>{user.state}, {user.district}, {user.city}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1246,16 +1410,61 @@ ABCD Team`
                     </select>
                   </div>
 
-                  {/* City */}
+                  {/* State Dropdown */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>State</label>
+                    <select
+                      value={editSelectedState}
+                      onChange={(e) => {
+                        setEditSelectedState(e.target.value)
+                        setEditSelectedDistrict('')
+                        setEditSelectedCity('')
+                        setEditDistricts([])
+                        setEditCities([])
+                      }}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
+                    >
+                      <option value=''>Select State</option>
+                      {editStates.map(state => (
+                        <option key={state} value={state}>{state.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* District Dropdown */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>District</label>
+                    <select
+                      value={editSelectedDistrict}
+                      onChange={(e) => {
+                        setEditSelectedDistrict(e.target.value)
+                        setEditSelectedCity('')
+                        setEditCities([])
+                      }}
+                      disabled={!editSelectedState || editDistricts.length === 0}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
+                    >
+                      <option value=''>Select District</option>
+                      {editDistricts.map(district => (
+                        <option key={district} value={district}>{district.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* City Dropdown */}
                   <div>
                     <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>City</label>
-                    <input
-                      type='text'
-                      name='city'
-                      value={editFormData.city}
-                      onChange={handleEditFormChange}
-                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
-                    />
+                    <select
+                      value={editSelectedCity}
+                      onChange={(e) => setEditSelectedCity(e.target.value)}
+                      disabled={!editSelectedDistrict || editCities.length === 0}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
+                    >
+                      <option value=''>Select City</option>
+                      {editCities.map(city => (
+                        <option key={city} value={city}>{city.toUpperCase()}</option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Relationship */}
@@ -1474,16 +1683,64 @@ ABCD Team`
                     </select>
                   </div>
 
-                  {/* City */}
-                  <div>
-                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>City</label>
-                    <input
-                      type='text'
-                      name='city'
-                      value={createFormData.city}
-                      onChange={handleCreateFormChange}
-                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
-                    />
+                  {/* State Dropdown */}
+                  <div className='md:col-span-1'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>State *</label>
+                    <select
+                      value={createSelectedState}
+                      onChange={(e) => {
+                        setCreateSelectedState(e.target.value)
+                        setCreateSelectedDistrict('')
+                        setCreateSelectedCity('')
+                        setCreateDistricts([])
+                        setCreateCities([])
+                      }}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
+                      required
+                    >
+                      <option value=''>Select State</option>
+                      {createStates.map(state => (
+                        <option key={state} value={state}>{state.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* District Dropdown */}
+                  <div className='md:col-span-1'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>District *</label>
+                    <select
+                      value={createSelectedDistrict}
+                      onChange={(e) => {
+                        setCreateSelectedDistrict(e.target.value)
+                        setCreateSelectedCity('')
+                        setCreateCities([])
+                      }}
+                      disabled={!createSelectedState || createDistricts.length === 0}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
+                      required
+                    >
+                      <option value=''>Select District</option>
+                      {createDistricts.map(district => (
+                        <option key={district} value={district}>{district.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* City Dropdown */}
+                  <div className='md:col-span-1'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>City *</label>
+                    <select
+                      value={createSelectedCity}
+                      onChange={(e) => setCreateSelectedCity(e.target.value)}
+                      disabled={!createSelectedDistrict || createCities.length === 0}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
+                      required
+                    >
+                      <option value=''>Select City</option>
+                      {createCities.map(city => (
+                        <option key={city} value={city}>{city.toUpperCase()}</option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Relationship */}

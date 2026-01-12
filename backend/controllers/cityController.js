@@ -163,6 +163,29 @@ const getDistricts = async (req, res) => {
   }
 };
 
+// Get districts by state
+const getDistrictsByState = async (req, res) => {
+  try {
+    const { state } = req.params;
+    const districts = await City.distinct('district', { state: state.toLowerCase() });
+
+    // Sort alphabetically
+    districts.sort();
+
+    return res.status(200).json({
+      success: true,
+      count: districts.length,
+      districts
+    });
+  } catch (error) {
+    console.error('Get districts by state error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 // Get cities by state
 const getCitiesByState = async (req, res) => {
   try {
@@ -427,6 +450,7 @@ module.exports = {
   getAllCitiesAdmin,
   getStates,
   getDistricts,
+  getDistrictsByState,
   getCitiesByState,
   getCitiesByDistrict,
   createCity,

@@ -427,6 +427,8 @@ const updateUser = async (req, res) => {
       'mobile',
       'email',
       'gotra',
+      'state',
+      'district',
       'city',
       'address',
       'relativeName',
@@ -438,7 +440,7 @@ const updateUser = async (req, res) => {
     ];
 
     // Certificate-relevant fields that trigger certificate regeneration
-    const certificateFields = ['fullName', 'gotra', 'city', 'relativeName', 'relationship'];
+    const certificateFields = ['fullName', 'gotra', 'state', 'district', 'city', 'relativeName', 'relationship'];
 
     // Check if any certificate-relevant field is being changed
     let certificateNeedsRegeneration = false;
@@ -454,6 +456,11 @@ const updateUser = async (req, res) => {
         user[field] = updateData[field];
       }
     });
+
+    // If email is being set to an empty string, set it to undefined to allow sparse index
+    if (updateData.email === '') {
+      user.email = undefined;
+    }
 
     await user.save();
 
@@ -500,6 +507,12 @@ const updateUser = async (req, res) => {
     });
   } catch (error) {
     console.error('Update user error:', error);
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+      return res.status(400).json({
+        success: false,
+        message: "A user with this email already exists."
+      });
+    }
     return res.status(500).json({
       success: false,
       message: error.message
@@ -580,7 +593,7 @@ const deleteUser = async (req, res) => {
 // Create user (admin) - bypasses payment requirement
 const createUser = async (req, res) => {
   try {
-    const { fullName, mobile, email, gotra, city, address, relativeName, relationship, referredBy, password } = req.body;
+    const { fullName, mobile, email, gotra, state, district, city, address, relativeName, relationship, referredBy, password } = req.body;
 
     // Validate required fields
     if (!fullName || !mobile || !gotra || !address || !relativeName) {
@@ -643,6 +656,14 @@ const createUser = async (req, res) => {
       userData.email = email;
     }
 
+    if (state) {
+      userData.state = state.toUpperCase();
+    }
+
+    if (district) {
+      userData.district = district.toUpperCase();
+    }
+
     if (city) {
       userData.city = city.toUpperCase();
     }
@@ -696,6 +717,23 @@ const createUser = async (req, res) => {
     });
   } catch (error) {
     console.error('Create user error:', error);
+
+    // Handle duplicate key error for mobile or email
+    if (error.code === 11000) {
+      if (error.keyPattern && error.keyPattern.mobile) {
+        return res.status(400).json({
+          success: false,
+          message: "User with this mobile number already exists"
+        });
+      }
+      if (error.keyPattern && error.keyPattern.email) {
+        return res.status(400).json({
+          success: false,
+          message: "User with this email already exists"
+        });
+      }
+    }
+
     return res.status(500).json({
       success: false,
       message: error.message

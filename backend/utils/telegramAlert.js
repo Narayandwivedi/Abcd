@@ -54,6 +54,8 @@ const sendSignupAlert = async (userData) => {
 📱 Mobile: ${userData.mobile || "N/A"}
 📧 Email: ${userData.email || "Not provided"}
 🏛️ Gotra: ${userData.gotra || "N/A"}
+🏙️ State: ${userData.state || "Not provided"}
+🏙️ District: ${userData.district || "Not provided"}
 🏙️ City: ${userData.city || "Not provided"}
 📍 Address: ${userData.address || "N/A"}
 💳 UTR Number: ${userData.utrNumber || "Not provided"}

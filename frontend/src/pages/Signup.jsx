@@ -4,7 +4,6 @@ import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 import GoogleLogin from '../component/GoogleLogin'
 import { QRCodeSVG } from 'qrcode.react'
-import CityDropdown from '../component/CityDropdown'
 
 const Signup = () => {
   const { BACKEND_URL, checkAuthStatus } = useContext(AppContext)
@@ -17,7 +16,6 @@ const Signup = () => {
     relationship: 'S/O',
     relativeName: '',
     address: '',
-    city: '',
     gotra: '',
     passportPhoto: null,
     utrNumber: '',
@@ -29,6 +27,13 @@ const Signup = () => {
   const [previewPassportPhoto, setPreviewPassportPhoto] = useState(null)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   const [referralStatus, setReferralStatus] = useState({ valid: null, name: '', city: '' })
+
+  const [states, setStates] = useState([])
+  const [districts, setDistricts] = useState([])
+  const [cities, setCities] = useState([])
+  const [selectedState, setSelectedState] = useState('')
+  const [selectedDistrict, setSelectedDistrict] = useState('')
+  const [selectedCity, setSelectedCity] = useState('')
 
   // UPI ID for payment
   const UPI_ID = '222716826030217@cnrb'
@@ -49,11 +54,63 @@ const Signup = () => {
     }
   }, [navigate])
 
+  // Fetch states on component mount
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/cities/states`)
+        const data = await response.json()
+        if (data.success) {
+          setStates(data.states)
+        }
+      } catch (error) {
+        console.error('Error fetching states:', error)
+      }
+    }
+    fetchStates()
+  }, [BACKEND_URL])
+
+  // Fetch districts when state changes
+  useEffect(() => {
+    if (selectedState) {
+      const fetchDistricts = async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/cities/districts/${selectedState}`)
+          const data = await response.json()
+          if (data.success) {
+            setDistricts(data.districts)
+          }
+        } catch (error) {
+          console.error('Error fetching districts:', error)
+        }
+      }
+      fetchDistricts()
+    }
+  }, [selectedState, BACKEND_URL])
+
+  // Fetch cities when district changes
+  useEffect(() => {
+    if (selectedDistrict) {
+      const fetchCities = async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/cities/district/${selectedDistrict}`)
+          const data = await response.json()
+          if (data.success) {
+            setCities(data.cities)
+          }
+        } catch (error) {
+          console.error('Error fetching cities:', error)
+        }
+      }
+      fetchCities()
+    }
+  }, [selectedDistrict, BACKEND_URL])
+
   const handleChange = (e) => {
     const { name, value } = e.target
 
     // Capitalize specific fields
-    const fieldsToCapitalize = ['fullName', 'relativeName', 'address', 'city']
+    const fieldsToCapitalize = ['fullName', 'relativeName', 'address']
     const newValue = fieldsToCapitalize.includes(name) ? value.toUpperCase() : value
 
     setFormData({
@@ -205,8 +262,8 @@ const Signup = () => {
       return
     }
 
-    if (!formData.city || !formData.city.trim()) {
-      toast.error('City is required')
+    if (!selectedCity) {
+      toast.error('Please select your state, district, and city')
       setLoading(false)
       return
     }
@@ -251,7 +308,9 @@ const Signup = () => {
       submitData.append('address', formData.address)
       submitData.append('gotra', formData.gotra)
       if (formData.email) submitData.append('email', formData.email)
-      if (formData.city) submitData.append('city', formData.city)
+      submitData.append('state', selectedState)
+      submitData.append('district', selectedDistrict)
+      submitData.append('city', selectedCity)
       if (formData.passportPhoto) submitData.append('passportPhoto', formData.passportPhoto)
       if (formData.utrNumber) submitData.append('utrNumber', formData.utrNumber)
       if (formData.paymentImage) submitData.append('paymentImage', formData.paymentImage)
@@ -277,13 +336,15 @@ const Signup = () => {
           relationship: 'S/O',
           relativeName: '',
           address: '',
-          city: '',
           gotra: '',
           passportPhoto: null,
           utrNumber: '',
           paymentImage: null,
           referredBy: ''
         })
+        setSelectedState('')
+        setSelectedDistrict('')
+        setSelectedCity('')
         setPreviewImage(null)
         setPreviewPassportPhoto(null)
       } else {
@@ -405,6 +466,95 @@ const Signup = () => {
               </div>
             </div>
 
+            {/* Relative's Name Field */}
+            <div>
+              <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
+                {formData.relationship === 'W/O' ? "Husband's Name" : "Father's Name"} <span className='text-red-400'>*</span>
+              </label>
+              <div className='relative'>
+                <input
+                  type='text'
+                  name='relativeName'
+                  value={formData.relativeName}
+                  onChange={handleChange}
+                  className='w-full px-3 md:px-4 py-2 md:py-3 pl-9 md:pl-11 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm'
+                  placeholder={formData.relationship === 'W/O' ? "Enter your husband's name" : "Enter your father's name"}
+                  required
+                />
+                <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' />
+                </svg>
+              </div>
+            </div>
+
+            {/* State Dropdown */}
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div>
+                <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
+                  State <span className='text-red-400'>*</span>
+                </label>
+                <select
+                  value={selectedState}
+                  onChange={(e) => {
+                    setSelectedState(e.target.value)
+                    setSelectedDistrict('')
+                    setSelectedCity('')
+                    setDistricts([])
+                    setCities([])
+                  }}
+                  className='w-full px-3 py-2 bg-white border border-white/30 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition backdrop-blur-sm text-xs md:text-sm'
+                  required
+                >
+                  <option value='' className='bg-white text-gray-900'>Select State</option>
+                  {states.map(state => (
+                    <option key={state} value={state} className='bg-white text-gray-900'>{state.toUpperCase()}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* District Dropdown */}
+              <div>
+                <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
+                  District <span className='text-red-400'>*</span>
+                </label>
+                <select
+                  value={selectedDistrict}
+                  onChange={(e) => {
+                    setSelectedDistrict(e.target.value)
+                    setSelectedCity('')
+                    setCities([])
+                  }}
+                  disabled={!selectedState || districts.length === 0}
+                  className='w-full px-3 py-2 bg-white border border-white/30 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition backdrop-blur-sm text-xs md:text-sm disabled:opacity-50'
+                  required
+                >
+                  <option value='' className='bg-white text-gray-900'>Select District</option>
+                  {districts.map(district => (
+                    <option key={district} value={district} className='bg-white text-gray-900'>{district.toUpperCase()}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* City Dropdown */}
+              <div>
+                <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
+                  City <span className='text-red-400'>*</span>
+                </label>
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  disabled={!selectedDistrict || cities.length === 0}
+                  className='w-full px-3 py-2 bg-white border border-white/30 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition backdrop-blur-sm text-xs md:text-sm disabled:opacity-50'
+                  required
+                >
+                  <option value='' className='bg-white text-gray-900'>Select City</option>
+                  {cities.map(city => (
+                    <option key={city} value={city} className='bg-white text-gray-900'>{city.toUpperCase()}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             {/* Address Field */}
             <div>
               <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
@@ -424,20 +574,6 @@ const Signup = () => {
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
                 </svg>
               </div>
-            </div>
-
-            {/* City Dropdown */}
-            <div>
-              <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
-                City <span className='text-red-400'>*</span>
-              </label>
-              <CityDropdown
-                value={formData.city}
-                onChange={(city) => setFormData({ ...formData, city })}
-                placeholder='Select your City'
-                required={true}
-                darkMode={true}
-              />
             </div>
 
             {/* Gotra Dropdown */}

@@ -3,6 +3,7 @@ const {
   getAllCities,
   getStates,
   getDistricts,
+  getDistrictsByState,
   getCitiesByState,
   getCitiesByDistrict
 } = require("../controllers/cityController");
@@ -18,6 +19,9 @@ router.get("/states", getStates);
 
 // GET /api/cities/districts - Get all districts
 router.get("/districts", getDistricts);
+
+// GET /api/cities/districts/:state - Get all districts by state
+router.get("/districts/:state", getDistrictsByState);
 
 // GET /api/cities/state/:state - Get cities by specific state
 router.get("/state/:state", getCitiesByState);

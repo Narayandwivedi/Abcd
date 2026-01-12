@@ -15,7 +15,7 @@ const handelUserSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
 
-    let { fullName, email, mobile, relativeName, relationship, address, gotra, city, utrNumber, referredBy } = req.body;
+    let { fullName, email, mobile, relativeName, relationship, address, gotra, state, district, city, utrNumber, referredBy } = req.body;
 
     // Trim input fields
     fullName = fullName?.trim();
@@ -23,6 +23,8 @@ const handelUserSignup = async (req, res) => {
     relativeName = relativeName?.trim();
     relationship = relationship?.trim();
     address = address?.trim();
+    state = state?.trim();
+    district = district?.trim();
     city = city?.trim();
     utrNumber = utrNumber?.trim();
 
@@ -30,6 +32,8 @@ const handelUserSignup = async (req, res) => {
     fullName = fullName?.toUpperCase();
     relativeName = relativeName?.toUpperCase();
     address = address?.toUpperCase();
+    if (state) state = state.toUpperCase();
+    if (district) district = district.toUpperCase();
     if (city) city = city.toUpperCase();
 
     if (!fullName || !mobile || !relativeName || !address || !gotra) {
@@ -96,6 +100,14 @@ const handelUserSignup = async (req, res) => {
       newUserData.email = email;
     }
 
+    if (state) {
+      newUserData.state = state;
+    }
+
+    if (district) {
+      newUserData.district = district;
+    }
+
     if (city) {
       newUserData.city = city;
     }
@@ -154,6 +166,21 @@ const handelUserSignup = async (req, res) => {
     });
   } catch (err) {
     console.error("❌ Signup Error:", err);
+    // Handle duplicate key error for mobile or email
+    if (err.code === 11000) {
+      if (err.keyPattern && err.keyPattern.mobile) {
+        return res.status(400).json({
+          success: false,
+          message: "Mobile number already registered."
+        });
+      }
+      if (err.keyPattern && err.keyPattern.email) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already registered."
+        });
+      }
+    }
     return res.status(500).json({ success: false, message: err.message });
   }
 };
