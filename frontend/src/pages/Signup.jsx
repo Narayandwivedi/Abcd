@@ -466,27 +466,6 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Relative's Name Field */}
-            <div>
-              <label className='block text-white font-semibold mb-1 md:mb-2 text-xs md:text-sm'>
-                {formData.relationship === 'W/O' ? "Husband's Name" : "Father's Name"} <span className='text-red-400'>*</span>
-              </label>
-              <div className='relative'>
-                <input
-                  type='text'
-                  name='relativeName'
-                  value={formData.relativeName}
-                  onChange={handleChange}
-                  className='w-full px-3 md:px-4 py-2 md:py-3 pl-9 md:pl-11 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition backdrop-blur-sm text-xs md:text-sm'
-                  placeholder={formData.relationship === 'W/O' ? "Enter your husband's name" : "Enter your father's name"}
-                  required
-                />
-                <svg className='absolute left-2.5 md:left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' />
-                </svg>
-              </div>
-            </div>
-
             {/* State Dropdown */}
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div>
