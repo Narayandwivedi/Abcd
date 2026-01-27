@@ -99,15 +99,26 @@ const sendVendorSignupAlert = async (vendorData) => {
     ? `${BACKEND_URL}/${vendorData.passportPhoto}`
     : "Not provided";
 
+  // Format business categories
+  const categoriesText = vendorData.businessCategories && vendorData.businessCategories.length > 0
+    ? vendorData.businessCategories.map((bc, i) => `  ${i + 1}. ${bc.category || bc.categoryName || "N/A"} → ${bc.subCategory || bc.subcategoryName || "N/A"}`).join("\n")
+    : "Not provided";
+
   // Format message with all vendor details
   const message = `🏪 NEW VENDOR SIGNUP REGISTRATION
 
 👤 Owner Name: ${vendorData.ownerName || "N/A"}
 🏢 Business Name: ${vendorData.businessName || "N/A"}
 📱 Mobile: ${vendorData.mobile || "Not provided"}
-📧 Email: ${vendorData.email || "N/A"}
+📧 Email: ${vendorData.email || "Not provided"}
+🌐 Website: ${vendorData.websiteUrl || "Not provided"}
+📲 Social Media: ${vendorData.socialUrl || "Not provided"}
+🏙️ State: ${vendorData.state || "Not provided"}
 🏙️ City: ${vendorData.city || "Not provided"}
-📂 Category: ${vendorData.membershipCategory || "Not provided"}
+💰 Membership Fees: ₹${vendorData.membershipFees || "Not provided"}
+
+📂 Business Categories:
+${categoriesText}
 
 📸 Vendor Photo: ${vendorPhotoLink}
 

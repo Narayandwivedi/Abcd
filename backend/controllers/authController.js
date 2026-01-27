@@ -56,32 +56,33 @@ const handelUserSignup = async (req, res) => {
       });
     }
 
+    // Convert mobile to number for consistent comparison
+    mobile = Number(mobile);
+
     // Validate Indian mobile number
-    if (mobile < 6000000000 || mobile > 9999999999) {
+    if (!mobile || mobile < 6000000000 || mobile > 9999999999) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid Indian mobile number",
       });
     }
 
-    // Check if user already exists by mobile (or email if provided)
-    const query = email
-      ? { $or: [{ email }, { mobile }] }
-      : { mobile };
+    // Check if user already exists by mobile
+    const existingByMobile = await userModel.findOne({ mobile });
+    if (existingByMobile) {
+      return res.status(400).json({
+        success: false,
+        message: "Mobile number already exists",
+      });
+    }
 
-    const existingUser = await userModel.findOne(query);
-
-    if (existingUser) {
-      if (email && existingUser.email === email) {
+    // Check if user already exists by email
+    if (email) {
+      const existingByEmail = await userModel.findOne({ email });
+      if (existingByEmail) {
         return res.status(400).json({
           success: false,
           message: "Email already exists",
-        });
-      }
-      if (existingUser.mobile === mobile) {
-        return res.status(400).json({
-          success: false,
-          message: "Mobile number already exists",
         });
       }
     }
@@ -171,17 +172,21 @@ const handelUserSignup = async (req, res) => {
       if (err.keyPattern && err.keyPattern.mobile) {
         return res.status(400).json({
           success: false,
-          message: "Mobile number already registered."
+          message: "Mobile number already exists",
         });
       }
       if (err.keyPattern && err.keyPattern.email) {
         return res.status(400).json({
           success: false,
-          message: "Email already registered."
+          message: "Email already exists",
         });
       }
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate entry found. Please check your details.",
+      });
     }
-    return res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
   }
 };
 

@@ -25,18 +25,6 @@ const vendorSchema = new mongoose.Schema({
     type: String,
   },
 
-  // Google OAuth fields
-  googleId: {
-    type: String,
-    unique: true,
-    sparse: true,
-  },
-  profilePicture: {
-    type: String,
-  },
-  passportPhoto: {
-    type: String,
-  },
   state: {
     type: String,
     required: true,
@@ -45,28 +33,18 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  membershipCategory: {
-    type: String,
-    enum: ['Bronze', 'Silver', 'Gold', 'Diamond', 'Platinum'],
+  membershipFees: {
+    type: Number,
     required: true,
   },
 
-  // Business Categories - Flattened structure for easier querying
+  // Business Categories - Plain text (max 5)
   businessCategories: [{
-    categoryId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
-      required: true,
-    },
-    subcategoryId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
-    categoryName: {
+    category: {
       type: String,
       required: true,
     },
-    subcategoryName: {
+    subCategory: {
       type: String,
       required: true,
     },

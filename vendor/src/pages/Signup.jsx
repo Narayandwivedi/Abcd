@@ -30,8 +30,8 @@ const Signup = () => {
     mobile: '',
     state: '',
     city: '',
-    membershipCategory: '',
-    businessCategories: [],
+    membershipFees: '',
+    businessCategories: [{ category: '', subCategory: '' }],
     websiteUrl: '',
     socialUrl: '',
     vendorPhoto: null
@@ -158,8 +158,15 @@ const Signup = () => {
     setError('')
 
     // Validation
-    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.state || !formData.city || formData.businessCategories.length === 0) {
-      setError('Please fill in all required fields including state, city, and at least one category and subcategory')
+    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.state || !formData.city || formData.businessCategories.length === 0 || !formData.membershipFees) {
+      setError('Please fill in all required fields including state, city, membership fees, and at least one category and subcategory')
+      return
+    }
+
+    // Validate each category entry has both fields
+    const hasEmptyCategory = formData.businessCategories.some(item => !item.category?.trim() || !item.subCategory?.trim())
+    if (hasEmptyCategory) {
+      setError('Please fill in both category and subcategory for all entries')
       return
     }
 
@@ -191,7 +198,7 @@ const Signup = () => {
       submitData.append('state', formData.state)
       submitData.append('city', formData.city)
       submitData.append('businessCategories', JSON.stringify(formData.businessCategories))
-      if (formData.membershipCategory) submitData.append('membershipCategory', formData.membershipCategory)
+      submitData.append('membershipFees', formData.membershipFees)
       if (formData.email) submitData.append('email', formData.email)
       if (formData.websiteUrl) submitData.append('websiteUrl', formData.websiteUrl)
       if (formData.socialUrl) submitData.append('socialUrl', formData.socialUrl)
@@ -212,8 +219,8 @@ const Signup = () => {
           mobile: '',
           state: '',
           city: '',
-          membershipCategory: '',
-          businessCategories: [],
+          membershipFees: '',
+          businessCategories: [{ category: '', subCategory: '' }],
           websiteUrl: '',
           socialUrl: '',
           vendorPhoto: null
@@ -446,24 +453,23 @@ const Signup = () => {
               required
             />
 
-            {/* Membership Category Selection */}
+            {/* Membership Fees */}
             <div>
               <label className='block text-sm font-bold text-gray-700 mb-2'>
-                Membership Category <span className='text-gray-500'>(Optional)</span>
+                Membership Fees (Rs.) <span className='text-red-500'>*</span>
               </label>
-              <select
-                name='membershipCategory'
-                value={formData.membershipCategory}
-                onChange={handleChange}
-                className='w-full px-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base appearance-none cursor-pointer'
-              >
-                <option value=''>Select Membership Category</option>
-                <option value='Bronze'>Bronze - Rs. 1,000 per year</option>
-                <option value='Silver'>Silver - Rs. 2,000 per year</option>
-                <option value='Gold'>Gold - Rs. 5,000 per year</option>
-                <option value='Diamond'>Diamond - Rs. 10,000 per year</option>
-                <option value='Platinum'>Platinum - Rs. 25,000 per year</option>
-              </select>
+              <div className='relative'>
+                <span className='absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm'>₹</span>
+                <input
+                  type='number'
+                  name='membershipFees'
+                  value={formData.membershipFees}
+                  onChange={handleChange}
+                  min='1'
+                  className='w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm sm:text-base'
+                  placeholder='Enter membership fees e.g. 1000'
+                />
+              </div>
             </div>
 
             {/* Photo Upload */}

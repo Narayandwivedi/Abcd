@@ -152,12 +152,12 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           width: doc.page.width
         });
 
-      // Add membership category
-      if (vendor.membershipCategory) {
+      // Add membership fees
+      if (vendor.membershipFees) {
         doc.fontSize(12)
           .fillColor('#7c3aed')
           .font('Helvetica-Bold')
-          .text(`Membership Category: ${vendor.membershipCategory}`, 0, 339, {
+          .text(`Membership Fees: ₹${vendor.membershipFees}`, 0, 339, {
             align: 'center',
             width: doc.page.width
           });

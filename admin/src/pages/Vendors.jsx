@@ -27,7 +27,7 @@ const Vendors = () => {
     state: '',
     city: '',
     businessCategories: [],
-    membershipCategory: '',
+    membershipFees: '',
     password: ''
   })
   const [creating, setCreating] = useState(false)
@@ -40,7 +40,7 @@ const Vendors = () => {
     state: '',
     city: '',
     businessCategories: [],
-    membershipCategory: ''
+    membershipFees: ''
   })
   const [editing, setEditing] = useState(false)
 
@@ -191,7 +191,7 @@ ABCD Team`
 
   // Create vendor handler
   const handleCreateVendor = async () => {
-    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.state || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipCategory) {
+    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.state || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipFees) {
       alert('Please fill all required fields including state, city, and at least one category and subcategory')
       return
     }
@@ -224,7 +224,7 @@ ABCD Team`
           state: '',
           city: '',
           businessCategories: [],
-          membershipCategory: '',
+          membershipFees: '',
           password: ''
         })
         fetchVendors()
@@ -250,14 +250,14 @@ ABCD Team`
       state: vendor.state || '',
       city: vendor.city || '',
       businessCategories: vendor.businessCategories || [],
-      membershipCategory: vendor.membershipCategory || ''
+      membershipFees: vendor.membershipFees || ''
     })
     setShowEditModal(true)
   }
 
   // Handle edit vendor
   const handleEditVendor = async () => {
-    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.state || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipCategory) {
+    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.state || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipFees) {
       alert('Please fill all required fields including state, city, and at least one category and subcategory')
       return
     }
@@ -291,7 +291,7 @@ ABCD Team`
           state: '',
           city: '',
           businessCategories: [],
-          membershipCategory: ''
+          membershipFees: ''
         })
         fetchVendors()
       } else {
@@ -576,18 +576,18 @@ ABCD Team`
                             <div className='flex flex-wrap gap-1'>
                               {vendor.businessCategories.map((bc, idx) => (
                                 <div key={idx} className='text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md'>
-                                  <span className='font-semibold'>{bc.categoryName}</span>
+                                  <span className='font-semibold'>{bc.category}</span>
                                   <span className='mx-1'>→</span>
-                                  <span>{bc.subcategoryName}</span>
+                                  <span>{bc.subCategory}</span>
                                 </div>
                               ))}
                             </div>
                           ) : (
                             <div className='text-sm text-gray-500'>No categories</div>
                           )}
-                          {vendor.membershipCategory && (
+                          {vendor.membershipFees && (
                             <span className='inline-block px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold mt-1'>
-                              {vendor.membershipCategory}
+                              ₹{vendor.membershipFees}
                             </span>
                           )}
                         </div>
@@ -820,9 +820,9 @@ ABCD Team`
                             <svg className='w-3 h-3 text-purple-600' fill='currentColor' viewBox='0 0 20 20'>
                               <path d='M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z' />
                             </svg>
-                            <span className='text-xs font-semibold text-purple-700'>{bc.categoryName}</span>
+                            <span className='text-xs font-semibold text-purple-700'>{bc.category}</span>
                             <span className='text-xs text-purple-500'>→</span>
-                            <span className='text-xs text-purple-600'>{bc.subcategoryName}</span>
+                            <span className='text-xs text-purple-600'>{bc.subCategory}</span>
                           </div>
                         ))}
                         {vendor.businessCategories.length > 2 && (
@@ -856,12 +856,12 @@ ABCD Team`
                     </div>
 
                     {/* Membership & Sub-Category */}
-                    {vendor.membershipCategory && (
+                    {vendor.membershipFees && (
                       <div className='flex items-center gap-2 bg-indigo-50 px-3 py-2 rounded-xl'>
                         <svg className='w-3.5 h-3.5 text-indigo-600' fill='currentColor' viewBox='0 0 20 20'>
                           <path d='M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z' />
                         </svg>
-                        <span className='text-xs font-medium text-indigo-700'>Membership: {vendor.membershipCategory}</span>
+                        <span className='text-xs font-medium text-indigo-700'>Membership: ₹{vendor.membershipFees}</span>
                       </div>
                     )}
 
@@ -1133,19 +1133,15 @@ ABCD Team`
               />
 
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Category *</label>
-                <select
-                  value={createForm.membershipCategory}
-                  onChange={(e) => setCreateForm({...createForm, membershipCategory: e.target.value})}
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) *</label>
+                <input
+                  type='number'
+                  value={createForm.membershipFees}
+                  onChange={(e) => setCreateForm({...createForm, membershipFees: e.target.value})}
+                  min='1'
+                  placeholder='Enter amount e.g. 1000'
                   className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                >
-                  <option value=''>Select Membership</option>
-                  <option value='Bronze'>Bronze</option>
-                  <option value='Silver'>Silver</option>
-                  <option value='Gold'>Gold</option>
-                  <option value='Diamond'>Diamond</option>
-                  <option value='Platinum'>Platinum</option>
-                </select>
+                />
               </div>
 
               <div>
@@ -1244,19 +1240,15 @@ ABCD Team`
               />
 
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Category *</label>
-                <select
-                  value={editForm.membershipCategory}
-                  onChange={(e) => setEditForm({...editForm, membershipCategory: e.target.value})}
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) *</label>
+                <input
+                  type='number'
+                  value={editForm.membershipFees}
+                  onChange={(e) => setEditForm({...editForm, membershipFees: e.target.value})}
+                  min='1'
+                  placeholder='Enter amount e.g. 1000'
                   className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                >
-                  <option value=''>Select Membership</option>
-                  <option value='Bronze'>Bronze</option>
-                  <option value='Silver'>Silver</option>
-                  <option value='Gold'>Gold</option>
-                  <option value='Diamond'>Diamond</option>
-                  <option value='Platinum'>Platinum</option>
-                </select>
+                />
               </div>
             </div>
 

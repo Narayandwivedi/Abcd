@@ -10,7 +10,7 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, state, city, membershipCategory, businessCategories, websiteUrl, socialUrl } = req.body;
+    let { email, mobile, ownerName, businessName, state, city, membershipFees, businessCategories, websiteUrl, socialUrl } = req.body;
 
     // Parse businessCategories if it's a string (from FormData)
     if (typeof businessCategories === 'string') {
@@ -27,43 +27,53 @@ const handleVendorSignup = async (req, res) => {
     businessName = businessName?.trim();
     state = state?.trim();
     city = city?.trim();
-    membershipCategory = membershipCategory?.trim();
+    membershipFees = Number(membershipFees);
     websiteUrl = websiteUrl?.trim();
     socialUrl = socialUrl?.trim();
 
-    if (!mobile || !ownerName || !businessName || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
-      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, state, city, at least one category-subcategory pair, and membership category are required" });
+    if (!mobile || !ownerName || !businessName || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
+      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, state, city, at least one category-subcategory pair, and membership fees are required" });
     }
 
+    // Validate max 5 categories and each must have category + subCategory strings
+    if (businessCategories.length > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
+    }
+    for (const item of businessCategories) {
+      if (!item.category || !item.subCategory || typeof item.category !== 'string' || typeof item.subCategory !== 'string') {
+        return res.status(400).json({ success: false, message: "Each category must have a category and subCategory text" });
+      }
+      item.category = item.category.trim();
+      item.subCategory = item.subCategory.trim();
+    }
+
+    // Convert mobile to number for consistent comparison
+    mobile = Number(mobile);
+
     // Validate Indian mobile number
-    if (mobile < 6000000000 || mobile > 9999999999) {
+    if (!mobile || mobile < 6000000000 || mobile > 9999999999) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid Indian mobile number",
       });
     }
 
-    // Check if vendor already exists by email or mobile
-    const existingVendorQuery = [{ mobile }];
-    if (email) {
-      existingVendorQuery.push({ email });
+    // Check if vendor already exists by mobile
+    const existingByMobile = await vendorModel.findOne({ mobile });
+    if (existingByMobile) {
+      return res.status(400).json({
+        success: false,
+        message: "Mobile number already exists",
+      });
     }
 
-    const existingVendor = await vendorModel.findOne({
-      $or: existingVendorQuery
-    });
-
-    if (existingVendor) {
-      if (email && existingVendor.email === email) {
+    // Check if vendor already exists by email
+    if (email) {
+      const existingByEmail = await vendorModel.findOne({ email });
+      if (existingByEmail) {
         return res.status(400).json({
           success: false,
           message: "Email already exists",
-        });
-      }
-      if (existingVendor.mobile === mobile) {
-        return res.status(400).json({
-          success: false,
-          message: "Mobile number already exists",
         });
       }
     }
@@ -75,7 +85,7 @@ const handleVendorSignup = async (req, res) => {
       state, // Required field
       city, // Required field
       businessCategories,
-      membershipCategory, // Required field
+      membershipFees, // Required field
       isBusinessApplicationSubmitted: true, // Skip business form, go directly to pending approval
     };
 
@@ -129,7 +139,26 @@ const handleVendorSignup = async (req, res) => {
     });
   } catch (err) {
     console.error("❌ Vendor Signup Error:", err);
-    return res.status(500).json({ success: false, message: err.message });
+    // Handle duplicate key error
+    if (err.code === 11000) {
+      if (err.keyPattern && err.keyPattern.mobile) {
+        return res.status(400).json({
+          success: false,
+          message: "Mobile number already exists",
+        });
+      }
+      if (err.keyPattern && err.keyPattern.email) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already exists",
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate entry found. Please check your details.",
+      });
+    }
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
   }
 };
 

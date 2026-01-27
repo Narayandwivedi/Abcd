@@ -137,14 +137,18 @@ const setVendorPassword = async (req, res) => {
 // Create vendor (admin)
 const createVendor = async (req, res) => {
   try {
-    const { ownerName, businessName, mobile, email, state, city, businessCategories, membershipCategory, password } = req.body;
+    const { ownerName, businessName, mobile, email, state, city, businessCategories, membershipFees, password } = req.body;
 
     // Validate required fields
-    if (!ownerName || !businessName || !mobile || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
+    if (!ownerName || !businessName || !mobile || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
       return res.status(400).json({
         success: false,
         message: "All required fields must be provided including state, city, at least one category and subcategory"
       });
+    }
+
+    if (businessCategories.length > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
     }
 
     // Check if mobile already exists
@@ -175,7 +179,7 @@ const createVendor = async (req, res) => {
       state,
       city,
       businessCategories,
-      membershipCategory,
+      membershipFees,
       paymentVerified: true,
       isVerified: true,
       isMobileVerified: true
@@ -245,14 +249,18 @@ const createVendor = async (req, res) => {
 const updateVendor = async (req, res) => {
   try {
     const { vendorId } = req.params;
-    const { ownerName, businessName, mobile, email, state, city, businessCategories, membershipCategory } = req.body;
+    const { ownerName, businessName, mobile, email, state, city, businessCategories, membershipFees } = req.body;
 
     // Validate required fields
-    if (!ownerName || !businessName || !mobile || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipCategory) {
+    if (!ownerName || !businessName || !mobile || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
       return res.status(400).json({
         success: false,
         message: "All required fields must be provided including state, city, at least one category and subcategory"
       });
+    }
+
+    if (businessCategories.length > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
     }
 
     const vendor = await vendorModel.findById(vendorId);
@@ -293,7 +301,7 @@ const updateVendor = async (req, res) => {
     vendor.state = state;
     vendor.city = city;
     vendor.businessCategories = businessCategories;
-    vendor.membershipCategory = membershipCategory;
+    vendor.membershipFees = membershipFees;
 
     // Update email if provided
     if (email && email.trim()) {
