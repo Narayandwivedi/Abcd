@@ -49,10 +49,32 @@ const vendorSchema = new mongoose.Schema({
       required: true,
     },
   }],
+  gstPan: {
+    type: String,
+  },
+  address: {
+    type: String,
+  },
   websiteUrl: {
     type: String,
   },
   socialUrl: {
+    type: String,
+  },
+  referredByName: {
+    type: String,
+  },
+  referralId: {
+    type: String,
+  },
+  membershipType: {
+    type: String,
+    enum: ['Silver', 'Gold', 'Diamond'],
+  },
+  amountPaid: {
+    type: Number,
+  },
+  paymentDetails: {
     type: String,
   },
   authProvider: {

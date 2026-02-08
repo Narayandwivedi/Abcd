@@ -10,7 +10,7 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, state, city, membershipFees, businessCategories, websiteUrl, socialUrl } = req.body;
+    let { email, mobile, ownerName, businessName, state, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid, paymentDetails } = req.body;
 
     // Parse businessCategories if it's a string (from FormData)
     if (typeof businessCategories === 'string') {
@@ -30,6 +30,13 @@ const handleVendorSignup = async (req, res) => {
     membershipFees = Number(membershipFees);
     websiteUrl = websiteUrl?.trim();
     socialUrl = socialUrl?.trim();
+    gstPan = gstPan?.trim();
+    address = address?.trim();
+    referredByName = referredByName?.trim();
+    referralId = referralId?.trim();
+    membershipType = membershipType?.trim();
+    amountPaid = amountPaid ? Number(amountPaid) : undefined;
+    paymentDetails = paymentDetails?.trim();
 
     if (!mobile || !ownerName || !businessName || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
       return res.status(400).json({ success: false, message: "Mobile, owner name, business name, state, city, at least one category-subcategory pair, and membership fees are required" });
@@ -103,6 +110,15 @@ const handleVendorSignup = async (req, res) => {
     if (socialUrl) {
       newVendorData.socialUrl = socialUrl;
     }
+
+    // Add new optional fields
+    if (gstPan) newVendorData.gstPan = gstPan;
+    if (address) newVendorData.address = address;
+    if (referredByName) newVendorData.referredByName = referredByName;
+    if (referralId) newVendorData.referralId = referralId;
+    if (membershipType) newVendorData.membershipType = membershipType;
+    if (amountPaid) newVendorData.amountPaid = amountPaid;
+    if (paymentDetails) newVendorData.paymentDetails = paymentDetails;
 
     // Process vendor photo if provided
     if (req.files && req.files.vendorPhoto && req.files.vendorPhoto[0]) {

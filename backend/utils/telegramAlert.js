@@ -107,18 +107,26 @@ const sendVendorSignupAlert = async (vendorData) => {
   // Format message with all vendor details
   const message = `🏪 NEW VENDOR SIGNUP REGISTRATION
 
-👤 Owner Name: ${vendorData.ownerName || "N/A"}
+👤 Applicant Name: ${vendorData.ownerName || "N/A"}
 🏢 Business Name: ${vendorData.businessName || "N/A"}
-📱 Mobile: ${vendorData.mobile || "Not provided"}
+📱 WhatsApp No: ${vendorData.mobile || "Not provided"}
 📧 Email: ${vendorData.email || "Not provided"}
-🌐 Website: ${vendorData.websiteUrl || "Not provided"}
-📲 Social Media: ${vendorData.socialUrl || "Not provided"}
+🆔 GSTN/PAN: ${vendorData.gstPan || "Not provided"}
+📍 Address: ${vendorData.address || "Not provided"}
 🏙️ State: ${vendorData.state || "Not provided"}
 🏙️ City: ${vendorData.city || "Not provided"}
-💰 Membership Fees: ₹${vendorData.membershipFees || "Not provided"}
+🌐 Website: ${vendorData.websiteUrl || "Not provided"}
 
 📂 Business Categories:
 ${categoriesText}
+
+👥 Referred By: ${vendorData.referredByName || "Not provided"}
+🔗 Referral ID: ${vendorData.referralId || "Not provided"}
+
+⭐ Membership Type: ${vendorData.membershipType || "Not selected"}
+💰 Membership Fees: ₹${vendorData.membershipFees || "Not provided"}
+💵 Amount Paid: ₹${vendorData.amountPaid || "Not provided"}
+🧾 Payment Details: ${vendorData.paymentDetails || "Not provided"}
 
 📸 Vendor Photo: ${vendorPhotoLink}
 

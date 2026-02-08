@@ -26,9 +26,9 @@ const MultiCategorySelector = ({
   }
 
   return (
-    <div className='space-y-3'>
-      <label className='block text-sm font-bold text-gray-700'>
-        Business Categories & Subcategories {required && <span className='text-red-500'>*</span>}
+    <div className='space-y-2'>
+      <label className='block text-sm font-semibold text-gray-700'>
+        Major Business Category & Sub Category {required && <span className='text-red-500'>*</span>}
       </label>
 
       {value.map((item, index) => (
@@ -38,15 +38,15 @@ const MultiCategorySelector = ({
               type='text'
               value={item.category}
               onChange={(e) => updateField(index, 'category', e.target.value)}
-              placeholder='Business Category'
-              className='w-full px-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm'
+              placeholder='Major Business Category'
+              className='w-full px-3 py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all text-sm'
             />
             <input
               type='text'
               value={item.subCategory}
               onChange={(e) => updateField(index, 'subCategory', e.target.value)}
-              placeholder='Subcategory'
-              className='w-full px-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm'
+              placeholder='Sub Category'
+              className='w-full px-3 py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all text-sm'
             />
           </div>
           {value.length > 1 && (
@@ -65,11 +65,11 @@ const MultiCategorySelector = ({
         <button
           type='button'
           onClick={addCategory}
-          className={`w-full px-4 py-2.5 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-dashed border-indigo-300 text-indigo-700 rounded-xl hover:border-indigo-500 hover:shadow-md transition-all flex items-center justify-center gap-2 font-semibold text-sm ${className}`}
+          className={`w-full px-4 py-2 bg-green-50 border border-dashed border-green-400 text-green-700 rounded hover:border-green-600 hover:bg-green-100 transition-all flex items-center justify-center gap-2 font-semibold text-sm ${className}`}
         >
           <Plus className='w-4 h-4' />
           {value.length === 0 ? 'Add Business Category' : 'Add More Category'}
-          <span className='text-xs text-indigo-400'>({value.length}/{MAX_CATEGORIES})</span>
+          <span className='text-xs text-green-500'>({value.length}/{MAX_CATEGORIES})</span>
         </button>
       )}
 
