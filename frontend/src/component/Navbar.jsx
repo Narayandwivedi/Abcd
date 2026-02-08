@@ -22,16 +22,6 @@ const Navbar = () => {
 
   return (
     <nav className='bg-white shadow-md md:shadow-lg sticky top-0 z-50 border-b border-gray-200'>
-      {/* Testing Strip with Moving Text */}
-      <div className='bg-yellow-400 py-1 overflow-hidden relative'>
-        <div className='animate-marquee whitespace-nowrap text-xs md:text-sm font-semibold text-gray-800'>
-          <span className='inline-block px-4'>This website is under testing and will be live sooner</span>
-          <span className='inline-block px-4'>This website is under testing and will be live sooner</span>
-          <span className='inline-block px-4'>This website is under testing and will be live sooner</span>
-          <span className='inline-block px-4'>This website is under testing and will be live sooner</span>
-        </div>
-      </div>
-
       <div className='container mx-auto px-3 md:px-4 py-1.5 md:py-2 flex justify-between items-center'>
         {/* Logo */}
         <Logo3 />
