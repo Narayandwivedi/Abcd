@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import WhatsAppButton from '../../component/WhatsAppButton'
 import CityDropdown from '../../component/CityDropdown'
@@ -8,20 +8,12 @@ import AdsCarousel from './components/AdsCarousel'
 import BuyLeadModal from './components/BuyLeadModal'
 import SellLeadModal from './components/SellLeadModal'
 import CategorySection from './components/CategorySection'
-import {
-  Scale, Car, Scissors, BookOpen, UtensilsCrossed, Camera, Calculator, Shirt,
-  Megaphone, Stethoscope, GraduationCap, Zap, Smartphone, HardHat, Apple,
-  Sofa, ShoppingCart, Wrench, Refrigerator, Home as HomeIcon, Building2, Hotel,
-  Paintbrush, Truck, Grid3X3, Pill, FlaskConical, Building, Trophy,
-  Phone, Plane, School, Globe
-} from 'lucide-react'
 
 const Home = () => {
   const navigate = useNavigate()
   const { isAuthenticated, user } = useContext(AppContext)
   const [selectedCity, setSelectedCity] = useState('')
   const [categories, setCategories] = useState([])
-  const [categoriesLoading, setCategoriesLoading] = useState(true)
 
   const [showBuyForm, setShowBuyForm] = useState(false)
   const [showSellForm, setShowSellForm] = useState(false)
@@ -49,44 +41,6 @@ const Home = () => {
     mobileNo: ''
   })
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
-
-  const iconMap = {
-    Scale, Car, Scissors, BookOpen, UtensilsCrossed, Camera, Calculator, Shirt,
-    Megaphone, Stethoscope, GraduationCap, Zap, Smartphone, HardHat, Apple,
-    Sofa, ShoppingCart, Wrench, Refrigerator, HomeIcon, Building2, Hotel,
-    Paintbrush, Truck, Grid3X3, Pill, FlaskConical, Building, Trophy,
-    Phone, Plane, School, Globe
-  }
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setCategoriesLoading(true)
-        const response = await fetch(`${BACKEND_URL}/api/categories`)
-        const data = await response.json()
-
-        if (data.success) {
-          const mappedCategories = data.categories.map(cat => ({
-            name: cat.name,
-            icon: iconMap[cat.icon] || ShoppingCart,
-            slug: cat.slug,
-            subcategories: cat.subcategories
-          }))
-          setCategories(mappedCategories)
-        } else {
-          console.error('Failed to load categories')
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-      } finally {
-        setCategoriesLoading(false)
-      }
-    }
-
-    fetchCategories()
-  }, [BACKEND_URL])
-
   useEffect(() => {
     const handlePopState = () => {
       if (showBuyForm) {
@@ -110,6 +64,10 @@ const Home = () => {
   const handleCategoryClick = (categoryName) => {
     navigate(`/category/${categoryName}`)
   }
+
+  const handleCategoriesLoaded = useCallback((loadedCategories) => {
+    setCategories(loadedCategories)
+  }, [])
 
   const handleBuyLeadClick = () => {
     if (isAuthenticated && user) {
@@ -179,7 +137,7 @@ const Home = () => {
         navigate={navigate}
       />
 
-      <AdsCarousel />
+      {/* <AdsCarousel /> */}
 
       <BuyLeadModal
         showBuyForm={showBuyForm}
@@ -197,9 +155,8 @@ const Home = () => {
       />
 
       <CategorySection 
-        categories={categories}
-        categoriesLoading={categoriesLoading}
         handleCategoryClick={handleCategoryClick}
+        onCategoriesLoaded={handleCategoriesLoaded}
       />
 
       <div className='hidden md:block'>

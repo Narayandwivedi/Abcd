@@ -1,6 +1,55 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import {
+  Scale, Car, Scissors, BookOpen, UtensilsCrossed, Camera, Calculator, Shirt,
+  Megaphone, Stethoscope, GraduationCap, Zap, Smartphone, HardHat, Apple,
+  Sofa, ShoppingCart, Wrench, Refrigerator, Home as HomeIcon, Building2, Hotel,
+  Paintbrush, Truck, Grid3X3, Pill, FlaskConical, Building, Trophy,
+  Phone, Plane, School, Globe
+} from 'lucide-react'
 
-const CategorySection = ({ categories, categoriesLoading, handleCategoryClick }) => {
+const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
+  const [categories, setCategories] = useState([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+
+  const iconMap = {
+    Scale, Car, Scissors, BookOpen, UtensilsCrossed, Camera, Calculator, Shirt,
+    Megaphone, Stethoscope, GraduationCap, Zap, Smartphone, HardHat, Apple,
+    Sofa, ShoppingCart, Wrench, Refrigerator, HomeIcon, Building2, Hotel,
+    Paintbrush, Truck, Grid3X3, Pill, FlaskConical, Building, Trophy,
+    Phone, Plane, School, Globe
+  }
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true)
+        const response = await fetch(`${BACKEND_URL}/api/categories`)
+        const data = await response.json()
+
+        if (data.success) {
+          const mappedCategories = data.categories.map(cat => ({
+            name: cat.name,
+            icon: iconMap[cat.icon] || ShoppingCart,
+            slug: cat.slug,
+            subcategories: cat.subcategories
+          }))
+          setCategories(mappedCategories)
+          onCategoriesLoaded(mappedCategories)
+        } else {
+          console.error('Failed to load categories')
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [onCategoriesLoaded])
+
   return (
     <section className='pt-1 pb-1 md:pt-3 md:pb-3 bg-gray-50'>
       <div className='container mx-auto px-3 md:px-4'>
