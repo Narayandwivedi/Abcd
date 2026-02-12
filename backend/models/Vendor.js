@@ -70,6 +70,11 @@ const vendorSchema = new mongoose.Schema({
   referralId: {
     type: String,
   },
+  referralCode: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow null for vendors without generated referral codes
+  },
   membershipType: {
     type: String,
     enum: ['Silver', 'Gold', 'Diamond'],

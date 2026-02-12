@@ -2,6 +2,25 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
+const getStatePrefixForVendorReferral = (state = "") => {
+  const normalizedState = String(state).trim().toLowerCase();
+
+  if (normalizedState.includes("chhattisgarh") || normalizedState.includes("chhatisgarh")) return "CG";
+  if (normalizedState.includes("bihar")) return "BR";
+  if (normalizedState.includes("jharkhand")) return "JH";
+  if (normalizedState.includes("odisha") || normalizedState.includes("orissa") || normalizedState.includes("orrisa")) return "OD";
+
+  const compact = normalizedState.replace(/[^a-z]/g, "");
+  return compact.slice(0, 2).toUpperCase() || "NA";
+};
+
+const buildVendorReferralCode = ({ state = "", certificateNumber = "" }) => {
+  const statePrefix = getStatePrefixForVendorReferral(state);
+  const suffixMatch = String(certificateNumber).match(/(\d{5})$/);
+  const suffix = suffixMatch ? suffixMatch[1] : String(certificateNumber).replace(/\D/g, "").slice(-5).padStart(5, "0");
+  return `${statePrefix}VM${suffix}`;
+};
+
 // Generate unique certificate number in format: VM-CG-YYYY-MM-00101
 const generateVendorCertificateNumber = async () => {
   const VendorCertificate = require('../models/VendorCertificate');
@@ -48,6 +67,10 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
     const certificateNumber = existingCertificateNumber || await generateVendorCertificateNumber();
     const fileName = `ABCD_VENDOR_CERTIFICATE_${certificateNumber}.pdf`;
     const filePath = path.join(vendorCertificatesDir, fileName);
+    const referralCode = vendor.referralCode || buildVendorReferralCode({
+      state: vendor.state,
+      certificateNumber
+    });
 
     return new Promise((resolve, reject) => {
 
@@ -181,6 +204,15 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           width: doc.page.width
         });
 
+      // Add vendor referral code
+      doc.fontSize(10)
+        .fillColor('#111827')
+        .font('Helvetica-Bold')
+        .text(`Referral Code: ${referralCode}`, 0, 392, {
+          align: 'center',
+          width: doc.page.width
+        });
+
       // Add issue date
       const issueDate = new Date().toLocaleDateString('en-IN', {
         day: '2-digit',
@@ -191,7 +223,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica')
-        .text(`Issued on: ${issueDate}`, 0, 398, {
+        .text(`Issued on: ${issueDate}`, 0, 408, {
           align: 'center',
           width: doc.page.width
         });
@@ -200,7 +232,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica-Bold')
-        .text('Valid till: 31 March 2027', 0, 411, {
+        .text('Valid till: 31 March 2027', 0, 421, {
           align: 'center',
           width: doc.page.width
         });
@@ -299,7 +331,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(7)
         .fillColor('#6b7280')
         .font('Helvetica-Oblique')
-        .text('Subject to Terms & Conditions', 40, 538, {
+        .text('Subject to Terms & Conditions', 40, 532, {
           align: 'left'
         });
 
@@ -310,6 +342,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
         // Return the certificate details
         resolve({
           certificateNumber,
+          referralCode,
           fileName,
           filePath,
           downloadLink: `/uploads/vendor-certificates/${fileName}`,
