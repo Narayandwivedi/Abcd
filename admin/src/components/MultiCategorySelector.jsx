@@ -1,3 +1,5 @@
+import CategoryDropdown from './CategoryDropdown'
+
 const MAX_CATEGORIES = 5
 
 const MultiCategorySelector = ({
@@ -6,18 +8,20 @@ const MultiCategorySelector = ({
   className = '',
   required = false,
 }) => {
+  const categories = value.length > 0 ? value : [{ category: '', subCategory: '' }]
 
   const addCategory = () => {
-    if (value.length >= MAX_CATEGORIES) return
-    onChange([...value, { category: '', subCategory: '' }])
+    if (categories.length >= MAX_CATEGORIES) return
+    onChange([...categories, { category: '', subCategory: '' }])
   }
 
   const removeCategory = (index) => {
-    onChange(value.filter((_, i) => i !== index))
+    const updated = categories.filter((_, i) => i !== index)
+    onChange(updated)
   }
 
   const updateField = (index, field, val) => {
-    const updated = value.map((item, i) =>
+    const updated = categories.map((item, i) =>
       i === index ? { ...item, [field]: val } : item
     )
     onChange(updated)
@@ -25,56 +29,51 @@ const MultiCategorySelector = ({
 
   return (
     <div className='space-y-3'>
-      <label className='block text-sm font-medium text-gray-700'>
-        Business Categories & Subcategories {required && '*'}
-      </label>
-
-      {value.map((item, index) => (
+      {categories.map((item, index) => (
         <div key={index} className='flex items-start gap-2'>
-          <div className='flex-1 grid grid-cols-2 gap-2'>
-            <input
-              type='text'
+          <div className='flex-1'>
+            <CategoryDropdown
               value={item.category}
-              onChange={(e) => updateField(index, 'category', e.target.value)}
-              placeholder='Business Category'
-              className='w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
-            />
-            <input
-              type='text'
-              value={item.subCategory}
-              onChange={(e) => updateField(index, 'subCategory', e.target.value)}
-              placeholder='Subcategory'
-              className='w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+              onChange={(category) => {
+                const updated = categories.map((row, i) =>
+                  i === index ? { ...row, category, subCategory: '' } : row
+                )
+                onChange(updated)
+              }}
+              subcategoryValue={item.subCategory}
+              onSubcategoryChange={(subCategory) => updateField(index, 'subCategory', subCategory)}
+              required={required}
+              showSubcategory
+              layout='row'
+              showLabels
             />
           </div>
-          <button
-            type='button'
-            onClick={() => removeCategory(index)}
-            className='mt-1 p-1.5 hover:bg-red-100 rounded-full transition-colors'
-          >
-            <svg className='w-4 h-4 text-red-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
-            </svg>
-          </button>
+          {categories.length > 1 && (
+            <button
+              type='button'
+              onClick={() => removeCategory(index)}
+              className='mt-1 p-1.5 hover:bg-red-100 rounded-full transition-colors'
+            >
+              <svg className='w-4 h-4 text-red-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+              </svg>
+            </button>
+          )}
         </div>
       ))}
 
-      {value.length < MAX_CATEGORIES && (
+      {categories.length < MAX_CATEGORIES && (
         <button
           type='button'
           onClick={addCategory}
-          className={`w-full px-4 py-2.5 bg-white border-2 border-dashed border-gray-300 text-gray-600 rounded-xl hover:border-blue-400 hover:text-blue-600 transition flex items-center justify-center gap-2 font-medium ${className}`}
+          className={`w-full px-3 py-2 bg-white border border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 transition flex items-center justify-center gap-1.5 text-xs font-medium ${className}`}
         >
-          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 4v16m8-8H4' />
           </svg>
-          {value.length === 0 ? 'Add Business Category' : 'Add More Category'}
-          <span className='text-xs text-gray-400'>({value.length}/{MAX_CATEGORIES})</span>
+          Add Category
+          <span className='text-xs text-gray-400'>({categories.length}/{MAX_CATEGORIES})</span>
         </button>
-      )}
-
-      {value.length === 0 && required && (
-        <p className='text-xs text-red-500 mt-1'>Please add at least one category and subcategory</p>
       )}
     </div>
   )

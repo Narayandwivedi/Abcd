@@ -1,4 +1,6 @@
 const bcrypt = require("bcryptjs");
+const fs = require("fs");
+const path = require("path");
 const vendorModel = require("../models/Vendor.js");
 const VendorCertificate = require("../models/VendorCertificate.js");
 const { generateVendorCertificatePDF } = require("../utils/generateVendorCertificate.js");
@@ -168,13 +170,13 @@ const setVendorPassword = async (req, res) => {
 // Create vendor (admin)
 const createVendor = async (req, res) => {
   try {
-    const { ownerName, businessName, mobile, email, state, city, businessCategories, membershipFees, password } = req.body;
+    const { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees, password } = req.body;
 
     // Validate required fields
-    if (!ownerName || !businessName || !mobile || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
+    if (!ownerName || !businessName || !mobile || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided including state, city, at least one category and subcategory"
+        message: "All required fields must be provided including state, district, city, at least one category and subcategory"
       });
     }
 
@@ -208,6 +210,7 @@ const createVendor = async (req, res) => {
       businessName,
       mobile,
       state,
+      district,
       city,
       businessCategories,
       membershipFees,
@@ -285,13 +288,13 @@ const createVendor = async (req, res) => {
 const updateVendor = async (req, res) => {
   try {
     const { vendorId } = req.params;
-    const { ownerName, businessName, mobile, email, state, city, businessCategories, membershipFees } = req.body;
+    const { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees } = req.body;
 
     // Validate required fields
-    if (!ownerName || !businessName || !mobile || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
+    if (!ownerName || !businessName || !mobile || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided including state, city, at least one category and subcategory"
+        message: "All required fields must be provided including state, district, city, at least one category and subcategory"
       });
     }
 
@@ -299,7 +302,7 @@ const updateVendor = async (req, res) => {
       return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
     }
 
-    const vendor = await vendorModel.findById(vendorId);
+    const vendor = await vendorModel.findById(vendorId).populate('activeCertificate');
 
     if (!vendor) {
       return res.status(404).json({
@@ -335,6 +338,7 @@ const updateVendor = async (req, res) => {
     vendor.businessName = businessName;
     vendor.mobile = mobile;
     vendor.state = state;
+    vendor.district = district;
     vendor.city = city;
     vendor.businessCategories = businessCategories;
     vendor.membershipFees = membershipFees;
@@ -348,17 +352,49 @@ const updateVendor = async (req, res) => {
 
     await vendor.save();
 
+    let certificateRegenerated = false;
+    let regeneratedCertificateLink = null;
+
+    // On vendor edit, regenerate certificate PDF with same certificate number and same referral code
+    if (vendor.activeCertificate) {
+      const activeCertificate = vendor.activeCertificate;
+
+      // Delete old certificate PDF file if it exists
+      if (activeCertificate.downloadLink) {
+        const oldCertificatePath = path.join(__dirname, '..', activeCertificate.downloadLink);
+        if (fs.existsSync(oldCertificatePath)) {
+          fs.unlinkSync(oldCertificatePath);
+          console.log(`[ADMIN] Deleted old vendor certificate PDF: ${oldCertificatePath}`);
+        }
+      }
+
+      // Keep same referral code; regenerate PDF with same certificate number and updated vendor details
+      const certificateData = await generateVendorCertificatePDF(vendor, activeCertificate.certificateNumber);
+
+      activeCertificate.downloadLink = certificateData.downloadLink;
+      activeCertificate.pdfDeleted = false;
+      await activeCertificate.save();
+
+      certificateRegenerated = true;
+      regeneratedCertificateLink = activeCertificate.downloadLink;
+      console.log(`[ADMIN] Vendor certificate regenerated: ${vendor.businessName} - ${activeCertificate.certificateNumber}`);
+    }
+
     console.log(`[ADMIN] Vendor updated: ${vendor.businessName}`);
 
     return res.status(200).json({
       success: true,
-      message: "Vendor updated successfully",
+      message: certificateRegenerated
+        ? "Vendor updated successfully and certificate regenerated"
+        : "Vendor updated successfully",
       vendor: {
         _id: vendor._id,
         businessName: vendor.businessName,
         ownerName: vendor.ownerName,
         mobile: vendor.mobile
-      }
+      },
+      certificateRegenerated,
+      certificateDownloadLink: regeneratedCertificateLink
     });
   } catch (error) {
     console.error('Update vendor error:', error);

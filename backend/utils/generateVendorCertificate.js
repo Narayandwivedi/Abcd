@@ -175,12 +175,12 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           width: doc.page.width
         });
 
-      // Add membership fees
-      if (vendor.membershipFees) {
+      // Add membership category
+      if (vendor.membershipType) {
         doc.fontSize(12)
           .fillColor('#7c3aed')
           .font('Helvetica-Bold')
-          .text(`Membership Fees: ₹${vendor.membershipFees}`, 0, 339, {
+          .text(`Membership Category: ${String(vendor.membershipType).toUpperCase()}`, 0, 339, {
             align: 'center',
             width: doc.page.width
           });
@@ -331,8 +331,9 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(7)
         .fillColor('#6b7280')
         .font('Helvetica-Oblique')
-        .text('Subject to Terms & Conditions', 40, 532, {
-          align: 'left'
+        .text('Subject to Terms & Conditions', 0, 536, {
+          align: 'center',
+          width: doc.page.width
         });
 
       // Finalize PDF

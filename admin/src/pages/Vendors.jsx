@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import StateCitySelector from '../components/StateCitySelector'
 import MultiCategorySelector from '../components/MultiCategorySelector'
 
 const Vendors = () => {
@@ -25,6 +24,7 @@ const Vendors = () => {
     mobile: '',
     email: '',
     state: '',
+    district: '',
     city: '',
     businessCategories: [],
     membershipFees: '',
@@ -38,11 +38,18 @@ const Vendors = () => {
     mobile: '',
     email: '',
     state: '',
+    district: '',
     city: '',
     businessCategories: [],
     membershipFees: ''
   })
   const [editing, setEditing] = useState(false)
+  const [createStates, setCreateStates] = useState([])
+  const [createDistricts, setCreateDistricts] = useState([])
+  const [createCities, setCreateCities] = useState([])
+  const [editStates, setEditStates] = useState([])
+  const [editDistricts, setEditDistricts] = useState([])
+  const [editCities, setEditCities] = useState([])
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -54,7 +61,103 @@ const Vendors = () => {
   // Fetch all vendors
   useEffect(() => {
     fetchVendors()
+    fetchCreateStates()
+    fetchEditStates()
   }, [])
+
+  useEffect(() => {
+    if (!createForm.state) {
+      setCreateDistricts([])
+      setCreateCities([])
+      return
+    }
+    fetchCreateDistricts(createForm.state)
+  }, [createForm.state])
+
+  useEffect(() => {
+    if (!createForm.district) {
+      setCreateCities([])
+      return
+    }
+    fetchCreateCities(createForm.district)
+  }, [createForm.district])
+
+  useEffect(() => {
+    if (!editForm.state) {
+      setEditDistricts([])
+      setEditCities([])
+      return
+    }
+    fetchEditDistricts(editForm.state)
+  }, [editForm.state])
+
+  useEffect(() => {
+    if (!editForm.district) {
+      setEditCities([])
+      return
+    }
+    fetchEditCities(editForm.district)
+  }, [editForm.district])
+
+  const fetchCreateStates = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/states`)
+      const data = await response.json()
+      if (data.success) setCreateStates(data.states)
+    } catch (error) {
+      console.error('Error fetching create states:', error)
+    }
+  }
+
+  const fetchCreateDistricts = async (state) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/districts/${encodeURIComponent(state)}`)
+      const data = await response.json()
+      if (data.success) setCreateDistricts(data.districts)
+    } catch (error) {
+      console.error('Error fetching create districts:', error)
+    }
+  }
+
+  const fetchCreateCities = async (district) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/district/${encodeURIComponent(district)}`)
+      const data = await response.json()
+      if (data.success) setCreateCities(data.cities)
+    } catch (error) {
+      console.error('Error fetching create cities:', error)
+    }
+  }
+
+  const fetchEditStates = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/states`)
+      const data = await response.json()
+      if (data.success) setEditStates(data.states)
+    } catch (error) {
+      console.error('Error fetching edit states:', error)
+    }
+  }
+
+  const fetchEditDistricts = async (state) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/districts/${encodeURIComponent(state)}`)
+      const data = await response.json()
+      if (data.success) setEditDistricts(data.districts)
+    } catch (error) {
+      console.error('Error fetching edit districts:', error)
+    }
+  }
+
+  const fetchEditCities = async (district) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/cities/district/${encodeURIComponent(district)}`)
+      const data = await response.json()
+      if (data.success) setEditCities(data.cities)
+    } catch (error) {
+      console.error('Error fetching edit cities:', error)
+    }
+  }
 
   const fetchVendors = async () => {
     try {
@@ -191,8 +294,8 @@ ABCD Team`
 
   // Create vendor handler
   const handleCreateVendor = async () => {
-    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.state || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipFees) {
-      alert('Please fill all required fields including state, city, and at least one category and subcategory')
+    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.state || !createForm.district || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipFees) {
+      alert('Please fill all required fields including state, district, city, and at least one category and subcategory')
       return
     }
 
@@ -222,6 +325,7 @@ ABCD Team`
           mobile: '',
           email: '',
           state: '',
+          district: '',
           city: '',
           businessCategories: [],
           membershipFees: '',
@@ -248,6 +352,7 @@ ABCD Team`
       mobile: vendor.mobile || '',
       email: vendor.email || '',
       state: vendor.state || '',
+      district: vendor.district || '',
       city: vendor.city || '',
       businessCategories: vendor.businessCategories || [],
       membershipFees: vendor.membershipFees || ''
@@ -257,8 +362,8 @@ ABCD Team`
 
   // Handle edit vendor
   const handleEditVendor = async () => {
-    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.state || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipFees) {
-      alert('Please fill all required fields including state, city, and at least one category and subcategory')
+    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.state || !editForm.district || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipFees) {
+      alert('Please fill all required fields including state, district, city, and at least one category and subcategory')
       return
     }
 
@@ -289,6 +394,7 @@ ABCD Team`
           mobile: '',
           email: '',
           state: '',
+          district: '',
           city: '',
           businessCategories: [],
           membershipFees: ''
@@ -1070,102 +1176,156 @@ ABCD Team`
       {/* Create Vendor Modal */}
       {showCreateModal && (
         <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
-          <div className='bg-white rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto'>
-            <h2 className='text-2xl font-bold text-gray-800 mb-4'>Create New Vendor</h2>
+          <div className='bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200'>
+            <div className='px-4 md:px-6 py-4 md:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50'>
+              <h2 className='text-xl md:text-2xl font-black text-gray-800'>Create New Vendor</h2>
+              <p className='text-xs md:text-sm text-gray-600 mt-1'>Fill all required details to create and approve vendor profile.</p>
+            </div>
 
-            <div className='space-y-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Owner Name *</label>
-                <input
-                  type='text'
-                  value={createForm.ownerName}
-                  onChange={(e) => setCreateForm({...createForm, ownerName: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
+            <div className='p-4 md:p-6 space-y-4 md:space-y-5'>
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Basic Details</h3>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Name <span className='text-red-500'>*</span></label>
+                    <input
+                      type='text'
+                      value={createForm.ownerName}
+                      onChange={(e) => setCreateForm({...createForm, ownerName: e.target.value})}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Business Name <span className='text-red-500'>*</span></label>
+                    <input
+                      type='text'
+                      value={createForm.businessName}
+                      onChange={(e) => setCreateForm({...createForm, businessName: e.target.value})}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Mobile (10 digits) <span className='text-red-500'>*</span></label>
+                    <input
+                      type='tel'
+                      maxLength={10}
+                      value={createForm.mobile}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 10)
+                        setCreateForm({...createForm, mobile: val})
+                      }}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Email</label>
+                    <input
+                      type='email'
+                      value={createForm.email}
+                      onChange={(e) => setCreateForm({...createForm, email: e.target.value})}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Business Name *</label>
-                <input
-                  type='text'
-                  value={createForm.businessName}
-                  onChange={(e) => setCreateForm({...createForm, businessName: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Location</h3>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>State <span className='text-red-500'>*</span></label>
+                    <select
+                      value={createForm.state}
+                      onChange={(e) => setCreateForm({ ...createForm, state: e.target.value, district: '', city: '' })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white'
+                    >
+                      <option value=''>Select State</option>
+                      {createStates.map(state => (
+                        <option key={state} value={state}>{state.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>District <span className='text-red-500'>*</span></label>
+                    <select
+                      value={createForm.district}
+                      onChange={(e) => setCreateForm({ ...createForm, district: e.target.value, city: '' })}
+                      disabled={!createForm.state || createDistricts.length === 0}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white disabled:opacity-50'
+                    >
+                      <option value=''>Select District</option>
+                      {createDistricts.map(district => (
+                        <option key={district} value={district}>{district.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>City <span className='text-red-500'>*</span></label>
+                    <select
+                      value={createForm.city}
+                      onChange={(e) => setCreateForm({ ...createForm, city: e.target.value })}
+                      disabled={!createForm.district || createCities.length === 0}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white disabled:opacity-50'
+                    >
+                      <option value=''>Select City</option>
+                      {createCities.map(city => (
+                        <option key={city} value={city}>{city.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Mobile * (10 digits)</label>
-                <input
-                  type='tel'
-                  maxLength={10}
-                  value={createForm.mobile}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, '').slice(0, 10)
-                    setCreateForm({...createForm, mobile: val})
-                  }}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Business Setup</h3>
+                <MultiCategorySelector
+                  value={createForm.businessCategories}
+                  onChange={(businessCategories) => setCreateForm({...createForm, businessCategories})}
+                  required
                 />
-              </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Email</label>
-                <input
-                  type='email'
-                  value={createForm.email}
-                  onChange={(e) => setCreateForm({...createForm, email: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) <span className='text-red-500'>*</span></label>
+                    <input
+                      type='number'
+                      value={createForm.membershipFees}
+                      onChange={(e) => setCreateForm({...createForm, membershipFees: e.target.value})}
+                      min='1'
+                      placeholder='Enter amount'
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
 
-              <StateCitySelector
-                stateValue={createForm.state}
-                cityValue={createForm.city}
-                onStateChange={(state) => setCreateForm({...createForm, state})}
-                onCityChange={(city) => setCreateForm({...createForm, city})}
-                required
-              />
-
-              <MultiCategorySelector
-                value={createForm.businessCategories}
-                onChange={(businessCategories) => setCreateForm({...createForm, businessCategories})}
-                required
-              />
-
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) *</label>
-                <input
-                  type='number'
-                  value={createForm.membershipFees}
-                  onChange={(e) => setCreateForm({...createForm, membershipFees: e.target.value})}
-                  min='1'
-                  placeholder='Enter amount e.g. 1000'
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Password (min 6 chars)</label>
-                <input
-                  type='text'
-                  value={createForm.password}
-                  onChange={(e) => setCreateForm({...createForm, password: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Password (min 6 chars)</label>
+                    <input
+                      type='text'
+                      value={createForm.password}
+                      onChange={(e) => setCreateForm({...createForm, password: e.target.value})}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className='flex gap-3 mt-6'>
+            <div className='flex gap-2 md:gap-3 p-4 md:p-6 pt-3 md:pt-4 border-t border-gray-200 bg-white'>
               <button
                 onClick={handleCreateVendor}
                 disabled={creating}
-                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50'
+                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 md:py-3 text-sm md:text-base rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50 shadow-md'
               >
                 {creating ? 'Creating...' : 'Create Vendor'}
               </button>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition'
+                className='flex-1 bg-gray-100 border border-gray-300 text-gray-700 py-2.5 md:py-3 text-sm md:text-base rounded-xl font-bold hover:bg-gray-200 transition'
               >
                 Cancel
               </button>
@@ -1225,13 +1385,51 @@ ABCD Team`
                 />
               </div>
 
-              <StateCitySelector
-                stateValue={editForm.state}
-                cityValue={editForm.city}
-                onStateChange={(state) => setEditForm({...editForm, state})}
-                onCityChange={(city) => setEditForm({...editForm, city})}
-                required
-              />
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>State *</label>
+                  <select
+                    value={editForm.state}
+                    onChange={(e) => setEditForm({ ...editForm, state: e.target.value, district: '', city: '' })}
+                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
+                  >
+                    <option value=''>Select State</option>
+                    {editStates.map(state => (
+                      <option key={state} value={state}>{state.toUpperCase()}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>District *</label>
+                  <select
+                    value={editForm.district}
+                    onChange={(e) => setEditForm({ ...editForm, district: e.target.value, city: '' })}
+                    disabled={!editForm.state || editDistricts.length === 0}
+                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
+                  >
+                    <option value=''>Select District</option>
+                    {editDistricts.map(district => (
+                      <option key={district} value={district}>{district.toUpperCase()}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>City *</label>
+                  <select
+                    value={editForm.city}
+                    onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                    disabled={!editForm.district || editCities.length === 0}
+                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
+                  >
+                    <option value=''>Select City</option>
+                    {editCities.map(city => (
+                      <option key={city} value={city}>{city.toUpperCase()}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
               <MultiCategorySelector
                 value={editForm.businessCategories}
