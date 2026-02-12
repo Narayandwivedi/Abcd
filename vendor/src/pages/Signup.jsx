@@ -23,7 +23,6 @@ const Signup = () => {
     city: '',
     websiteUrl: '',
     email: '',
-    referredByName: '',
     referralId: '',
     membershipType: '',
     membershipFees: '',
@@ -41,6 +40,8 @@ const Signup = () => {
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
   const UPI_ID = '222716826030217@cnrb'
+  const qrAmount = Number(formData.membershipFees) > 0 ? Number(formData.membershipFees) : ''
+  const upiQrValue = `upi://pay?pa=${UPI_ID}&pn=ABCD Platform${qrAmount ? `&am=${qrAmount}` : ''}&cu=INR`
 
   useEffect(() => {
     fetchStates()
@@ -238,7 +239,6 @@ const Signup = () => {
       if (formData.websiteUrl) submitData.append('websiteUrl', formData.websiteUrl)
       if (formData.gstPan) submitData.append('gstPan', formData.gstPan)
       if (formData.address) submitData.append('address', formData.address)
-      if (formData.referredByName) submitData.append('referredByName', formData.referredByName)
       if (formData.referralId) submitData.append('referralId', formData.referralId)
       if (formData.membershipType) submitData.append('membershipType', formData.membershipType)
       if (formData.paymentScreenshot) submitData.append('paymentScreenshot', formData.paymentScreenshot)
@@ -252,7 +252,7 @@ const Signup = () => {
           ownerName: '', mobile: '', businessName: '', gstPan: '',
           businessCategories: [{ category: '', subCategory: '' }],
           address: '', state: '', district: '', city: '', websiteUrl: '', email: '',
-          referredByName: '', referralId: '', membershipType: '',
+          referralId: '', membershipType: '',
           membershipFees: '', paymentScreenshot: null, vendorPhoto: null
         })
         setPreviewPhoto(null)
@@ -447,40 +447,36 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Row: Referred By + Referral ID */}
+            {/* Referral ID */}
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-              <div>
-                <label className={labelClass}>Referred By (Name)</label>
-                <input type='text' name='referredByName' value={formData.referredByName} onChange={handleChange} className={inputClass} placeholder='Referrer name' />
-              </div>
               <div>
                 <label className={labelClass}>Referral ID</label>
                 <input type='text' name='referralId' value={formData.referralId} onChange={handleChange} className={inputClass} placeholder='Referral ID' />
               </div>
             </div>
 
-            {/* Membership Type - Radio buttons like PDF */}
+            {/* Membership Type */}
             <div className='bg-[#2e7d32] rounded py-2.5 px-4'>
               <div className='flex items-center justify-between flex-wrap gap-2'>
                 <span className='text-white font-bold text-sm tracking-wide'>MEMBERSHIP TYPE</span>
                 <div className='flex items-center gap-4 sm:gap-6'>
-                  {['Silver', 'Gold', 'Diamond'].map((type) => (
-                    <label key={type} className='flex items-center gap-1.5 cursor-pointer'>
-                      <input
-                        type='radio'
-                        name='membershipType'
-                        value={type}
-                        checked={formData.membershipType === type}
-                        onChange={handleChange}
-                        className='w-4 h-4 accent-white'
-                      />
-                      <span className={`font-bold text-sm ${
-                        type === 'Silver' ? 'text-gray-200' :
-                        type === 'Gold' ? 'text-yellow-300' :
-                        'text-cyan-200'
-                      }`}>{type.toUpperCase()}</span>
-                    </label>
-                  ))}
+                {['Silver', 'Gold', 'Diamond'].map((type) => (
+                  <label key={type} className='flex items-center gap-1.5 cursor-pointer'>
+                    <input
+                      type='radio'
+                      name='membershipType'
+                      value={type}
+                      checked={formData.membershipType === type}
+                      onChange={handleChange}
+                      className='w-4 h-4 accent-white'
+                    />
+                    <span className={`font-bold text-sm ${
+                      type === 'Silver' ? 'text-gray-200' :
+                      type === 'Gold' ? 'text-yellow-300' :
+                      'text-cyan-200'
+                    }`}>{type.toUpperCase()}</span>
+                  </label>
+                ))}
                 </div>
               </div>
             </div>
@@ -525,7 +521,7 @@ const Signup = () => {
                   <p className='text-xs font-mono text-gray-900 break-all'>{UPI_ID}</p>
                 </div>
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ABCD Platform`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiQrValue)}`}
                   alt='UPI QR Code'
                   className='w-20 h-20 sm:w-24 sm:h-24 border border-gray-200 rounded bg-white p-1'
                 />
