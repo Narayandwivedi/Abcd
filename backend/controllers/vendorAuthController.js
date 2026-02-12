@@ -10,7 +10,7 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, state, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid, paymentDetails } = req.body;
+    let { email, mobile, ownerName, businessName, state, district, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid, paymentDetails } = req.body;
 
     // Parse businessCategories if it's a string (from FormData)
     if (typeof businessCategories === 'string') {
@@ -26,6 +26,7 @@ const handleVendorSignup = async (req, res) => {
     ownerName = ownerName?.trim();
     businessName = businessName?.trim();
     state = state?.trim();
+    district = district?.trim();
     city = city?.trim();
     membershipFees = Number(membershipFees);
     websiteUrl = websiteUrl?.trim();
@@ -38,8 +39,8 @@ const handleVendorSignup = async (req, res) => {
     amountPaid = amountPaid ? Number(amountPaid) : undefined;
     paymentDetails = paymentDetails?.trim();
 
-    if (!mobile || !ownerName || !businessName || !state || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
-      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, state, city, at least one category-subcategory pair, and membership fees are required" });
+    if (!mobile || !ownerName || !businessName || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
+      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, state, district, city, at least one category-subcategory pair, and membership fees are required" });
     }
 
     // Validate max 5 categories and each must have category + subCategory strings
@@ -90,6 +91,7 @@ const handleVendorSignup = async (req, res) => {
       ownerName,
       businessName,
       state, // Required field
+      district, // Required field
       city, // Required field
       businessCategories,
       membershipFees, // Required field

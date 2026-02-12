@@ -29,6 +29,9 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  district: {
+    type: String,
+  },
   city: {
     type: String,
     required: true,

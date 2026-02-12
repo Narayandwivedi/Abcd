@@ -19,6 +19,7 @@ const Signup = () => {
     businessCategories: [{ category: '', subCategory: '' }],
     address: '',
     state: '',
+    district: '',
     city: '',
     websiteUrl: '',
     email: '',
@@ -33,7 +34,9 @@ const Signup = () => {
   const [previewPhoto, setPreviewPhoto] = useState(null)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   const [availableStates, setAvailableStates] = useState([])
+  const [availableDistricts, setAvailableDistricts] = useState([])
   const [availableCities, setAvailableCities] = useState([])
+  const [loadingDistricts, setLoadingDistricts] = useState(false)
   const [loadingCities, setLoadingCities] = useState(false)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
@@ -63,14 +66,38 @@ const Signup = () => {
     }
   }
 
-  const fetchCitiesByState = async (selectedState) => {
+  const fetchDistrictsByState = async (selectedState) => {
     if (!selectedState) {
+      setAvailableDistricts([])
+      setAvailableCities([])
+      return
+    }
+    try {
+      setLoadingDistricts(true)
+      const response = await fetch(`${BACKEND_URL}/api/cities/districts/${encodeURIComponent(selectedState)}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const data = await response.json()
+      if (data.success) {
+        setAvailableDistricts(data.districts)
+      }
+    } catch (error) {
+      console.error('Error fetching districts:', error)
+      toast.error('Failed to load districts')
+    } finally {
+      setLoadingDistricts(false)
+    }
+  }
+
+  const fetchCitiesByDistrict = async (selectedDistrict) => {
+    if (!selectedDistrict) {
       setAvailableCities([])
       return
     }
     try {
       setLoadingCities(true)
-      const response = await fetch(`${BACKEND_URL}/api/cities/state/${selectedState}`, {
+      const response = await fetch(`${BACKEND_URL}/api/cities/district/${encodeURIComponent(selectedDistrict)}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       })
@@ -88,9 +115,17 @@ const Signup = () => {
 
   const handleStateChange = (e) => {
     const selectedState = e.target.value
-    setFormData({ ...formData, state: selectedState, city: '' })
+    setFormData({ ...formData, state: selectedState, district: '', city: '' })
     setError('')
-    fetchCitiesByState(selectedState)
+    setAvailableCities([])
+    fetchDistrictsByState(selectedState)
+  }
+
+  const handleDistrictChange = (e) => {
+    const selectedDistrict = e.target.value
+    setFormData({ ...formData, district: selectedDistrict, city: '' })
+    setError('')
+    fetchCitiesByDistrict(selectedDistrict)
   }
 
   const handleChange = (e) => {
@@ -124,7 +159,7 @@ const Signup = () => {
     e.preventDefault()
     setError('')
 
-    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.state || !formData.city || formData.businessCategories.length === 0 || !formData.membershipFees) {
+    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.state || !formData.district || !formData.city || formData.businessCategories.length === 0 || !formData.membershipFees) {
       setError('Please fill in all required fields')
       return
     }
@@ -158,6 +193,7 @@ const Signup = () => {
       submitData.append('businessName', formData.businessName)
       submitData.append('mobile', formData.mobile)
       submitData.append('state', formData.state)
+      submitData.append('district', formData.district)
       submitData.append('city', formData.city)
       submitData.append('businessCategories', JSON.stringify(formData.businessCategories))
       submitData.append('membershipFees', formData.membershipFees)
@@ -179,11 +215,12 @@ const Signup = () => {
         setFormData({
           ownerName: '', mobile: '', businessName: '', gstPan: '',
           businessCategories: [{ category: '', subCategory: '' }],
-          address: '', state: '', city: '', websiteUrl: '', email: '',
+          address: '', state: '', district: '', city: '', websiteUrl: '', email: '',
           referredByName: '', referralId: '', membershipType: '',
           membershipFees: '', amountPaid: '', paymentDetails: '', vendorPhoto: null
         })
         setPreviewPhoto(null)
+        setAvailableDistricts([])
         setAvailableCities([])
         setTimeout(() => {
           setShowSuccessPopup(false)
@@ -289,8 +326,8 @@ const Signup = () => {
               <textarea name='address' value={formData.address} onChange={handleChange} rows={2} className={inputClass + ' resize-none'} placeholder='Enter full address' />
             </div>
 
-            {/* Row: State + City */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+            {/* Row: State + District + City */}
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
               <div>
                 <label className={labelClass}>
                   State <span className='text-red-500'>*</span>
@@ -304,11 +341,30 @@ const Signup = () => {
               </div>
               <div>
                 <label className={labelClass}>
+                  District <span className='text-red-500'>*</span>
+                </label>
+                <select
+                  name='district'
+                  value={formData.district}
+                  onChange={handleDistrictChange}
+                  disabled={!formData.state || loadingDistricts}
+                  className={inputClass + ' appearance-none cursor-pointer capitalize disabled:opacity-50'}
+                >
+                  <option value=''>
+                    {loadingDistricts ? 'Loading...' : !formData.state ? 'Select state first' : availableDistricts.length === 0 ? 'No districts available' : 'Select District'}
+                  </option>
+                  {availableDistricts.map((district) => (
+                    <option key={district} value={district} className='capitalize'>{district}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>
                   City <span className='text-red-500'>*</span>
                 </label>
-                <select name='city' value={formData.city} onChange={handleChange} disabled={!formData.state || loadingCities} className={inputClass + ' appearance-none cursor-pointer capitalize disabled:opacity-50'}>
+                <select name='city' value={formData.city} onChange={handleChange} disabled={!formData.district || loadingCities} className={inputClass + ' appearance-none cursor-pointer capitalize disabled:opacity-50'}>
                   <option value=''>
-                    {loadingCities ? 'Loading...' : !formData.state ? 'Select state first' : availableCities.length === 0 ? 'No cities available' : 'Select City'}
+                    {loadingCities ? 'Loading...' : !formData.district ? 'Select district first' : availableCities.length === 0 ? 'No cities available' : 'Select City'}
                   </option>
                   {availableCities.map((city) => (
                     <option key={city} value={city} className='capitalize'>{city}</option>
