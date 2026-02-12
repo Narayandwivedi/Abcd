@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+﻿import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import MultiCategorySelector from '../components/MultiCategorySelector'
@@ -27,11 +27,11 @@ const Signup = () => {
     referralId: '',
     membershipType: '',
     membershipFees: '',
-    amountPaid: '',
-    paymentDetails: '',
+    paymentScreenshot: null,
     vendorPhoto: null
   })
   const [previewPhoto, setPreviewPhoto] = useState(null)
+  const [previewPaymentScreenshot, setPreviewPaymentScreenshot] = useState(null)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   const [availableStates, setAvailableStates] = useState([])
   const [availableDistricts, setAvailableDistricts] = useState([])
@@ -40,6 +40,7 @@ const Signup = () => {
   const [loadingCities, setLoadingCities] = useState(false)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+  const UPI_ID = '222716826030217@cnrb'
 
   useEffect(() => {
     fetchStates()
@@ -130,6 +131,16 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
+    if (name === 'membershipType') {
+      const membershipFeeMap = {
+        Silver: '1999',
+        Gold: '4999',
+        Diamond: '9999',
+      }
+      setFormData({ ...formData, membershipType: value, membershipFees: membershipFeeMap[value] || '' })
+      setError('')
+      return
+    }
     setFormData({ ...formData, [name]: value })
     setError('')
   }
@@ -155,6 +166,27 @@ const Signup = () => {
     }
   }
 
+  const handlePaymentScreenshotChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!validTypes.includes(file.type)) {
+        toast.error('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
+        e.target.value = ''
+        return
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Payment screenshot size should be less than 10MB')
+        e.target.value = ''
+        return
+      }
+      setFormData({ ...formData, paymentScreenshot: file })
+      const reader = new FileReader()
+      reader.onloadend = () => setPreviewPaymentScreenshot(reader.result)
+      reader.readAsDataURL(file)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -172,6 +204,11 @@ const Signup = () => {
 
     if (!formData.vendorPhoto) {
       setError('Please upload your photo')
+      return
+    }
+
+    if (!formData.paymentScreenshot) {
+      setError('Please upload payment screenshot')
       return
     }
 
@@ -204,8 +241,7 @@ const Signup = () => {
       if (formData.referredByName) submitData.append('referredByName', formData.referredByName)
       if (formData.referralId) submitData.append('referralId', formData.referralId)
       if (formData.membershipType) submitData.append('membershipType', formData.membershipType)
-      if (formData.amountPaid) submitData.append('amountPaid', formData.amountPaid)
-      if (formData.paymentDetails) submitData.append('paymentDetails', formData.paymentDetails)
+      if (formData.paymentScreenshot) submitData.append('paymentScreenshot', formData.paymentScreenshot)
       if (formData.vendorPhoto) submitData.append('vendorPhoto', formData.vendorPhoto)
 
       const result = await signup(submitData)
@@ -217,9 +253,10 @@ const Signup = () => {
           businessCategories: [{ category: '', subCategory: '' }],
           address: '', state: '', district: '', city: '', websiteUrl: '', email: '',
           referredByName: '', referralId: '', membershipType: '',
-          membershipFees: '', amountPaid: '', paymentDetails: '', vendorPhoto: null
+          membershipFees: '', paymentScreenshot: null, vendorPhoto: null
         })
         setPreviewPhoto(null)
+        setPreviewPaymentScreenshot(null)
         setAvailableDistricts([])
         setAvailableCities([])
         setTimeout(() => {
@@ -242,11 +279,11 @@ const Signup = () => {
   const labelClass = 'block text-sm font-semibold text-gray-700 mb-1'
 
   return (
-    <div className='min-h-screen bg-gray-100 flex items-center justify-center p-2 sm:p-4'>
-      <div className='w-full max-w-2xl bg-white shadow-xl overflow-hidden'>
+    <div className='min-h-screen bg-gray-100 flex items-start sm:items-center justify-center p-0 sm:p-4'>
+      <div className='w-full max-w-2xl bg-white shadow-none sm:shadow-xl overflow-hidden'>
 
         {/* Header with Logo */}
-        <div className='bg-white px-4 sm:px-6 pt-4 pb-2 text-center'>
+        <div className='bg-white px-3 sm:px-6 pt-3 sm:pt-4 pb-2 text-center'>
           <img src='/abcd logo3.png' alt='ABCD Logo' className='mx-auto w-20 h-20 sm:w-24 sm:h-24 object-contain mb-2' />
           <h1 className='text-[#1a237e] text-sm sm:text-lg font-extrabold tracking-wide leading-tight'>
             AGRAWAL BUSINESS & COMMUNITY DEVELOPMENT (ABCD)
@@ -275,7 +312,7 @@ const Signup = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className='px-4 sm:px-6 pb-4'>
+        <form onSubmit={handleSubmit} className='px-3 sm:px-6 pb-3 sm:pb-4'>
           <div className='space-y-3'>
 
             {/* Row: Applicants Name + WhatsApp No */}
@@ -292,6 +329,31 @@ const Signup = () => {
                 </label>
                 <input type='tel' name='mobile' value={formData.mobile} onChange={handleChange} maxLength={10} className={inputClass} placeholder='9876543210' />
               </div>
+            </div>
+
+            {/* Photo Upload */}
+            <div>
+              <label className={labelClass}>
+                Upload Your Photo <span className='text-red-500'>*</span>
+              </label>
+              <div>
+                <input type='file' accept='image/jpeg,image/jpg,image/png,image/webp' onChange={handlePhotoChange} className='hidden' id='vendor-photo-upload' />
+                <label htmlFor='vendor-photo-upload' className='w-full px-4 py-2.5 bg-gray-100 border border-gray-300 rounded text-sm cursor-pointer hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center justify-center'>
+                  <svg className='w-4 h-4 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
+                  </svg>
+                  {formData.vendorPhoto ? formData.vendorPhoto.name : 'Choose Photo'}
+                </label>
+              </div>
+              {previewPhoto && (
+                <div className='mt-2 relative'>
+                  <img src={previewPhoto} alt='Preview' className='w-full h-24 sm:h-32 object-cover rounded border border-gray-300' />
+                  <button type='button' onClick={() => { setFormData({ ...formData, vendorPhoto: null }); setPreviewPhoto(null) }}
+                    className='absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600'>
+                    x
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Row: Business Name + GSTN/PAN */}
@@ -442,50 +504,66 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Row: Membership Fees + Amount Paid + Payment Details */}
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+            {/* Membership Fees */}
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
               <div>
                 <label className={labelClass}>
                   Membership Fees (Rs.) <span className='text-red-500'>*</span>
                 </label>
                 <div className='relative'>
                   <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm'>₹</span>
-                  <input type='number' name='membershipFees' value={formData.membershipFees} onChange={handleChange} min='1' className={inputClass + ' pl-7'} placeholder='e.g. 1999' />
+                  <input type='number' name='membershipFees' value={formData.membershipFees} onChange={handleChange} min='1' className={inputClass + ' pl-7'} placeholder='Amount' />
                 </div>
-              </div>
-              <div>
-                <label className={labelClass}>Amount Paid</label>
-                <div className='relative'>
-                  <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm'>₹</span>
-                  <input type='number' name='amountPaid' value={formData.amountPaid} onChange={handleChange} min='0' className={inputClass + ' pl-7'} placeholder='Rs.' />
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>Payment Details</label>
-                <input type='text' name='paymentDetails' value={formData.paymentDetails} onChange={handleChange} className={inputClass} placeholder='UPI / Cash / Cheque' />
               </div>
             </div>
 
-            {/* Photo Upload */}
-            <div>
-              <label className={labelClass}>
-                Upload Your Photo <span className='text-red-500'>*</span>
-              </label>
-              <div className='flex items-center gap-3'>
-                <input type='file' accept='image/jpeg,image/jpg,image/png,image/webp' onChange={handlePhotoChange} className='hidden' id='vendor-photo-upload' />
-                <label htmlFor='vendor-photo-upload' className='px-4 py-2 bg-gray-100 border border-gray-300 rounded text-sm cursor-pointer hover:bg-gray-200 transition-colors'>
-                  {formData.vendorPhoto ? formData.vendorPhoto.name : 'Choose Photo'}
-                </label>
-                {previewPhoto && (
-                  <div className='relative'>
-                    <img src={previewPhoto} alt='Preview' className='w-14 h-18 object-cover rounded border border-gray-300' />
-                    <button type='button' onClick={() => { setFormData({ ...formData, vendorPhoto: null }); setPreviewPhoto(null) }}
-                      className='absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600'>
-                      x
-                    </button>
-                  </div>
-                )}
+            {/* Payment QR + Screenshot Upload */}
+            <div className='border border-gray-200 rounded p-3 bg-gray-50'>
+              <div className='flex items-center justify-between bg-white border border-gray-200 rounded p-3 mb-3'>
+                <div className='pr-3'>
+                  <p className='text-[10px] text-gray-600'>Scan to pay</p>
+                  <p className='text-xs font-mono text-gray-900 break-all'>{UPI_ID}</p>
+                </div>
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ABCD Platform`)}`}
+                  alt='UPI QR Code'
+                  className='w-20 h-20 sm:w-24 sm:h-24 border border-gray-200 rounded bg-white p-1'
+                />
               </div>
+
+              <div className='mb-2'>
+                <input
+                  type='file'
+                  accept='image/jpeg,image/jpg,image/png,image/webp'
+                  onChange={handlePaymentScreenshotChange}
+                  className='hidden'
+                  id='payment-screenshot-upload'
+                />
+                <label
+                  htmlFor='payment-screenshot-upload'
+                  className='w-full px-3 py-2.5 bg-white border border-gray-300 rounded text-sm cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-center'
+                >
+                  <svg className='w-4 h-4 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
+                  </svg>
+                  {formData.paymentScreenshot ? formData.paymentScreenshot.name : 'Upload Payment Screenshot'}
+                </label>
+              </div>
+              {previewPaymentScreenshot && (
+                <div className='mt-2 relative'>
+                  <img src={previewPaymentScreenshot} alt='Payment screenshot preview' className='w-full h-24 sm:h-32 object-cover rounded border border-gray-300' />
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setFormData({ ...formData, paymentScreenshot: null })
+                      setPreviewPaymentScreenshot(null)
+                    }}
+                    className='absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600'
+                  >
+                    x
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Error Message */}
@@ -509,21 +587,6 @@ const Signup = () => {
             </button>
           </div>
 
-          {/* Login Link */}
-          <div className='mt-4 text-center'>
-            <p className='text-gray-600 text-xs'>
-              Already have an account?{' '}
-              <a href='/login' className='text-[#2e7d32] font-bold hover:underline'>Sign In</a>
-            </p>
-          </div>
-
-          {/* Go to Home */}
-          <div className='mt-3'>
-            <a href='https://abcdvyapar.com' target='_blank' rel='noopener noreferrer'
-              className='w-full bg-[#c62828] text-white font-bold py-2.5 rounded hover:bg-[#b71c1c] transition-all flex items-center justify-center text-sm'>
-              Go to Home
-            </a>
-          </div>
         </form>
 
         {/* Footer */}
@@ -531,6 +594,22 @@ const Signup = () => {
           <p className='text-green-100 text-[10px]'>
             Website : www.abcdvyapar.com &nbsp;|&nbsp; Email : info@abcdvyapar.com
           </p>
+        </div>
+
+        {/* Login Link */}
+        <div className='mt-4 text-center px-3 sm:px-6'>
+          <p className='text-gray-600 text-xs'>
+            Already have an account?{' '}
+            <a href='/login' className='text-[#2e7d32] font-bold hover:underline'>Sign In</a>
+          </p>
+        </div>
+
+        {/* Go to Home */}
+        <div className='mt-3 px-3 sm:px-6 pb-3 sm:pb-4'>
+          <a href='https://abcdvyapar.com' target='_blank' rel='noopener noreferrer'
+            className='w-full bg-[#c62828] text-white font-bold py-2.5 rounded hover:bg-[#b71c1c] transition-all flex items-center justify-center text-sm'>
+            Go to Home
+          </a>
         </div>
       </div>
 
@@ -566,3 +645,4 @@ const Signup = () => {
 }
 
 export default Signup
+

@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const vendorModel = require("../models/Vendor.js");
-const { handleVendorPhotoUpload } = require("./uploadController");
+const { handleVendorPhotoUpload, handlePaymentScreenshotUpload } = require("./uploadController");
 const { sendVendorSignupAlert } = require("../utils/telegramAlert");
 
 const handleVendorSignup = async (req, res) => {
@@ -10,7 +10,7 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, state, district, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid, paymentDetails } = req.body;
+    let { email, mobile, ownerName, businessName, state, district, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid } = req.body;
 
     // Parse businessCategories if it's a string (from FormData)
     if (typeof businessCategories === 'string') {
@@ -37,7 +37,6 @@ const handleVendorSignup = async (req, res) => {
     referralId = referralId?.trim();
     membershipType = membershipType?.trim();
     amountPaid = amountPaid ? Number(amountPaid) : undefined;
-    paymentDetails = paymentDetails?.trim();
 
     if (!mobile || !ownerName || !businessName || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
       return res.status(400).json({ success: false, message: "Mobile, owner name, business name, state, district, city, at least one category-subcategory pair, and membership fees are required" });
@@ -120,7 +119,6 @@ const handleVendorSignup = async (req, res) => {
     if (referralId) newVendorData.referralId = referralId;
     if (membershipType) newVendorData.membershipType = membershipType;
     if (amountPaid) newVendorData.amountPaid = amountPaid;
-    if (paymentDetails) newVendorData.paymentDetails = paymentDetails;
 
     // Process vendor photo if provided
     if (req.files && req.files.vendorPhoto && req.files.vendorPhoto[0]) {
@@ -133,6 +131,24 @@ const handleVendorSignup = async (req, res) => {
           message: error.message || "Failed to upload vendor photo"
         });
       }
+    }
+
+    // Payment screenshot is mandatory for vendor signup
+    if (!req.files || !req.files.paymentScreenshot || !req.files.paymentScreenshot[0]) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment screenshot is required"
+      });
+    }
+
+    try {
+      newVendorData.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
+    } catch (error) {
+      console.error("Payment screenshot upload error:", error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || "Failed to upload payment screenshot"
+      });
     }
 
     // Create new vendor WITHOUT logging them in (similar to user signup)
