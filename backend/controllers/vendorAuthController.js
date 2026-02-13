@@ -18,7 +18,7 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, owners, businessName, state, district, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid } = req.body;
+    let { email, mobile, ownerName, owners, businessName, state, district, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid, utrNumber } = req.body;
 
     // Parse businessCategories if it's a string (from FormData)
     if (typeof businessCategories === 'string') {
@@ -52,6 +52,7 @@ const handleVendorSignup = async (req, res) => {
     address = address?.trim();
     referredByName = referredByName?.trim();
     referralId = referralId?.trim();
+    utrNumber = utrNumber?.trim();
     membershipType = membershipType?.trim();
     amountPaid = amountPaid ? Number(amountPaid) : undefined;
 
@@ -147,6 +148,7 @@ const handleVendorSignup = async (req, res) => {
     if (address) newVendorData.address = address;
     if (referredByName) newVendorData.referredByName = referredByName;
     if (referralId) newVendorData.referralId = referralId;
+    if (utrNumber) newVendorData.utrNumber = utrNumber;
     if (membershipType) newVendorData.membershipType = membershipType;
     if (amountPaid) newVendorData.amountPaid = amountPaid;
 
@@ -180,11 +182,19 @@ const handleVendorSignup = async (req, res) => {
       });
     }
 
-    // Payment screenshot is mandatory for vendor signup
-    if (!req.files || !req.files.paymentScreenshot || !req.files.paymentScreenshot[0]) {
+    const hasPaymentScreenshot = !!(req.files && req.files.paymentScreenshot && req.files.paymentScreenshot[0]);
+
+    if (!hasPaymentScreenshot) {
       return res.status(400).json({
         success: false,
         message: "Payment screenshot is required"
+      });
+    }
+
+    if (!/^\d{12}$/.test(utrNumber || "")) {
+      return res.status(400).json({
+        success: false,
+        message: "UTR number must be exactly 12 digits"
       });
     }
 

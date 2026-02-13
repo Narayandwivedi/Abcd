@@ -29,6 +29,7 @@ const Signup = () => {
     referralId: '',
     membershipType: '',
     membershipFees: '',
+    utrNumber: '',
     paymentScreenshot: null,
   })
   const [previewPaymentScreenshot, setPreviewPaymentScreenshot] = useState(null)
@@ -138,6 +139,7 @@ const Signup = () => {
         Silver: '2000',
         Gold: '5000',
         Diamond: '10000',
+        Platinum: '25000',
       }
       setFormData({ ...formData, membershipType: value, membershipFees: membershipFeeMap[value] || '' })
       setError('')
@@ -259,6 +261,11 @@ const Signup = () => {
       return
     }
 
+    if (!/^\d{12}$/.test((formData.utrNumber || '').trim())) {
+      setError('Please enter a valid 12-digit UTR number')
+      return
+    }
+
     if (!acceptedTerms) {
       setError('Please accept Terms & Conditions to continue')
       return
@@ -294,6 +301,7 @@ const Signup = () => {
       if (formData.address) submitData.append('address', formData.address)
       if (formData.referralId) submitData.append('referralId', formData.referralId)
       if (formData.membershipType) submitData.append('membershipType', formData.membershipType)
+      if (formData.utrNumber?.trim()) submitData.append('utrNumber', formData.utrNumber.trim())
       if (formData.paymentScreenshot) submitData.append('paymentScreenshot', formData.paymentScreenshot)
       formData.owners.forEach((owner) => {
         if (owner.photo) submitData.append('ownerPhotos', owner.photo)
@@ -308,7 +316,7 @@ const Signup = () => {
           businessCategories: [{ category: '', subCategory: '' }],
           address: '', state: '', district: '', city: '', websiteUrl: '', email: '',
           referralId: '', membershipType: '',
-          membershipFees: '', paymentScreenshot: null
+          membershipFees: '', utrNumber: '', paymentScreenshot: null
         })
         setPreviewPaymentScreenshot(null)
         setAcceptedTerms(false)
@@ -563,23 +571,26 @@ const Signup = () => {
 
             {/* Membership Type */}
             <div className='bg-[#2e7d32] rounded py-2 sm:py-2.5 px-3 sm:px-4'>
-              <div className='flex items-center justify-between flex-wrap gap-2'>
-                <span className='text-white font-bold text-xs sm:text-sm tracking-wide'>MEMBERSHIP TYPE</span>
-                <div className='flex items-center gap-4 sm:gap-6'>
-                {['Silver', 'Gold', 'Diamond'].map((type) => (
+              <div className='space-y-2'>
+                <span className='text-white font-bold text-xs sm:text-sm tracking-wide block'>MEMBERSHIP TYPE</span>
+                <div className='grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3'>
+                {['Silver', 'Gold', 'Diamond', 'Platinum'].map((type) => (
                   <label key={type} className='flex items-center gap-1.5 cursor-pointer'>
                     <input
-                      type='radio'
+                      type='checkbox'
                       name='membershipType'
-                      value={type}
                       checked={formData.membershipType === type}
-                      onChange={handleChange}
-                      className='w-4 h-4 accent-white'
+                      onChange={() => {
+                        const selectedValue = formData.membershipType === type ? '' : type
+                        handleChange({ target: { name: 'membershipType', value: selectedValue } })
+                      }}
+                      className='w-3.5 h-3.5 sm:w-4 sm:h-4 accent-white'
                     />
-                    <span className={`font-bold text-xs sm:text-sm ${
+                    <span className={`font-bold text-[10px] sm:text-sm ${
                       type === 'Silver' ? 'text-gray-200' :
                       type === 'Gold' ? 'text-yellow-300' :
-                      'text-cyan-200'
+                      type === 'Diamond' ? 'text-cyan-200' :
+                      'text-pink-200'
                     }`}>{type.toUpperCase()}</span>
                   </label>
                 ))}
@@ -630,8 +641,8 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Payment QR + Screenshot Upload */}
-            <div className='border border-gray-200 rounded p-2.5 sm:p-3 bg-gray-50'>
+            {/* Payment Proof */}
+            <div className='border border-gray-300 rounded p-2.5 sm:p-3 bg-gray-100'>
               <div className='flex items-center justify-between bg-white border border-gray-200 rounded p-2.5 sm:p-3 mb-2.5 sm:mb-3'>
                 <div className='pr-3'>
                   <p className='text-[9px] sm:text-[10px] text-gray-600'>Scan to pay</p>
@@ -661,6 +672,23 @@ const Signup = () => {
                   </svg>
                   {formData.paymentScreenshot ? formData.paymentScreenshot.name : 'Upload Payment Screenshot'}
                 </label>
+              </div>
+
+              <div className='text-center text-[10px] sm:text-xs text-gray-500 mb-2'>OR</div>
+
+              <div className='mb-2'>
+                <input
+                  type='text'
+                  name='utrNumber'
+                  value={formData.utrNumber}
+                  onChange={(e) => {
+                    const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 12)
+                    handleChange({ target: { name: 'utrNumber', value: digitsOnly } })
+                  }}
+                  className={inputClass}
+                  placeholder='Enter 12-digit UTR'
+                  maxLength={12}
+                />
               </div>
               {previewPaymentScreenshot && (
                 <div className='mt-2 relative'>
@@ -744,6 +772,10 @@ const Signup = () => {
               <div>
                 <p className='font-bold text-gray-900'>Diamond Membership - Rs. 10000/-</p>
                 <p>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, Space In Monthly Magazine Voice Of ABCD, 100 Business Card, Premium Office Gifts, Invitation to Our Weekly Video Podcast, Free Sub-domain website, Every Month Free 15 Advertisements, Gift Vouchers Worth Rs. 20000/-, For Extra Advertisement @Rs. 99 Per Ad</p>
+              </div>
+              <div>
+                <p className='font-bold text-gray-900'>Platinum Membership - Rs. 25000/-</p>
+                <p>Premium membership plan with enhanced benefits as per ABCD membership policy.</p>
               </div>
             </div>
 
