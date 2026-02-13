@@ -10,7 +10,7 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { email, mobile, ownerName, businessName, state, district, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid } = req.body;
+    let { email, mobile, ownerName, owners, businessName, state, district, city, membershipFees, businessCategories, websiteUrl, socialUrl, gstPan, address, referredByName, referralId, membershipType, amountPaid } = req.body;
 
     // Parse businessCategories if it's a string (from FormData)
     if (typeof businessCategories === 'string') {
@@ -18,6 +18,15 @@ const handleVendorSignup = async (req, res) => {
         businessCategories = JSON.parse(businessCategories);
       } catch (e) {
         return res.status(400).json({ success: false, message: "Invalid business categories format" });
+      }
+    }
+
+    // Parse owners if it's a string (from FormData)
+    if (typeof owners === 'string') {
+      try {
+        owners = JSON.parse(owners);
+      } catch (e) {
+        return res.status(400).json({ success: false, message: "Invalid owners format" });
       }
     }
 
@@ -38,8 +47,21 @@ const handleVendorSignup = async (req, res) => {
     membershipType = membershipType?.trim();
     amountPaid = amountPaid ? Number(amountPaid) : undefined;
 
-    if (!mobile || !ownerName || !businessName || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
-      return res.status(400).json({ success: false, message: "Mobile, owner name, business name, state, district, city, at least one category-subcategory pair, and membership fees are required" });
+    // Normalize owners payload and support legacy ownerName fallback
+    if (!Array.isArray(owners) || owners.length === 0) {
+      owners = ownerName ? [{ name: ownerName }] : [];
+    }
+
+    owners = owners.map((item) => ({
+      name: (item?.name || item?.ownerName || '').trim()
+    })).filter((item) => item.name);
+
+    if (!mobile || owners.length === 0 || !businessName || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
+      return res.status(400).json({ success: false, message: "Mobile, at least one owner with photo, business name, state, district, city, at least one category-subcategory pair, and membership fees are required" });
+    }
+
+    if (owners.length > 10) {
+      return res.status(400).json({ success: false, message: "Maximum 10 owners are allowed" });
     }
 
     // Validate max 5 categories and each must have category + subCategory strings
@@ -87,7 +109,7 @@ const handleVendorSignup = async (req, res) => {
 
     const newVendorData = {
       mobile,
-      ownerName,
+      ownerName: owners[0].name,
       businessName,
       state, // Required field
       district, // Required field
@@ -120,17 +142,34 @@ const handleVendorSignup = async (req, res) => {
     if (membershipType) newVendorData.membershipType = membershipType;
     if (amountPaid) newVendorData.amountPaid = amountPaid;
 
-    // Process vendor photo if provided
-    if (req.files && req.files.vendorPhoto && req.files.vendorPhoto[0]) {
-      try {
-        newVendorData.passportPhoto = await handleVendorPhotoUpload(req.files.vendorPhoto[0]);
-      } catch (error) {
-        console.error("Vendor photo upload error:", error);
-        return res.status(500).json({
-          success: false,
-          message: error.message || "Failed to upload vendor photo"
+    const ownerPhotoFiles = (req.files && req.files.ownerPhotos) ? req.files.ownerPhotos : [];
+    const legacyVendorPhotoFiles = (req.files && req.files.vendorPhoto) ? req.files.vendorPhoto : [];
+    const normalizedOwnerPhotoFiles = ownerPhotoFiles.length > 0 ? ownerPhotoFiles : legacyVendorPhotoFiles;
+
+    if (normalizedOwnerPhotoFiles.length !== owners.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload one photo for each owner"
+      });
+    }
+
+    try {
+      const ownersWithPhotos = [];
+      for (let i = 0; i < owners.length; i++) {
+        const photoPath = await handleVendorPhotoUpload(normalizedOwnerPhotoFiles[i]);
+        ownersWithPhotos.push({
+          name: owners[i].name,
+          photo: photoPath
         });
       }
+      newVendorData.owners = ownersWithPhotos;
+      newVendorData.passportPhoto = ownersWithPhotos[0].photo;
+    } catch (error) {
+      console.error("Owner photo upload error:", error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || "Failed to upload owner photos"
+      });
     }
 
     // Payment screenshot is mandatory for vendor signup

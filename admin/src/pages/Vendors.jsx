@@ -53,6 +53,45 @@ const Vendors = () => {
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
+  const toAbsoluteFileUrl = (filePath) => {
+    if (!filePath || typeof filePath !== 'string') return null
+    if (/^https?:\/\//i.test(filePath)) return filePath
+    if (filePath.startsWith('/')) return `${BACKEND_URL}${filePath}`
+    return `${BACKEND_URL}/${filePath}`
+  }
+
+  const normalizeVendors = (vendorList = []) => {
+    return vendorList.map((vendor) => {
+      const owners = Array.isArray(vendor.owners)
+        ? vendor.owners.filter((owner) => owner && typeof owner.name === 'string' && owner.name.trim())
+        : []
+
+      const ownerNames = owners.map((owner) => owner.name.trim())
+      if (ownerNames.length === 0 && vendor.ownerName) {
+        ownerNames.push(vendor.ownerName)
+      }
+
+      return {
+        ...vendor,
+        owners,
+        ownerNames,
+        ownerNamesText: ownerNames.join(', ')
+      }
+    })
+  }
+
+  const getVendorPrimaryPhoto = (vendor) => {
+    if (vendor?.passportPhoto) return vendor.passportPhoto
+    if (Array.isArray(vendor?.owners) && vendor.owners[0]?.photo) return vendor.owners[0].photo
+    return null
+  }
+
+  const getOwnerSummary = (vendor) => {
+    if (!vendor?.ownerNames?.length) return 'N/A'
+    if (vendor.ownerNames.length === 1) return vendor.ownerNames[0]
+    return `${vendor.ownerNames[0]} +${vendor.ownerNames.length - 1}`
+  }
+
   // Debug logging for createForm
   useEffect(() => {
     console.log('Vendors - createForm changed:', createForm)
@@ -172,8 +211,9 @@ const Vendors = () => {
       const data = await response.json()
 
       if (data.success) {
-        setVendors(data.vendors)
-        calculateStats(data.vendors)
+        const normalizedVendors = normalizeVendors(data.vendors || [])
+        setVendors(normalizedVendors)
+        calculateStats(normalizedVendors)
       }
     } catch (error) {
       console.error('Error fetching vendors:', error)
@@ -497,6 +537,7 @@ ABCD Team`
     // Search filter
     const matchesSearch = vendor.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vendor.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vendor.ownerNamesText?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vendor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vendor.mobile?.toString().includes(searchTerm)
 
@@ -632,24 +673,38 @@ ABCD Team`
                     <tr key={vendor._id} className='hover:bg-gray-50 transition'>
                       <td className='px-6 py-4'>
                         <div className='flex items-center gap-3'>
-                          {vendor.passportPhoto ? (
-                            <img
-                              src={`${BACKEND_URL}/${vendor.passportPhoto}`}
-                              alt={vendor.businessName}
-                              onClick={() => handlePhotoClick(`${BACKEND_URL}/${vendor.passportPhoto}`)}
-                              className='w-12 h-12 rounded-full object-cover border-2 border-gray-200 cursor-pointer hover:opacity-80 transition'
-                            />
-                          ) : (
+                            {getVendorPrimaryPhoto(vendor) ? (
+                              <img
+                                src={toAbsoluteFileUrl(getVendorPrimaryPhoto(vendor))}
+                                alt={vendor.businessName}
+                                onClick={() => handlePhotoClick(toAbsoluteFileUrl(getVendorPrimaryPhoto(vendor)))}
+                                className='w-12 h-12 rounded-full object-cover border-2 border-gray-200 cursor-pointer hover:opacity-80 transition'
+                              />
+                            ) : (
                             <div className='w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold'>
                               {vendor.businessName?.[0]?.toUpperCase()}
                             </div>
                           )}
-                          <div>
-                            <div className='font-semibold text-gray-800'>{vendor.businessName}</div>
-                            <div className='text-xs text-gray-500'>Owner: {vendor.ownerName}</div>
-                            <div className='text-xs text-gray-500'>
-                              {[vendor.city, vendor.district, vendor.state].filter(Boolean).join(', ') || 'N/A'}
-                            </div>
+                            <div>
+                              <div className='font-semibold text-gray-800'>{vendor.businessName}</div>
+                              <div className='text-xs text-gray-500'>Owners: {getOwnerSummary(vendor)}</div>
+                              {vendor.ownerNames?.length > 1 && (
+                                <div className='flex flex-wrap gap-1 mt-1'>
+                                  {vendor.ownerNames.slice(0, 3).map((ownerName, idx) => (
+                                    <span key={idx} className='px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded text-[10px] font-medium'>
+                                      {ownerName}
+                                    </span>
+                                  ))}
+                                  {vendor.ownerNames.length > 3 && (
+                                    <span className='px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-medium'>
+                                      +{vendor.ownerNames.length - 3} more
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                              <div className='text-xs text-gray-500'>
+                                {[vendor.city, vendor.district, vendor.state].filter(Boolean).join(', ') || 'N/A'}
+                              </div>
                             {vendor.gstPan && (
                               <div className='text-xs text-gray-500'>PAN/GST: {vendor.gstPan}</div>
                             )}
@@ -870,11 +925,11 @@ ABCD Team`
                     <div className='flex items-start gap-3'>
                       {/* Profile Photo with Ring */}
                       <div className='relative flex-shrink-0'>
-                        {vendor.passportPhoto ? (
+                        {getVendorPrimaryPhoto(vendor) ? (
                           <img
-                            src={`${BACKEND_URL}/${vendor.passportPhoto}`}
+                            src={toAbsoluteFileUrl(getVendorPrimaryPhoto(vendor))}
                             alt={vendor.businessName}
-                            onClick={() => handlePhotoClick(`${BACKEND_URL}/${vendor.passportPhoto}`)}
+                            onClick={() => handlePhotoClick(toAbsoluteFileUrl(getVendorPrimaryPhoto(vendor)))}
                             className='w-16 h-16 rounded-full object-cover border-4 border-white shadow-md cursor-pointer hover:scale-105 transition-transform duration-200'
                           />
                         ) : (
@@ -892,12 +947,26 @@ ABCD Team`
                         )}
                       </div>
 
-                      {/* Vendor Info */}
-                      <div className='flex-1 min-w-0'>
-                        <h3 className='font-bold text-gray-900 text-sm leading-tight mb-0.5'>{vendor.businessName}</h3>
-                        <p className='text-xs text-gray-600 mb-0.5'>Owner: {vendor.ownerName}</p>
-                        {vendor.activeCertificate?.certificateNumber && (
-                          <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold mb-0.5'>
+                        {/* Vendor Info */}
+                        <div className='flex-1 min-w-0'>
+                          <h3 className='font-bold text-gray-900 text-sm leading-tight mb-0.5'>{vendor.businessName}</h3>
+                          <p className='text-xs text-gray-600 mb-0.5'>Owners: {getOwnerSummary(vendor)}</p>
+                          {vendor.ownerNames?.length > 1 && (
+                            <div className='flex flex-wrap gap-1 mb-1'>
+                              {vendor.ownerNames.slice(0, 3).map((ownerName, idx) => (
+                                <span key={idx} className='px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded-md text-[10px] font-semibold'>
+                                  {ownerName}
+                                </span>
+                              ))}
+                              {vendor.ownerNames.length > 3 && (
+                                <span className='px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded-md text-[10px] font-semibold'>
+                                  +{vendor.ownerNames.length - 3} more
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {vendor.activeCertificate?.certificateNumber && (
+                            <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold mb-0.5'>
                             <svg className='w-3 h-3 flex-shrink-0' fill='currentColor' viewBox='0 0 20 20'>
                               <path fillRule='evenodd' d='M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z' clipRule='evenodd' />
                             </svg>

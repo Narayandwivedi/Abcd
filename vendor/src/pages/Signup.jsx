@@ -6,6 +6,7 @@ import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 
 const Signup = () => {
+  const createEmptyOwner = () => ({ name: '', photo: null, previewUrl: '' })
   const { isAuthenticated, signup } = useContext(AppContext)
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -14,7 +15,7 @@ const Signup = () => {
   const [showTermsPopup, setShowTermsPopup] = useState(false)
 
   const [formData, setFormData] = useState({
-    ownerName: '',
+    owners: [createEmptyOwner()],
     mobile: '',
     businessName: '',
     gstPan: '',
@@ -29,9 +30,7 @@ const Signup = () => {
     membershipType: '',
     membershipFees: '',
     paymentScreenshot: null,
-    vendorPhoto: null
   })
-  const [previewPhoto, setPreviewPhoto] = useState(null)
   const [previewPaymentScreenshot, setPreviewPaymentScreenshot] = useState(null)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   const [availableStates, setAvailableStates] = useState([])
@@ -148,25 +147,62 @@ const Signup = () => {
     setError('')
   }
 
-  const handlePhotoChange = (e) => {
+  const addOwner = () => {
+    setFormData((prev) => {
+      if (prev.owners.length >= 10) {
+        toast.error('Maximum 10 owners allowed')
+        return prev
+      }
+      return { ...prev, owners: [...prev.owners, createEmptyOwner()] }
+    })
+  }
+
+  const removeOwner = (index) => {
+    setFormData((prev) => {
+      if (prev.owners.length <= 1) return prev
+      const removedOwner = prev.owners[index]
+      if (removedOwner?.previewUrl) {
+        URL.revokeObjectURL(removedOwner.previewUrl)
+      }
+      return { ...prev, owners: prev.owners.filter((_, i) => i !== index) }
+    })
+  }
+
+  const handleOwnerNameChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => (i === index ? { ...owner, name: value } : owner))
+    }))
+    setError('')
+  }
+
+  const handleOwnerPhotoChange = (index, e) => {
     const file = e.target.files[0]
-    if (file) {
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-      if (!validTypes.includes(file.type)) {
-        toast.error('Please upload a valid image (JPG, PNG, or WebP)')
-        e.target.value = ''
-        return
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('Photo size should be less than 10MB')
-        e.target.value = ''
-        return
-      }
-      setFormData({ ...formData, vendorPhoto: file })
-      const reader = new FileReader()
-      reader.onloadend = () => setPreviewPhoto(reader.result)
-      reader.readAsDataURL(file)
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a valid image (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
     }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Photo size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    const previewUrl = URL.createObjectURL(file)
+    setFormData((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => {
+        if (i !== index) return owner
+        if (owner.previewUrl) URL.revokeObjectURL(owner.previewUrl)
+        return { ...owner, photo: file, previewUrl }
+      })
+    }))
+    setError('')
   }
 
   const handlePaymentScreenshotChange = (e) => {
@@ -194,19 +230,20 @@ const Signup = () => {
     e.preventDefault()
     setError('')
 
-    if (!formData.ownerName || !formData.businessName || !formData.mobile || !formData.state || !formData.district || !formData.city || formData.businessCategories.length === 0 || !formData.membershipFees) {
+    if (!formData.businessName || !formData.mobile || !formData.state || !formData.district || !formData.city || formData.businessCategories.length === 0 || !formData.membershipFees) {
       setError('Please fill in all required fields')
+      return
+    }
+
+    const hasInvalidOwners = formData.owners.some((owner) => !owner.name?.trim() || !owner.photo)
+    if (hasInvalidOwners) {
+      setError('Please add owner name and photo for all owners')
       return
     }
 
     const hasEmptyCategory = formData.businessCategories.some(item => !item.category?.trim() || !item.subCategory?.trim())
     if (hasEmptyCategory) {
       setError('Please fill in both category and subcategory for all entries')
-      return
-    }
-
-    if (!formData.vendorPhoto) {
-      setError('Please upload your photo')
       return
     }
 
@@ -234,7 +271,9 @@ const Signup = () => {
 
     try {
       const submitData = new FormData()
-      submitData.append('ownerName', formData.ownerName)
+      const ownersPayload = formData.owners.map((owner) => ({ name: owner.name.trim() }))
+      submitData.append('ownerName', ownersPayload[0]?.name || '')
+      submitData.append('owners', JSON.stringify(ownersPayload))
       submitData.append('businessName', formData.businessName)
       submitData.append('mobile', formData.mobile)
       submitData.append('state', formData.state)
@@ -249,20 +288,21 @@ const Signup = () => {
       if (formData.referralId) submitData.append('referralId', formData.referralId)
       if (formData.membershipType) submitData.append('membershipType', formData.membershipType)
       if (formData.paymentScreenshot) submitData.append('paymentScreenshot', formData.paymentScreenshot)
-      if (formData.vendorPhoto) submitData.append('vendorPhoto', formData.vendorPhoto)
+      formData.owners.forEach((owner) => {
+        if (owner.photo) submitData.append('ownerPhotos', owner.photo)
+      })
 
       const result = await signup(submitData)
 
       if (result.success) {
         setShowSuccessPopup(true)
         setFormData({
-          ownerName: '', mobile: '', businessName: '', gstPan: '',
+          owners: [createEmptyOwner()], mobile: '', businessName: '', gstPan: '',
           businessCategories: [{ category: '', subCategory: '' }],
           address: '', state: '', district: '', city: '', websiteUrl: '', email: '',
           referralId: '', membershipType: '',
-          membershipFees: '', paymentScreenshot: null, vendorPhoto: null
+          membershipFees: '', paymentScreenshot: null
         })
-        setPreviewPhoto(null)
         setPreviewPaymentScreenshot(null)
         setAcceptedTerms(false)
         setAvailableDistricts([])
@@ -339,37 +379,78 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Row: Owner Name + Owner Photo */}
-            <div className='grid grid-cols-2 gap-2 sm:gap-3'>
-              <div>
+            {/* Owners */}
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
                 <label className={labelClass}>
-                  Owner Name <span className='text-red-500'>*</span>
+                  Owners <span className='text-red-500'>*</span>
                 </label>
-                <input type='text' name='ownerName' value={formData.ownerName} onChange={handleChange} className={inputClass} placeholder='Enter owner name' />
+                <button
+                  type='button'
+                  onClick={addOwner}
+                  className='px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-[#1a237e] border border-[#1a237e]/30 rounded hover:bg-[#1a237e]/5 transition'
+                >
+                  + Add Owner
+                </button>
               </div>
-              <div>
-                <label className={labelClass}>
-                  Owner Photo <span className='text-red-500'>*</span>
-                </label>
-                <div>
-                  <input type='file' accept='image/jpeg,image/jpg,image/png,image/webp' onChange={handlePhotoChange} className='hidden' id='vendor-photo-upload' />
-                  <label htmlFor='vendor-photo-upload' className='w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-100 border border-gray-300 rounded text-xs sm:text-sm cursor-pointer hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center justify-center'>
-                    <svg className='w-4 h-4 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
-                    </svg>
-                    {formData.vendorPhoto ? formData.vendorPhoto.name : 'Choose Photo'}
-                  </label>
-                </div>
-                {previewPhoto && (
-                  <div className='mt-2 relative'>
-                    <img src={previewPhoto} alt='Preview' className='w-full h-24 sm:h-32 object-cover rounded border border-gray-300' />
-                    <button type='button' onClick={() => { setFormData({ ...formData, vendorPhoto: null }); setPreviewPhoto(null) }}
-                      className='absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600'>
-                      x
-                    </button>
+
+              {formData.owners.map((owner, index) => (
+                <div key={`owner-${index}`} className='border border-gray-200 rounded p-2 space-y-2 bg-gray-50'>
+                  <div className='grid grid-cols-2 gap-2 sm:gap-3'>
+                    <div>
+                      <label className={labelClass}>
+                        Owner Name {index + 1} <span className='text-red-500'>*</span>
+                      </label>
+                      <input
+                        type='text'
+                        value={owner.name}
+                        onChange={(e) => handleOwnerNameChange(index, e.target.value)}
+                        className={inputClass}
+                        placeholder='Enter owner name'
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>
+                        Owner Photo {index + 1} <span className='text-red-500'>*</span>
+                      </label>
+                      <div>
+                        <input
+                          type='file'
+                          accept='image/jpeg,image/jpg,image/png,image/webp'
+                          onChange={(e) => handleOwnerPhotoChange(index, e)}
+                          className='hidden'
+                          id={`owner-photo-upload-${index}`}
+                        />
+                        <label
+                          htmlFor={`owner-photo-upload-${index}`}
+                          className='w-full px-2.5 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-300 rounded text-[10px] sm:text-sm cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap flex items-center justify-center'
+                        >
+                          <svg className='w-4 h-4 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
+                          </svg>
+                          {owner.photo ? 'Photo Selected' : 'Choose Photo'}
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
+
+                  <div className='flex items-start justify-between gap-2'>
+                    {owner.previewUrl ? (
+                      <img src={owner.previewUrl} alt={`Owner ${index + 1} preview`} className='w-24 h-24 object-cover rounded border border-gray-300' />
+                    ) : <div />}
+
+                    {formData.owners.length > 1 && (
+                      <button
+                        type='button'
+                        onClick={() => removeOwner(index)}
+                        className='px-2 py-1 text-[11px] sm:text-xs font-semibold text-red-700 border border-red-300 rounded hover:bg-red-50 transition'
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* GSTN/PAN */}

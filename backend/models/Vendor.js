@@ -16,6 +16,17 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  owners: [{
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    photo: {
+      type: String,
+      required: true,
+    },
+  }],
   businessName: {
     type: String,
     required: true,
@@ -105,6 +116,9 @@ const vendorSchema = new mongoose.Schema({
   },
 
   // Payment and Approval Fields
+  passportPhoto: {
+    type: String,
+  },
   paymentScreenshot: {
     type: String,
   },

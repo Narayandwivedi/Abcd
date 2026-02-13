@@ -13,7 +13,8 @@ const router = express.Router();
 // Vendor Authentication Routes
 router.post("/signup",
   upload.fields([
-    { name: 'vendorPhoto', maxCount: 1 },
+    { name: 'vendorPhoto', maxCount: 1 }, // backward compatibility
+    { name: 'ownerPhotos', maxCount: 10 },
     { name: 'paymentScreenshot', maxCount: 1 },
   ]),
   handleVendorSignup
