@@ -4,6 +4,14 @@ const vendorModel = require("../models/Vendor.js");
 const { handleVendorPhotoUpload, handlePaymentScreenshotUpload } = require("./uploadController");
 const { sendVendorSignupAlert } = require("../utils/telegramAlert");
 
+const normalizeWebsiteUrl = (value) => {
+  if (!value || typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+};
+
 const handleVendorSignup = async (req, res) => {
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
@@ -38,7 +46,7 @@ const handleVendorSignup = async (req, res) => {
     district = district?.trim();
     city = city?.trim();
     membershipFees = Number(membershipFees);
-    websiteUrl = websiteUrl?.trim();
+    websiteUrl = normalizeWebsiteUrl(websiteUrl);
     socialUrl = socialUrl?.trim();
     gstPan = gstPan?.trim();
     address = address?.trim();

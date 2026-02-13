@@ -143,6 +143,13 @@ const Signup = () => {
       setError('')
       return
     }
+    if (name === 'websiteUrl') {
+      // Let users type only domain (example: abc.com). Backend will add https://.
+      const normalizedValue = value.replace(/^https?:\/\//i, '')
+      setFormData({ ...formData, [name]: normalizedValue })
+      setError('')
+      return
+    }
     setFormData({ ...formData, [name]: value })
     setError('')
   }
@@ -528,7 +535,17 @@ const Signup = () => {
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
               <div>
                 <label className={labelClass}>Website If Any</label>
-                <input type='url' name='websiteUrl' value={formData.websiteUrl} onChange={handleChange} className={inputClass} placeholder='https://www.yourbusiness.com' />
+                <div className='flex items-center rounded border border-gray-300 bg-white'>
+                  <span className='px-2 text-[10px] sm:text-xs text-gray-500 select-none'>https://</span>
+                  <input
+                    type='text'
+                    name='websiteUrl'
+                    value={formData.websiteUrl}
+                    onChange={handleChange}
+                    className='w-full px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-r text-gray-900 focus:outline-none focus:ring-1 focus:ring-[#1a237e] transition-all text-xs sm:text-sm'
+                    placeholder='yourbusiness.com'
+                  />
+                </div>
               </div>
               <div>
                 <label className={labelClass}>Email</label>
