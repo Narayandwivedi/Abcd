@@ -10,6 +10,8 @@ const Signup = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [showTermsPopup, setShowTermsPopup] = useState(false)
 
   const [formData, setFormData] = useState({
     ownerName: '',
@@ -134,9 +136,9 @@ const Signup = () => {
     const { name, value } = e.target
     if (name === 'membershipType') {
       const membershipFeeMap = {
-        Silver: '1999',
-        Gold: '4999',
-        Diamond: '9999',
+        Silver: '2000',
+        Gold: '5000',
+        Diamond: '10000',
       }
       setFormData({ ...formData, membershipType: value, membershipFees: membershipFeeMap[value] || '' })
       setError('')
@@ -213,6 +215,11 @@ const Signup = () => {
       return
     }
 
+    if (!acceptedTerms) {
+      setError('Please accept Terms & Conditions to continue')
+      return
+    }
+
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError('Please enter a valid email address')
       return
@@ -257,6 +264,7 @@ const Signup = () => {
         })
         setPreviewPhoto(null)
         setPreviewPaymentScreenshot(null)
+        setAcceptedTerms(false)
         setAvailableDistricts([])
         setAvailableCities([])
         setTimeout(() => {
@@ -315,13 +323,13 @@ const Signup = () => {
         <form onSubmit={handleSubmit} className='px-3 sm:px-6 pb-3 sm:pb-4'>
           <div className='space-y-2.5 sm:space-y-3'>
 
-            {/* Row: Applicants Name + WhatsApp No */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+            {/* Row: Business Name + WhatsApp No */}
+            <div className='grid grid-cols-2 gap-2 sm:gap-3'>
               <div>
                 <label className={labelClass}>
-                  Applicant's Name <span className='text-red-500'>*</span>
+                  Business Name <span className='text-red-500'>*</span>
                 </label>
-                <input type='text' name='ownerName' value={formData.ownerName} onChange={handleChange} className={inputClass} placeholder='Enter full name' />
+                <input type='text' name='businessName' value={formData.businessName} onChange={handleChange} className={inputClass} placeholder='Enter business name' />
               </div>
               <div>
                 <label className={labelClass}>
@@ -331,45 +339,45 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Photo Upload */}
-            <div>
-              <label className={labelClass}>
-                Upload Your Photo <span className='text-red-500'>*</span>
-              </label>
+            {/* Row: Owner Name + Owner Photo */}
+            <div className='grid grid-cols-2 gap-2 sm:gap-3'>
               <div>
-                <input type='file' accept='image/jpeg,image/jpg,image/png,image/webp' onChange={handlePhotoChange} className='hidden' id='vendor-photo-upload' />
-                <label htmlFor='vendor-photo-upload' className='w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-100 border border-gray-300 rounded text-xs sm:text-sm cursor-pointer hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center justify-center'>
-                  <svg className='w-4 h-4 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
-                  </svg>
-                  {formData.vendorPhoto ? formData.vendorPhoto.name : 'Choose Photo'}
+                <label className={labelClass}>
+                  Owner Name <span className='text-red-500'>*</span>
                 </label>
+                <input type='text' name='ownerName' value={formData.ownerName} onChange={handleChange} className={inputClass} placeholder='Enter owner name' />
               </div>
-              {previewPhoto && (
-                <div className='mt-2 relative'>
-                  <img src={previewPhoto} alt='Preview' className='w-full h-24 sm:h-32 object-cover rounded border border-gray-300' />
-                  <button type='button' onClick={() => { setFormData({ ...formData, vendorPhoto: null }); setPreviewPhoto(null) }}
-                    className='absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600'>
-                    x
-                  </button>
+              <div>
+                <label className={labelClass}>
+                  Owner Photo <span className='text-red-500'>*</span>
+                </label>
+                <div>
+                  <input type='file' accept='image/jpeg,image/jpg,image/png,image/webp' onChange={handlePhotoChange} className='hidden' id='vendor-photo-upload' />
+                  <label htmlFor='vendor-photo-upload' className='w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-100 border border-gray-300 rounded text-xs sm:text-sm cursor-pointer hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center justify-center'>
+                    <svg className='w-4 h-4 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
+                    </svg>
+                    {formData.vendorPhoto ? formData.vendorPhoto.name : 'Choose Photo'}
+                  </label>
                 </div>
-              )}
+                {previewPhoto && (
+                  <div className='mt-2 relative'>
+                    <img src={previewPhoto} alt='Preview' className='w-full h-24 sm:h-32 object-cover rounded border border-gray-300' />
+                    <button type='button' onClick={() => { setFormData({ ...formData, vendorPhoto: null }); setPreviewPhoto(null) }}
+                      className='absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600'>
+                      x
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Row: Business Name + GSTN/PAN */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-              <div>
-                <label className={labelClass}>
-                  Business Name <span className='text-red-500'>*</span>
-                </label>
-                <input type='text' name='businessName' value={formData.businessName} onChange={handleChange} className={inputClass} placeholder='Enter business name' />
-              </div>
-              <div>
-                <label className={labelClass}>
-                  GSTN Details / PAN No.
-                </label>
-                <input type='text' name='gstPan' value={formData.gstPan} onChange={handleChange} className={inputClass} placeholder='Enter GSTN or PAN number' />
-              </div>
+            {/* GSTN/PAN */}
+            <div>
+              <label className={labelClass}>
+                GSTN Details / PAN No.
+              </label>
+              <input type='text' name='gstPan' value={formData.gstPan} onChange={handleChange} className={inputClass} placeholder='Enter GSTN or PAN number' />
             </div>
 
             {/* Business Categories */}
@@ -481,22 +489,33 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Membership Benefits Info */}
-            <div className='border border-gray-200 rounded p-2.5 sm:p-3 bg-gray-50 text-[11px] sm:text-xs text-gray-700 space-y-2'>
-              <p className='font-bold text-gray-800 underline text-xs sm:text-sm'>I hereby agree to all the Terms & Conditions</p>
-              <p className='font-semibold text-gray-600 text-[11px] sm:text-xs'>Annual Membership charges & privileges</p>
-
-              <div>
-                <p className='font-bold text-gray-800 text-[11px] sm:text-xs'>Silver Membership - Rs. 1999/-</p>
-                <p className='text-gray-600'>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, 25 Business Card, Every Month Free 02 Advertisements, Gift Vouchers Worth Rs. 2000/-, For Extra Advertisement @Rs. 149 Per Ad</p>
-              </div>
-              <div>
-                <p className='font-bold text-gray-800 text-[11px] sm:text-xs'>Gold Membership - Rs. 4999/-</p>
-                <p className='text-gray-600'>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, Space In Monthly Magazine Voice Of ABCD, 50 Business Card, Premium Office Gifts, Invitation to Our Weekly Video Podcast, Free Sub-domain website, Every Month Free 06 Advertisements, Gift Vouchers Worth Rs. 7500/-, For Extra Advertisement @Rs. 125 Per Ad</p>
-              </div>
-              <div>
-                <p className='font-bold text-gray-800 text-[11px] sm:text-xs'>Diamond Membership - Rs. 9999/-</p>
-                <p className='text-gray-600'>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, Space In Monthly Magazine Voice Of ABCD, 100 Business Card, Premium Office Gifts, Invitation to Our Weekly Video Podcast, Free Sub-domain website, Every Month Free 15 Advertisements, Gift Vouchers Worth Rs. 20000/-, For Extra Advertisement @Rs. 99 Per Ad</p>
+            {/* Terms & Conditions */}
+            <div className='border border-gray-200 rounded p-2.5 sm:p-3 bg-gray-50'>
+              <div className='flex items-start gap-2'>
+                <label className='flex items-start gap-2 cursor-pointer'>
+                  <input
+                    type='checkbox'
+                    checked={acceptedTerms}
+                    onChange={(e) => {
+                      setAcceptedTerms(e.target.checked)
+                      if (e.target.checked) setError('')
+                    }}
+                    className='mt-0.5 sm:mt-0 w-4 h-4 accent-[#2e7d32]'
+                  />
+                  <span className='text-[11px] sm:text-sm font-semibold text-gray-700'>
+                    I agree to{' '}
+                    <button
+                      type='button'
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setShowTermsPopup(true)
+                      }}
+                      className='inline text-[#1a237e] underline underline-offset-2 hover:text-[#111a5c]'
+                    >
+                      Terms & Conditions
+                    </button>
+                  </span>
+                </label>
               </div>
             </div>
 
@@ -608,6 +627,40 @@ const Signup = () => {
           </a>
         </div>
       </div>
+
+      {/* Terms Popup Modal */}
+      {showTermsPopup && (
+        <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-3 sm:px-4'>
+          <div className='bg-white rounded-2xl p-4 sm:p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl'>
+            <h3 className='text-base sm:text-lg font-bold text-gray-800 mb-3'>Annual Membership Charges & Privileges</h3>
+
+            <div className='space-y-3 text-xs sm:text-sm text-gray-700'>
+              <div>
+                <p className='font-bold text-gray-900'>Silver Membership - Rs. 2000/-</p>
+                <p>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, 25 Business Card, Every Month Free 02 Advertisements, Gift Vouchers Worth Rs. 2000/-, For Extra Advertisement @Rs. 149 Per Ad</p>
+              </div>
+              <div>
+                <p className='font-bold text-gray-900'>Gold Membership - Rs. 5000/-</p>
+                <p>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, Space In Monthly Magazine Voice Of ABCD, 50 Business Card, Premium Office Gifts, Invitation to Our Weekly Video Podcast, Free Sub-domain website, Every Month Free 06 Advertisements, Gift Vouchers Worth Rs. 7500/-, For Extra Advertisement @Rs. 125 Per Ad</p>
+              </div>
+              <div>
+                <p className='font-bold text-gray-900'>Diamond Membership - Rs. 10000/-</p>
+                <p>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, Space In Monthly Magazine Voice Of ABCD, 100 Business Card, Premium Office Gifts, Invitation to Our Weekly Video Podcast, Free Sub-domain website, Every Month Free 15 Advertisements, Gift Vouchers Worth Rs. 20000/-, For Extra Advertisement @Rs. 99 Per Ad</p>
+              </div>
+            </div>
+
+            <div className='mt-4 flex justify-end'>
+              <button
+                type='button'
+                onClick={() => setShowTermsPopup(false)}
+                className='px-4 py-2 bg-[#1a237e] text-white text-xs sm:text-sm font-semibold rounded hover:bg-[#111a5c] transition'
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Success Popup Modal */}
       {showSuccessPopup && (
