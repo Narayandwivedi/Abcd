@@ -275,45 +275,45 @@ const Signup = () => {
     }
   }
 
-  const inputClass = 'w-full px-3 py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-[#1a237e] focus:ring-1 focus:ring-[#1a237e] transition-all text-sm'
-  const labelClass = 'block text-sm font-semibold text-gray-700 mb-1'
+  const inputClass = 'w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-[#1a237e] focus:ring-1 focus:ring-[#1a237e] transition-all text-xs sm:text-sm'
+  const labelClass = 'block text-xs sm:text-sm font-semibold text-gray-700 mb-1'
 
   return (
     <div className='min-h-screen bg-gray-100 flex items-start sm:items-center justify-center p-0 sm:p-4'>
       <div className='w-full max-w-2xl bg-white shadow-none sm:shadow-xl overflow-hidden'>
 
         {/* Header with Logo */}
-        <div className='bg-white px-3 sm:px-6 pt-3 sm:pt-4 pb-2 text-center'>
+        <div className='bg-white px-3 sm:px-6 pt-0 sm:pt-4 pb-2 text-center'>
           <img src='/abcd logo3.png' alt='ABCD Logo' className='mx-auto w-20 h-20 sm:w-24 sm:h-24 object-contain mb-2' />
           <h1 className='text-[#1a237e] text-sm sm:text-lg font-extrabold tracking-wide leading-tight'>
             AGRAWAL BUSINESS & COMMUNITY DEVELOPMENT (ABCD)
           </h1>
-          <p className='text-gray-600 text-[9px] sm:text-[11px] mt-0.5'>
+          <p className='text-gray-600 text-[7px] sm:text-[11px] mt-1 sm:mt-0.5 whitespace-nowrap leading-none sm:leading-normal'>
             Geet Siya, 32 Bangla Parisar, Ashoka Ratan, Shankar Nagar, <span className='font-bold'>RAIPUR</span> (CG) 492004
           </p>
-          <p className='text-gray-800 text-[10px] sm:text-xs mt-1 font-extrabold tracking-wide'>
+          <p className='text-gray-800 text-[7px] sm:text-xs mt-1.5 sm:mt-1 font-extrabold tracking-tight sm:tracking-wide whitespace-nowrap leading-none sm:leading-normal'>
             A UNIT OF CHHATTIGARH PRANTIYA AGRAWAL SANGATHAN (CGPAS)
           </p>
-          <p className='text-gray-500 text-[8px] sm:text-[10px] mt-0.5'>
+          <p className='text-gray-500 text-[6px] sm:text-[10px] mt-1.5 sm:mt-0.5 whitespace-nowrap leading-none sm:leading-normal'>
             Hanuman Market, Ramsagar Para, <span className='font-bold'>RAIPUR</span> (CG) 492001, Tell - 0771-3562323
           </p>
         </div>
 
         {/* VENDOR REGISTRATION FORM banner */}
-        <div className='bg-[#1a237e] py-2.5 text-center'>
+        <div className='bg-[#1a237e] py-2 sm:py-2.5 text-center'>
           <h2 className='text-white text-lg sm:text-xl font-bold tracking-wider'>
             VENDOR REGISTRATION FORM
           </h2>
         </div>
 
         {/* Subtitle */}
-        <div className='px-4 sm:px-6 pt-3 pb-1'>
-          <p className='text-gray-600 text-xs italic'>To apply for membership please complete all details</p>
+        <div className='px-4 sm:px-6 pt-2.5 sm:pt-3 pb-1'>
+          <p className='text-gray-600 text-[11px] sm:text-xs italic'>To apply for membership please complete all details</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className='px-3 sm:px-6 pb-3 sm:pb-4'>
-          <div className='space-y-3'>
+          <div className='space-y-2.5 sm:space-y-3'>
 
             {/* Row: Applicants Name + WhatsApp No */}
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
@@ -338,7 +338,7 @@ const Signup = () => {
               </label>
               <div>
                 <input type='file' accept='image/jpeg,image/jpg,image/png,image/webp' onChange={handlePhotoChange} className='hidden' id='vendor-photo-upload' />
-                <label htmlFor='vendor-photo-upload' className='w-full px-4 py-2.5 bg-gray-100 border border-gray-300 rounded text-sm cursor-pointer hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center justify-center'>
+                <label htmlFor='vendor-photo-upload' className='w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-100 border border-gray-300 rounded text-xs sm:text-sm cursor-pointer hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center justify-center'>
                   <svg className='w-4 h-4 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
                   </svg>
@@ -456,9 +456,9 @@ const Signup = () => {
             </div>
 
             {/* Membership Type */}
-            <div className='bg-[#2e7d32] rounded py-2.5 px-4'>
+            <div className='bg-[#2e7d32] rounded py-2 sm:py-2.5 px-3 sm:px-4'>
               <div className='flex items-center justify-between flex-wrap gap-2'>
-                <span className='text-white font-bold text-sm tracking-wide'>MEMBERSHIP TYPE</span>
+                <span className='text-white font-bold text-xs sm:text-sm tracking-wide'>MEMBERSHIP TYPE</span>
                 <div className='flex items-center gap-4 sm:gap-6'>
                 {['Silver', 'Gold', 'Diamond'].map((type) => (
                   <label key={type} className='flex items-center gap-1.5 cursor-pointer'>
@@ -470,7 +470,7 @@ const Signup = () => {
                       onChange={handleChange}
                       className='w-4 h-4 accent-white'
                     />
-                    <span className={`font-bold text-sm ${
+                    <span className={`font-bold text-xs sm:text-sm ${
                       type === 'Silver' ? 'text-gray-200' :
                       type === 'Gold' ? 'text-yellow-300' :
                       'text-cyan-200'
@@ -482,20 +482,20 @@ const Signup = () => {
             </div>
 
             {/* Membership Benefits Info */}
-            <div className='border border-gray-200 rounded p-3 bg-gray-50 text-xs text-gray-700 space-y-2.5'>
-              <p className='font-bold text-gray-800 underline text-sm'>I hereby agree to all the Terms & Conditions</p>
-              <p className='font-semibold text-gray-600'>Annual Membership charges & privileges</p>
+            <div className='border border-gray-200 rounded p-2.5 sm:p-3 bg-gray-50 text-[11px] sm:text-xs text-gray-700 space-y-2'>
+              <p className='font-bold text-gray-800 underline text-xs sm:text-sm'>I hereby agree to all the Terms & Conditions</p>
+              <p className='font-semibold text-gray-600 text-[11px] sm:text-xs'>Annual Membership charges & privileges</p>
 
               <div>
-                <p className='font-bold text-gray-800'>Silver Membership - Rs. 1999/-</p>
+                <p className='font-bold text-gray-800 text-[11px] sm:text-xs'>Silver Membership - Rs. 1999/-</p>
                 <p className='text-gray-600'>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, 25 Business Card, Every Month Free 02 Advertisements, Gift Vouchers Worth Rs. 2000/-, For Extra Advertisement @Rs. 149 Per Ad</p>
               </div>
               <div>
-                <p className='font-bold text-gray-800'>Gold Membership - Rs. 4999/-</p>
+                <p className='font-bold text-gray-800 text-[11px] sm:text-xs'>Gold Membership - Rs. 4999/-</p>
                 <p className='text-gray-600'>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, Space In Monthly Magazine Voice Of ABCD, 50 Business Card, Premium Office Gifts, Invitation to Our Weekly Video Podcast, Free Sub-domain website, Every Month Free 06 Advertisements, Gift Vouchers Worth Rs. 7500/-, For Extra Advertisement @Rs. 125 Per Ad</p>
               </div>
               <div>
-                <p className='font-bold text-gray-800'>Diamond Membership - Rs. 9999/-</p>
+                <p className='font-bold text-gray-800 text-[11px] sm:text-xs'>Diamond Membership - Rs. 9999/-</p>
                 <p className='text-gray-600'>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, Space In Monthly Magazine Voice Of ABCD, 100 Business Card, Premium Office Gifts, Invitation to Our Weekly Video Podcast, Free Sub-domain website, Every Month Free 15 Advertisements, Gift Vouchers Worth Rs. 20000/-, For Extra Advertisement @Rs. 99 Per Ad</p>
               </div>
             </div>
@@ -507,23 +507,23 @@ const Signup = () => {
                   Membership Fees (Rs.) <span className='text-red-500'>*</span>
                 </label>
                 <div className='relative'>
-                  <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm'>₹</span>
+                  <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-xs sm:text-sm'>₹</span>
                   <input type='number' name='membershipFees' value={formData.membershipFees} onChange={handleChange} min='1' className={inputClass + ' pl-7'} placeholder='Amount' />
                 </div>
               </div>
             </div>
 
             {/* Payment QR + Screenshot Upload */}
-            <div className='border border-gray-200 rounded p-3 bg-gray-50'>
-              <div className='flex items-center justify-between bg-white border border-gray-200 rounded p-3 mb-3'>
+            <div className='border border-gray-200 rounded p-2.5 sm:p-3 bg-gray-50'>
+              <div className='flex items-center justify-between bg-white border border-gray-200 rounded p-2.5 sm:p-3 mb-2.5 sm:mb-3'>
                 <div className='pr-3'>
-                  <p className='text-[10px] text-gray-600'>Scan to pay</p>
-                  <p className='text-xs font-mono text-gray-900 break-all'>{UPI_ID}</p>
+                  <p className='text-[9px] sm:text-[10px] text-gray-600'>Scan to pay</p>
+                  <p className='text-[11px] sm:text-xs font-mono text-gray-900 break-all'>{UPI_ID}</p>
                 </div>
                 <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiQrValue)}`}
                   alt='UPI QR Code'
-                  className='w-20 h-20 sm:w-24 sm:h-24 border border-gray-200 rounded bg-white p-1'
+                  className='w-16 h-16 sm:w-24 sm:h-24 border border-gray-200 rounded bg-white p-1'
                 />
               </div>
 
@@ -537,7 +537,7 @@ const Signup = () => {
                 />
                 <label
                   htmlFor='payment-screenshot-upload'
-                  className='w-full px-3 py-2.5 bg-white border border-gray-300 rounded text-sm cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-center'
+                  className='w-full px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded text-xs sm:text-sm cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-center'
                 >
                   <svg className='w-4 h-4 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
@@ -565,13 +565,13 @@ const Signup = () => {
             {/* Error Message */}
             {error && (
               <div className='bg-red-50 border-l-4 border-red-500 p-3'>
-                <p className='text-sm font-semibold text-red-800'>{error}</p>
+                <p className='text-xs sm:text-sm font-semibold text-red-800'>{error}</p>
               </div>
             )}
 
             {/* Submit Button */}
             <button type='submit' disabled={loading}
-              className='w-full bg-[#2e7d32] text-white font-bold py-3 rounded hover:bg-[#1b5e20] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm'>
+              className='w-full bg-[#2e7d32] text-white font-bold py-2.5 sm:py-3 rounded hover:bg-[#1b5e20] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-xs sm:text-sm'>
               {loading ? (
                 <>
                   <Loader2 className='w-5 h-5 animate-spin' />
@@ -603,7 +603,7 @@ const Signup = () => {
         {/* Go to Home */}
         <div className='mt-3 px-3 sm:px-6 pb-3 sm:pb-4'>
           <a href='https://abcdvyapar.com' target='_blank' rel='noopener noreferrer'
-            className='w-full bg-[#c62828] text-white font-bold py-2.5 rounded hover:bg-[#b71c1c] transition-all flex items-center justify-center text-sm'>
+            className='w-full bg-[#c62828] text-white font-bold py-2 sm:py-2.5 rounded hover:bg-[#b71c1c] transition-all flex items-center justify-center text-xs sm:text-sm'>
             Go to Home
           </a>
         </div>

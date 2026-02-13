@@ -63,11 +63,11 @@ const Login = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center sm:p-4'>
+    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-start sm:items-center justify-center sm:p-4'>
       {/* Main Container */}
       <div className='w-full max-w-md'>
         {/* Logo & Brand */}
-        <div className='text-center mb-6 sm:mb-8 px-6 sm:px-0 pt-8 sm:pt-0'>
+        <div className='text-center mb-6 sm:mb-8 px-6 sm:px-0 pt-0 sm:pt-0'>
           <div className='inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl mb-3 sm:mb-4 shadow-lg'>
             <Store className='w-7 h-7 sm:w-8 sm:h-8 text-white' />
           </div>

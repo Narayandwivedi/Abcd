@@ -50,7 +50,7 @@ const MultiCategorySelector = ({
 
   return (
     <div className='space-y-2'>
-      <label className='block text-sm font-semibold text-gray-700'>
+      <label className='block text-xs sm:text-sm font-semibold text-gray-700'>
         Major Business Category & Sub Category {required && <span className='text-red-500'>*</span>}
       </label>
 
@@ -59,12 +59,12 @@ const MultiCategorySelector = ({
         const subcategories = selectedCategory?.subcategories || []
 
         return (
-          <div key={index} className='flex items-start gap-2'>
-            <div className='flex-1 grid grid-cols-2 gap-2'>
+          <div key={index} className='flex items-start gap-1.5 sm:gap-2'>
+            <div className='flex-1 grid grid-cols-2 gap-1.5 sm:gap-2'>
               <select
                 value={item.category || ''}
                 onChange={(e) => updateRow(index, { category: e.target.value, subCategory: '' })}
-                className='w-full px-3 py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all text-sm'
+                className='w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all text-xs sm:text-sm'
               >
                 <option value=''>Select Category</option>
                 {categories.map((category) => (
@@ -78,7 +78,7 @@ const MultiCategorySelector = ({
                 value={item.subCategory || ''}
                 onChange={(e) => updateRow(index, { subCategory: e.target.value })}
                 disabled={!item.category}
-                className='w-full px-3 py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all text-sm disabled:opacity-50'
+                className='w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all text-xs sm:text-sm disabled:opacity-50'
               >
                 <option value=''>Select Sub Category</option>
                 {subcategories.map((subcat) => (
@@ -93,7 +93,7 @@ const MultiCategorySelector = ({
               <button
                 type='button'
                 onClick={() => removeCategory(index)}
-                className='mt-1.5 p-1.5 hover:bg-red-100 rounded-full transition-colors'
+                className='mt-1 p-1.5 hover:bg-red-100 rounded-full transition-colors'
               >
                 <X className='w-4 h-4 text-red-500' />
               </button>
@@ -106,7 +106,7 @@ const MultiCategorySelector = ({
         <button
           type='button'
           onClick={addCategory}
-          className={`w-full px-4 py-2 bg-green-50 border border-dashed border-green-400 text-green-700 rounded hover:border-green-600 hover:bg-green-100 transition-all flex items-center justify-center gap-2 font-semibold text-sm ${className}`}
+          className={`w-full px-3 sm:px-4 py-2 bg-green-50 border border-dashed border-green-400 text-green-700 rounded hover:border-green-600 hover:bg-green-100 transition-all flex items-center justify-center gap-1.5 sm:gap-2 font-semibold text-xs sm:text-sm ${className}`}
         >
           <Plus className='w-4 h-4' />
           Add More Category
