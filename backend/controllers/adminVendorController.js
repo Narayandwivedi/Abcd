@@ -35,7 +35,7 @@ const buildVendorReferralCode = ({ state, certificateNumber }) => {
 const getAllVendors = async (req, res) => {
   try {
     const vendors = await vendorModel.find()
-      .select('-password')
+      .select('-password -__v')
       .populate('activeCertificate', 'certificateNumber downloadLink issueDate expiryDate renewalCount status pdfDeleted')
       .sort({ createdAt: -1 });
 

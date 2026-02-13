@@ -648,8 +648,17 @@ ABCD Team`
                             <div className='font-semibold text-gray-800'>{vendor.businessName}</div>
                             <div className='text-xs text-gray-500'>Owner: {vendor.ownerName}</div>
                             <div className='text-xs text-gray-500'>
-                              {vendor.city || 'N/A'}{vendor.state ? `, ${vendor.state}` : ''}
+                              {[vendor.city, vendor.district, vendor.state].filter(Boolean).join(', ') || 'N/A'}
                             </div>
+                            {vendor.gstPan && (
+                              <div className='text-xs text-gray-500'>PAN/GST: {vendor.gstPan}</div>
+                            )}
+                            {vendor.membershipType && (
+                              <div className='text-xs text-gray-500'>Membership Type: {vendor.membershipType}</div>
+                            )}
+                            {vendor.referralCode && (
+                              <div className='text-xs text-purple-600 font-semibold'>Referral: {vendor.referralCode}</div>
+                            )}
                             {vendor.activeCertificate?.certificateNumber && (
                               <div className='text-xs text-blue-600 font-semibold mt-1'>
                                 Cert: {vendor.activeCertificate?.certificateNumber}
@@ -674,6 +683,9 @@ ABCD Team`
                           {vendor.email && (
                             <div className='text-xs text-gray-600'>{vendor.email}</div>
                           )}
+                          {vendor.websiteUrl && (
+                            <div className='text-xs text-gray-600 truncate'>Web: {vendor.websiteUrl}</div>
+                          )}
                         </div>
                       </td>
                       <td className='px-6 py-4'>
@@ -696,12 +708,18 @@ ABCD Team`
                               ₹{vendor.membershipFees}
                             </span>
                           )}
+                          {vendor.referralId && (
+                            <div className='text-xs text-gray-500 mt-1'>Referral ID: {vendor.referralId}</div>
+                          )}
                         </div>
                       </td>
                       <td className='px-6 py-4'>
                         <div className='text-sm'>
                           {vendor.utrNumber && (
                             <div className='text-gray-600'>UTR: {vendor.utrNumber}</div>
+                          )}
+                          {vendor.amountPaid && (
+                            <div className='text-gray-600 text-xs'>Amount Paid: ₹{vendor.amountPaid}</div>
                           )}
                           {vendor.paymentScreenshot && (
                             <a
@@ -892,9 +910,15 @@ ABCD Team`
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
                           </svg>
                           <span className='text-left break-words'>
-                            {vendor.city || 'N/A'}{vendor.state ? `, ${vendor.state}` : ''}
+                            {[vendor.city, vendor.district, vendor.state].filter(Boolean).join(', ') || 'N/A'}
                           </span>
                         </div>
+                        {vendor.gstPan && (
+                          <p className='text-[11px] text-gray-600 mt-1'>PAN/GST: {vendor.gstPan}</p>
+                        )}
+                        {vendor.referralCode && (
+                          <p className='text-[11px] text-purple-600 font-semibold mt-0.5'>Referral: {vendor.referralCode}</p>
+                        )}
                       </div>
                     </div>
                   </div>
