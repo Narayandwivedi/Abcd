@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import * as XLSX from 'xlsx'
 
 const Dashboard = () => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
   const [exporting, setExporting] = useState(false)
   const [exportOptions, setExportOptions] = useState({
     users: false,
@@ -58,6 +59,27 @@ const Dashboard = () => {
     return flattened
   }
 
+  const toAbsoluteUploadUrl = (value) => {
+    if (typeof value !== 'string') return value
+    const trimmed = value.trim()
+    if (!trimmed || /^https?:\/\//i.test(trimmed)) return value
+    const normalizedPath = trimmed.replace(/\\/g, '/')
+    const relativePath = normalizedPath.replace(/^\.?\//, '')
+    if (relativePath.startsWith('upload/')) return `${BACKEND_URL}/${relativePath}`
+    if (relativePath.startsWith('uploads/')) return `${BACKEND_URL}/${relativePath}`
+    if (normalizedPath.startsWith('/upload/')) return `${BACKEND_URL}${normalizedPath}`
+    if (normalizedPath.startsWith('/uploads/')) return `${BACKEND_URL}${normalizedPath}`
+    return value
+  }
+
+  const normalizeExcelRow = (row) => {
+    const normalizedRow = {}
+    for (const key in row) {
+      normalizedRow[key] = toAbsoluteUploadUrl(row[key])
+    }
+    return normalizedRow
+  }
+
   const handleExport = async (format) => {
     const selected = Object.entries(exportOptions).filter(([_, v]) => v).map(([k]) => k)
     if (selected.length === 0) {
@@ -85,7 +107,7 @@ const Dashboard = () => {
             if (format === 'json') {
               downloadFile(data, `${key}_${timestamp}.json`, 'json')
             } else {
-              const flatData = data.map(item => flattenObject(item))
+              const flatData = data.map(item => normalizeExcelRow(flattenObject(item)))
               downloadFile(flatData, `${key}_${timestamp}.xlsx`, 'excel')
             }
             toast.success(`${key} exported successfully (${response.data.count} records)`)
