@@ -1,236 +1,93 @@
-import { useState, useEffect } from 'react'
+const demoAds = [
+  {
+    id: 'ad1',
+    label: 'ad1',
+    title: 'Festival Offer',
+    gradient: 'from-rose-500 via-orange-500 to-amber-500',
+    icon: 'star'
+  },
+  {
+    id: 'ad2',
+    label: 'ad2',
+    title: 'New Launch',
+    gradient: 'from-blue-500 via-cyan-500 to-teal-500',
+    icon: 'spark'
+  },
+  {
+    id: 'ad3',
+    label: 'ad3',
+    title: 'Limited Deal',
+    gradient: 'from-violet-500 via-fuchsia-500 to-pink-500',
+    icon: 'bolt'
+  },
+  {
+    id: 'ad4',
+    label: 'ad4',
+    title: 'Best Seller',
+    gradient: 'from-emerald-500 via-green-500 to-lime-500',
+    icon: 'crown'
+  }
+]
 
-const AdsCarousel = () => {
-  const [adsData, setAdsData] = useState([])
-  const [adsLoading, setAdsLoading] = useState(true)
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024)
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(true)
-  const [isPaused, setIsPaused] = useState(false)
-  const [touchStart, setTouchStart] = useState(0)
-  const [touchEnd, setTouchEnd] = useState(0)
-
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
-
-  // Fallback static images if no ads in database
-  const adImages = [
-    '/ad1.webp',
-    '/ad2.webp',
-    '/ad3.webp',
-    '/ad4.webp',
-    '/ad5.webp',
-    '/ad6.webp',
-    '/ad7.webp',
-    '/ad8.webp',
-    '/ad9.webp',
-    '/ad10.webp',
-    '/ad11.webp',
-    '/ad12.webp',
-    '/ad13.webp',
-    '/ad14.webp',
-    '/ad15.webp',
-    '/ad16.webp'
-  ]
-
-  // Use fetched ads if available, otherwise fallback to static images
-  // For database ads, prepend BACKEND_URL to the image path
-  const displayAds = adsData.length > 0
-    ? adsData.map(ad => ({ ...ad, adImg: `${BACKEND_URL}${ad.adImg}` }))
-    : adImages.map((img, idx) => ({ adImg: img, _id: idx }))
-
-  // Fetch ads from database
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        setAdsLoading(true)
-        const response = await fetch(`${BACKEND_URL}/api/ads/active`)
-        const data = await response.json()
-
-        if (data.success && data.ads.length > 0) {
-          setAdsData(data.ads)
-        } else {
-          // Fallback to static images if no ads in database
-          setAdsData([])
-        }
-      } catch (error) {
-        console.error('Error fetching ads:', error)
-        setAdsData([]) // Fallback to empty array on error
-      } finally {
-        setAdsLoading(false)
-      }
-    }
-
-    fetchAds()
-  }, [BACKEND_URL])
-
-  // Initialize currentSlide after displayAds is ready
-  useEffect(() => {
-    if (displayAds.length > 0 && currentSlide === 0) {
-      setCurrentSlide(displayAds.length)
-    }
-  }, [displayAds.length])
-
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024)
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  // Auto-slide functionality - infinite scroll to the right
-  useEffect(() => {
-    if (isPaused || displayAds.length === 0) return // Don't auto-scroll when paused or no ads
-
-    const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => prev + 1)
-    }, 1600) // Change slide every 1.6 seconds
-
-    return () => clearInterval(slideInterval)
-  }, [isPaused, displayAds.length])
-
-  // Reset position for infinite loop effect
-  useEffect(() => {
-    if (displayAds.length === 0) return
-
-    // When we reach the end of the second set, instantly reset to the first set
-    if (currentSlide >= displayAds.length * 2) {
-      setTimeout(() => {
-        setIsTransitioning(false)
-        setCurrentSlide(displayAds.length)
-        setTimeout(() => setIsTransitioning(true), 50)
-      }, 500) // Wait for transition to complete
-    }
-    // When going backward past the first set, reset to the second set
-    if (currentSlide < displayAds.length) {
-      setIsTransitioning(false)
-      setCurrentSlide(displayAds.length)
-      setTimeout(() => setIsTransitioning(true), 50)
-    }
-  }, [currentSlide, displayAds.length])
-
-  // Manual navigation functions
-  const handlePrevSlide = () => {
-    setCurrentSlide((prev) => prev - 1)
+const AdIcon = ({ type }) => {
+  if (type === 'spark') {
+    return (
+      <svg className='w-5 h-5 md:w-6 md:h-6' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+        <path strokeLinecap='round' strokeLinejoin='round' d='M12 3l1.9 4.2L18 9l-4.1 1.8L12 15l-1.9-4.2L6 9l4.1-1.8L12 3z' />
+      </svg>
+    )
   }
 
-  const handleNextSlide = () => {
-    setCurrentSlide((prev) => prev + 1)
+  if (type === 'bolt') {
+    return (
+      <svg className='w-5 h-5 md:w-6 md:h-6' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+        <path strokeLinecap='round' strokeLinejoin='round' d='M13 2L5 14h6l-1 8 9-12h-6l1-8z' />
+      </svg>
+    )
   }
 
-  // Touch event handlers
-  const handleTouchStart = (e) => {
-    setTouchStart(e.targetTouches[0].clientX)
-    setIsPaused(true) // Pause auto-scroll on touch
-  }
-
-  const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX)
-  }
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) {
-      setIsPaused(false)
-      return
-    }
-
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
-
-    if (isLeftSwipe) {
-      handleNextSlide() // Swipe left = next slide
-    } else if (isRightSwipe) {
-      handlePrevSlide() // Swipe right = previous slide
-    }
-
-    // Reset touch values and resume auto-scroll
-    setTouchStart(0)
-    setTouchEnd(0)
-    setIsPaused(false)
-  }
-
-  // Mouse event handlers for desktop
-  const handleMouseDown = () => {
-    setIsPaused(true)
-  }
-
-  const handleMouseUp = () => {
-    setIsPaused(false)
-  }
-
-  const handleAdClick = (index) => {
-    // Navigate to ad detail or do nothing for static images
-    console.log('Ad clicked:', index)
-  }
-
-  // Don't render if loading or no ads
-  if (adsLoading || displayAds.length === 0) {
-    return null
+  if (type === 'crown') {
+    return (
+      <svg className='w-5 h-5 md:w-6 md:h-6' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+        <path strokeLinecap='round' strokeLinejoin='round' d='M3 8l4.5 4 4.5-7 4.5 7L21 8l-2 11H5L3 8z' />
+      </svg>
+    )
   }
 
   return (
+    <svg className='w-5 h-5 md:w-6 md:h-6' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+      <path strokeLinecap='round' strokeLinejoin='round' d='M12 3l2.2 4.6L19 8.3l-3.5 3.4.8 4.9L12 14.8 7.7 16.6l.8-4.9L5 8.3l4.8-.7L12 3z' />
+    </svg>
+  )
+}
+
+const DemoAdCard = ({ ad }) => {
+  return (
+    <div className={`group relative h-32 md:h-40 rounded-xl bg-gradient-to-br ${ad.gradient} p-[1px] shadow-md hover:shadow-xl transition-all duration-300`}>
+      <div className='relative h-full rounded-[11px] bg-white/95 p-4 md:p-5 overflow-hidden flex flex-col'>
+        <div className='absolute -top-10 -right-8 w-24 h-24 rounded-full bg-white/35 blur-lg' />
+        <span className='relative text-[10px] md:text-xs font-semibold text-gray-500'>{ad.label}</span>
+
+        <div className='relative flex-1 flex items-center justify-center'>
+          <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gradient-to-br ${ad.gradient} text-white flex items-center justify-center shadow-lg`}>
+            <AdIcon type={ad.icon} />
+          </div>
+        </div>
+
+        <p className='relative text-center text-sm md:text-base font-semibold text-gray-900'>{ad.title}</p>
+      </div>
+    </div>
+  )
+}
+
+const AdsCarousel = () => {
+  return (
     <section className='pb-0 lg:pb-1 bg-white'>
       <div className='container mx-auto px-4'>
-        {/* Horizontal sliding carousel for both Mobile and Desktop */}
-        <div
-          className='relative mx-auto overflow-hidden cursor-grab active:cursor-grabbing max-w-7xl'
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        >
-          {/* Previous Button - Mobile Only */}
-          <button
-            onClick={handlePrevSlide}
-            className='lg:hidden absolute left-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1 shadow-md transition-all'
-            aria-label='Previous slide'
-          >
-            <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
-            </svg>
-          </button>
-
-          {/* Next Button - Mobile Only */}
-          <button
-            onClick={handleNextSlide}
-            className='lg:hidden absolute right-1 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 rounded-full p-1 shadow-md transition-all'
-            aria-label='Next slide'
-          >
-            <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-            </svg>
-          </button>
-
-          <div
-            className='flex'
-            style={{
-              transform: `translateX(calc(-${currentSlide * (isDesktop ? 20 : 80)}%))`,
-              transition: isTransitioning ? 'transform 500ms ease-in-out' : 'none'
-            }}
-          >
-            {/* Render 3 sets of images for seamless infinite scrolling */}
-            {[...Array(3)].map((_, setIndex) =>
-              displayAds.map((ad, index) => (
-                <div key={`${setIndex}-${index}`} className='flex-shrink-0 px-0.5 lg:px-2' style={{ width: isDesktop ? '20%' : '80%' }}>
-                  <div
-                    onClick={() => ad.link ? window.open(ad.link, '_blank') : handleAdClick(index)}
-                    className='bg-white rounded-lg lg:rounded-xl shadow-lg overflow-hidden cursor-pointer border border-gray-200 flex items-center justify-center bg-gray-50 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1'
-                    style={{ height: isDesktop ? '160px' : '150px' }}
-                  >
-                    <img
-                      src={ad.adImg}
-                      alt={ad.title || `Advertisement ${index + 1}`}
-                      className='w-full h-full object-contain p-2'
-                    />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+        <div className='max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3'>
+          {demoAds.map((ad) => (
+            <DemoAdCard key={ad.id} ad={ad} />
+          ))}
         </div>
       </div>
     </section>

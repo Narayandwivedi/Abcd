@@ -137,7 +137,7 @@ const Home = () => {
         navigate={navigate}
       />
 
-      {/* <AdsCarousel /> */}
+      <AdsCarousel />
 
       <BuyLeadModal
         showBuyForm={showBuyForm}
