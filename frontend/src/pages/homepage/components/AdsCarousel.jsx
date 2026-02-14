@@ -16,7 +16,7 @@ const HOT_DEAL_FILES = [
 ]
 
 const COLLAPSE_MS = 720
-const EXPAND_MS = 560
+const REVEAL_MS = 520
 const SWITCH_INTERVAL_MS = 1800
 
 const hotDealAds = HOT_DEAL_FILES.map((fileName, index) => ({
@@ -56,18 +56,13 @@ const AdsCarousel = () => {
     }
 
     let collapseTimerId = null
-    let expandTimerId = null
 
     const intervalId = setInterval(() => {
       setAnimationPhase('collapsing')
 
       collapseTimerId = setTimeout(() => {
         setGroupIndex((prev) => (prev + 1) % adGroups.length)
-        setAnimationPhase('expanding')
-
-        expandTimerId = setTimeout(() => {
-          setAnimationPhase('idle')
-        }, EXPAND_MS)
+        setAnimationPhase('revealing')
       }, COLLAPSE_MS)
     }, SWITCH_INTERVAL_MS)
 
@@ -76,38 +71,26 @@ const AdsCarousel = () => {
       if (collapseTimerId) {
         clearTimeout(collapseTimerId)
       }
-      if (expandTimerId) {
-        clearTimeout(expandTimerId)
-      }
     }
   }, [adGroups.length])
 
   const visibleAds = adGroups[groupIndex] || hotDealAds.slice(0, 4)
 
   const isCollapsing = animationPhase === 'collapsing'
-  const isExpanding = animationPhase === 'expanding'
-
   const gridAnimationStyle = {
     transitionProperty: 'transform, opacity, filter',
-    transitionDuration: `${isCollapsing ? COLLAPSE_MS : EXPAND_MS}ms`,
+    transitionDuration: `${isCollapsing ? COLLAPSE_MS : REVEAL_MS}ms`,
     transitionTimingFunction: isCollapsing
-      ? 'cubic-bezier(0.55, 0.02, 0.26, 0.99)'
-      : 'cubic-bezier(0.16, 1, 0.3, 1)',
-    transformOrigin: 'center top',
+      ? 'cubic-bezier(0.4, 0, 0.2, 1)'
+      : 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+    transformOrigin: 'center center',
     willChange: 'transform, opacity, filter',
-    backfaceVisibility: 'hidden',
     transform:
       isCollapsing
-        ? 'perspective(1200px) rotateX(24deg) scale(0.86, 0.8) translateY(-14px)'
-        : isExpanding
-          ? 'perspective(1200px) rotateX(-6deg) scale(1.02, 1.03) translateY(2px)'
-          : 'perspective(1200px) rotateX(0deg) scale(1, 1) translateY(0px)',
-    opacity: isCollapsing ? 0.22 : 1,
-    filter: isCollapsing
-      ? 'blur(2px) saturate(0.92) brightness(0.9)'
-      : isExpanding
-        ? 'blur(0px) saturate(1.04)'
-        : 'blur(0px) saturate(1)'
+        ? 'scale(0.94) translateY(-6px)'
+        : 'scale(1) translateY(0px)',
+    opacity: isCollapsing ? 0.06 : 1,
+    filter: isCollapsing ? 'blur(2px) saturate(0.95)' : 'blur(0px) saturate(1)'
   }
 
   return (
