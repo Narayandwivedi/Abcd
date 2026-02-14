@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from 'react'
+
 const demoAds = [
   {
     id: 'ad1',
@@ -25,6 +27,34 @@ const demoAds = [
     label: 'ad4',
     title: 'Best Seller',
     gradient: 'from-emerald-500 via-green-500 to-lime-500',
+    icon: 'crown'
+  },
+  {
+    id: 'ad5',
+    label: 'ad5',
+    title: 'Daily Deals',
+    gradient: 'from-indigo-500 via-blue-500 to-sky-500',
+    icon: 'spark'
+  },
+  {
+    id: 'ad6',
+    label: 'ad6',
+    title: 'Hot Price',
+    gradient: 'from-red-500 via-rose-500 to-pink-500',
+    icon: 'bolt'
+  },
+  {
+    id: 'ad7',
+    label: 'ad7',
+    title: 'Top Rated',
+    gradient: 'from-amber-500 via-yellow-500 to-orange-500',
+    icon: 'star'
+  },
+  {
+    id: 'ad8',
+    label: 'ad8',
+    title: 'Weekend Sale',
+    gradient: 'from-teal-500 via-emerald-500 to-green-500',
     icon: 'crown'
   }
 ]
@@ -81,11 +111,48 @@ const DemoAdCard = ({ ad }) => {
 }
 
 const AdsCarousel = () => {
+  const [groupIndex, setGroupIndex] = useState(0)
+  const [isCollapsing, setIsCollapsing] = useState(false)
+
+  const adGroups = useMemo(() => {
+    const groups = []
+    for (let i = 0; i < demoAds.length; i += 4) {
+      groups.push(demoAds.slice(i, i + 4))
+    }
+    return groups
+  }, [])
+
+  useEffect(() => {
+    let collapseTimerId = null
+
+    const intervalId = setInterval(() => {
+      setIsCollapsing(true)
+
+      collapseTimerId = setTimeout(() => {
+        setGroupIndex((prev) => (prev + 1) % adGroups.length)
+        setIsCollapsing(false)
+      }, 230)
+    }, 1500)
+
+    return () => {
+      clearInterval(intervalId)
+      if (collapseTimerId) {
+        clearTimeout(collapseTimerId)
+      }
+    }
+  }, [adGroups.length])
+
+  const visibleAds = adGroups[groupIndex] || demoAds.slice(0, 4)
+
   return (
     <section className='pb-0 lg:pb-1 bg-white'>
       <div className='container mx-auto px-4'>
-        <div className='max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3'>
-          {demoAds.map((ad) => (
+        <div
+          className={`max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 transition-all duration-300 ${
+            isCollapsing ? 'scale-95 opacity-85' : 'scale-100 opacity-100'
+          }`}
+        >
+          {visibleAds.map((ad) => (
             <DemoAdCard key={ad.id} ad={ad} />
           ))}
         </div>
