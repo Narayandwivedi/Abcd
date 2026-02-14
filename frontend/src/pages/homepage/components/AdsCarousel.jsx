@@ -17,7 +17,7 @@ const HOT_DEAL_FILES = [
 
 const COLLAPSE_MS = 720
 const REVEAL_MS = 520
-const SWITCH_INTERVAL_MS = 1800
+const SWITCH_INTERVAL_MS = 2500
 
 const hotDealAds = HOT_DEAL_FILES.map((fileName, index) => ({
   id: `hot-deal-${index + 1}`,
