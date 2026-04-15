@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import MultiCategorySelector from '../components/MultiCategorySelector'
@@ -136,7 +136,6 @@ const Signup = () => {
     const { name, value } = e.target
     if (name === 'membershipType') {
       const membershipFeeMap = {
-        Silver: '2000',
         Gold: '5000',
         Diamond: '10000',
         Platinum: '25000',
@@ -574,7 +573,7 @@ const Signup = () => {
               <div className='space-y-2'>
                 <span className='text-white font-bold text-xs sm:text-sm tracking-wide block'>MEMBERSHIP TYPE</span>
                 <div className='grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3'>
-                {['Silver', 'Gold', 'Diamond', 'Platinum'].map((type) => (
+                {['Gold', 'Diamond', 'Platinum'].map((type) => (
                   <label key={type} className='flex items-center gap-1.5 cursor-pointer'>
                     <input
                       type='checkbox'
@@ -587,7 +586,6 @@ const Signup = () => {
                       className='w-3.5 h-3.5 sm:w-4 sm:h-4 accent-white'
                     />
                     <span className={`font-bold text-[10px] sm:text-sm ${
-                      type === 'Silver' ? 'text-gray-200' :
                       type === 'Gold' ? 'text-yellow-300' :
                       type === 'Diamond' ? 'text-cyan-200' :
                       'text-pink-200'
@@ -761,10 +759,6 @@ const Signup = () => {
             <h3 className='text-base sm:text-lg font-bold text-gray-800 mb-3'>Annual Membership Charges & Privileges</h3>
 
             <div className='space-y-3 text-xs sm:text-sm text-gray-700'>
-              <div>
-                <p className='font-bold text-gray-900'>Silver Membership - Rs. 2000/-</p>
-                <p>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, 25 Business Card, Every Month Free 02 Advertisements, Gift Vouchers Worth Rs. 2000/-, For Extra Advertisement @Rs. 149 Per Ad</p>
-              </div>
               <div>
                 <p className='font-bold text-gray-900'>Gold Membership - Rs. 5000/-</p>
                 <p>Welcome Kit, Premium Framed Vendor Certificate, Vendor ID Card, Space In Monthly Magazine Voice Of ABCD, 50 Business Card, Premium Office Gifts, Invitation to Our Weekly Video Podcast, Free Sub-domain website, Every Month Free 06 Advertisements, Gift Vouchers Worth Rs. 7500/-, For Extra Advertisement @Rs. 125 Per Ad</p>
