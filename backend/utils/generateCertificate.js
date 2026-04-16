@@ -2,30 +2,23 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-// Generate unique certificate number in format: YM-CG-{year}-{month}-{6-digit-number}
-// Example: YM-CG-2025-10-001001
+// Generate unique certificate number in format: CG00001 (up to 9) or CG000010 (above 9)
 const generateCertificateNumber = async () => {
   const Certificate = require('../models/Certificate');
 
   // Count total certificates issued
   const certificateCount = await Certificate.countDocuments();
 
-  // Get current year and month
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11, so add 1
-
-  // Generate certificate number starting from 001001
-  // The incrementing number starts at 1 and grows with each new certificate
+  // Generate certificate number starting from 1
   const incrementingNumber = certificateCount + 1;
 
-  // Pad the number to 6 digits (001001, 001002, etc.)
-  const paddedNumber = String(incrementingNumber).padStart(6, '0');
-
-  // Format: YM-CG-{year}-{month}-{6-digit-number}
-  const certificateNumber = `YM-CG-${currentYear}-${currentMonth}-${paddedNumber}`;
-
-  return certificateNumber;
+  if (incrementingNumber <= 9) {
+    // 5 digits padding: CG00001 to CG00009 (total 7 characters)
+    return `CG${String(incrementingNumber).padStart(5, '0')}`;
+  } else {
+    // 6 digits padding: CG000010, CG000100, etc. (total 8 characters)
+    return `CG${String(incrementingNumber).padStart(6, '0')}`;
+  }
 };
 
 // Generate certificate PDF
@@ -40,11 +33,8 @@ const generateCertificatePDF = async (user) => {
     // Generate unique certificate number
     const certificateNumber = await generateCertificateNumber();
 
-    // Generate referral code from last 5 digits of certificate number
-    // Example: YM-CG-2025-10-001001 -> CG01001
-    const certificateDigits = certificateNumber.split('-').pop(); // Gets "001001"
-    const last5Digits = certificateDigits.slice(-5); // Gets "01001"
-    const referralCode = `CG${last5Digits}`; // Creates "CG01001"
+    // The referral code is now identical to the certificate number
+    const referralCode = certificateNumber;
 
     const fileName = `ABCD_MEMBER_CERTIFICATE_${certificateNumber}.pdf`;
     const filePath = path.join(certificatesDir, fileName);
@@ -340,10 +330,8 @@ const regenerateCertificatePDF = async (user, existingCertificateNumber) => {
     // Use the existing certificate number
     const certificateNumber = existingCertificateNumber;
 
-    // Generate referral code from last 5 digits of certificate number
-    const certificateDigits = certificateNumber.split('-').pop(); // Gets "001001"
-    const last5Digits = certificateDigits.slice(-5); // Gets "01001"
-    const referralCode = `CG${last5Digits}`; // Creates "CG01001"
+    // The referral code is now identical to the certificate number
+    const referralCode = certificateNumber;
 
     const fileName = `ABCD_MEMBER_CERTIFICATE_${certificateNumber}.pdf`;
     const filePath = path.join(certificatesDir, fileName);
