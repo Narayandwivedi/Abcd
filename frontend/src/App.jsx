@@ -209,7 +209,7 @@ const App = () => {
           <Route path='/signup' element={<Signup />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
-          <Route path='/category/:categoryName' element={<CategoryPage />} />
+          <Route path='/category/:categorySlug' element={<CategoryPage />} />
           <Route path='/:type/:id' element={<AdDetail />} />
         </Routes>
       </div>

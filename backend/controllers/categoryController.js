@@ -1,4 +1,5 @@
 const Category = require("../models/Category");
+const Vendor = require("../models/Vendor");
 
 // Helper function to generate slug from name
 const generateSlug = (name) => {
@@ -14,7 +15,20 @@ const generateSlug = (name) => {
 // Get all categories (public - for frontend)
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.getActiveCategories();
+    const { hasVendors } = req.query;
+    let categories = await Category.getActiveCategories();
+
+    // If hasVendors is true, filter only categories that have at least one verified & active vendor
+    if (hasVendors === 'true') {
+      const activeVendorCategoryIds = await Vendor.distinct('businessCategories.categoryId', {
+        isVerified: true,
+        isActive: true,
+        'businessCategories.categoryId': { $ne: null }
+      });
+      
+      const activeIdStrings = activeVendorCategoryIds.map(id => id.toString());
+      categories = categories.filter(cat => activeIdStrings.includes(cat._id.toString()));
+    }
 
     return res.status(200).json({
       success: true,
@@ -82,7 +96,7 @@ const getCategoryById = async (req, res) => {
 
     let category;
     // Check if it's a MongoDB ObjectId or a slug
-    if (categoryId.match(/^[0-9a-fA-F]{24}$/)) {
+    if (categoryId && categoryId.match(/^[0-9a-fA-F]{24}$/)) {
       category = await Category.findById(categoryId);
     } else {
       category = await Category.findBySlug(categoryId);
@@ -101,6 +115,60 @@ const getCategoryById = async (req, res) => {
     });
   } catch (error) {
     console.error('Get category by ID error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Get vendors by category slug
+const getVendorsByCategory = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { city } = req.query;
+
+    // 1. Find the category by slug
+    const category = await Category.findOne({ slug, isActive: true });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found"
+      });
+    }
+
+    // 2. Build query for vendors
+    const vendorQuery = {
+      isVerified: true,
+      isActive: true,
+      'businessCategories.categoryId': category._id
+    };
+
+    // Optional city filter
+    if (city) {
+      vendorQuery.city = { $regex: new RegExp(city, 'i') };
+    }
+
+    // 3. Find vendors
+    const vendors = await Vendor.find(vendorQuery)
+      .select('businessName ownerName mobile email city state businessCategories passportPhoto owners')
+      .sort({ businessName: 1 });
+
+    return res.status(200).json({
+      success: true,
+      category: {
+        _id: category._id,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        icon: category.icon
+      },
+      count: vendors.length,
+      vendors
+    });
+  } catch (error) {
+    console.error('Get vendors by category error:', error);
     return res.status(500).json({
       success: false,
       message: error.message
@@ -473,6 +541,7 @@ module.exports = {
   getAllCategories,
   getAllCategoriesAdmin,
   getCategoryById,
+  getVendorsByCategory,
   createCategory,
   updateCategory,
   deleteCategory,

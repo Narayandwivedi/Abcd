@@ -83,6 +83,10 @@ const handleVendorSignup = async (req, res) => {
       }
       item.category = item.category.trim();
       item.subCategory = item.subCategory.trim();
+      
+      // Handle IDs if provided by frontend
+      if (item.categoryId) item.categoryId = item.categoryId.trim();
+      if (item.subcategoryId) item.subcategoryId = item.subcategoryId.trim();
     }
 
     // Convert mobile to number for consistent comparison

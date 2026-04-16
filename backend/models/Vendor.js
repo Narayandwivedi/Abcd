@@ -58,9 +58,16 @@ const vendorSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+    },
     subCategory: {
       type: String,
       required: true,
+    },
+    subcategoryId: {
+      type: mongoose.Schema.Types.ObjectId,
     },
   }],
   gstPan: {

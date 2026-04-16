@@ -63,7 +63,15 @@ const MultiCategorySelector = ({
             <div className='flex-1 grid grid-cols-2 gap-1.5 sm:gap-2'>
               <select
                 value={item.category || ''}
-                onChange={(e) => updateRow(index, { category: e.target.value, subCategory: '' })}
+                onChange={(e) => {
+                  const selectedCat = categories.find(c => c.name === e.target.value);
+                  updateRow(index, { 
+                    category: e.target.value, 
+                    categoryId: selectedCat?._id || null,
+                    subCategory: '',
+                    subcategoryId: null 
+                  });
+                }}
                 className='w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all text-xs sm:text-sm'
               >
                 <option value=''>Select Category</option>
@@ -76,7 +84,13 @@ const MultiCategorySelector = ({
 
               <select
                 value={item.subCategory || ''}
-                onChange={(e) => updateRow(index, { subCategory: e.target.value })}
+                onChange={(e) => {
+                  const selectedSub = subcategories.find(s => s.name === e.target.value);
+                  updateRow(index, { 
+                    subCategory: e.target.value,
+                    subcategoryId: selectedSub?._id || null
+                  });
+                }}
                 disabled={!item.category}
                 className='w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded text-gray-900 focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all text-xs sm:text-sm disabled:opacity-50'
               >
