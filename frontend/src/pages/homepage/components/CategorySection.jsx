@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react'
 
 const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
   const [categories, setCategories] = useState([])
+  const [noVendorCategories, setNoVendorCategories] = useState([])
   const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const [noVendorLoading, setNoVendorLoading] = useState(true)
 
   const gradients = [
     'from-[#FF5F6D] to-[#FFC371]',
@@ -47,7 +49,32 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
       }
     }
 
+    const fetchNoVendorCategories = async () => {
+      try {
+        setNoVendorLoading(true)
+        const response = await fetch(`${BACKEND_URL}/api/categories?hasVendors=false`)
+        const data = await response.json()
+
+        if (data.success) {
+          const mappedCategories = data.categories.map((cat, index) => ({
+            name: cat.name,
+            slug: cat.slug,
+            subcategories: cat.subcategories,
+            gradient: gradients[(index + 6) % gradients.length]
+          }))
+          setNoVendorCategories(mappedCategories)
+        } else {
+          console.error('Failed to load no-vendor categories')
+        }
+      } catch (error) {
+        console.error('Error fetching no-vendor categories:', error)
+      } finally {
+        setNoVendorLoading(false)
+      }
+    }
+
     fetchCategories()
+    fetchNoVendorCategories()
   }, [onCategoriesLoaded])
 
   return (
@@ -93,6 +120,60 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
             ))
           )}
         </div>
+
+        {/* Vendors Joining Soon Section */}
+        {!noVendorLoading && noVendorCategories.length > 0 && (
+          <div className='mt-12 md:mt-20 anim-fade-in'>
+            {/* Divider Line */}
+            <div className='relative flex items-center justify-center mb-12 md:mb-16'>
+              <div className='w-full border-t border-gray-100'></div>
+              <div className='absolute bg-white px-6 py-1 rounded-full border border-gray-100 shadow-sm'>
+                <span className='text-xs md:text-sm font-semibold text-gray-400 tracking-widest uppercase'>
+                  Explore More
+                </span>
+              </div>
+            </div>
+
+            <div className='text-center mb-6 md:mb-12'>
+              <h2 className='text-xl md:text-3xl font-extrabold text-gray-900 tracking-tight'>
+                Vendors Joining Soon
+              </h2>
+              <p className='mt-2 md:mt-3 text-gray-500 text-sm md:text-base max-w-2xl mx-auto px-4'>
+                Stay tuned! New verified vendors are currently being onboarded for these business categories.
+              </p>
+              <div className='mt-3 md:mt-4 h-1.5 w-16 md:w-24 bg-blue-600/40 mx-auto rounded-full'></div>
+            </div>
+
+            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 max-w-7xl mx-auto'>
+              {noVendorCategories.map((category) => (
+                <div
+                  key={category.name}
+                  onClick={() => handleCategoryClick(category.slug)}
+                  className={`group relative h-24 md:h-32 rounded-xl shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer overflow-hidden border border-gray-100`}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-60 group-hover:opacity-100 transition-all duration-500`}></div>
+                  
+                  {/* Glassmorphic overlay for "Coming Soon" look */}
+                  <div className='absolute inset-0 bg-white/10 backdrop-blur-[1px] group-hover:backdrop-blur-0 transition-all duration-500'></div>
+                  
+                  {/* Decorative element */}
+                  <div className='absolute -right-6 -bottom-6 w-20 h-20 bg-white/20 rounded-full group-hover:scale-150 transition-transform duration-700 blur-xl'></div>
+                  
+                  <div className='relative h-full flex flex-col items-center justify-center p-3 text-center'>
+                    <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-md group-hover:scale-105 transition-transform duration-300'>
+                      {category.name}
+                    </h3>
+                    <div className='mt-1.5 px-2 py-0.5 bg-black/20 rounded-full backdrop-blur-md opacity-80 group-hover:opacity-100 transition-opacity'>
+                      <span className='text-[8px] md:text-[10px] text-white font-bold tracking-wider uppercase'>
+                        Coming Soon
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )

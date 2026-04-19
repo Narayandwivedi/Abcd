@@ -18,8 +18,8 @@ const getAllCategories = async (req, res) => {
     const { hasVendors } = req.query;
     let categories = await Category.getActiveCategories();
 
-    // If hasVendors is true, filter only categories that have at least one verified & active vendor
-    if (hasVendors === 'true') {
+    // Filter based on hasVendors query parameter
+    if (hasVendors === 'true' || hasVendors === 'false') {
       const activeVendorCategoryIds = await Vendor.distinct('businessCategories.categoryId', {
         isVerified: true,
         isActive: true,
@@ -27,7 +27,14 @@ const getAllCategories = async (req, res) => {
       });
       
       const activeIdStrings = activeVendorCategoryIds.map(id => id.toString());
-      categories = categories.filter(cat => activeIdStrings.includes(cat._id.toString()));
+      
+      if (hasVendors === 'true') {
+        // Only categories that have at least one verified & active vendor
+        categories = categories.filter(cat => activeIdStrings.includes(cat._id.toString()));
+      } else {
+        // Only categories that have NO verified & active vendors
+        categories = categories.filter(cat => !activeIdStrings.includes(cat._id.toString()));
+      }
     }
 
     return res.status(200).json({
