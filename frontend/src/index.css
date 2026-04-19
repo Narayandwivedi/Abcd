@@ -1,10 +1,32 @@
 @import "tailwindcss";
 
+@layer base {
+  html {
+    font-size: 16px; /* Default for mobile/tablets to keep readability */
+  }
+  
+  /* Smaller laptops */
+  @media (min-width: 1024px) {
+    html {
+      font-size: 14px; 
+    }
+  }
+
+  /* Larger laptops and desktops */
+  @media (min-width: 1440px) {
+    html {
+      font-size: 16px;
+    }
+  }
+}
+
+
 /* Marquee Animation */
 @keyframes marquee {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -20,6 +42,7 @@
   0% {
     transform: translateY(0);
   }
+
   100% {
     transform: translateY(-50%);
   }
@@ -41,10 +64,13 @@
 
 /* Glowing Animation for Buttons */
 @keyframes glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 255, 255, 0.2);
     transform: scale(1);
   }
+
   50% {
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.3);
     transform: scale(1.02);
