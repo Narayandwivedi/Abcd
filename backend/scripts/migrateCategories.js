@@ -25,7 +25,7 @@ async function migrate() {
       for (const busCat of vendor.businessCategories) {
         // Find matching category by name (case-insensitive)
         const matchedCategory = categories.find(
-          c => c.name.toLowerCase() === busCat.category.toLowerCase()
+          c => c.name && busCat.category && c.name.toLowerCase() === busCat.category.toLowerCase()
         );
 
         if (matchedCategory) {
@@ -33,7 +33,7 @@ async function migrate() {
 
           // Find matching subcategory
           const matchedSub = matchedCategory.subcategories.find(
-            s => s.name.toLowerCase() === busCat.subCategory.toLowerCase()
+            s => s.name && busCat.subCategory && s.name.toLowerCase() === busCat.subCategory.toLowerCase()
           );
 
           if (matchedSub) {
