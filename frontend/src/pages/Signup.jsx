@@ -712,6 +712,33 @@ const Signup = () => {
                 </div>
               </div>
 
+              {/* Bank Details Section */}
+              <div className='bg-white/10 rounded-lg p-3 md:p-4 mb-3 md:mb-4 border border-white/10'>
+                <p className='text-purple-300 text-[10px] md:text-xs font-bold uppercase tracking-wider mb-2'>Or Pay via Bank Transfer</p>
+                <div className='space-y-1.5'>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-400 text-[10px] md:text-xs'>Bank Name</span>
+                    <span className='text-white text-[10px] md:text-xs font-semibold'>CANARA BANK</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-400 text-[10px] md:text-xs'>Account Name</span>
+                    <span className='text-white text-[10px] md:text-xs font-semibold'>CHHATTISGARH PRANTIYA AGRAWAL SAMMELAN</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-400 text-[10px] md:text-xs'>Account No.</span>
+                    <span className='text-white text-[10px] md:text-xs font-mono font-bold tracking-wider'>78552200030217</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-400 text-[10px] md:text-xs'>IFSC Code</span>
+                    <span className='text-white text-[10px] md:text-xs font-mono font-bold tracking-wider'>CNRB0017855</span>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-gray-400 text-[10px] md:text-xs'>Branch</span>
+                    <span className='text-white text-[10px] md:text-xs font-semibold'>RAIPUR MAIN BRANCH</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Payment Screenshot Upload - Single Line */}
               <div className='mb-2 md:mb-3'>
                 <div className='relative'>

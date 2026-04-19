@@ -653,6 +653,33 @@ const Signup = () => {
                 />
               </div>
 
+              {/* Bank Details Area */}
+              <div className='bg-white border border-gray-200 rounded p-2.5 sm:p-3 mb-2.5 sm:mb-3'>
+                <p className='text-[#1a237e] text-[10px] sm:text-xs font-bold uppercase tracking-tight mb-2'>Bank Transfer Details</p>
+                <div className='space-y-1 sm:space-y-1.5'>
+                  <div className='flex justify-between items-start'>
+                    <span className='text-gray-500 text-[10px] sm:text-xs mr-2'>Bank</span>
+                    <span className='text-gray-900 text-[10px] sm:text-xs font-semibold text-right'>CANARA BANK</span>
+                  </div>
+                  <div className='flex justify-between items-start'>
+                    <span className='text-gray-500 text-[10px] sm:text-xs mr-2'>A/C Name</span>
+                    <span className='text-gray-900 text-[10px] sm:text-xs font-semibold text-right leading-tight'>CHHATTISGARH PRANTIYA AGRAWAL SAMMELAN</span>
+                  </div>
+                  <div className='flex justify-between items-start'>
+                    <span className='text-gray-500 text-[10px] sm:text-xs mr-2'>A/C No.</span>
+                    <span className='text-gray-900 text-[10px] sm:text-xs font-mono font-bold tracking-wider'>78552200030217</span>
+                  </div>
+                  <div className='flex justify-between items-start'>
+                    <span className='text-gray-500 text-[10px] sm:text-xs mr-2'>IFSC</span>
+                    <span className='text-gray-900 text-[10px] sm:text-xs font-mono font-bold tracking-wider'>CNRB0017855</span>
+                  </div>
+                  <div className='flex justify-between items-start'>
+                    <span className='text-gray-500 text-[10px] sm:text-xs mr-2'>Branch</span>
+                    <span className='text-gray-900 text-[10px] sm:text-xs font-semibold text-right'>RAIPUR MAIN BRANCH</span>
+                  </div>
+                </div>
+              </div>
+
               <div className='mb-2'>
                 <input
                   type='file'
