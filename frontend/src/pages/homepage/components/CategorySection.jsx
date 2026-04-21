@@ -89,7 +89,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
           <div className='mt-1 md:mt-2 h-1 w-16 md:w-24 bg-blue-600 mx-auto rounded-full'></div>
         </div>
 
-        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 max-w-7xl mx-auto'>
+        <div className='grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 max-w-7xl mx-auto'>
           {categoriesLoading ? (
             Array.from({ length: 12 }).map((_, index) => (
               <div
@@ -140,9 +140,9 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
           <div className='mt-12 md:mt-20 anim-fade-in'>
             {/* Divider Line */}
             <div className='relative flex items-center justify-center mb-12 md:mb-16'>
-              <div className='w-full border-t border-gray-100'></div>
-              <div className='absolute bg-white px-6 py-1 rounded-full border border-gray-100 shadow-sm'>
-                <span className='text-xs md:text-sm font-semibold text-gray-400 tracking-widest uppercase'>
+              <div className='w-full border-t border-gray-300'></div>
+              <div className='absolute bg-white px-6 py-1 rounded-full border border-gray-300 shadow-sm'>
+                <span className='text-xs md:text-sm font-semibold text-gray-500 tracking-widest uppercase'>
                   Explore More
                 </span>
               </div>
@@ -158,7 +158,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
               <div className='mt-3 md:mt-4 h-1.5 w-16 md:w-24 bg-blue-600/40 mx-auto rounded-full'></div>
             </div>
 
-            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 max-w-7xl mx-auto'>
+            <div className='grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 max-w-7xl mx-auto'>
               {noVendorCategories.map((category) => (
                 <div
                   key={category.name}
