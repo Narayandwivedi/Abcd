@@ -35,8 +35,8 @@ router.patch("/cities/:cityId/toggle-status", adminAuth, toggleCityStatus);
 
 // Category management routes
 router.get("/categories", adminAuth, getAllCategoriesAdmin);
-router.post("/categories", adminAuth, createCategory);
-router.put("/categories/:categoryId", adminAuth, updateCategory);
+router.post("/categories", adminAuth, upload.single('image'), createCategory);
+router.put("/categories/:categoryId", adminAuth, upload.single('image'), updateCategory);
 router.delete("/categories/:categoryId", adminAuth, deleteCategory);
 router.patch("/categories/:categoryId/toggle-status", adminAuth, toggleCategoryStatus);
 

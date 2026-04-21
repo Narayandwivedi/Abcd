@@ -14,12 +14,22 @@ const Categories = () => {
   const [tempSubcategory, setTempSubcategory] = useState('')
   const [editingSubcategory, setEditingSubcategory] = useState(null)
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, totalSubcategories: 0 })
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
   useEffect(() => {
     fetchCategories()
   }, [])
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setSelectedFile(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
 
   const fetchCategories = async () => {
     try {
@@ -48,8 +58,13 @@ const Categories = () => {
   const handleAddCategory = async (e) => {
     e.preventDefault()
 
-    if (!formData.name.trim() || !formData.icon.trim()) {
-      toast.warning('Name and icon are required')
+    if (!formData.name.trim()) {
+      toast.warning('Name is required')
+      return
+    }
+
+    if (!formData.icon.trim() && !selectedFile) {
+      toast.warning('Either an icon or an image is required')
       return
     }
 
@@ -57,17 +72,18 @@ const Categories = () => {
     const validSubcategories = formData.subcategories.filter(s => s && s.trim())
 
     try {
+      const categoryData = new FormData()
+      categoryData.append('name', formData.name)
+      categoryData.append('icon', formData.icon)
+      categoryData.append('description', formData.description)
+      if (selectedFile) {
+        categoryData.append('image', selectedFile)
+      }
+
       const response = await fetch(`${BACKEND_URL}/api/admin/categories`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          icon: formData.icon,
-          description: formData.description
-        }),
+        body: categoryData,
       })
       const data = await response.json()
 
@@ -89,6 +105,8 @@ const Categories = () => {
         toast.success(`Category added successfully with ${validSubcategories.length} subcategories!`)
         setShowAddModal(false)
         setFormData({ name: '', icon: '', description: '', subcategories: [] })
+        setSelectedFile(null)
+        setImagePreview(null)
         fetchCategories()
       } else {
         toast.error(data.message || 'Failed to add category')
@@ -102,23 +120,24 @@ const Categories = () => {
   const handleEditCategory = async (e) => {
     e.preventDefault()
 
-    if (!formData.name.trim() || !formData.icon.trim()) {
-      toast.warning('Name and icon are required')
+    if (!formData.name.trim()) {
+      toast.warning('Name is required')
       return
     }
 
     try {
+      const categoryData = new FormData()
+      categoryData.append('name', formData.name)
+      categoryData.append('icon', formData.icon)
+      categoryData.append('description', formData.description)
+      if (selectedFile) {
+        categoryData.append('image', selectedFile)
+      }
+
       const response = await fetch(`${BACKEND_URL}/api/admin/categories/${selectedCategory._id}`, {
         method: 'PUT',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          icon: formData.icon,
-          description: formData.description
-        }),
+        body: categoryData,
       })
       const data = await response.json()
 
@@ -146,6 +165,8 @@ const Categories = () => {
         setShowEditModal(false)
         setSelectedCategory(null)
         setFormData({ name: '', icon: '', description: '', subcategories: [] })
+        setSelectedFile(null)
+        setImagePreview(null)
         fetchCategories()
       } else {
         toast.error(data.message || 'Failed to update category')
@@ -212,6 +233,8 @@ const Categories = () => {
       description: category.description || '',
       subcategories: category.subcategories.map(sub => sub.name) || []
     })
+    setSelectedFile(null)
+    setImagePreview(category.image ? `${BACKEND_URL}${category.image}` : null)
     setTempSubcategory('')
     setShowEditModal(true)
   }
@@ -421,8 +444,16 @@ const Categories = () => {
             <div key={category._id} className='bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow'>
               <div className='flex items-start justify-between mb-3'>
                 <div className='flex items-center gap-3'>
-                  <div className='w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center'>
-                    <span className='text-2xl font-bold text-blue-600'>{category.icon.substring(0, 2)}</span>
+                  <div className='w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center overflow-hidden'>
+                    {category.image ? (
+                      <img 
+                        src={`${BACKEND_URL}${category.image}`} 
+                        alt={category.name} 
+                        className='w-full h-full object-cover'
+                      />
+                    ) : (
+                      <span className='text-2xl font-bold text-blue-600'>{category.icon?.substring(0, 2) || 'CT'}</span>
+                    )}
                   </div>
                   <div>
                     <h3 className='text-lg font-bold text-gray-800'>{category.name}</h3>
@@ -526,16 +557,34 @@ const Categories = () => {
                 <p className='text-xs text-gray-500 mt-1'>Main category name - slug auto-generated</p>
               </div>
               <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Icon Name *</label>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Icon Name (Optional if image provided)</label>
                 <input
                   type='text'
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                   placeholder='e.g., Scale, Smartphone, Stethoscope'
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  required
                 />
                 <p className='text-xs text-gray-500 mt-1'>Lucide-react icon name</p>
+              </div>
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Category Image (Optional if icon provided)</label>
+                <div className='flex items-center gap-4'>
+                  <div className='flex-1'>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleImageChange}
+                      className='w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition'
+                    />
+                  </div>
+                  {imagePreview && (
+                    <div className='w-16 h-16 rounded-lg overflow-hidden border border-gray-200'>
+                      <img src={imagePreview} alt='Preview' className='w-full h-full object-cover' />
+                    </div>
+                  )}
+                </div>
+                <p className='text-xs text-gray-500 mt-1'>Recommended: 800x400px. Will be converted to AVIF.</p>
               </div>
               <div>
                 <label className='block text-sm font-semibold text-gray-700 mb-2'>Description (Optional)</label>
@@ -669,16 +718,34 @@ const Categories = () => {
                 <p className='text-xs text-gray-500 mt-1'>Main category name - slug auto-generated</p>
               </div>
               <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Icon Name *</label>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Icon Name (Optional if image exists)</label>
                 <input
                   type='text'
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                   placeholder='e.g., Scale, Smartphone, Stethoscope'
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  required
                 />
                 <p className='text-xs text-gray-500 mt-1'>Lucide-react icon name</p>
+              </div>
+              <div>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Category Image (Optional if icon exists)</label>
+                <div className='flex items-center gap-4'>
+                  <div className='flex-1'>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleImageChange}
+                      className='w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition'
+                    />
+                  </div>
+                  {imagePreview && (
+                    <div className='w-16 h-16 rounded-lg overflow-hidden border border-gray-200'>
+                      <img src={imagePreview} alt='Preview' className='w-full h-full object-cover' />
+                    </div>
+                  )}
+                </div>
+                <p className='text-xs text-gray-500 mt-1'>Recommended: 800x400px. Will be converted to AVIF.</p>
               </div>
               <div>
                 <label className='block text-sm font-semibold text-gray-700 mb-2'>Description (Optional)</label>

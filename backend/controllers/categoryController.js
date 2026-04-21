@@ -1,5 +1,14 @@
 const Category = require("../models/Category");
 const Vendor = require("../models/Vendor");
+const path = require("path");
+const fs = require("fs");
+const sharp = require("sharp");
+
+// Ensure category directory exists
+const categoryDir = path.resolve(__dirname, "..", "uploads", "category");
+if (!fs.existsSync(categoryDir)) {
+  fs.mkdirSync(categoryDir, { recursive: true });
+}
 
 // Helper function to generate slug from name
 const generateSlug = (name) => {
@@ -189,10 +198,10 @@ const createCategory = async (req, res) => {
     const { name, icon, description } = req.body;
 
     // Validate required fields
-    if (!name || !icon) {
+    if (!name || (!icon && !req.file)) {
       return res.status(400).json({
         success: false,
-        message: "Name and icon are required"
+        message: "Name and at least one visual (icon or image) are required"
       });
     }
 
@@ -208,17 +217,40 @@ const createCategory = async (req, res) => {
     });
 
     if (existingCategory) {
+      // Clean up uploaded file if name conflict
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
       return res.status(400).json({
         success: false,
         message: "Category with this name already exists"
       });
     }
 
+    let imageUrl = '';
+    if (req.file) {
+      const uniqueName = `cat-${Date.now()}-${Math.round(Math.random() * 1e9)}.avif`;
+      const finalPath = path.join(categoryDir, uniqueName);
+
+      // Convert to AVIF and compress
+      await sharp(req.file.path)
+        .avif({ quality: 60 })
+        .toFile(finalPath);
+
+      // Delete temp file
+      if (fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+
+      imageUrl = `/uploads/category/${uniqueName}`;
+    }
+
     // Create new category
     const newCategory = await Category.create({
       name: name.trim(),
       slug,
-      icon: icon.trim(),
+      icon: icon?.trim() || '',
+      image: imageUrl,
       description: description?.trim() || '',
       subcategories: [],
       isActive: true
@@ -233,6 +265,10 @@ const createCategory = async (req, res) => {
     });
   } catch (error) {
     console.error('Create category error:', error);
+    // Clean up uploaded file if creation fails
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
     return res.status(500).json({
       success: false,
       message: error.message
@@ -250,6 +286,10 @@ const updateCategory = async (req, res) => {
     const category = await Category.findById(categoryId);
 
     if (!category) {
+      // Clean up uploaded file if category not found
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
       return res.status(404).json({
         success: false,
         message: "Category not found"
@@ -268,6 +308,10 @@ const updateCategory = async (req, res) => {
       });
 
       if (duplicateCategory) {
+        // Clean up uploaded file if name conflict
+        if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
         return res.status(400).json({
           success: false,
           message: "Category with this name already exists"
@@ -279,9 +323,35 @@ const updateCategory = async (req, res) => {
     }
 
     // Update other fields
-    if (icon) category.icon = icon.trim();
+    if (icon !== undefined) category.icon = icon.trim();
     if (description !== undefined) category.description = description.trim();
     if (isActive !== undefined) category.isActive = isActive;
+
+    // Handle image upload
+    if (req.file) {
+      // Delete old image from filesystem if it exists
+      if (category.image) {
+        const oldImagePath = path.join(__dirname, "..", category.image);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      const uniqueName = `cat-${Date.now()}-${Math.round(Math.random() * 1e9)}.avif`;
+      const finalPath = path.join(categoryDir, uniqueName);
+
+      // Convert to AVIF and compress
+      await sharp(req.file.path)
+        .avif({ quality: 60 })
+        .toFile(finalPath);
+
+      // Delete temp file
+      if (fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+
+      category.image = `/uploads/category/${uniqueName}`;
+    }
 
     await category.save();
 
@@ -294,6 +364,10 @@ const updateCategory = async (req, res) => {
     });
   } catch (error) {
     console.error('Update category error:', error);
+    // Clean up uploaded file if update fails
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
     return res.status(500).json({
       success: false,
       message: error.message
@@ -313,6 +387,14 @@ const deleteCategory = async (req, res) => {
         success: false,
         message: "Category not found"
       });
+    }
+
+    // Delete image from filesystem if it exists
+    if (category.image) {
+      const imagePath = path.join(__dirname, "..", category.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
 
     await Category.findByIdAndDelete(categoryId);

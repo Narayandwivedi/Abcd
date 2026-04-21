@@ -34,6 +34,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
           const mappedCategories = data.categories.map((cat, index) => ({
             name: cat.name,
             slug: cat.slug,
+            image: cat.image,
             subcategories: cat.subcategories,
             gradient: gradients[index % gradients.length]
           }))
@@ -59,6 +60,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
           const mappedCategories = data.categories.map((cat, index) => ({
             name: cat.name,
             slug: cat.slug,
+            image: cat.image,
             subcategories: cat.subcategories,
             gradient: gradients[(index + 6) % gradients.length]
           }))
@@ -106,13 +108,25 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
                 onClick={() => handleCategoryClick(category.slug)}
                 className={`group relative h-24 md:h-32 rounded-xl shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer overflow-hidden border border-gray-100`}
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-85 group-hover:opacity-100 transition-opacity duration-500`}></div>
-                
-                {/* Decorative circle */}
-                <div className='absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700'></div>
+                {category.image ? (
+                  <>
+                    <img 
+                      src={`${BACKEND_URL}${category.image}`} 
+                      alt={category.name} 
+                      className='absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'
+                    />
+                    <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-100 transition-opacity duration-500'></div>
+                  </>
+                ) : (
+                  <>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-85 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                    {/* Decorative circle only for gradient cards */}
+                    <div className='absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700'></div>
+                  </>
+                )}
                 
                 <div className='relative h-full flex items-center justify-center p-3 text-center'>
-                  <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-md group-hover:scale-110 transition-transform duration-300'>
+                  <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-lg group-hover:scale-110 transition-transform duration-300'>
                     {category.name}
                   </h3>
                 </div>
@@ -151,16 +165,28 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
                   onClick={() => handleCategoryClick(category.slug)}
                   className={`group relative h-24 md:h-32 rounded-xl shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer overflow-hidden border border-gray-100`}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-60 group-hover:opacity-100 transition-all duration-500`}></div>
-                  
-                  {/* Glassmorphic overlay for "Coming Soon" look */}
-                  <div className='absolute inset-0 bg-white/10 backdrop-blur-[1px] group-hover:backdrop-blur-0 transition-all duration-500'></div>
-                  
-                  {/* Decorative element */}
-                  <div className='absolute -right-6 -bottom-6 w-20 h-20 bg-white/20 rounded-full group-hover:scale-150 transition-transform duration-700 blur-xl'></div>
+                  {category.image ? (
+                    <>
+                      <img 
+                        src={`${BACKEND_URL}${category.image}`} 
+                        alt={category.name} 
+                        className='absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'
+                      />
+                      <div className='absolute inset-0 bg-black/40 backdrop-blur-[1px] group-hover:backdrop-blur-0 transition-all duration-500'></div>
+                      <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent'></div>
+                    </>
+                  ) : (
+                    <>
+                      <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-60 group-hover:opacity-100 transition-all duration-500`}></div>
+                      {/* Glassmorphic overlay for "Coming Soon" look */}
+                      <div className='absolute inset-0 bg-white/10 backdrop-blur-[1px] group-hover:backdrop-blur-0 transition-all duration-500'></div>
+                      {/* Decorative element */}
+                      <div className='absolute -right-6 -bottom-6 w-20 h-20 bg-white/20 rounded-full group-hover:scale-150 transition-transform duration-700 blur-xl'></div>
+                    </>
+                  )}
                   
                   <div className='relative h-full flex flex-col items-center justify-center p-3 text-center'>
-                    <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-md group-hover:scale-105 transition-transform duration-300'>
+                    <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-lg group-hover:scale-105 transition-transform duration-300'>
                       {category.name}
                     </h3>
                     <div className='mt-1.5 px-2 py-0.5 bg-black/20 rounded-full backdrop-blur-md opacity-80 group-hover:opacity-100 transition-opacity'>
