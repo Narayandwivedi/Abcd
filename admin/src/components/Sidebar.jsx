@@ -189,7 +189,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         </div>
 
         {/* Menu Items */}
-        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-280px)]">
+        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-210px)]">
           {menuItems.map((item) => (
             <Link
               key={item.path}
@@ -237,14 +237,14 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         </nav>
 
         {/* User Info & Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-700/30 bg-blue-900/50 space-y-2">
-          <div className="flex items-center space-x-3 px-4 py-3 bg-black/20 rounded-xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+        <div className="absolute bottom-0 left-0 right-0 px-2.5 py-2 border-t border-blue-700/30 bg-blue-900/50 space-y-1">
+          <div className="flex items-center space-x-2 px-2.5 py-1.5 bg-black/20 rounded-md">
+            <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">
               {admin?.fullName?.charAt(0).toUpperCase() || 'A'}
             </div>
             <div className="flex-1">
-              <div className="font-semibold text-blue-100 text-sm truncate">{admin?.fullName || 'Admin'}</div>
-              <div className="text-xs text-blue-300">Super Admin</div>
+              <div className="font-semibold text-blue-100 text-xs truncate">{admin?.fullName || 'Admin'}</div>
+              <div className="text-[10px] text-blue-300">Super Admin</div>
             </div>
           </div>
 
@@ -252,26 +252,26 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           {!showLogoutConfirm ? (
             <button
               onClick={() => setShowLogoutConfirm(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-xl transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
+              className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-md transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              <span className="font-semibold text-sm">Logout</span>
+              <span className="font-semibold text-xs">Logout</span>
             </button>
           ) : (
-            <div className="space-y-2">
-              <p className="text-xs text-blue-200 text-center">Are you sure?</p>
-              <div className="flex gap-2">
+            <div className="space-y-1">
+              <p className="text-[10px] text-blue-200 text-center">Are you sure?</p>
+              <div className="flex gap-1.5">
                 <button
                   onClick={handleLogout}
-                  className="flex-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold transition"
+                  className="flex-1 px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-xs font-semibold transition"
                 >
                   Yes
                 </button>
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-semibold transition"
+                  className="flex-1 px-2 py-1 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-xs font-semibold transition"
                 >
                   No
                 </button>
