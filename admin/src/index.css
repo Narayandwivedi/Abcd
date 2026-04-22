@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+/*
+  Admin desktop density:
+  - lg laptops (1024-1279px) should feel the most compact.
+  - xl laptops (1280-1535px) should be slightly reduced.
+  - 2xl and larger keep the default Tailwind scale.
+*/
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 1280px) and (max-width: 1535.98px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1536px) {
+  html {
+    font-size: 16px;
+  }
+}
