@@ -632,9 +632,19 @@ const Signup = () => {
                 <label className={labelClass}>
                   Membership Fees (Rs.) <span className='text-red-500'>*</span>
                 </label>
-                <div className='relative'>
-                  <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-xs sm:text-sm'>₹</span>
-                  <input type='number' name='membershipFees' value={formData.membershipFees} onChange={handleChange} min='1' className={inputClass + ' pl-7'} placeholder='Amount' />
+                <div className='flex items-stretch bg-white border border-gray-300 rounded focus-within:border-[#1a237e] focus-within:ring-1 focus-within:ring-[#1a237e] transition-all overflow-hidden'>
+                  <span className='flex w-8 sm:w-9 shrink-0 items-center justify-center border-r border-gray-300 bg-gray-50 text-gray-600 font-semibold text-xs sm:text-sm leading-none'>
+                    ₹
+                  </span>
+                  <input
+                    type='number'
+                    name='membershipFees'
+                    value={formData.membershipFees}
+                    onChange={handleChange}
+                    min='1'
+                    className='min-w-0 flex-1 px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white text-gray-900 focus:outline-none transition-all text-xs sm:text-sm'
+                    placeholder='Amount'
+                  />
                 </div>
               </div>
             </div>

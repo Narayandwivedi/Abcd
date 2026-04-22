@@ -1,58 +1,94 @@
 import { useEffect, useMemo, useState } from 'react'
 
-const HOT_DEAL_FILES = [
-  'deal1.jpg',
-  'deal11.jpg',
-  'deal2.jpg',
-  'deal3.jpg',
-  'deal8.jpg',
-  'images (1).jpg',
-  'images (2).jpg',
-  'images (3).jpg',
-  'images (4).jpg',
-  'images (5).jpg',
-  'images (6).jpg',
-  'images.jpg'
-]
-
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 const COLLAPSE_MS = 720
 const REVEAL_MS = 520
-const SWITCH_INTERVAL_MS = 2500
+const SWITCH_INTERVAL_MS = 2600
 
-const hotDealAds = HOT_DEAL_FILES.map((fileName, index) => ({
-  id: `hot-deal-${index + 1}`,
-  src: `/hot%20deals/${encodeURIComponent(fileName)}`,
-  alt: `Hot Deal ${index + 1}`
-}))
+const getAdImageUrl = (imagePath) => {
+  if (!imagePath) {
+    return ''
+  }
 
-const ImageAdCard = ({ ad }) => {
+  if (/^https?:\/\//i.test(imagePath)) {
+    return imagePath
+  }
+
+  return `${BACKEND_URL}${imagePath.startsWith('/') ? imagePath : `/${imagePath}`}`
+}
+
+const openAdLink = (link) => {
+  if (!link) {
+    return
+  }
+
+  const targetUrl = /^https?:\/\//i.test(link) ? link : `https://${link}`
+  window.open(targetUrl, '_blank', 'noopener,noreferrer')
+}
+
+const AdCard = ({ ad, index }) => {
+  const imageUrl = getAdImageUrl(ad.adImg)
+  const isClickable = Boolean(ad.link)
+
   return (
-    <div className='relative h-32 md:h-40 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden'>
+    <button
+      type='button'
+      onClick={() => openAdLink(ad.link)}
+      disabled={!isClickable}
+      className={`relative h-32 md:h-40 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden ${
+        isClickable ? 'cursor-pointer hover:shadow-lg' : 'cursor-default'
+      } transition-shadow`}
+      aria-label={ad.title || `Advertisement ${index + 1}`}
+    >
       <img
-        src={ad.src}
-        alt={ad.alt}
+        src={imageUrl}
+        alt={ad.title || `Advertisement ${index + 1}`}
         loading='lazy'
-        className='w-full h-full object-cover'
+        className='w-full h-full object-contain bg-gray-50'
       />
-    </div>
+    </button>
   )
 }
 
 const AdsCarousel = () => {
+  const [ads, setAds] = useState([])
+  const [loading, setLoading] = useState(true)
   const [groupIndex, setGroupIndex] = useState(0)
   const [animationPhase, setAnimationPhase] = useState('idle')
 
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/ads/active`)
+        const data = await response.json()
+
+        if (response.ok && data.success && Array.isArray(data.ads)) {
+          setAds(data.ads.filter((ad) => ad.adImg))
+        } else {
+          setAds([])
+        }
+      } catch (error) {
+        console.error('Error fetching ads:', error)
+        setAds([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAds()
+  }, [])
+
   const adGroups = useMemo(() => {
     const groups = []
-    for (let i = 0; i < hotDealAds.length; i += 4) {
-      groups.push(hotDealAds.slice(i, i + 4))
+    for (let i = 0; i < ads.length; i += 4) {
+      groups.push(ads.slice(i, i + 4))
     }
     return groups
-  }, [])
+  }, [ads])
 
   useEffect(() => {
     if (adGroups.length <= 1) {
-      return
+      return undefined
     }
 
     let collapseTimerId = null
@@ -74,8 +110,17 @@ const AdsCarousel = () => {
     }
   }, [adGroups.length])
 
-  const visibleAds = adGroups[groupIndex] || hotDealAds.slice(0, 4)
+  useEffect(() => {
+    if (groupIndex >= adGroups.length) {
+      setGroupIndex(0)
+    }
+  }, [adGroups.length, groupIndex])
 
+  if (loading || ads.length === 0) {
+    return null
+  }
+
+  const visibleAds = adGroups[groupIndex] || adGroups[0] || []
   const isCollapsing = animationPhase === 'collapsing'
   const gridAnimationStyle = {
     transitionProperty: 'transform, opacity, filter',
@@ -100,8 +145,8 @@ const AdsCarousel = () => {
           className='max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3'
           style={gridAnimationStyle}
         >
-          {visibleAds.map((ad) => (
-            <ImageAdCard key={ad.id} ad={ad} />
+          {visibleAds.map((ad, index) => (
+            <AdCard key={ad._id || `${groupIndex}-${index}`} ad={ad} index={index} />
           ))}
         </div>
       </div>
