@@ -255,11 +255,6 @@ const Signup = () => {
       return
     }
 
-    if (!formData.paymentScreenshot) {
-      setError('Please upload payment screenshot')
-      return
-    }
-
     if (!/^\d{12}$/.test((formData.utrNumber || '').trim())) {
       setError('Please enter a valid 12-digit UTR number')
       return

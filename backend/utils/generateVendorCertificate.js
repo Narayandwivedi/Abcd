@@ -2,6 +2,9 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
+const VENDOR_CERTIFICATE_PREFIX = 'VCG';
+const VENDOR_CERTIFICATE_DIGITS = 5;
+
 const getStatePrefixForVendorReferral = (state = "") => {
   const normalizedState = String(state).trim().toLowerCase();
 
@@ -14,6 +17,14 @@ const getStatePrefixForVendorReferral = (state = "") => {
   return compact.slice(0, 2).toUpperCase() || "NA";
 };
 
+const formatVendorCertificateNumber = (sequenceNumber) =>
+  `${VENDOR_CERTIFICATE_PREFIX}${String(sequenceNumber).padStart(VENDOR_CERTIFICATE_DIGITS, '0')}`;
+
+const extractVendorCertificateSequence = (certificateNumber = '') => {
+  const match = String(certificateNumber).match(/(\d+)$/);
+  return match ? Number.parseInt(match[1], 10) : 0;
+};
+
 const buildVendorReferralCode = ({ state = "", certificateNumber = "" }) => {
   const statePrefix = getStatePrefixForVendorReferral(state);
   const suffixMatch = String(certificateNumber).match(/(\d{5})$/);
@@ -21,36 +32,15 @@ const buildVendorReferralCode = ({ state = "", certificateNumber = "" }) => {
   return `${statePrefix}VM${suffix}`;
 };
 
-// Generate unique certificate number in format: VM-CG-YYYY-MM-00101
+// Generate unique certificate number in format: VCG00001, VCG00009, VCG00010
 const generateVendorCertificateNumber = async () => {
   const VendorCertificate = require('../models/VendorCertificate');
+  const certificates = await VendorCertificate.find({}, 'certificateNumber').lean();
+  const highestSequence = certificates.reduce((maxSequence, certificate) => {
+    return Math.max(maxSequence, extractVendorCertificateSequence(certificate.certificateNumber));
+  }, 0);
 
-  // Get current year and month
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-
-  // Get the last certificate number to increment from
-  const lastCertificate = await VendorCertificate.findOne()
-    .sort({ createdAt: -1 })
-    .select('certificateNumber');
-
-  let incrementingNumber = 101; // Start from 00101 if no certificates exist
-
-  if (lastCertificate && lastCertificate.certificateNumber) {
-    // Extract the number part from the last certificate (e.g., "VM-CG-2025-12-00101" -> 101)
-    const lastNumberMatch = lastCertificate.certificateNumber.match(/(\d+)$/);
-    if (lastNumberMatch) {
-      const lastNumber = parseInt(lastNumberMatch[1]);
-      incrementingNumber = lastNumber + 1;
-    }
-  }
-
-  // Generate certificate number
-  // Format: VM-CG-YYYY-MM-00101, VM-CG-YYYY-MM-00102, etc.
-  const certificateNumber = `VM-CG-${year}-${month}-${String(incrementingNumber).padStart(5, '0')}`;
-
-  return certificateNumber;
+  return formatVendorCertificateNumber(highestSequence + 1);
 };
 
 // Generate vendor certificate PDF
@@ -362,6 +352,9 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
 };
 
 module.exports = {
+  formatVendorCertificateNumber,
+  extractVendorCertificateSequence,
+  buildVendorReferralCode,
   generateVendorCertificateNumber,
   generateVendorCertificatePDF
 };

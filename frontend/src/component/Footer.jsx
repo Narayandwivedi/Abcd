@@ -6,7 +6,6 @@ const Footer = () => {
     <footer className='bg-gray-800 text-white mt-auto mb-10 md:mb-0'>
       <div className='container mx-auto px-4 py-4 md:py-8'>
         <div className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8'>
-          {/* Company Info - Hidden on Mobile */}
           <div className='hidden md:block'>
             <h3 className='text-xl font-bold mb-4'>ABCD</h3>
             <p className='text-gray-400 text-sm'>
@@ -14,7 +13,6 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Links Section - Mobile: Combined, Desktop: Quick Links */}
           <div>
             <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Links</h4>
             <ul className='space-y-1 md:space-y-2 text-xs md:text-base'>
@@ -36,7 +34,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Legal - Desktop Only */}
           <div className='hidden md:block'>
             <h4 className='text-lg font-semibold mb-4'>Legal</h4>
             <ul className='space-y-2'>
@@ -49,7 +46,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Address */}
           <div>
             <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Address</h4>
             <div className='space-y-1 md:space-y-2 text-gray-400 text-[10px] md:text-sm'>
@@ -57,10 +53,30 @@ const Footer = () => {
               <p>Hanuman Market, Ramsagar Para,</p>
               <p className='font-bold text-yellow-400'>RAIPUR (CG) 492001</p>
             </div>
+
+            <div className='hidden md:flex mt-6 flex-col gap-4 max-w-xs'>
+              <Link to='/signup' className='block'>
+                <div className='relative bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-4 py-3 rounded-xl font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>
+                  <p className='text-sm leading-tight'>Join as Buyer</p>
+                  <p className='text-xl font-extrabold'>@Rs 499/year</p>
+                </div>
+              </Link>
+
+              <a
+                href='https://vendor.abcdvyapar.com/signup'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='block'
+              >
+                <div className='relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 rounded-xl font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>
+                  <p className='text-sm leading-tight'>Join as Vendor</p>
+                  <p className='text-xl font-extrabold'>Register Now</p>
+                </div>
+              </a>
+            </div>
           </div>
 
-          {/* Contact */}
-          <div>
+          <div className='md:-mt-16'>
             <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Contact</h4>
             <div className='space-y-1 md:space-y-2 text-gray-400 text-[10px] md:text-sm'>
               <p>
@@ -74,28 +90,29 @@ const Footer = () => {
               </p>
             </div>
           </div>
-
-          {/* Join Buttons - Mobile Only (Stacked) */}
-          <div className='md:hidden flex flex-col gap-3'>
-            {/* Join as Buyer */}
-            <Link to='/signup' className='block'>
-              <div className='relative bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse'>
-                <p className='text-[11px] leading-tight'>Join as Buyer</p>
-                <p className='text-sm font-extrabold'>@₹499/year</p>
-              </div>
-            </Link>
-
-            {/* Join as Vendor */}
-            <a href='https://vendor.abcdvyapar.com/signup' className='block'>
-              <div className='relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse'>
-                <p className='text-[11px] leading-tight'>Join as Vendor</p>
-                <p className='text-sm font-extrabold'>Register Now</p>
-              </div>
-            </a>
-          </div>
         </div>
 
-        {/* Bottom Bar */}
+        <div className='mt-6 flex flex-col gap-3 max-w-xs mx-auto md:hidden'>
+          <Link to='/signup' className='block'>
+            <div className='relative bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>
+              <p className='text-[11px] leading-tight'>Join as Buyer</p>
+              <p className='text-sm font-extrabold'>@Rs 499/year</p>
+            </div>
+          </Link>
+
+          <a
+            href='https://vendor.abcdvyapar.com/signup'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='block'
+          >
+            <div className='relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>
+              <p className='text-[11px] leading-tight'>Join as Vendor</p>
+              <p className='text-sm font-extrabold'>Register Now</p>
+            </div>
+          </a>
+        </div>
+
         <div className='border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm'>
           <p>&copy; {new Date().getFullYear()} ABCD. All rights reserved.</p>
         </div>

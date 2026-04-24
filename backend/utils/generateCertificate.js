@@ -2,23 +2,27 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-// Generate unique certificate number in format: CG00001 (up to 9) or CG000010 (above 9)
+const CERTIFICATE_PREFIX = 'CG';
+const CERTIFICATE_DIGITS = 6;
+
+const formatCertificateNumber = (sequenceNumber) =>
+  `${CERTIFICATE_PREFIX}${String(sequenceNumber).padStart(CERTIFICATE_DIGITS, '0')}`;
+
+const extractCertificateSequence = (certificateNumber = '') => {
+  const match = String(certificateNumber).match(/(\d+)$/);
+  return match ? Number.parseInt(match[1], 10) : 0;
+};
+
+// Generate unique certificate number in format: CG000001, CG000009, CG000010
 const generateCertificateNumber = async () => {
   const Certificate = require('../models/Certificate');
 
-  // Count total certificates issued
-  const certificateCount = await Certificate.countDocuments();
+  const certificates = await Certificate.find({}, 'certificateNumber').lean();
+  const highestSequence = certificates.reduce((maxSequence, certificate) => {
+    return Math.max(maxSequence, extractCertificateSequence(certificate.certificateNumber));
+  }, 0);
 
-  // Generate certificate number starting from 1
-  const incrementingNumber = certificateCount + 1;
-
-  if (incrementingNumber <= 9) {
-    // 5 digits padding: CG00001 to CG00009 (total 7 characters)
-    return `CG${String(incrementingNumber).padStart(5, '0')}`;
-  } else {
-    // 6 digits padding: CG000010, CG000100, etc. (total 8 characters)
-    return `CG${String(incrementingNumber).padStart(6, '0')}`;
-  }
+  return formatCertificateNumber(highestSequence + 1);
 };
 
 // Generate certificate PDF
@@ -616,6 +620,8 @@ const regenerateCertificatePDF = async (user, existingCertificateNumber) => {
 };
 
 module.exports = {
+  formatCertificateNumber,
+  extractCertificateSequence,
   generateCertificateNumber,
   generateCertificatePDF,
   regenerateCertificatePDF

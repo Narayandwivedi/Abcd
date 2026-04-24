@@ -84,7 +84,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
       <div className='container mx-auto px-4'>
         <div className='text-center mb-4 md:mb-10'>
           <h2 className='text-xl md:text-3xl font-extrabold text-gray-900 tracking-tight'>
-            Shop by Category
+            Vendor by Category
           </h2>
           <div className='mt-1 md:mt-2 h-1 w-16 md:w-24 bg-blue-600 mx-auto rounded-full'></div>
         </div>

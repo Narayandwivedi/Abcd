@@ -540,7 +540,7 @@ const validateReferralCode = async (req, res) => {
   try {
     const { referralCode } = req.params;
 
-    if (!referralCode || referralCode.length !== 7) {
+    if (!referralCode || !/^[A-Za-z]{2}\d{6}$/.test(referralCode)) {
       return res.status(400).json({ success: false, message: "Invalid referral code" });
     }
 

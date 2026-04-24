@@ -188,13 +188,6 @@ const handleVendorSignup = async (req, res) => {
 
     const hasPaymentScreenshot = !!(req.files && req.files.paymentScreenshot && req.files.paymentScreenshot[0]);
 
-    if (!hasPaymentScreenshot) {
-      return res.status(400).json({
-        success: false,
-        message: "Payment screenshot is required"
-      });
-    }
-
     if (!/^\d{12}$/.test(utrNumber || "")) {
       return res.status(400).json({
         success: false,
@@ -202,14 +195,16 @@ const handleVendorSignup = async (req, res) => {
       });
     }
 
-    try {
-      newVendorData.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
-    } catch (error) {
-      console.error("Payment screenshot upload error:", error);
-      return res.status(500).json({
-        success: false,
-        message: error.message || "Failed to upload payment screenshot"
-      });
+    if (hasPaymentScreenshot) {
+      try {
+        newVendorData.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
+      } catch (error) {
+        console.error("Payment screenshot upload error:", error);
+        return res.status(500).json({
+          success: false,
+          message: error.message || "Failed to upload payment screenshot"
+        });
+      }
     }
 
     // Create new vendor WITHOUT logging them in (similar to user signup)

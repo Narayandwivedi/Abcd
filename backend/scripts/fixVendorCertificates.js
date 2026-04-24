@@ -3,16 +3,17 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const Certificate = require('../models/Certificate');
-const User = require('../models/User');
+const VendorCertificate = require('../models/VendorCertificate');
+const Vendor = require('../models/Vendor');
 const {
-  formatCertificateNumber,
-  extractCertificateSequence,
-  regenerateCertificatePDF
-} = require('../utils/generateCertificate');
+  formatVendorCertificateNumber,
+  extractVendorCertificateSequence,
+  buildVendorReferralCode,
+  generateVendorCertificatePDF
+} = require('../utils/generateVendorCertificate');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/abcd';
-const CERTIFICATES_DIR = path.join(__dirname, '..', 'uploads', 'certificates');
+const CERTIFICATES_DIR = path.join(__dirname, '..', 'uploads', 'vendor-certificates');
 
 function moveCertificateFile(oldPath, newPath) {
   if (!fs.existsSync(oldPath)) {
@@ -53,38 +54,30 @@ function moveCertificateFile(oldPath, newPath) {
   }
 }
 
-async function fixCertificates() {
+async function fixVendorCertificates() {
   try {
-    console.log('Starting member certificate migration...');
+    console.log('Starting vendor certificate migration...');
     console.log(`Certificates directory: ${CERTIFICATES_DIR}`);
 
     await mongoose.connect(MONGO_URI);
     console.log('Connected to MongoDB');
 
-    const certificates = await Certificate.find({}).sort({ createdAt: 1, _id: 1 });
-    console.log(`Found ${certificates.length} certificates to process`);
+    const certificates = await VendorCertificate.find({}).sort({ createdAt: 1, _id: 1 });
+    console.log(`Found ${certificates.length} vendor certificates to process`);
 
     let updatedCount = 0;
     let skipCount = 0;
     let errorCount = 0;
 
-    for (const cert of certificates) {
+    for (const [index, cert] of certificates.entries()) {
       try {
         const oldNumber = cert.certificateNumber;
-        const sequenceNumber = extractCertificateSequence(oldNumber);
-
-        if (!sequenceNumber) {
-          console.error(`Could not extract sequence from ${oldNumber}`);
-          errorCount++;
-          continue;
-        }
-
-        const newNumber = formatCertificateNumber(sequenceNumber);
-        const oldFileName = `ABCD_MEMBER_CERTIFICATE_${oldNumber}.pdf`;
-        const newFileName = `ABCD_MEMBER_CERTIFICATE_${newNumber}.pdf`;
+        const newNumber = formatVendorCertificateNumber(index + 1);
+        const oldFileName = `ABCD_VENDOR_CERTIFICATE_${oldNumber}.pdf`;
+        const newFileName = `ABCD_VENDOR_CERTIFICATE_${newNumber}.pdf`;
         const oldPath = path.join(CERTIFICATES_DIR, oldFileName);
         const newPath = path.join(CERTIFICATES_DIR, newFileName);
-        const expectedDownloadLink = `/uploads/certificates/${newFileName}`;
+        const expectedDownloadLink = `/uploads/vendor-certificates/${newFileName}`;
         let changed = false;
 
         if (oldNumber !== newNumber) {
@@ -117,11 +110,19 @@ async function fixCertificates() {
           changed = true;
         }
 
-        const user = await User.findById(cert.userId);
-        if (user) {
-          if (user.referralCode !== newNumber) {
-            await User.updateOne({ _id: user._id }, { $set: { referralCode: newNumber } });
-            console.log(`   Updated user ${user.fullName} referral code to ${newNumber}`);
+        const vendor = await Vendor.findById(cert.vendorId);
+        if (vendor) {
+          const expectedReferralCode = buildVendorReferralCode({
+            state: vendor.state,
+            certificateNumber: newNumber
+          });
+
+          if (vendor.referralCode !== expectedReferralCode) {
+            await Vendor.updateOne(
+              { _id: vendor._id },
+              { $set: { referralCode: expectedReferralCode } }
+            );
+            console.log(`   Updated vendor ${vendor.businessName} referral code to ${expectedReferralCode}`);
             changed = true;
           }
 
@@ -134,7 +135,7 @@ async function fixCertificates() {
             }
           }
 
-          const pdfData = await regenerateCertificatePDF(user.toObject ? user.toObject() : user, newNumber);
+          const pdfData = await generateVendorCertificatePDF(vendor.toObject ? vendor.toObject() : vendor, newNumber);
           if (cert.downloadLink !== pdfData.downloadLink) {
             cert.downloadLink = pdfData.downloadLink;
             changed = true;
@@ -147,7 +148,7 @@ async function fixCertificates() {
 
           console.log(`   Regenerated PDF for ${newNumber}`);
         } else {
-          console.warn(`   Associated user not found for certificate ${oldNumber}`);
+          console.warn(`   Associated vendor not found for certificate ${oldNumber}`);
         }
 
         if (changed) {
@@ -157,12 +158,12 @@ async function fixCertificates() {
           skipCount++;
         }
       } catch (err) {
-        console.error(`Error processing certificate ${cert.certificateNumber}:`, err.message);
+        console.error(`Error processing vendor certificate ${cert.certificateNumber}:`, err.message);
         errorCount++;
       }
     }
 
-    const activeCertificates = await Certificate.find({ pdfDeleted: { $ne: true } }, 'downloadLink').lean();
+    const activeCertificates = await VendorCertificate.find({ pdfDeleted: { $ne: true } }, 'downloadLink').lean();
     const keepFiles = new Set(
       activeCertificates
         .map((certificate) => path.basename(certificate.downloadLink || ''))
@@ -196,4 +197,4 @@ async function fixCertificates() {
   }
 }
 
-fixCertificates();
+fixVendorCertificates();

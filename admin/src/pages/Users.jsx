@@ -424,11 +424,11 @@ ABCD Team`
 
   // Validate referral code for edit form
   const handleReferralChange = async (value) => {
-    const code = value.toUpperCase().slice(0, 7)
+    const code = value.toUpperCase().slice(0, 8)
     setEditFormData(prev => ({ ...prev, referredBy: code }))
 
-    if (code.length === 7) {
-      const referralRegex = /^[A-Za-z]{2}[0-9]{5}$/
+    if (code.length === 8) {
+      const referralRegex = /^[A-Za-z]{2}[0-9]{6}$/
       if (referralRegex.test(code)) {
         try {
           const response = await fetch(`${BACKEND_URL}/api/auth/validate-referral/${code}`)
@@ -456,11 +456,11 @@ ABCD Team`
       return
     }
 
-    // Validate referral code format if provided (2 letters + 5 digits = 7 chars)
+    // Validate referral code format if provided (2 letters + 6 digits = 8 chars)
     if (editFormData.referredBy && editFormData.referredBy.trim()) {
-      const referralRegex = /^[A-Za-z]{2}[0-9]{5}$/
+      const referralRegex = /^[A-Za-z]{2}[0-9]{6}$/
       if (!referralRegex.test(editFormData.referredBy.trim())) {
-        toast.warning('Referral code must be 2 letters followed by 5 digits (e.g., CG00006)', { autoClose: 2000 })
+        toast.warning('Referral code must be 2 letters followed by 6 digits (e.g., CG000006)', { autoClose: 2000 })
         return
       }
     }
@@ -609,6 +609,11 @@ ABCD Team`
 
     if (!createFormData.passportPhoto) {
       toast.warning('Passport photo is required', { autoClose: 800 })
+      return
+    }
+
+    if (createFormData.referredBy && !/^[A-Za-z]{2}[0-9]{6}$/.test(createFormData.referredBy.trim())) {
+      toast.warning('Referral code must be 2 letters followed by 6 digits (e.g., CG000006)', { autoClose: 2000 })
       return
     }
 
@@ -1508,14 +1513,14 @@ ABCD Team`
 
                   {/* Referred By */}
                   <div className='md:col-span-2'>
-                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Referred By (e.g., CG00006)</label>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Referred By (e.g., CG000006)</label>
                     <input
                       type='text'
                       name='referredBy'
                       value={editFormData.referredBy}
                       onChange={(e) => handleReferralChange(e.target.value)}
-                      maxLength={7}
-                      placeholder='e.g., CG00006'
+                      maxLength={8}
+                      placeholder='e.g., CG000006'
                       className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
                     />
                     {referralStatus.valid === true && (
@@ -1772,17 +1777,17 @@ ABCD Team`
 
                   {/* Referred By */}
                   <div>
-                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Referred By (e.g., CG00006)</label>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>Referred By (e.g., CG000006)</label>
                     <input
                       type='text'
                       name='referredBy'
                       value={createFormData.referredBy}
                       onChange={(e) => {
-                        const val = e.target.value.toUpperCase().slice(0, 7)
+                        const val = e.target.value.toUpperCase().slice(0, 8)
                         setCreateFormData(prev => ({ ...prev, referredBy: val }))
                       }}
-                      maxLength={7}
-                      placeholder='e.g., CG00006'
+                      maxLength={8}
+                      placeholder='e.g., CG000006'
                       className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
                     />
                   </div>
