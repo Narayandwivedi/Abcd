@@ -152,9 +152,6 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
               <h2 className='text-xl md:text-3xl font-extrabold text-gray-900 tracking-tight'>
                 Vendors Joining Soon
               </h2>
-              <p className='mt-2 md:mt-3 text-gray-500 text-sm md:text-base max-w-2xl mx-auto px-4'>
-                Stay tuned! New verified vendors are currently being onboarded for these business categories.
-              </p>
               <div className='mt-3 md:mt-4 h-1.5 w-16 md:w-24 bg-blue-600/40 mx-auto rounded-full'></div>
             </div>
 

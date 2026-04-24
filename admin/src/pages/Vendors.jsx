@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import MultiCategorySelector from '../components/MultiCategorySelector'
 
 const Vendors = () => {
+  const createEmptyOwner = () => ({ name: '', photo: null, previewUrl: '' })
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -19,17 +20,25 @@ const Vendors = () => {
   })
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForm, setCreateForm] = useState({
-    ownerName: '',
+    owners: [createEmptyOwner()],
     businessName: '',
     mobile: '',
     email: '',
+    gstPan: '',
+    address: '',
     state: '',
     district: '',
     city: '',
+    websiteUrl: '',
+    referralId: '',
+    membershipType: '',
     businessCategories: [],
     membershipFees: '',
+    utrNumber: '',
+    paymentScreenshot: null,
     password: ''
   })
+  const [previewPaymentScreenshot, setPreviewPaymentScreenshot] = useState(null)
   const [creating, setCreating] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -90,6 +99,106 @@ const Vendors = () => {
     if (!vendor?.ownerNames?.length) return 'N/A'
     if (vendor.ownerNames.length === 1) return vendor.ownerNames[0]
     return `${vendor.ownerNames[0]} +${vendor.ownerNames.length - 1}`
+  }
+
+  const addCreateOwner = () => {
+    setCreateForm((prev) => {
+      if (prev.owners.length >= 10) {
+        alert('Maximum 10 owners allowed')
+        return prev
+      }
+      return { ...prev, owners: [...prev.owners, createEmptyOwner()] }
+    })
+  }
+
+  const removeCreateOwner = (index) => {
+    setCreateForm((prev) => {
+      if (prev.owners.length <= 1) return prev
+      const removedOwner = prev.owners[index]
+      if (removedOwner?.previewUrl) URL.revokeObjectURL(removedOwner.previewUrl)
+      return { ...prev, owners: prev.owners.filter((_, i) => i !== index) }
+    })
+  }
+
+  const handleCreateOwnerNameChange = (index, value) => {
+    setCreateForm((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => (i === index ? { ...owner, name: value } : owner))
+    }))
+  }
+
+  const handleCreateOwnerPhotoChange = (index, e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid image (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Photo size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    const previewUrl = URL.createObjectURL(file)
+    setCreateForm((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => {
+        if (i !== index) return owner
+        if (owner.previewUrl) URL.revokeObjectURL(owner.previewUrl)
+        return { ...owner, photo: file, previewUrl }
+      })
+    }))
+  }
+
+  const handleCreatePaymentScreenshotChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Payment screenshot size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    setCreateForm((prev) => ({ ...prev, paymentScreenshot: file }))
+    const reader = new FileReader()
+    reader.onloadend = () => setPreviewPaymentScreenshot(reader.result)
+    reader.readAsDataURL(file)
+  }
+
+  const resetCreateForm = () => {
+    setCreateForm({
+      owners: [createEmptyOwner()],
+      businessName: '',
+      mobile: '',
+      email: '',
+      gstPan: '',
+      address: '',
+      state: '',
+      district: '',
+      city: '',
+      websiteUrl: '',
+      referralId: '',
+      membershipType: '',
+      businessCategories: [],
+      membershipFees: '',
+      utrNumber: '',
+      paymentScreenshot: null,
+      password: ''
+    })
+    setPreviewPaymentScreenshot(null)
   }
 
   // Debug logging for createForm
@@ -334,7 +443,7 @@ ABCD Team`
 
   // Create vendor handler
   const handleCreateVendor = async () => {
-    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.state || !createForm.district || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipFees) {
+    if (!createForm.businessName || !createForm.mobile || !createForm.state || !createForm.district || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipFees) {
       alert('Please fill all required fields including state, district, city, and at least one category and subcategory')
       return
     }
@@ -344,33 +453,61 @@ ABCD Team`
       return
     }
 
+    const hasInvalidOwners = createForm.owners.some((owner) => !owner.name?.trim() || !owner.photo)
+    if (hasInvalidOwners) {
+      alert('Please add owner name and photo for all owners')
+      return
+    }
+
+    const hasEmptyCategory = createForm.businessCategories.some(item => !item.category?.trim() || !item.subCategory?.trim())
+    if (hasEmptyCategory) {
+      alert('Please fill in both category and subcategory for all entries')
+      return
+    }
+
+    if (createForm.utrNumber && !/^\d{12}$/.test((createForm.utrNumber || '').trim())) {
+      alert('Please enter a valid 12-digit UTR number')
+      return
+    }
+
     try {
       setCreating(true)
+      const formData = new FormData()
+      const ownersPayload = createForm.owners.map((owner) => ({ name: owner.name.trim() }))
+
+      formData.append('ownerName', ownersPayload[0]?.name || '')
+      formData.append('owners', JSON.stringify(ownersPayload))
+      formData.append('businessName', createForm.businessName)
+      formData.append('mobile', createForm.mobile)
+      formData.append('state', createForm.state)
+      formData.append('district', createForm.district)
+      formData.append('city', createForm.city)
+      formData.append('businessCategories', JSON.stringify(createForm.businessCategories))
+      formData.append('membershipFees', createForm.membershipFees)
+      if (createForm.email) formData.append('email', createForm.email)
+      if (createForm.websiteUrl) formData.append('websiteUrl', createForm.websiteUrl)
+      if (createForm.gstPan) formData.append('gstPan', createForm.gstPan)
+      if (createForm.address) formData.append('address', createForm.address)
+      if (createForm.referralId) formData.append('referralId', createForm.referralId)
+      if (createForm.membershipType) formData.append('membershipType', createForm.membershipType)
+      if (createForm.utrNumber?.trim()) formData.append('utrNumber', createForm.utrNumber.trim())
+      if (createForm.password) formData.append('password', createForm.password)
+      if (createForm.paymentScreenshot) formData.append('paymentScreenshot', createForm.paymentScreenshot)
+      createForm.owners.forEach((owner) => {
+        if (owner.photo) formData.append('ownerPhotos', owner.photo)
+      })
+
       const response = await fetch(`${BACKEND_URL}/api/admin/vendors`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(createForm),
+        body: formData,
       })
       const data = await response.json()
 
       if (data.success) {
         alert('Vendor created successfully!')
         setShowCreateModal(false)
-        setCreateForm({
-          ownerName: '',
-          businessName: '',
-          mobile: '',
-          email: '',
-          state: '',
-          district: '',
-          city: '',
-          businessCategories: [],
-          membershipFees: '',
-          password: ''
-        })
+        resetCreateForm()
         fetchVendors()
       } else {
         alert(data.message || 'Failed to create vendor')
@@ -1276,39 +1413,39 @@ ABCD Team`
             </div>
 
             <div className='p-4 md:p-6 space-y-4 md:space-y-5'>
-              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-4'>
                 <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Basic Details</h3>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div>
-                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Name <span className='text-red-500'>*</span></label>
-                    <input
-                      type='text'
-                      value={createForm.ownerName}
-                      onChange={(e) => setCreateForm({...createForm, ownerName: e.target.value})}
-                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                    />
-                  </div>
-
                   <div>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Business Name <span className='text-red-500'>*</span></label>
                     <input
                       type='text'
                       value={createForm.businessName}
-                      onChange={(e) => setCreateForm({...createForm, businessName: e.target.value})}
+                      onChange={(e) => setCreateForm({ ...createForm, businessName: e.target.value })}
                       className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
 
                   <div>
-                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Mobile (10 digits) <span className='text-red-500'>*</span></label>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>WhatsApp No. <span className='text-red-500'>*</span></label>
                     <input
                       type='tel'
                       maxLength={10}
                       value={createForm.mobile}
                       onChange={(e) => {
                         const val = e.target.value.replace(/\D/g, '').slice(0, 10)
-                        setCreateForm({...createForm, mobile: val})
+                        setCreateForm({ ...createForm, mobile: val })
                       }}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>GSTN Details / PAN No.</label>
+                    <input
+                      type='text'
+                      value={createForm.gstPan}
+                      onChange={(e) => setCreateForm({ ...createForm, gstPan: e.target.value })}
                       className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
@@ -1318,15 +1455,84 @@ ABCD Team`
                     <input
                       type='email'
                       value={createForm.email}
-                      onChange={(e) => setCreateForm({...createForm, email: e.target.value})}
+                      onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
                       className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
                 </div>
+
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700'>Owners <span className='text-red-500'>*</span></label>
+                    <button
+                      type='button'
+                      onClick={addCreateOwner}
+                      className='px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition'
+                    >
+                      + Add Owner
+                    </button>
+                  </div>
+
+                  {createForm.owners.map((owner, index) => (
+                    <div key={`create-owner-${index}`} className='border border-gray-200 rounded-xl p-3 bg-white space-y-3'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                        <div>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Name {index + 1} <span className='text-red-500'>*</span></label>
+                          <input
+                            type='text'
+                            value={owner.name}
+                            onChange={(e) => handleCreateOwnerNameChange(index, e.target.value)}
+                            className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Photo {index + 1} <span className='text-red-500'>*</span></label>
+                          <input
+                            type='file'
+                            accept='image/jpeg,image/jpg,image/png,image/webp'
+                            onChange={(e) => handleCreateOwnerPhotoChange(index, e)}
+                            className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+                          />
+                        </div>
+                      </div>
+
+                      <div className='flex items-start justify-between'>
+                        {owner.previewUrl ? (
+                          <img src={owner.previewUrl} alt={`Owner ${index + 1}`} className='w-20 h-20 object-cover rounded-lg border border-gray-300' />
+                        ) : <div />}
+                        {createForm.owners.length > 1 && (
+                          <button
+                            type='button'
+                            onClick={() => removeCreateOwner(index)}
+                            className='px-3 py-1 text-xs font-semibold text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition'
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
-                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Location</h3>
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Business Setup</h3>
+                <MultiCategorySelector
+                  value={createForm.businessCategories}
+                  onChange={(businessCategories) => setCreateForm({ ...createForm, businessCategories })}
+                  required
+                />
+
+                <div>
+                  <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Address</label>
+                  <textarea
+                    rows='2'
+                    value={createForm.address}
+                    onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })}
+                    className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  />
+                </div>
+
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
                   <div>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>State <span className='text-red-500'>*</span></label>
@@ -1372,17 +1578,56 @@ ABCD Team`
                     </select>
                   </div>
                 </div>
-              </div>
-
-              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
-                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Business Setup</h3>
-                <MultiCategorySelector
-                  value={createForm.businessCategories}
-                  onChange={(businessCategories) => setCreateForm({...createForm, businessCategories})}
-                  required
-                />
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Website If Any</label>
+                    <div className='flex items-center rounded-xl border-2 border-gray-200 bg-white overflow-hidden'>
+                      <span className='px-3 text-xs text-gray-500'>https://</span>
+                      <input
+                        type='text'
+                        value={createForm.websiteUrl}
+                        onChange={(e) => setCreateForm({ ...createForm, websiteUrl: e.target.value.replace(/^https?:\/\//i, '') })}
+                        className='w-full px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        placeholder='yourbusiness.com'
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Referral ID</label>
+                    <input
+                      type='text'
+                      value={createForm.referralId}
+                      onChange={(e) => setCreateForm({ ...createForm, referralId: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-2'>Membership Type</label>
+                    <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
+                      {['Gold', 'Diamond', 'Platinum'].map((type) => (
+                        <label key={type} className='flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white cursor-pointer'>
+                          <input
+                            type='checkbox'
+                            checked={createForm.membershipType === type}
+                            onChange={() => {
+                              const membershipFeeMap = { Gold: '5000', Diamond: '10000', Platinum: '25000' }
+                              const selectedValue = createForm.membershipType === type ? '' : type
+                              setCreateForm({
+                                ...createForm,
+                                membershipType: selectedValue,
+                                membershipFees: selectedValue ? membershipFeeMap[selectedValue] : ''
+                              })
+                            }}
+                          />
+                          <span className='text-xs md:text-sm font-semibold'>{type}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) <span className='text-red-500'>*</span></label>
                     <input
@@ -1396,6 +1641,17 @@ ABCD Team`
                   </div>
 
                   <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>UTR Number</label>
+                    <input
+                      type='text'
+                      maxLength={12}
+                      value={createForm.utrNumber}
+                      onChange={(e) => setCreateForm({ ...createForm, utrNumber: e.target.value.replace(/\D/g, '').slice(0, 12) })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Password (min 6 chars)</label>
                     <input
                       type='text'
@@ -1404,7 +1660,33 @@ ABCD Team`
                       className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Payment Screenshot</label>
+                    <input
+                      type='file'
+                      accept='image/jpeg,image/jpg,image/png,image/webp'
+                      onChange={handleCreatePaymentScreenshotChange}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+                    />
+                  </div>
                 </div>
+
+                {previewPaymentScreenshot && (
+                  <div className='mt-2 relative'>
+                    <img src={previewPaymentScreenshot} alt='Payment screenshot preview' className='w-full h-32 object-cover rounded-xl border border-gray-300' />
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setCreateForm({ ...createForm, paymentScreenshot: null })
+                        setPreviewPaymentScreenshot(null)
+                      }}
+                      className='absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs'
+                    >
+                      x
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

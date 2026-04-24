@@ -4,6 +4,15 @@ const path = require("path");
 const vendorModel = require("../models/Vendor.js");
 const VendorCertificate = require("../models/VendorCertificate.js");
 const { generateVendorCertificatePDF } = require("../utils/generateVendorCertificate.js");
+const { handleVendorPhotoUpload, handlePaymentScreenshotUpload } = require("./uploadController");
+
+const normalizeWebsiteUrl = (value) => {
+  if (!value || typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+};
 
 const getStatePrefixForVendorReferral = (state = "") => {
   const normalizedState = String(state).trim().toLowerCase();
@@ -170,18 +179,103 @@ const setVendorPassword = async (req, res) => {
 // Create vendor (admin)
 const createVendor = async (req, res) => {
   try {
-    const { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees, password } = req.body;
+    let {
+      ownerName,
+      owners,
+      businessName,
+      mobile,
+      email,
+      state,
+      district,
+      city,
+      businessCategories,
+      membershipFees,
+      password,
+      websiteUrl,
+      socialUrl,
+      gstPan,
+      address,
+      referredByName,
+      referralId,
+      membershipType,
+      amountPaid,
+      utrNumber
+    } = req.body;
 
-    // Validate required fields
-    if (!ownerName || !businessName || !mobile || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
+    if (typeof businessCategories === 'string') {
+      try {
+        businessCategories = JSON.parse(businessCategories);
+      } catch (e) {
+        return res.status(400).json({ success: false, message: "Invalid business categories format" });
+      }
+    }
+
+    if (typeof owners === 'string') {
+      try {
+        owners = JSON.parse(owners);
+      } catch (e) {
+        return res.status(400).json({ success: false, message: "Invalid owners format" });
+      }
+    }
+
+    email = email?.trim();
+    ownerName = ownerName?.trim();
+    businessName = businessName?.trim();
+    state = state?.trim();
+    district = district?.trim();
+    city = city?.trim();
+    membershipFees = Number(membershipFees);
+    websiteUrl = normalizeWebsiteUrl(websiteUrl);
+    socialUrl = socialUrl?.trim();
+    gstPan = gstPan?.trim();
+    address = address?.trim();
+    referredByName = referredByName?.trim();
+    referralId = referralId?.trim();
+    utrNumber = utrNumber?.trim();
+    membershipType = membershipType?.trim();
+    amountPaid = amountPaid ? Number(amountPaid) : undefined;
+
+    if (!Array.isArray(owners) || owners.length === 0) {
+      owners = ownerName ? [{ name: ownerName }] : [];
+    }
+
+    owners = owners.map((item) => ({
+      name: (item?.name || item?.ownerName || '').trim()
+    })).filter((item) => item.name);
+
+    if (!mobile || owners.length === 0 || !businessName || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided including state, district, city, at least one category and subcategory"
+        message: "Mobile, at least one owner with photo, business name, state, district, city, at least one category-subcategory pair, and membership fees are required"
       });
+    }
+
+    if (owners.length > 10) {
+      return res.status(400).json({ success: false, message: "Maximum 10 owners are allowed" });
     }
 
     if (businessCategories.length > 5) {
       return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
+    }
+
+    for (const item of businessCategories) {
+      if (!item.category || !item.subCategory || typeof item.category !== 'string' || typeof item.subCategory !== 'string') {
+        return res.status(400).json({ success: false, message: "Each category must have a category and subCategory text" });
+      }
+      item.category = item.category.trim();
+      item.subCategory = item.subCategory.trim();
+
+      if (item.categoryId) item.categoryId = item.categoryId.trim();
+      if (item.subcategoryId) item.subcategoryId = item.subcategoryId.trim();
+    }
+
+    mobile = Number(mobile);
+
+    if (!mobile || mobile < 6000000000 || mobile > 9999999999) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid Indian mobile number",
+      });
     }
 
     // Check if mobile already exists
@@ -206,7 +300,7 @@ const createVendor = async (req, res) => {
 
     // Create vendor data
     const vendorData = {
-      ownerName,
+      ownerName: owners[0].name,
       businessName,
       mobile,
       state,
@@ -216,7 +310,8 @@ const createVendor = async (req, res) => {
       membershipFees,
       paymentVerified: true,
       isVerified: true,
-      isMobileVerified: true
+      isMobileVerified: true,
+      isBusinessApplicationSubmitted: true,
     };
 
     // Only add email if it's provided and not empty
@@ -224,10 +319,70 @@ const createVendor = async (req, res) => {
       vendorData.email = email.trim();
     }
 
+    if (websiteUrl) vendorData.websiteUrl = websiteUrl;
+    if (socialUrl) vendorData.socialUrl = socialUrl;
+    if (gstPan) vendorData.gstPan = gstPan;
+    if (address) vendorData.address = address;
+    if (referredByName) vendorData.referredByName = referredByName;
+    if (referralId) vendorData.referralId = referralId;
+    if (utrNumber) vendorData.utrNumber = utrNumber;
+    if (membershipType) vendorData.membershipType = membershipType;
+    if (amountPaid) vendorData.amountPaid = amountPaid;
+
     // Hash password if provided
     if (password && password.length >= 6) {
       const salt = await bcrypt.genSalt(10);
       vendorData.password = await bcrypt.hash(password, salt);
+    }
+
+    const ownerPhotoFiles = (req.files && req.files.ownerPhotos) ? req.files.ownerPhotos : [];
+    const legacyVendorPhotoFiles = (req.files && req.files.vendorPhoto) ? req.files.vendorPhoto : [];
+    const normalizedOwnerPhotoFiles = ownerPhotoFiles.length > 0 ? ownerPhotoFiles : legacyVendorPhotoFiles;
+
+    if (normalizedOwnerPhotoFiles.length !== owners.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload one photo for each owner"
+      });
+    }
+
+    try {
+      const ownersWithPhotos = [];
+      for (let i = 0; i < owners.length; i++) {
+        const photoPath = await handleVendorPhotoUpload(normalizedOwnerPhotoFiles[i]);
+        ownersWithPhotos.push({
+          name: owners[i].name,
+          photo: photoPath
+        });
+      }
+      vendorData.owners = ownersWithPhotos;
+      vendorData.passportPhoto = ownersWithPhotos[0].photo;
+    } catch (error) {
+      console.error("Owner photo upload error:", error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || "Failed to upload owner photos"
+      });
+    }
+
+    if (utrNumber && !/^\d{12}$/.test(utrNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: "UTR number must be exactly 12 digits"
+      });
+    }
+
+    const hasPaymentScreenshot = !!(req.files && req.files.paymentScreenshot && req.files.paymentScreenshot[0]);
+    if (hasPaymentScreenshot) {
+      try {
+        vendorData.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
+      } catch (error) {
+        console.error("Payment screenshot upload error:", error);
+        return res.status(500).json({
+          success: false,
+          message: error.message || "Failed to upload payment screenshot"
+        });
+      }
     }
 
     const vendor = await vendorModel.create(vendorData);
