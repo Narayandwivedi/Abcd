@@ -5,18 +5,6 @@ const path = require('path');
 const VENDOR_CERTIFICATE_PREFIX = 'VCG';
 const VENDOR_CERTIFICATE_DIGITS = 5;
 
-const getStatePrefixForVendorReferral = (state = "") => {
-  const normalizedState = String(state).trim().toLowerCase();
-
-  if (normalizedState.includes("chhattisgarh") || normalizedState.includes("chhatisgarh")) return "CG";
-  if (normalizedState.includes("bihar")) return "BR";
-  if (normalizedState.includes("jharkhand")) return "JH";
-  if (normalizedState.includes("odisha") || normalizedState.includes("orissa") || normalizedState.includes("orrisa")) return "OD";
-
-  const compact = normalizedState.replace(/[^a-z]/g, "");
-  return compact.slice(0, 2).toUpperCase() || "NA";
-};
-
 const formatVendorCertificateNumber = (sequenceNumber) =>
   `${VENDOR_CERTIFICATE_PREFIX}${String(sequenceNumber).padStart(VENDOR_CERTIFICATE_DIGITS, '0')}`;
 
@@ -25,12 +13,7 @@ const extractVendorCertificateSequence = (certificateNumber = '') => {
   return match ? Number.parseInt(match[1], 10) : 0;
 };
 
-const buildVendorReferralCode = ({ state = "", certificateNumber = "" }) => {
-  const statePrefix = getStatePrefixForVendorReferral(state);
-  const suffixMatch = String(certificateNumber).match(/(\d{5})$/);
-  const suffix = suffixMatch ? suffixMatch[1] : String(certificateNumber).replace(/\D/g, "").slice(-5).padStart(5, "0");
-  return `${statePrefix}VM${suffix}`;
-};
+const buildVendorReferralCode = ({ certificateNumber = "" }) => String(certificateNumber);
 
 // Generate unique certificate number in format: VCG00001, VCG00009, VCG00010
 const generateVendorCertificateNumber = async () => {
@@ -57,10 +40,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
     const certificateNumber = existingCertificateNumber || await generateVendorCertificateNumber();
     const fileName = `ABCD_VENDOR_CERTIFICATE_${certificateNumber}.pdf`;
     const filePath = path.join(vendorCertificatesDir, fileName);
-    const referralCode = vendor.referralCode || buildVendorReferralCode({
-      state: vendor.state,
-      certificateNumber
-    });
+    const referralCode = certificateNumber;
 
     return new Promise((resolve, reject) => {
 

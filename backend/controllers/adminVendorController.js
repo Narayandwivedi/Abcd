@@ -14,32 +14,6 @@ const normalizeWebsiteUrl = (value) => {
   return `https://${trimmed}`;
 };
 
-const getStatePrefixForVendorReferral = (state = "") => {
-  const normalizedState = String(state).trim().toLowerCase();
-
-  if (normalizedState.includes("chhattisgarh") || normalizedState.includes("chhatisgarh")) return "CG";
-  if (normalizedState.includes("bihar")) return "BR";
-  if (normalizedState.includes("jharkhand")) return "JH";
-  if (normalizedState.includes("odisha") || normalizedState.includes("orissa") || normalizedState.includes("orrisa")) return "OD";
-
-  const compact = normalizedState.replace(/[^a-z]/g, "");
-  return compact.slice(0, 2).toUpperCase() || "NA";
-};
-
-const getLastFiveDigitsFromCertificate = (certificateNumber = "") => {
-  const match = String(certificateNumber).match(/(\d{5})$/);
-  if (match) return match[1];
-
-  const digitsOnly = String(certificateNumber).replace(/\D/g, "");
-  return digitsOnly.slice(-5).padStart(5, "0");
-};
-
-const buildVendorReferralCode = ({ state, certificateNumber }) => {
-  const statePrefix = getStatePrefixForVendorReferral(state);
-  const suffix = getLastFiveDigitsFromCertificate(certificateNumber);
-  return `${statePrefix}VM${suffix}`;
-};
-
 // Get all vendors (for admin)
 const getAllVendors = async (req, res) => {
   try {
@@ -97,10 +71,7 @@ const approveVendor = async (req, res) => {
     vendor.isRejected = false; // Clear rejection status if re-approving
     vendor.rejectionReason = undefined; // Clear rejection reason
     vendor.activeCertificate = certificate._id;
-    vendor.referralCode = certificateData.referralCode || buildVendorReferralCode({
-      state: vendor.state,
-      certificateNumber: certificate.certificateNumber
-    });
+    vendor.referralCode = certificateData.referralCode || certificate.certificateNumber;
     await vendor.save();
 
     console.log(`[ADMIN] Vendor approved and certificate generated: ${vendor.businessName} - ${certificate.certificateNumber}`);
@@ -405,10 +376,7 @@ const createVendor = async (req, res) => {
 
     // Update vendor with certificate reference
     vendor.activeCertificate = certificate._id;
-    vendor.referralCode = certificateData.referralCode || buildVendorReferralCode({
-      state: vendor.state,
-      certificateNumber: certificate.certificateNumber
-    });
+    vendor.referralCode = certificateData.referralCode || certificate.certificateNumber;
     await vendor.save();
 
     console.log(`[ADMIN] Vendor created with certificate: ${vendor.businessName} - ${certificate.certificateNumber}`);

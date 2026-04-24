@@ -114,6 +114,7 @@ const renewVendorCertificate = async (req, res) => {
 
     // Update vendor's active certificate reference
     vendor.activeCertificate = newCertificate._id;
+    vendor.referralCode = newCertificate.certificateNumber;
     await vendor.save();
 
     console.log(`[VENDOR CERT] Certificate renewed for vendor ${vendor.businessName} - New: ${newCertificate.certificateNumber}, Old: ${oldCertificate.certificateNumber}`);
