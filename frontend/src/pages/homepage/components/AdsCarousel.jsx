@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 const SLIDE_INTERVAL_MS = 1200
 const SLIDE_TRANSITION_MS = 500
+const DESKTOP_BREAKPOINT = 1024
 
 const getAdImageUrl = (imagePath) => {
   if (!imagePath) {
@@ -25,12 +26,15 @@ const openAdLink = (link) => {
   window.open(targetUrl, '_blank', 'noopener,noreferrer')
 }
 
-const AdCard = ({ ad, index }) => {
+const AdCard = ({ ad, index, visibleCount }) => {
   const imageUrl = getAdImageUrl(ad.adImg)
   const isClickable = Boolean(ad.link)
 
   return (
-    <div className='w-1/2 flex-shrink-0 px-1.5'>
+    <div
+      className='flex-shrink-0 px-1.5'
+      style={{ width: `${100 / visibleCount}%` }}
+    >
       <button
         type='button'
         onClick={() => openAdLink(ad.link)}
@@ -56,6 +60,9 @@ const AdsCarousel = () => {
   const [loading, setLoading] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(true)
+  const [visibleCount, setVisibleCount] = useState(() =>
+    typeof window !== 'undefined' && window.innerWidth >= DESKTOP_BREAKPOINT ? 4 : 2
+  )
 
   useEffect(() => {
     const fetchAds = async () => {
@@ -79,25 +86,37 @@ const AdsCarousel = () => {
     fetchAds()
   }, [])
 
+  useEffect(() => {
+    const handleResize = () => {
+      setVisibleCount(window.innerWidth >= DESKTOP_BREAKPOINT ? 4 : 2)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const effectiveVisibleCount = Math.min(visibleCount, Math.max(ads.length, 1))
+
   const carouselAds = useMemo(() => {
-    if (ads.length <= 1) {
+    if (ads.length <= effectiveVisibleCount) {
       return ads
     }
 
     return [...ads, ...ads, ...ads]
-  }, [ads])
+  }, [ads, effectiveVisibleCount])
 
   useEffect(() => {
-    if (ads.length > 1) {
+    if (ads.length > effectiveVisibleCount) {
       setCurrentSlide(ads.length)
       setIsTransitioning(true)
     } else {
       setCurrentSlide(0)
+      setIsTransitioning(false)
     }
-  }, [ads.length])
+  }, [ads.length, effectiveVisibleCount])
 
   useEffect(() => {
-    if (ads.length <= 1) {
+    if (ads.length <= effectiveVisibleCount) {
       return undefined
     }
 
@@ -106,10 +125,10 @@ const AdsCarousel = () => {
     }, SLIDE_INTERVAL_MS)
 
     return () => clearInterval(intervalId)
-  }, [ads.length])
+  }, [ads.length, effectiveVisibleCount])
 
   useEffect(() => {
-    if (ads.length <= 1) {
+    if (ads.length <= effectiveVisibleCount) {
       return undefined
     }
 
@@ -123,10 +142,10 @@ const AdsCarousel = () => {
     }
 
     return undefined
-  }, [ads.length, currentSlide])
+  }, [ads.length, currentSlide, effectiveVisibleCount])
 
   useEffect(() => {
-    if (!isTransitioning) {
+    if (!isTransitioning && ads.length > effectiveVisibleCount) {
       const frameId = window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
           setIsTransitioning(true)
@@ -137,33 +156,25 @@ const AdsCarousel = () => {
     }
 
     return undefined
-  }, [isTransitioning])
+  }, [ads.length, effectiveVisibleCount, isTransitioning])
 
   if (loading || ads.length === 0) {
     return null
   }
 
-  if (ads.length === 1) {
+  if (ads.length <= effectiveVisibleCount) {
     return (
       <section className='pb-0 lg:pb-1 bg-white'>
         <div className='container mx-auto px-4'>
-          <div className='max-w-7xl mx-auto px-1.5'>
-            <button
-              type='button'
-              onClick={() => openAdLink(ads[0].link)}
-              disabled={!ads[0].link}
-              className={`relative h-32 md:h-40 w-full rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden ${
-                ads[0].link ? 'cursor-pointer hover:shadow-lg' : 'cursor-default'
-              } transition-shadow`}
-              aria-label={ads[0].title || 'Advertisement 1'}
-            >
-              <img
-                src={getAdImageUrl(ads[0].adImg)}
-                alt={ads[0].title || 'Advertisement 1'}
-                loading='lazy'
-                className='w-full h-full object-contain bg-gray-50'
+          <div className='max-w-7xl mx-auto flex'>
+            {ads.map((ad, index) => (
+              <AdCard
+                key={ad._id || index}
+                ad={ad}
+                index={index}
+                visibleCount={effectiveVisibleCount}
               />
-            </button>
+            ))}
           </div>
         </div>
       </section>
@@ -177,12 +188,17 @@ const AdsCarousel = () => {
           <div
             className='flex'
             style={{
-              transform: `translateX(-${currentSlide * 50}%)`,
+              transform: `translateX(-${currentSlide * (100 / effectiveVisibleCount)}%)`,
               transition: isTransitioning ? `transform ${SLIDE_TRANSITION_MS}ms ease-in-out` : 'none'
             }}
           >
             {carouselAds.map((ad, index) => (
-              <AdCard key={`${ad._id || ad.title || 'ad'}-${index}`} ad={ad} index={index} />
+              <AdCard
+                key={`${ad._id || ad.title || 'ad'}-${index}`}
+                ad={ad}
+                index={index}
+                visibleCount={effectiveVisibleCount}
+              />
             ))}
           </div>
         </div>
