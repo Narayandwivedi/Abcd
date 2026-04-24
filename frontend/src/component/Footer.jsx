@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 
 const Footer = () => {
   return (
-    <footer className='bg-gray-800 text-white mt-auto mb-10 md:mb-0'>
+    <footer className='bg-gray-800 text-white mt-auto mb-10 md:mb-24'>
       <div className='container mx-auto px-4 py-4 md:py-8'>
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8'>
+        <div className='grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-8'>
           <div className='hidden md:block'>
             <h3 className='text-xl font-bold mb-4'>ABCD</h3>
             <p className='text-gray-400 text-sm'>
@@ -76,7 +76,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className='md:-mt-16'>
+          <div>
             <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Contact</h4>
             <div className='space-y-1 md:space-y-2 text-gray-400 text-[10px] md:text-sm'>
               <p>

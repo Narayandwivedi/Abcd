@@ -137,9 +137,9 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
 
         {/* Vendors Joining Soon Section */}
         {!noVendorLoading && noVendorCategories.length > 0 && (
-          <div className='mt-12 md:mt-20 anim-fade-in'>
+          <div className='mt-6 md:mt-8 anim-fade-in'>
             {/* Divider Line */}
-            <div className='relative flex items-center justify-center mb-12 md:mb-16'>
+            <div className='relative flex items-center justify-center mb-6 md:mb-8'>
               <div className='w-full border-t border-gray-300'></div>
               <div className='absolute bg-white px-6 py-1 rounded-full border border-gray-300 shadow-sm'>
                 <span className='text-xs md:text-sm font-semibold text-gray-500 tracking-widest uppercase'>
@@ -148,7 +148,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
               </div>
             </div>
 
-            <div className='text-center mb-6 md:mb-12'>
+            <div className='text-center mb-5 md:mb-8'>
               <h2 className='text-xl md:text-3xl font-extrabold text-gray-900 tracking-tight'>
                 Vendors Joining Soon
               </h2>
