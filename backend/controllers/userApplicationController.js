@@ -1,15 +1,13 @@
-const VendorApplication = require('../models/VendorApplication');
+const UserApplication = require('../models/UserApplication');
 const User = require('../models/User');
 const Vendor = require('../models/Vendor');
-const { sendVendorSignupAlert } = require("../utils/telegramAlert");
-const path = require('path');
-const fs = require('fs');
+const { sendUserApplicationAlert } = require("../utils/telegramAlert");
 
 const submitApplication = async (req, res) => {
   try {
-    const { ownerName, whatsappNumber, businessName, city, referralCode, membershipType, membershipAmount, utrNumber } = req.body;
+    const { fullName, whatsappNumber, city, referralCode, utrNumber } = req.body;
 
-    if (!ownerName || !whatsappNumber || !businessName || !city) {
+    if (!fullName || !whatsappNumber || !city) {
       return res.status(400).json({ success: false, message: "Please fill all required fields" });
     }
 
@@ -20,14 +18,11 @@ const submitApplication = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please upload a payment screenshot or enter a UTR number" });
     }
 
-    const newApplication = new VendorApplication({
-      ownerName,
+    const newApplication = new UserApplication({
+      fullName,
       whatsappNumber,
-      businessName,
       city,
       referralCode: referralCode || '',
-      membershipType: membershipType || undefined,
-      membershipAmount: membershipAmount ? Number(membershipAmount) : undefined,
       utrNumber: utrNumber || '',
       paymentScreenshot: req.file ? `uploads/temp/${req.file.filename}` : undefined,
     });
@@ -36,18 +31,15 @@ const submitApplication = async (req, res) => {
 
     // Send Telegram alert
     try {
-      await sendVendorSignupAlert({
-        ownerName: ownerName + ' (Application)',
+      await sendUserApplicationAlert({
+        fullName,
         mobile: whatsappNumber,
-        businessName,
         city,
-        referralId: referralCode,
-        membershipType,
-        membershipFees: membershipAmount,
+        referredBy: referralCode,
         utrNumber: utrNumber || 'N/A',
       });
     } catch (err) {
-      console.error("Telegram Vendor Alert Error:", err.message);
+      console.error("Telegram User Alert Error:", err.message);
     }
 
     return res.status(201).json({
@@ -55,7 +47,7 @@ const submitApplication = async (req, res) => {
       message: "Application submitted successfully! Our team will contact you soon."
     });
   } catch (error) {
-    console.error("Vendor Application Error:", error);
+    console.error("User Application Error:", error);
     return res.status(500).json({ success: false, message: "Failed to submit application. Please try again." });
   }
 };
@@ -99,14 +91,4 @@ const verifyReferralCode = async (req, res) => {
   }
 };
 
-const getAllApplications = async (req, res) => {
-  try {
-    const applications = await VendorApplication.find().sort({ createdAt: -1 });
-    return res.status(200).json({ success: true, applications });
-  } catch (error) {
-    console.error("Get All Applications Error:", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
-  }
-};
-
-module.exports = { submitApplication, verifyReferralCode, getAllApplications };
+module.exports = { submitApplication, verifyReferralCode };
