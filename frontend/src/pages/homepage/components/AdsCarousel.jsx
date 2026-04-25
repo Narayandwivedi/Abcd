@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 const SLIDE_INTERVAL_MS = 1200
@@ -60,9 +60,16 @@ const AdsCarousel = () => {
   const [loading, setLoading] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(true)
+  const [isPaused, setIsPaused] = useState(false)
+  const [dragOffset, setDragOffset] = useState(0)
   const [visibleCount, setVisibleCount] = useState(() =>
     typeof window !== 'undefined' && window.innerWidth >= DESKTOP_BREAKPOINT ? 4 : 2
   )
+  const trackRef = useRef(null)
+  const touchStartXRef = useRef(0)
+  const touchCurrentXRef = useRef(0)
+  const isDraggingRef = useRef(false)
+  const suppressClickRef = useRef(false)
 
   useEffect(() => {
     const fetchAds = async () => {
@@ -120,12 +127,16 @@ const AdsCarousel = () => {
       return undefined
     }
 
+    if (isPaused) {
+      return undefined
+    }
+
     const intervalId = setInterval(() => {
       setCurrentSlide((prev) => prev + 1)
     }, SLIDE_INTERVAL_MS)
 
     return () => clearInterval(intervalId)
-  }, [ads.length, effectiveVisibleCount])
+  }, [ads.length, effectiveVisibleCount, isPaused])
 
   useEffect(() => {
     if (ads.length <= effectiveVisibleCount) {
@@ -135,7 +146,16 @@ const AdsCarousel = () => {
     if (currentSlide >= ads.length * 2) {
       const timeoutId = setTimeout(() => {
         setIsTransitioning(false)
-        setCurrentSlide(ads.length)
+        setCurrentSlide((prev) => prev - ads.length)
+      }, SLIDE_TRANSITION_MS)
+
+      return () => clearTimeout(timeoutId)
+    }
+
+    if (currentSlide < ads.length) {
+      const timeoutId = setTimeout(() => {
+        setIsTransitioning(false)
+        setCurrentSlide((prev) => prev + ads.length)
       }, SLIDE_TRANSITION_MS)
 
       return () => clearTimeout(timeoutId)
@@ -157,6 +177,82 @@ const AdsCarousel = () => {
 
     return undefined
   }, [ads.length, effectiveVisibleCount, isTransitioning])
+
+  const handleTouchStart = (event) => {
+    if (ads.length <= effectiveVisibleCount || event.touches.length !== 1) {
+      return
+    }
+
+    const touchX = event.touches[0].clientX
+    touchStartXRef.current = touchX
+    touchCurrentXRef.current = touchX
+    isDraggingRef.current = true
+    suppressClickRef.current = false
+    setIsPaused(true)
+    setIsTransitioning(false)
+    setDragOffset(0)
+  }
+
+  const handleTouchMove = (event) => {
+    if (!isDraggingRef.current || event.touches.length !== 1) {
+      return
+    }
+
+    const touchX = event.touches[0].clientX
+    touchCurrentXRef.current = touchX
+
+    const deltaX = touchX - touchStartXRef.current
+    if (Math.abs(deltaX) > 8) {
+      suppressClickRef.current = true
+    }
+
+    setDragOffset(deltaX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!isDraggingRef.current) {
+      return
+    }
+
+    isDraggingRef.current = false
+
+    const slideWidth = trackRef.current
+      ? trackRef.current.offsetWidth / effectiveVisibleCount
+      : 0
+    const swipeThreshold = Math.max(30, slideWidth * 0.2)
+    const totalDeltaX = touchCurrentXRef.current - touchStartXRef.current
+
+    if (Math.abs(totalDeltaX) >= swipeThreshold) {
+      setCurrentSlide((prev) => {
+        if (totalDeltaX < 0) {
+          return prev + 1
+        }
+
+        return prev - 1
+      })
+    }
+
+    setDragOffset(0)
+    setIsTransitioning(true)
+    setIsPaused(false)
+  }
+
+  const handleTouchCancel = () => {
+    isDraggingRef.current = false
+    setDragOffset(0)
+    setIsTransitioning(true)
+    setIsPaused(false)
+  }
+
+  const handleClickCapture = (event) => {
+    if (!suppressClickRef.current) {
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+    suppressClickRef.current = false
+  }
 
   if (loading || ads.length === 0) {
     return null
@@ -186,10 +282,17 @@ const AdsCarousel = () => {
       <div className='container mx-auto px-4'>
         <div className='max-w-7xl mx-auto overflow-hidden'>
           <div
+            ref={trackRef}
             className='flex'
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchCancel}
+            onClickCapture={handleClickCapture}
             style={{
-              transform: `translateX(-${currentSlide * (100 / effectiveVisibleCount)}%)`,
-              transition: isTransitioning ? `transform ${SLIDE_TRANSITION_MS}ms ease-in-out` : 'none'
+              transform: `translateX(calc(-${currentSlide * (100 / effectiveVisibleCount)}% + ${dragOffset}px))`,
+              transition: isTransitioning ? `transform ${SLIDE_TRANSITION_MS}ms ease-in-out` : 'none',
+              touchAction: 'pan-x pinch-zoom'
             }}
           >
             {carouselAds.map((ad, index) => (
