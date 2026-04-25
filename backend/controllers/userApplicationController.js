@@ -91,4 +91,14 @@ const verifyReferralCode = async (req, res) => {
   }
 };
 
-module.exports = { submitApplication, verifyReferralCode };
+const getAllApplications = async (req, res) => {
+  try {
+    const applications = await UserApplication.find().sort({ createdAt: -1 });
+    return res.status(200).json({ success: true, data: applications });
+  } catch (error) {
+    console.error("Fetch User Applications Error:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch applications" });
+  }
+};
+
+module.exports = { submitApplication, verifyReferralCode, getAllApplications };
