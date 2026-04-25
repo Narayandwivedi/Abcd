@@ -44,7 +44,8 @@ const Users = () => {
     passportPhoto: null,
     referredBy: '',
     password: '',
-    city: ''
+    city: '',
+    utrNumber: ''
   })
   const [creating, setCreating] = useState(false)
   const [activeTab, setActiveTab] = useState('approved') // approved, applications
@@ -662,6 +663,7 @@ ABCD Team`
       if (createFormData.email) formData.append('email', createFormData.email)
       if (createFormData.referredBy) formData.append('referredBy', createFormData.referredBy)
       if (createFormData.password) formData.append('password', createFormData.password)
+      if (createFormData.utrNumber) formData.append('utrNumber', createFormData.utrNumber)
 
       const response = await fetch(`${BACKEND_URL}/api/admin/users`, {
         method: 'POST',
@@ -684,7 +686,8 @@ ABCD Team`
           passportPhoto: null,
           referredBy: '',
           password: '',
-          city: ''
+          city: '',
+          utrNumber: ''
         })
         setCreateSelectedState('')
         setCreateSelectedDistrict('')
@@ -1509,6 +1512,23 @@ ABCD Team`
                       name='password'
                       value={createFormData.password}
                       onChange={handleCreateFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* UTR Number */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>UTR Number (12 digits)</label>
+                    <input
+                      type='text'
+                      name='utrNumber'
+                      maxLength={12}
+                      value={createFormData.utrNumber}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 12)
+                        setCreateFormData(prev => ({ ...prev, utrNumber: val }))
+                      }}
+                      placeholder='12-digit UTR number'
                       className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
                     />
                   </div>

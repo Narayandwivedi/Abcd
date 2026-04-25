@@ -593,7 +593,7 @@ const deleteUser = async (req, res) => {
 // Create user (admin) - bypasses payment requirement
 const createUser = async (req, res) => {
   try {
-    const { fullName, mobile, email, gotra, state, district, city, address, relativeName, relationship, referredBy, password } = req.body;
+    const { fullName, mobile, email, gotra, state, district, city, address, relativeName, relationship, referredBy, password, utrNumber } = req.body;
 
     // Validate required fields
     if (!fullName || !mobile || !gotra || !address || !relativeName) {
@@ -666,6 +666,10 @@ const createUser = async (req, res) => {
 
     if (city) {
       userData.city = city.toUpperCase();
+    }
+
+    if (utrNumber) {
+      userData.utrNumber = utrNumber;
     }
 
     if (referredBy) {
