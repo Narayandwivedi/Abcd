@@ -1,4 +1,6 @@
 const VendorApplication = require('../models/VendorApplication');
+const User = require('../models/User');
+const Vendor = require('../models/Vendor');
 const { sendVendorSignupAlert } = require("../utils/telegramAlert");
 const path = require('path');
 const fs = require('fs');
@@ -58,4 +60,43 @@ const submitApplication = async (req, res) => {
   }
 };
 
-module.exports = { submitApplication };
+const verifyReferralCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+    if (!code) {
+      return res.status(400).json({ success: false, message: "Code is required" });
+    }
+
+    let person = null;
+    let name = "";
+    let city = "";
+
+    if (code.startsWith('VCG')) {
+      person = await Vendor.findOne({ referralCode: code });
+      if (person) {
+        name = person.ownerName;
+        city = person.city;
+      }
+    } else if (code.startsWith('CG')) {
+      person = await User.findOne({ referralCode: code });
+      if (person) {
+        name = person.fullName;
+        city = person.city;
+      }
+    }
+
+    if (!person) {
+      return res.status(404).json({ success: false, message: "Invalid referral code" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: { name, city }
+    });
+  } catch (error) {
+    console.error("Referral Verify Error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+module.exports = { submitApplication, verifyReferralCode };

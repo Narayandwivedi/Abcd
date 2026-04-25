@@ -25,15 +25,49 @@ const Signup = () => {
   })
   const [paymentScreenshot, setPaymentScreenshot] = useState(null)
   const [screenshotPreview, setScreenshotPreview] = useState(null)
+  const [referralInfo, setReferralInfo] = useState(null)
+  const [isVerifyingReferral, setIsVerifyingReferral] = useState(false)
   const [errors, setErrors] = useState({})
 
   const selectedMembership = MEMBERSHIP_OPTIONS.find(m => m.type === formData.membershipType)
   const qrAmount = selectedMembership ? selectedMembership.amount : ''
   const upiQrValue = `upi://pay?pa=${UPI_ID}&pn=ABCD Platform${qrAmount ? `&am=${qrAmount}` : ''}&cu=INR`
 
+  const verifyReferral = async (code) => {
+    if (code.length !== 8) {
+      setReferralInfo(null)
+      return
+    }
+    setIsVerifyingReferral(true)
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/vendor-application/verify-referral/${code}`)
+      const data = await response.json()
+      if (data.success) {
+        setReferralInfo(data.data)
+      } else {
+        setReferralInfo(null)
+      }
+    } catch (error) {
+      console.error('Referral verification error:', error)
+      setReferralInfo(null)
+    } finally {
+      setIsVerifyingReferral(false)
+    }
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    if (name === 'referralCode') {
+      const upperValue = value.toUpperCase().slice(0, 8)
+      setFormData(prev => ({ ...prev, [name]: upperValue }))
+      if (upperValue.length === 8) {
+        verifyReferral(upperValue)
+      } else {
+        setReferralInfo(null)
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }))
+    }
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
   }
 
@@ -216,8 +250,26 @@ const Signup = () => {
               <label className={labelClass}>Referral Code</label>
               <div className='relative'>
                 <Gift className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                <input type='text' name='referralCode' value={formData.referralCode} onChange={handleChange} placeholder='Enter referral code (if any)' className={inputClass('referralCode')} />
+                <input 
+                  type='text' 
+                  name='referralCode' 
+                  value={formData.referralCode} 
+                  onChange={handleChange} 
+                  placeholder='Enter referral code (if any)' 
+                  maxLength={8}
+                  className={inputClass('referralCode')} 
+                />
+                {isVerifyingReferral && (
+                  <div className='absolute right-3 top-1/2 -translate-y-1/2'>
+                    <Loader2 className='w-4 h-4 animate-spin text-indigo-500' />
+                  </div>
+                )}
               </div>
+              {referralInfo && (
+                <p className='text-xs text-green-600 mt-1 font-bold'>
+                  {referralInfo.name}-{referralInfo.city}
+                </p>
+              )}
             </div>
 
             {/* Membership Type */}
