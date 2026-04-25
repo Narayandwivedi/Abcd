@@ -14,6 +14,7 @@ const MEMBERSHIP_OPTIONS = [
 const Signup = () => {
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [applicationNumber, setApplicationNumber] = useState('')
   const [formData, setFormData] = useState({
     ownerName: '',
     whatsappNumber: '',
@@ -140,6 +141,7 @@ const Signup = () => {
       })
       const data = await response.json()
       if (data.success) {
+        setApplicationNumber(data.applicationNumber)
         setSubmitted(true)
         toast.success('Application submitted successfully!')
       } else {
@@ -168,7 +170,28 @@ const Signup = () => {
             <CheckCircle className='w-11 h-11 text-green-600' />
           </div>
           <h2 className='text-2xl font-black text-gray-900 mb-3'>Application Submitted!</h2>
-          <p className='text-gray-600 mb-6 leading-relaxed'>
+          
+          <div className='bg-indigo-50 border-2 border-indigo-100 rounded-2xl p-4 mb-6'>
+            <p className='text-[10px] text-indigo-600 font-bold uppercase tracking-wider mb-1'>Your Application Number</p>
+            <div className='flex items-center justify-center gap-3'>
+              <span className='text-2xl font-black text-indigo-900 tracking-widest'>{applicationNumber}</span>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(applicationNumber)
+                  toast.success('Application number copied!', { position: 'bottom-center', autoClose: 1000 })
+                }}
+                className='p-2 bg-white text-indigo-600 rounded-lg shadow-sm hover:bg-indigo-50 transition-colors border border-indigo-100'
+                title='Copy Number'
+              >
+                <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z' />
+                </svg>
+              </button>
+            </div>
+            <p className='text-[10px] text-red-500 font-bold mt-2 uppercase'>⚠️ Please take a screenshot for future reference</p>
+          </div>
+
+          <p className='text-gray-600 mb-6 text-sm leading-relaxed'>
             Thank you for applying to ABCD Vyapar! Our team will review your application and contact you on your WhatsApp number <span className='font-bold text-gray-800'>{formData.whatsappNumber}</span> within 24–48 hours.
           </p>
           <a

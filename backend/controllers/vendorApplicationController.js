@@ -57,7 +57,8 @@ const submitApplication = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Application submitted successfully! Our team will contact you soon."
+      message: "Application submitted successfully! Our team will contact you soon.",
+      applicationNumber
     });
   } catch (error) {
     console.error("Vendor Application Error:", error);
