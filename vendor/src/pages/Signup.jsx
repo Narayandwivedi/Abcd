@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Loader2, CheckCircle, User, Phone, Building2, MapPin, Gift, Upload, Hash } from 'lucide-react'
+import { Loader2, CheckCircle, User, Phone, Building2, MapPin, Gift, Upload, Hash, FileText } from 'lucide-react'
 import { toast } from 'react-toastify'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
@@ -158,13 +158,11 @@ const Signup = () => {
 
         {/* Header */}
         <div className='text-center mb-5 sm:mb-4 px-2 pt-6 sm:pt-0'>
-          <div className='flex items-center justify-center gap-3 sm:gap-4 mb-2'>
-            <div className='inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-lg'>
-              <Building2 className='w-6 h-6 sm:w-7 sm:h-7 text-white' />
-            </div>
-            <h1 className='text-2xl sm:text-3xl lg:text-2xl xl:text-2xl font-black text-gray-900'>ABCD Vendor</h1>
+          <div className='flex items-center justify-center gap-2 mb-1'>
+            <FileText className='w-5 h-5 text-indigo-600' />
+            <h1 className='text-xl sm:text-2xl lg:text-xl font-black text-gray-900'>ABCD Vendor Application</h1>
           </div>
-          <p className='text-sm sm:text-base lg:text-sm xl:text-sm text-gray-600'>Submit your application — our team will contact you!</p>
+          <p className='text-sm sm:text-base lg:text-sm xl:text-sm text-gray-500'>Submit your application — our team will contact you!</p>
         </div>
 
         {/* Card */}
