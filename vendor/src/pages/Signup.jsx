@@ -1,8 +1,15 @@
 import React, { useState } from 'react'
-import { Loader2, CheckCircle, User, Phone, Building2, MapPin, Gift, CreditCard } from 'lucide-react'
+import { Loader2, CheckCircle, User, Phone, Building2, MapPin, Gift, Upload, Hash } from 'lucide-react'
 import { toast } from 'react-toastify'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+const UPI_ID = '222716826030217@cnrb'
+
+const MEMBERSHIP_OPTIONS = [
+  { type: 'Gold',     amount: 5000,  color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-400', check: 'accent-yellow-500' },
+  { type: 'Diamond',  amount: 10000, color: 'text-cyan-600',   bg: 'bg-cyan-50',   border: 'border-cyan-400',   check: 'accent-cyan-500' },
+  { type: 'Platinum', amount: 25000, color: 'text-pink-600',   bg: 'bg-pink-50',   border: 'border-pink-400',   check: 'accent-pink-500' },
+]
 
 const Signup = () => {
   const [loading, setLoading] = useState(false)
@@ -13,16 +20,43 @@ const Signup = () => {
     businessName: '',
     city: '',
     referralCode: '',
-    paymentInformation: '',
+    membershipType: '',
+    utrNumber: '',
   })
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null)
+  const [screenshotPreview, setScreenshotPreview] = useState(null)
   const [errors, setErrors] = useState({})
+
+  const selectedMembership = MEMBERSHIP_OPTIONS.find(m => m.type === formData.membershipType)
+  const qrAmount = selectedMembership ? selectedMembership.amount : ''
+  const upiQrValue = `upi://pay?pa=${UPI_ID}&pn=ABCD Platform${qrAmount ? `&am=${qrAmount}` : ''}&cu=INR`
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }))
+    setFormData(prev => ({ ...prev, [name]: value }))
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
+  }
+
+  const handleMembershipSelect = (type) => {
+    setFormData(prev => ({ ...prev, membershipType: type }))
+    if (errors.membershipType) setErrors(prev => ({ ...prev, membershipType: '' }))
+  }
+
+  const handleScreenshotChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a valid image (JPG, PNG, WebP)')
+      return
     }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size should be less than 10MB')
+      return
+    }
+    setPaymentScreenshot(file)
+    setScreenshotPreview(URL.createObjectURL(file))
+    if (errors.payment) setErrors(prev => ({ ...prev, payment: '' }))
   }
 
   const validate = () => {
@@ -31,10 +65,17 @@ const Signup = () => {
     if (!formData.whatsappNumber.trim()) {
       newErrors.whatsappNumber = 'WhatsApp number is required'
     } else if (!/^[6-9]\d{9}$/.test(formData.whatsappNumber.trim())) {
-      newErrors.whatsappNumber = 'Enter a valid 10-digit WhatsApp number'
+      newErrors.whatsappNumber = 'Enter a valid 10-digit number'
     }
     if (!formData.businessName.trim()) newErrors.businessName = 'Business name is required'
     if (!formData.city.trim()) newErrors.city = 'City is required'
+    if (!formData.membershipType) newErrors.membershipType = 'Please select a membership type'
+    // Either UTR or screenshot is required
+    const hasUtr = formData.utrNumber.trim().length > 0
+    const hasScreenshot = !!paymentScreenshot
+    if (!hasUtr && !hasScreenshot) {
+      newErrors.payment = 'Please upload a payment screenshot or enter a UTR number'
+    }
     return newErrors
   }
 
@@ -48,17 +89,20 @@ const Signup = () => {
 
     setLoading(true)
     try {
+      const submitData = new FormData()
+      submitData.append('ownerName', formData.ownerName.trim())
+      submitData.append('whatsappNumber', formData.whatsappNumber.trim())
+      submitData.append('businessName', formData.businessName.trim())
+      submitData.append('city', formData.city.trim())
+      submitData.append('referralCode', formData.referralCode.trim())
+      submitData.append('membershipType', formData.membershipType)
+      submitData.append('membershipAmount', selectedMembership?.amount || '')
+      if (formData.utrNumber.trim()) submitData.append('utrNumber', formData.utrNumber.trim())
+      if (paymentScreenshot) submitData.append('paymentScreenshot', paymentScreenshot)
+
       const response = await fetch(`${BACKEND_URL}/api/vendor-application/submit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ownerName: formData.ownerName.trim(),
-          whatsappNumber: formData.whatsappNumber.trim(),
-          businessName: formData.businessName.trim(),
-          city: formData.city.trim(),
-          referralCode: formData.referralCode.trim(),
-          paymentInformation: formData.paymentInformation.trim(),
-        }),
+        body: submitData,
       })
       const data = await response.json()
       if (data.success) {
@@ -75,16 +119,12 @@ const Signup = () => {
     }
   }
 
-  const fields = [
-    { name: 'ownerName', label: 'Business Owner Name', type: 'text', icon: User, placeholder: 'Enter your full name', required: true },
-    { name: 'whatsappNumber', label: 'WhatsApp Number', type: 'tel', icon: Phone, placeholder: '9876543210', required: true, maxLength: 10 },
-    { name: 'businessName', label: 'Business Name', type: 'text', icon: Building2, placeholder: 'Enter your business name', required: true },
-    { name: 'city', label: 'City', type: 'text', icon: MapPin, placeholder: 'Enter your city', required: true },
-    { name: 'referralCode', label: 'Referral Code', type: 'text', icon: Gift, placeholder: 'Enter referral code (if any)', required: false },
-    { name: 'paymentInformation', label: 'Payment Information', type: 'text', icon: CreditCard, placeholder: 'UTR No. or transaction details', required: false },
-  ]
-  const firstRowFields = fields.slice(0, 2)
-  const remainingFields = fields.slice(2)
+  const inputClass = (name) =>
+    `w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white transition-all font-medium ${
+      errors[name] ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
+    }`
+
+  const labelClass = 'block text-xs sm:text-sm font-bold text-gray-700 mb-1.5'
 
   if (submitted) {
     return (
@@ -95,7 +135,7 @@ const Signup = () => {
           </div>
           <h2 className='text-2xl font-black text-gray-900 mb-3'>Application Submitted!</h2>
           <p className='text-gray-600 mb-6 leading-relaxed'>
-            Thank you for applying to ABCD Vyapar! Our team will review your application and contact you on your WhatsApp number <span className='font-bold text-gray-800'>{formData.whatsappNumber}</span> within 24-48 hours.
+            Thank you for applying to ABCD Vyapar! Our team will review your application and contact you on your WhatsApp number <span className='font-bold text-gray-800'>{formData.whatsappNumber}</span> within 24–48 hours.
           </p>
           <a
             href='https://abcdvyapar.com'
@@ -113,99 +153,198 @@ const Signup = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-start sm:items-center justify-center px-0.5 py-2 sm:p-4'>
-      <div className='w-full sm:max-w-lg py-1 sm:py-0'>
-        <div className='bg-white sm:rounded-3xl sm:shadow-xl px-2 py-4 sm:p-6'>
-          <div className='mb-4 text-center'>
-            <h1 className='text-xl sm:text-2xl font-black text-gray-900'>Vendor Application Form</h1>
+    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-start sm:items-center justify-center px-2 py-4 sm:p-4'>
+      <div className='w-full max-w-lg'>
+
+        {/* Header */}
+        <div className='text-center mb-5 sm:mb-4 px-2 pt-6 sm:pt-0'>
+          <div className='flex items-center justify-center gap-3 sm:gap-4 mb-2'>
+            <div className='inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-lg'>
+              <Building2 className='w-6 h-6 sm:w-7 sm:h-7 text-white' />
+            </div>
+            <h1 className='text-2xl sm:text-3xl lg:text-2xl xl:text-2xl font-black text-gray-900'>ABCD Vendor</h1>
           </div>
+          <p className='text-sm sm:text-base lg:text-sm xl:text-sm text-gray-600'>Submit your application — our team will contact you!</p>
+        </div>
 
-          <form onSubmit={handleSubmit} className='space-y-3'>
-            <div className='grid grid-cols-2 gap-1.5 sm:gap-2'>
-              {firstRowFields.map(({ name, label, type, icon: Icon, placeholder, required, maxLength }) => (
-                <div key={name}>
-                  <label className='block text-xs sm:text-sm font-bold text-gray-700 mb-1.5'>
-                    {label} {required && <span className='text-red-500'>*</span>}
-                  </label>
-                  <div className='relative'>
-                    <Icon className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                    <input
-                      type={type}
-                      name={name}
-                      value={formData[name]}
-                      onChange={handleChange}
-                      placeholder={placeholder}
-                      maxLength={maxLength}
-                      className={`w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white transition-all font-medium ${
-                        errors[name] ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                      }`}
-                    />
-                  </div>
-                  {errors[name] && (
-                    <p className='text-xs text-red-500 mt-1 font-medium'>{errors[name]}</p>
-                  )}
-                </div>
-              ))}
-            </div>
+        {/* Card */}
+        <div className='bg-white sm:rounded-3xl sm:shadow-xl p-4 sm:p-8'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
 
-            {/* Business Name + City in same row */}
-            <div className='grid grid-cols-2 gap-1.5 sm:gap-2'>
-              {fields.slice(2, 4).map(({ name, label, type, icon: Icon, placeholder, required, maxLength }) => (
-                <div key={name}>
-                  <label className='block text-xs sm:text-sm font-bold text-gray-700 mb-1.5'>
-                    {label} {required && <span className='text-red-500'>*</span>}
-                  </label>
-                  <div className='relative'>
-                    <Icon className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                    <input
-                      type={type}
-                      name={name}
-                      value={formData[name]}
-                      onChange={handleChange}
-                      placeholder={placeholder}
-                      maxLength={maxLength}
-                      className={`w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white transition-all font-medium ${
-                        errors[name] ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                      }`}
-                    />
-                  </div>
-                  {errors[name] && (
-                    <p className='text-xs text-red-500 mt-1 font-medium'>{errors[name]}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Referral Code + Payment Information — each full width */}
-            {fields.slice(4).map(({ name, label, type, icon: Icon, placeholder, required, maxLength }) => (
-              <div key={name}>
-                <label className='block text-xs sm:text-sm font-bold text-gray-700 mb-1.5'>
-                  {label} {required && <span className='text-red-500'>*</span>}
-                </label>
+            {/* Row 1: Owner Name + WhatsApp */}
+            <div className='grid grid-cols-2 gap-2'>
+              {/* Owner Name */}
+              <div>
+                <label className={labelClass}>Owner Name <span className='text-red-500'>*</span></label>
                 <div className='relative'>
-                  <Icon className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                  <input
-                    type={type}
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    placeholder={placeholder}
-                    maxLength={maxLength}
-                    className={`w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white transition-all font-medium ${
-                      errors[name] ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                    }`}
-                  />
+                  <User className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                  <input type='text' name='ownerName' value={formData.ownerName} onChange={handleChange} placeholder='Your full name' className={inputClass('ownerName')} />
                 </div>
-                {errors[name] && (
-                  <p className='text-xs text-red-500 mt-1 font-medium'>{errors[name]}</p>
-                )}
+                {errors.ownerName && <p className='text-xs text-red-500 mt-1'>{errors.ownerName}</p>}
               </div>
-            ))}
+              {/* WhatsApp */}
+              <div>
+                <label className={labelClass}>WhatsApp No. <span className='text-red-500'>*</span></label>
+                <div className='relative'>
+                  <Phone className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                  <input type='tel' name='whatsappNumber' value={formData.whatsappNumber} onChange={handleChange} placeholder='9876543210' maxLength={10} className={inputClass('whatsappNumber')} />
+                </div>
+                {errors.whatsappNumber && <p className='text-xs text-red-500 mt-1'>{errors.whatsappNumber}</p>}
+              </div>
+            </div>
 
+            {/* Row 2: Business Name + City */}
+            <div className='grid grid-cols-2 gap-2'>
+              <div>
+                <label className={labelClass}>Business Name <span className='text-red-500'>*</span></label>
+                <div className='relative'>
+                  <Building2 className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                  <input type='text' name='businessName' value={formData.businessName} onChange={handleChange} placeholder='Business name' className={inputClass('businessName')} />
+                </div>
+                {errors.businessName && <p className='text-xs text-red-500 mt-1'>{errors.businessName}</p>}
+              </div>
+              <div>
+                <label className={labelClass}>City <span className='text-red-500'>*</span></label>
+                <div className='relative'>
+                  <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                  <input type='text' name='city' value={formData.city} onChange={handleChange} placeholder='Your city' className={inputClass('city')} />
+                </div>
+                {errors.city && <p className='text-xs text-red-500 mt-1'>{errors.city}</p>}
+              </div>
+            </div>
+
+            {/* Referral Code */}
+            <div>
+              <label className={labelClass}>Referral Code</label>
+              <div className='relative'>
+                <Gift className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                <input type='text' name='referralCode' value={formData.referralCode} onChange={handleChange} placeholder='Enter referral code (if any)' className={inputClass('referralCode')} />
+              </div>
+            </div>
+
+            {/* Membership Type */}
+            <div>
+              <label className={labelClass}>Membership Type <span className='text-red-500'>*</span></label>
+              <div className='grid grid-cols-3 gap-2'>
+                {MEMBERSHIP_OPTIONS.map(({ type, amount, color, bg, border }) => (
+                  <button
+                    key={type}
+                    type='button'
+                    onClick={() => handleMembershipSelect(type)}
+                    className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-xl border-2 transition-all duration-150 ${
+                      formData.membershipType === type
+                        ? `${bg} ${border} ${color} scale-105 shadow-md`
+                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className='text-xs font-black tracking-wide'>{type.toUpperCase()}</span>
+                    <span className='text-[10px] sm:text-xs font-bold mt-0.5'>₹{amount.toLocaleString()}</span>
+                  </button>
+                ))}
+              </div>
+              {errors.membershipType && <p className='text-xs text-red-500 mt-1'>{errors.membershipType}</p>}
+            </div>
+
+            {/* Payment Section */}
+            <div className='border-2 border-gray-200 rounded-2xl overflow-hidden'>
+              <div className='bg-[#1a237e] px-3 py-2'>
+                <p className='text-white text-xs sm:text-sm font-bold'>Payment Information</p>
+                <p className='text-indigo-200 text-[10px]'>Upload screenshot OR enter UTR number (at least one required)</p>
+              </div>
+
+              <div className='p-3 space-y-3'>
+                {/* QR + Bank Details */}
+                <div className='flex items-start gap-3 bg-gray-50 rounded-xl p-2.5'>
+                  {/* QR Code */}
+                  <div className='flex-shrink-0'>
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(upiQrValue)}`}
+                      alt='UPI QR Code'
+                      className='w-20 h-20 sm:w-24 sm:h-24 border border-gray-200 rounded-lg bg-white p-1'
+                    />
+                    <p className='text-[9px] text-gray-500 text-center mt-1'>Scan to pay</p>
+                  </div>
+
+                  {/* Bank Details */}
+                  <div className='flex-1 space-y-1'>
+                    <p className='text-[#1a237e] text-[10px] sm:text-xs font-bold uppercase tracking-tight'>Bank Details</p>
+                    {[
+                      ['UPI ID', UPI_ID],
+                      ['Bank', 'CANARA BANK'],
+                      ['A/C No.', '78552200030217'],
+                      ['IFSC', 'CNRB0017855'],
+                    ].map(([label, value]) => (
+                      <div key={label} className='flex justify-between items-start gap-1'>
+                        <span className='text-gray-500 text-[9px] sm:text-[10px] shrink-0'>{label}</span>
+                        <span className='text-gray-900 text-[9px] sm:text-[10px] font-semibold text-right break-all'>{value}</span>
+                      </div>
+                    ))}
+                    {selectedMembership && (
+                      <div className='mt-1.5 bg-indigo-50 rounded-lg px-2 py-1'>
+                        <p className='text-indigo-700 text-[10px] font-bold'>Amount: ₹{selectedMembership.amount.toLocaleString()}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Upload Screenshot */}
+                <div>
+                  <input type='file' id='payment-screenshot' accept='image/jpeg,image/jpg,image/png,image/webp' onChange={handleScreenshotChange} className='hidden' />
+                  <label
+                    htmlFor='payment-screenshot'
+                    className='flex items-center justify-center gap-2 w-full py-2.5 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl text-xs sm:text-sm text-gray-600 cursor-pointer hover:bg-gray-100 hover:border-indigo-400 transition-all'
+                  >
+                    <Upload className='w-4 h-4' />
+                    {paymentScreenshot ? paymentScreenshot.name : 'Upload Payment Screenshot'}
+                  </label>
+                  {screenshotPreview && (
+                    <div className='mt-2 relative'>
+                      <img src={screenshotPreview} alt='Payment screenshot' className='w-full h-24 object-cover rounded-xl border border-gray-200' />
+                      <button
+                        type='button'
+                        onClick={() => { setPaymentScreenshot(null); setScreenshotPreview(null) }}
+                        className='absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600'
+                      >✕</button>
+                    </div>
+                  )}
+                </div>
+
+                {/* OR divider */}
+                <div className='flex items-center gap-2'>
+                  <div className='flex-1 h-px bg-gray-200' />
+                  <span className='text-[10px] text-gray-400 font-semibold'>OR</span>
+                  <div className='flex-1 h-px bg-gray-200' />
+                </div>
+
+                {/* UTR Number */}
+                <div>
+                  <div className='relative'>
+                    <Hash className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                    <input
+                      type='text'
+                      name='utrNumber'
+                      value={formData.utrNumber}
+                      onChange={(e) => {
+                        const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 12)
+                        setFormData(prev => ({ ...prev, utrNumber: digitsOnly }))
+                        if (errors.payment) setErrors(prev => ({ ...prev, payment: '' }))
+                      }}
+                      placeholder='Enter 12-digit UTR number'
+                      maxLength={12}
+                      className='w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium'
+                    />
+                  </div>
+                </div>
+
+                {errors.payment && <p className='text-xs text-red-500 font-medium'>{errors.payment}</p>}
+              </div>
+            </div>
+
+            {/* Submit Button */}
             <button
               type='submit'
               disabled={loading}
-              className='w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold py-3 rounded-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-sm mt-2'
+              className='w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold py-3 rounded-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-sm'
             >
               {loading ? (
                 <>
@@ -216,14 +355,13 @@ const Signup = () => {
                 'Submit Application'
               )}
             </button>
-          </form>
 
-          <div className='mt-4 text-center'>
-            <p className='text-xs text-gray-500'>
+            <p className='text-center text-xs text-gray-500'>
               Already have an account?{' '}
               <a href='/login' className='font-bold text-indigo-600 hover:underline'>Sign In</a>
             </p>
-          </div>
+
+          </form>
         </div>
       </div>
     </div>

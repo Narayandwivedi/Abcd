@@ -1,12 +1,21 @@
 const VendorApplication = require('../models/VendorApplication');
 const { sendVendorSignupAlert } = require("../utils/telegramAlert");
+const path = require('path');
+const fs = require('fs');
 
 const submitApplication = async (req, res) => {
   try {
-    const { ownerName, whatsappNumber, businessName, city, referralCode, paymentInformation } = req.body;
+    const { ownerName, whatsappNumber, businessName, city, referralCode, membershipType, membershipAmount, utrNumber } = req.body;
 
     if (!ownerName || !whatsappNumber || !businessName || !city) {
       return res.status(400).json({ success: false, message: "Please fill all required fields" });
+    }
+
+    // Either screenshot or UTR is required
+    const hasUtr = utrNumber && utrNumber.trim().length > 0;
+    const hasScreenshot = !!(req.file);
+    if (!hasUtr && !hasScreenshot) {
+      return res.status(400).json({ success: false, message: "Please upload a payment screenshot or enter a UTR number" });
     }
 
     const newApplication = new VendorApplication({
@@ -14,21 +23,26 @@ const submitApplication = async (req, res) => {
       whatsappNumber,
       businessName,
       city,
-      referralCode,
-      paymentInformation
+      referralCode: referralCode || '',
+      membershipType: membershipType || undefined,
+      membershipAmount: membershipAmount ? Number(membershipAmount) : undefined,
+      utrNumber: utrNumber || '',
+      paymentScreenshot: req.file ? `uploads/temp/${req.file.filename}` : undefined,
     });
 
     await newApplication.save();
 
-    // Send telegram alert using the existing alert structure
+    // Send Telegram alert
     try {
       await sendVendorSignupAlert({
-        ownerName: ownerName + ' (Lead)',
+        ownerName: ownerName + ' (Application)',
         mobile: whatsappNumber,
         businessName,
         city,
         referralId: referralCode,
-        paymentDetails: paymentInformation
+        membershipType,
+        membershipFees: membershipAmount,
+        utrNumber: utrNumber || 'N/A',
       });
     } catch (err) {
       console.error("Telegram Vendor Alert Error:", err.message);
@@ -44,6 +58,4 @@ const submitApplication = async (req, res) => {
   }
 };
 
-module.exports = {
-  submitApplication
-};
+module.exports = { submitApplication };
