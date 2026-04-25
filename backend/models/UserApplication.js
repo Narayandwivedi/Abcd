@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const userApplicationSchema = new mongoose.Schema({
+  applicationNumber: { type: String, unique: true },
   fullName: { type: String, required: true, trim: true },
   whatsappNumber: { type: String, required: true, trim: true },
   city: { type: String, required: true, trim: true },

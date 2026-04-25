@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const vendorApplicationSchema = new mongoose.Schema({
+  applicationNumber: { type: String, unique: true },
   ownerName: { type: String, required: true, trim: true },
   whatsappNumber: { type: String, required: true, trim: true },
   businessName: { type: String, required: true, trim: true },

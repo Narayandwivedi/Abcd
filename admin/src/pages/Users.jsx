@@ -841,11 +841,12 @@ ABCD Team`
                       <tr key={app._id} className='hover:bg-gray-50 transition'>
                         <td className='px-6 py-4'>
                           <div className='flex items-center gap-3'>
-                            <div className='w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold'>
+                            <div className='w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold'>
                               {app.fullName?.[0]?.toUpperCase()}
                             </div>
                             <div>
                               <div className='font-semibold text-gray-800'>{app.fullName}</div>
+                              <div className='text-[10px] text-indigo-600 font-bold uppercase'>{app.applicationNumber}</div>
                               <div className='text-xs text-gray-500'>City: {app.city}</div>
                             </div>
                           </div>

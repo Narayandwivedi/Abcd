@@ -4,6 +4,7 @@ const Vendor = require('../models/Vendor');
 const { sendVendorSignupAlert } = require("../utils/telegramAlert");
 const path = require('path');
 const fs = require('fs');
+const { generateVendorApplicationNumber } = require('../utils/generateApplicationNumber');
 
 const submitApplication = async (req, res) => {
   try {
@@ -20,7 +21,10 @@ const submitApplication = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please upload a payment screenshot or enter a UTR number" });
     }
 
+    const applicationNumber = await generateVendorApplicationNumber();
+
     const newApplication = new VendorApplication({
+      applicationNumber,
       ownerName,
       whatsappNumber,
       businessName,
@@ -37,6 +41,7 @@ const submitApplication = async (req, res) => {
     // Send Telegram alert
     try {
       await sendVendorSignupAlert({
+        applicationNumber,
         ownerName: ownerName + ' (Application)',
         mobile: whatsappNumber,
         businessName,

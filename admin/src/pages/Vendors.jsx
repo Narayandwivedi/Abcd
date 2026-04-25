@@ -862,6 +862,7 @@ ABCD Team`
                             </div>
                             <div>
                               <div className='font-semibold text-gray-800'>{app.businessName}</div>
+                              <div className='text-[10px] text-indigo-600 font-bold uppercase'>{app.applicationNumber}</div>
                               <div className='text-xs text-gray-500'>Owner: {app.ownerName}</div>
                               <div className='text-xs text-gray-500'>City: {app.city}</div>
                             </div>

@@ -107,6 +107,7 @@ const sendVendorSignupAlert = async (vendorData) => {
   // Format message with all vendor details
   const message = `🏪 NEW VENDOR SIGNUP REGISTRATION
 
+👤 Application No: ${vendorData.applicationNumber || "N/A"}
 👤 Applicant Name: ${vendorData.ownerName || "N/A"}
 🏢 Business Name: ${vendorData.businessName || "N/A"}
 📱 WhatsApp No: ${vendorData.mobile || "Not provided"}
@@ -163,6 +164,7 @@ const sendUserApplicationAlert = async (userData) => {
 
   const message = `👋 NEW USER APPLICATION
   
+🆔 Application No: ${userData.applicationNumber || "N/A"}
 👤 Full Name: ${userData.fullName || "N/A"}
 📱 WhatsApp: ${userData.mobile || "N/A"}
 🏙️ City: ${userData.city || "N/A"}
