@@ -22,7 +22,8 @@ const Users = () => {
     relationship: '',
     passportPhoto: null,
     utrNumber: '',
-    referredBy: ''
+    referredBy: '',
+    city: ''
   })
   const [stats, setStats] = useState({
     total: 0,
@@ -42,7 +43,8 @@ const Users = () => {
     relationship: 'S/O',
     passportPhoto: null,
     referredBy: '',
-    password: ''
+    password: '',
+    city: ''
   })
   const [creating, setCreating] = useState(false)
   const [activeTab, setActiveTab] = useState('approved') // approved, applications
@@ -518,7 +520,7 @@ ABCD Team`
         referredBy: editFormData.referredBy,
         state: editSelectedState,
         district: editSelectedDistrict,
-        city: editSelectedCity
+        city: editFormData.city || editSelectedCity
       }
 
       // Add photo path if uploaded
@@ -625,8 +627,8 @@ ABCD Team`
       return
     }
 
-    if (!createSelectedCity) {
-      toast.warning('Please select a state, district, and city', { autoClose: 800 })
+    if (!createSelectedCity && !createFormData.city) {
+      toast.warning('Please select a city or enter it manually', { autoClose: 800 })
       return
     }
 
@@ -654,7 +656,7 @@ ABCD Team`
       formData.append('passportPhoto', createFormData.passportPhoto)
       formData.append('state', createSelectedState)
       formData.append('district', createSelectedDistrict)
-      formData.append('city', createSelectedCity)
+      formData.append('city', createFormData.city || createSelectedCity)
 
       // Add optional fields if provided
       if (createFormData.email) formData.append('email', createFormData.email)
@@ -681,7 +683,8 @@ ABCD Team`
           relationship: 'S/O',
           passportPhoto: null,
           referredBy: '',
-          password: ''
+          password: '',
+          city: ''
         })
         setCreateSelectedState('')
         setCreateSelectedDistrict('')
@@ -871,6 +874,7 @@ ABCD Team`
                                 city: app.city,
                                 referredBy: app.referralCode,
                                 utrNumber: app.utrNumber,
+                                city: app.city,
                               }));
                               setShowCreateModal(true);
                             }}
@@ -1047,6 +1051,19 @@ ABCD Team`
                       name='mobile'
                       value={editFormData.mobile}
                       onChange={handleEditFormChange}
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
+                  </div>
+
+                  {/* City */}
+                  <div>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>City *</label>
+                    <input
+                      type='text'
+                      name='city'
+                      value={editFormData.city}
+                      onChange={handleEditFormChange}
+                      placeholder='Enter city'
                       className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
                     />
                   </div>
@@ -1408,6 +1425,19 @@ ABCD Team`
                         <option key={district} value={district}>{district.toUpperCase()}</option>
                       ))}
                     </select>
+                  </div>
+
+                  {/* Manual City Input */}
+                  <div className='md:col-span-1'>
+                    <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1.5'>City (Manual) *</label>
+                    <input
+                      type='text'
+                      name='city'
+                      value={createFormData.city}
+                      onChange={handleCreateFormChange}
+                      placeholder='Or enter city manually'
+                      className='w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    />
                   </div>
 
                   {/* City Dropdown */}
