@@ -83,6 +83,8 @@ const Signup = () => {
     { name: 'referralCode', label: 'Referral Code', type: 'text', icon: Gift, placeholder: 'Enter referral code (if any)', required: false },
     { name: 'paymentInformation', label: 'Payment Information', type: 'text', icon: CreditCard, placeholder: 'UTR No. or transaction details', required: false },
   ]
+  const firstRowFields = fields.slice(0, 2)
+  const remainingFields = fields.slice(2)
 
   if (submitted) {
     return (
@@ -111,15 +113,71 @@ const Signup = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-start sm:items-center justify-center sm:p-4'>
-      <div className='w-full max-w-lg py-6 sm:py-0'>
-        <div className='bg-white sm:rounded-3xl sm:shadow-xl p-4 sm:p-6'>
+    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-start sm:items-center justify-center px-0.5 py-2 sm:p-4'>
+      <div className='w-full sm:max-w-lg py-1 sm:py-0'>
+        <div className='bg-white sm:rounded-3xl sm:shadow-xl px-2 py-4 sm:p-6'>
           <div className='mb-4 text-center'>
             <h1 className='text-xl sm:text-2xl font-black text-gray-900'>Vendor Application Form</h1>
           </div>
 
           <form onSubmit={handleSubmit} className='space-y-3'>
-            {fields.map(({ name, label, type, icon: Icon, placeholder, required, maxLength }) => (
+            <div className='grid grid-cols-2 gap-1.5 sm:gap-2'>
+              {firstRowFields.map(({ name, label, type, icon: Icon, placeholder, required, maxLength }) => (
+                <div key={name}>
+                  <label className='block text-xs sm:text-sm font-bold text-gray-700 mb-1.5'>
+                    {label} {required && <span className='text-red-500'>*</span>}
+                  </label>
+                  <div className='relative'>
+                    <Icon className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                    <input
+                      type={type}
+                      name={name}
+                      value={formData[name]}
+                      onChange={handleChange}
+                      placeholder={placeholder}
+                      maxLength={maxLength}
+                      className={`w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white transition-all font-medium ${
+                        errors[name] ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                      }`}
+                    />
+                  </div>
+                  {errors[name] && (
+                    <p className='text-xs text-red-500 mt-1 font-medium'>{errors[name]}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Business Name + City in same row */}
+            <div className='grid grid-cols-2 gap-1.5 sm:gap-2'>
+              {fields.slice(2, 4).map(({ name, label, type, icon: Icon, placeholder, required, maxLength }) => (
+                <div key={name}>
+                  <label className='block text-xs sm:text-sm font-bold text-gray-700 mb-1.5'>
+                    {label} {required && <span className='text-red-500'>*</span>}
+                  </label>
+                  <div className='relative'>
+                    <Icon className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                    <input
+                      type={type}
+                      name={name}
+                      value={formData[name]}
+                      onChange={handleChange}
+                      placeholder={placeholder}
+                      maxLength={maxLength}
+                      className={`w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white transition-all font-medium ${
+                        errors[name] ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                      }`}
+                    />
+                  </div>
+                  {errors[name] && (
+                    <p className='text-xs text-red-500 mt-1 font-medium'>{errors[name]}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Referral Code + Payment Information — each full width */}
+            {fields.slice(4).map(({ name, label, type, icon: Icon, placeholder, required, maxLength }) => (
               <div key={name}>
                 <label className='block text-xs sm:text-sm font-bold text-gray-700 mb-1.5'>
                   {label} {required && <span className='text-red-500'>*</span>}
