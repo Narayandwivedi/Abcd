@@ -75,32 +75,34 @@ const BuyLeadModal = ({
         {/* Scrollable Form Content */}
         <div className='overflow-y-auto flex-1 p-4 md:p-6'>
           <form onSubmit={handleBuyLeadSubmit} className='space-y-2 md:space-y-4'>
-            {/* Name */}
-            <div>
-              <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Your Name *</label>
-              <input
-                type='text'
-                value={buyLeadData.name}
-                onChange={(e) => setBuyLeadData({ ...buyLeadData, name: e.target.value })}
-                className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
-                placeholder='Enter your name'
-                required
-              />
-            </div>
+            <div className='grid grid-cols-[3fr_2fr] gap-3 md:gap-4'>
+              {/* Name */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Your Name *</label>
+                <input
+                  type='text'
+                  value={buyLeadData.name}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, name: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  placeholder='Enter name'
+                  required
+                />
+              </div>
 
-            {/* Mobile Number */}
-            <div>
-              <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Mobile Number *</label>
-              <input
-                type='tel'
-                value={buyLeadData.mobileNo}
-                onChange={(e) => setBuyLeadData({ ...buyLeadData, mobileNo: e.target.value })}
-                className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
-                placeholder='Enter your mobile number'
-                pattern='[0-9]{10}'
-                maxLength='10'
-                required
-              />
+              {/* Mobile Number */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Mobile Number *</label>
+                <input
+                  type='tel'
+                  value={buyLeadData.mobileNo}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, mobileNo: e.target.value })}
+                  className='w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+                  placeholder='Enter mobile'
+                  pattern='[0-9]{10}'
+                  maxLength='10'
+                  required
+                />
+              </div>
             </div>
 
             {/* Town/City */}
