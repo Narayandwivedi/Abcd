@@ -11,20 +11,27 @@ const SellLeads = () => {
   const [selectedCity, setSelectedCity] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
 
-  // Categories list
-  const categories = [
-    'Advocates', 'Automobiles', 'Beauty parlour', 'Books n stationery', 'Catering',
-    'CCTV', 'Chartered accountants', 'Clothing', 'Digital marketing', 'Doctors',
-    'Education n training', 'Electrical', 'Electronics', 'Engineers', 'Fruits n Veg',
-    'Furniture', 'Grocery', 'Hardware', 'Home appliances', 'Home service',
-    'Hospital', 'Hotel', 'Interior decorators', 'Logistics n courier', 'Marble and tiles',
-    'Medicine', 'Pathology', 'Properties', 'Restaurent', 'Sports',
-    'Telecommunication', 'Tour n Travels', 'Tuition and coaching', 'Web solutions'
-  ]
+  const [categories, setCategories] = useState([])
 
   useEffect(() => {
     fetchApprovedSellLeads()
+    fetchCategories()
   }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+      const response = await fetch(`${BACKEND_URL}/api/categories`)
+      const data = await response.json()
+      if (data.success) {
+        // Handle both possible structures (direct name string or object with name property)
+        const categoryList = data.data.map(cat => cat.name || cat.title || cat.categoryName).filter(Boolean)
+        setCategories(categoryList)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   // Filter leads when city or category filter changes
   useEffect(() => {
