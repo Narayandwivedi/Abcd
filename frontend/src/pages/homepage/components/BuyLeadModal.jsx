@@ -128,7 +128,7 @@ const BuyLeadModal = ({
               />
             </div>
 
-            <div className='grid grid-cols-[3fr_2fr] gap-3 md:gap-4'>
+            <div className='grid grid-cols-[11fr_9fr] gap-3 md:gap-4'>
               {/* Item Required */}
               <div>
                 <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Item Required *</label>
