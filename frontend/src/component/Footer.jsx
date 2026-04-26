@@ -90,6 +90,20 @@ const Footer = () => {
               </p>
             </div>
           </div>
+
+          {/* YouTube Demo Window - Mobile Only */}
+          <div className='mt-4 md:hidden overflow-hidden rounded-xl shadow-lg border border-gray-700 bg-gray-900'>
+            <div className='aspect-video w-full'>
+              <iframe 
+                className='w-full h-full'
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                title="ABCD Demo Video" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
         </div>
 
         <div className='mt-6 flex flex-col gap-3 max-w-xs mx-auto md:hidden'>

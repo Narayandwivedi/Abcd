@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import WhatsAppButton from '../../component/WhatsAppButton'
 import CityDropdown from '../../component/CityDropdown'
 import { AppContext } from '../../context/AppContext'
 import BuySellLeadSection from './components/BuySellLeadSection'
@@ -176,9 +175,6 @@ const Home = () => {
         handleCategoryClick={handleCategoryClick}
       />
 
-      <div className='hidden md:block'>
-        <WhatsAppButton />
-      </div>
     </div>
   )
 }
