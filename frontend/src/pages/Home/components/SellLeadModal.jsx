@@ -83,7 +83,7 @@ const SellLeadModal = ({
                   type='text'
                   value={sellLeadData.vendorName}
                   onChange={(e) => setSellLeadData({ ...sellLeadData, vendorName: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='Enter vendor/business name'
                   required
                 />
@@ -96,7 +96,7 @@ const SellLeadModal = ({
                   type='tel'
                   value={sellLeadData.mobileNo}
                   onChange={(e) => setSellLeadData({ ...sellLeadData, mobileNo: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='Enter mobile number'
                   pattern='[0-9]{10}'
                   maxLength='10'
@@ -126,7 +126,7 @@ const SellLeadModal = ({
                   type='text'
                   value={sellLeadData.productServiceOffered}
                   onChange={(e) => setSellLeadData({ ...sellLeadData, productServiceOffered: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='What are you selling?'
                   required
                 />
@@ -139,7 +139,7 @@ const SellLeadModal = ({
                   type='text'
                   value={sellLeadData.brand}
                   onChange={(e) => setSellLeadData({ ...sellLeadData, brand: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='Enter brand name'
                   required
                 />
@@ -154,7 +154,7 @@ const SellLeadModal = ({
                   type='text'
                   value={sellLeadData.mrpListPrice}
                   onChange={(e) => setSellLeadData({ ...sellLeadData, mrpListPrice: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='e.g., ₹5000'
                   required
                 />
@@ -167,7 +167,7 @@ const SellLeadModal = ({
                   type='text'
                   value={sellLeadData.specialOfferPrice}
                   onChange={(e) => setSellLeadData({ ...sellLeadData, specialOfferPrice: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='e.g., ₹4000'
                   required
                 />
@@ -182,7 +182,7 @@ const SellLeadModal = ({
                   type='text'
                   value={sellLeadData.stockQtyAvailable}
                   onChange={(e) => setSellLeadData({ ...sellLeadData, stockQtyAvailable: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='e.g., 100 units'
                   required
                 />
@@ -196,7 +196,7 @@ const SellLeadModal = ({
                   min={new Date().toISOString().split('T')[0]}
                   value={sellLeadData.validity}
                   onChange={(e) => setSellLeadData({ ...sellLeadData, validity: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   required
                 />
               </div>
