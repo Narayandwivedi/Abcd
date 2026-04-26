@@ -169,6 +169,7 @@ const Home = () => {
         setShowSellForm={setShowSellForm}
         sellLeadData={sellLeadData}
         setSellLeadData={setSellLeadData}
+        categories={categories}
       />
 
       <CategorySection 

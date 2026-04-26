@@ -1,16 +1,18 @@
 import React from 'react'
 import CityDropdown from '../../../component/CityDropdown'
+import CategoryDropdown from '../../../component/CategoryDropdown'
 import { toast } from 'react-toastify'
 
 const SellLeadModal = ({
   showSellForm,
   setShowSellForm,
   sellLeadData,
-  setSellLeadData
+  setSellLeadData,
+  categories
 }) => {
   const handleSellLeadSubmit = async (e) => {
     e.preventDefault()
-    if (!sellLeadData.vendorName || !sellLeadData.vendorLocation || !sellLeadData.productServiceOffered ||
+    if (!sellLeadData.vendorName || !sellLeadData.vendorLocation || !sellLeadData.category || !sellLeadData.productServiceOffered ||
         !sellLeadData.brand || !sellLeadData.mrpListPrice || !sellLeadData.specialOfferPrice ||
         !sellLeadData.stockQtyAvailable || !sellLeadData.validity || !sellLeadData.mobileNo) {
       toast.error('Please fill all required fields')
@@ -36,6 +38,7 @@ const SellLeadModal = ({
         setSellLeadData({
           vendorName: '',
           vendorLocation: '',
+          category: '',
           productServiceOffered: '',
           brand: '',
           modelDetail: '',
@@ -105,17 +108,38 @@ const SellLeadModal = ({
               </div>
             </div>
 
-            {/* Vendor Location */}
-            <div>
-              <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Vendor Location (Town/District) *</label>
-              <CityDropdown
-                value={sellLeadData.vendorLocation}
-                onChange={(city) => setSellLeadData({ ...sellLeadData, vendorLocation: city })}
-                placeholder='Select location'
-                required={true}
-                darkMode={false}
-                className='border-2 border-gray-300 rounded-lg h-[40px] md:h-[42px] lg:h-[36px]'
-              />
+            <div className='grid grid-cols-[11fr_9fr] gap-3 md:gap-4'>
+              {/* Vendor Location (Town/District) */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Vendor Location *</label>
+                <CityDropdown
+                  value={sellLeadData.vendorLocation}
+                  onChange={(city) => setSellLeadData({ ...sellLeadData, vendorLocation: city })}
+                  placeholder='Select location'
+                  required={true}
+                  darkMode={false}
+                  className='border-2 border-gray-300 rounded-lg h-[40px] md:h-[42px] lg:h-[36px]'
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Category *</label>
+                <CategoryDropdown
+                  value={sellLeadData.category}
+                  onChange={(cat) => {
+                    if (cat) {
+                      setSellLeadData({ ...sellLeadData, category: cat.name })
+                    } else {
+                      setSellLeadData({ ...sellLeadData, category: '' })
+                    }
+                  }}
+                  categories={categories || []}
+                  placeholder='Select Category'
+                  required={true}
+                  className=''
+                />
+              </div>
             </div>
 
             <div className='grid grid-cols-[3fr_2fr] gap-3 md:gap-4'>
