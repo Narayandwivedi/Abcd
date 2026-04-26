@@ -32,14 +32,14 @@ const AdCard = ({ ad, index, visibleCount }) => {
 
   return (
     <div
-      className='flex-shrink-0 px-1.5'
+      className='flex-shrink-0 px-1 md:px-1.5'
       style={{ width: `${100 / visibleCount}%` }}
     >
       <button
         type='button'
         onClick={() => openAdLink(ad.link)}
         disabled={!isClickable}
-        className={`relative h-32 md:h-40 w-full rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden ${
+        className={`relative h-40 md:h-48 w-full rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden ${
           isClickable ? 'cursor-pointer hover:shadow-lg' : 'cursor-default'
         } transition-shadow`}
         aria-label={ad.title || `Advertisement ${index + 1}`}
@@ -261,7 +261,7 @@ const AdsCarousel = () => {
   if (ads.length <= effectiveVisibleCount) {
     return (
       <section className='pb-0 lg:pb-1 bg-white'>
-        <div className='container mx-auto px-4'>
+        <div className='container mx-auto px-1 md:px-4'>
           <div className='max-w-7xl mx-auto flex'>
             {ads.map((ad, index) => (
               <AdCard
@@ -279,7 +279,7 @@ const AdsCarousel = () => {
 
   return (
     <section className='pb-0 lg:pb-1 bg-white'>
-      <div className='container mx-auto px-4'>
+      <div className='container mx-auto px-1 md:px-4'>
         <div className='max-w-7xl mx-auto overflow-hidden'>
           <div
             ref={trackRef}
