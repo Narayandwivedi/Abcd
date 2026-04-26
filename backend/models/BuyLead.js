@@ -33,7 +33,7 @@ const buyLeadSchema = new mongoose.Schema({
   },
   minorCategory: {
     type: String,
-    required: true,
+    required: false,
   },
   qualityQuantityDesc: {
     type: String,

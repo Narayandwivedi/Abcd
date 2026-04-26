@@ -20,7 +20,7 @@ const createBuyLead = async (req, res) => {
 
     // Validate required fields
     if (!name || !mobileNo || !townCity || !itemRequired ||
-        !majorCategory || !minorCategory || !qualityQuantityDesc ||
+        !majorCategory || !qualityQuantityDesc ||
         !priceRange || !deliveryAddress) {
       return res.status(400).json({
         success: false,

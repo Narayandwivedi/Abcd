@@ -12,10 +12,18 @@ const BuyLeadModal = ({
 }) => {
   const handleBuyLeadSubmit = async (e) => {
     e.preventDefault()
-    if (!buyLeadData.name || !buyLeadData.mobileNo || !buyLeadData.townCity || !buyLeadData.itemRequired ||
-        !buyLeadData.majorCategory || !buyLeadData.qualityQuantityDesc ||
-        !buyLeadData.priceRange || !buyLeadData.deliveryAddress) {
-      toast.error('Please fill all required fields')
+    const missingFields = []
+    if (!buyLeadData.name) missingFields.push('Name')
+    if (!buyLeadData.mobileNo) missingFields.push('Mobile Number')
+    if (!buyLeadData.townCity) missingFields.push('Town/City')
+    if (!buyLeadData.itemRequired) missingFields.push('Item Required')
+    if (!buyLeadData.majorCategory) missingFields.push('Category')
+    if (!buyLeadData.qualityQuantityDesc) missingFields.push('Description')
+    if (!buyLeadData.priceRange) missingFields.push('Price Range')
+    if (!buyLeadData.deliveryAddress) missingFields.push('Delivery Address')
+
+    if (missingFields.length > 0) {
+      toast.error(`Please fill: ${missingFields.join(', ')}`)
       return
     }
 
