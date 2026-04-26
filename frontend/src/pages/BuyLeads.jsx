@@ -24,8 +24,8 @@ const BuyLeads = () => {
       const response = await fetch(`${BACKEND_URL}/api/categories`)
       const data = await response.json()
       if (data.success) {
-        // Handle both possible structures (direct name string or object with name property)
-        const categoryList = data.data.map(cat => cat.name || cat.title || cat.categoryName).filter(Boolean)
+        const categoryData = data.categories || data.data || []
+        const categoryList = categoryData.map(cat => cat.name || cat.title || cat.categoryName).filter(Boolean)
         setCategories(categoryList)
       }
     } catch (error) {
@@ -211,7 +211,7 @@ View more leads at: ${window.location.origin}/buy-leads`
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className='w-full px-2 md:px-3 py-2 md:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-xs md:text-sm bg-white'
+                  className={`w-full px-2 md:px-3 py-2 md:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-xs md:text-sm bg-white ${!selectedCategory ? 'text-gray-400' : 'text-gray-800'}`}
                 >
                   <option value=''>All Categories</option>
                   {categories.map((category) => (
