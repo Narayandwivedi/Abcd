@@ -85,7 +85,7 @@ const BuyLeadModal = ({
                   type='text'
                   value={buyLeadData.name}
                   onChange={(e) => setBuyLeadData({ ...buyLeadData, name: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='Enter name'
                   required
                 />
@@ -98,7 +98,7 @@ const BuyLeadModal = ({
                   type='tel'
                   value={buyLeadData.mobileNo}
                   onChange={(e) => setBuyLeadData({ ...buyLeadData, mobileNo: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='Enter mobile'
                   pattern='[0-9]{10}'
                   maxLength='10'
@@ -128,7 +128,7 @@ const BuyLeadModal = ({
                   type='text'
                   value={buyLeadData.itemRequired}
                   onChange={(e) => setBuyLeadData({ ...buyLeadData, itemRequired: e.target.value })}
-                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-xs'
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                   placeholder='What do you want to buy?'
                   required
                 />
@@ -160,7 +160,7 @@ const BuyLeadModal = ({
               <textarea
                 value={buyLeadData.qualityQuantityDesc}
                 onChange={(e) => setBuyLeadData({ ...buyLeadData, qualityQuantityDesc: e.target.value })}
-                className='w-full px-3 py-2 md:px-3 md:py-2 lg:px-3 lg:py-1.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-xs'
+                className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                 placeholder='Describe the quality and quantity you need'
                 rows='2'
                 required
@@ -174,7 +174,7 @@ const BuyLeadModal = ({
                 type='text'
                 value={buyLeadData.priceRange}
                 onChange={(e) => setBuyLeadData({ ...buyLeadData, priceRange: e.target.value })}
-                className='w-full px-3 py-2 md:px-3 md:py-2 lg:px-3 lg:py-1.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-xs'
+                className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                 placeholder='e.g., ₹1000 - ₹5000'
                 required
               />
@@ -186,7 +186,7 @@ const BuyLeadModal = ({
               <textarea
                 value={buyLeadData.deliveryAddress}
                 onChange={(e) => setBuyLeadData({ ...buyLeadData, deliveryAddress: e.target.value })}
-                className='w-full px-3 py-2 md:px-3 md:py-2 lg:px-3 lg:py-1.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-xs'
+                className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                 placeholder='Enter complete delivery address'
                 rows='2'
                 required
