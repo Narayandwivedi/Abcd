@@ -209,7 +209,7 @@ const SellLeadModal = ({
                 type='text'
                 value={sellLeadData.modelDetail}
                 onChange={(e) => setSellLeadData({ ...sellLeadData, modelDetail: e.target.value })}
-                className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm lg:text-xs'
+                className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
                 placeholder='Enter model (optional)'
               />
             </div>
