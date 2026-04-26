@@ -39,7 +39,7 @@ const AdCard = ({ ad, index, visibleCount }) => {
         type='button'
         onClick={() => openAdLink(ad.link)}
         disabled={!isClickable}
-        className={`relative h-40 md:h-48 w-full rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden ${
+        className={`relative h-48 md:h-56 w-full rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden ${
           isClickable ? 'cursor-pointer hover:shadow-lg' : 'cursor-default'
         } transition-shadow`}
         aria-label={ad.title || `Advertisement ${index + 1}`}
