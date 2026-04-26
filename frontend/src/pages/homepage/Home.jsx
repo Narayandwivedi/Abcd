@@ -23,6 +23,7 @@ const Home = () => {
     townCity: '',
     itemRequired: '',
     majorCategory: '',
+    categoryId: '',
     minorCategory: '',
     qualityQuantityDesc: '',
     priceRange: '',
@@ -61,13 +62,27 @@ const Home = () => {
     }
   }, [showBuyForm, showSellForm])
 
+  useEffect(() => {
+    const fetchAllCategories = async () => {
+      try {
+        const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+        const response = await fetch(`${BACKEND_URL}/api/categories`)
+        const data = await response.json()
+        if (data.success) {
+          setCategories(data.categories.map(c => ({ id: c._id, name: c.name })))
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      }
+    }
+    fetchAllCategories()
+  }, [])
+
   const handleCategoryClick = (categoryName) => {
     navigate(`/category/${categoryName}`)
   }
 
-  const handleCategoriesLoaded = useCallback((loadedCategories) => {
-    setCategories(loadedCategories)
-  }, [])
+
 
   const handleBuyLeadClick = () => {
     if (isAuthenticated && user) {
@@ -77,6 +92,7 @@ const Home = () => {
         townCity: user?.city || user?.town || '',
         itemRequired: '',
         majorCategory: '',
+        categoryId: '',
         minorCategory: '',
         qualityQuantityDesc: '',
         priceRange: '',
@@ -89,6 +105,7 @@ const Home = () => {
         townCity: '',
         itemRequired: '',
         majorCategory: '',
+        categoryId: '',
         minorCategory: '',
         qualityQuantityDesc: '',
         priceRange: '',
@@ -131,7 +148,7 @@ const Home = () => {
 
   return (
     <div className='min-h-screen bg-gray-50'>
-      <BuySellLeadSection 
+      <BuySellLeadSection
         handleBuyLeadClick={handleBuyLeadClick}
         handleSellLeadClick={handleSellLeadClick}
         navigate={navigate}
@@ -144,7 +161,7 @@ const Home = () => {
         setShowBuyForm={setShowBuyForm}
         buyLeadData={buyLeadData}
         setBuyLeadData={setBuyLeadData}
-        categories={categories.map(c => c.name)}
+        categories={categories}
       />
 
       <SellLeadModal
@@ -156,7 +173,6 @@ const Home = () => {
 
       <CategorySection 
         handleCategoryClick={handleCategoryClick}
-        onCategoriesLoaded={handleCategoriesLoaded}
       />
 
       <div className='hidden md:block'>

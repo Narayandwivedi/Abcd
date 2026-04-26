@@ -39,7 +39,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
             gradient: gradients[index % gradients.length]
           }))
           setCategories(mappedCategories)
-          onCategoriesLoaded(mappedCategories)
+          if (onCategoriesLoaded) onCategoriesLoaded(mappedCategories)
         } else {
           console.error('Failed to load categories')
         }
@@ -110,9 +110,9 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
               >
                 {category.image ? (
                   <>
-                    <img 
-                      src={`${BACKEND_URL}${category.image}`} 
-                      alt={category.name} 
+                    <img
+                      src={`${BACKEND_URL}${category.image}`}
+                      alt={category.name}
                       className='absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'
                     />
                     <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-100 transition-opacity duration-500'></div>
@@ -124,7 +124,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
                     <div className='absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700'></div>
                   </>
                 )}
-                
+
                 <div className='relative h-full flex items-center justify-center p-3 text-center'>
                   <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-lg group-hover:scale-110 transition-transform duration-300'>
                     {category.name}
@@ -164,9 +164,9 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
                 >
                   {category.image ? (
                     <>
-                      <img 
-                        src={`${BACKEND_URL}${category.image}`} 
-                        alt={category.name} 
+                      <img
+                        src={`${BACKEND_URL}${category.image}`}
+                        alt={category.name}
                         className='absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'
                       />
                       <div className='absolute inset-0 bg-black/40 backdrop-blur-[1px] group-hover:backdrop-blur-0 transition-all duration-500'></div>
@@ -181,7 +181,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
                       <div className='absolute -right-6 -bottom-6 w-20 h-20 bg-white/20 rounded-full group-hover:scale-150 transition-transform duration-700 blur-xl'></div>
                     </>
                   )}
-                  
+
                   <div className='relative h-full flex flex-col items-center justify-center p-3 text-center'>
                     <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-lg group-hover:scale-105 transition-transform duration-300'>
                       {category.name}

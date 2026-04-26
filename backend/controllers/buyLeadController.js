@@ -14,7 +14,8 @@ const createBuyLead = async (req, res) => {
       minorCategory,
       qualityQuantityDesc,
       priceRange,
-      deliveryAddress
+      deliveryAddress,
+      categoryId
     } = req.body;
 
     // Validate required fields
@@ -42,6 +43,7 @@ const createBuyLead = async (req, res) => {
       qualityQuantityDesc,
       priceRange,
       deliveryAddress,
+      categoryId,
       status: 'pending'
     });
 

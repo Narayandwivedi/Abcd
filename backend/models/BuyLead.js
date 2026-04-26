@@ -26,6 +26,11 @@ const buyLeadSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: false,
+  },
   minorCategory: {
     type: String,
     required: true,
