@@ -169,7 +169,8 @@ const SellLeads = () => {
       lead.productServiceOffered.toLowerCase().includes(searchLower) ||
       lead.mobileNo.includes(searchTerm) ||
       lead.vendorLocation.toLowerCase().includes(searchLower) ||
-      lead.brand.toLowerCase().includes(searchLower)
+      lead.brand.toLowerCase().includes(searchLower) ||
+      (lead.category && lead.category.toLowerCase().includes(searchLower))
     )
   })
 
@@ -286,6 +287,7 @@ const SellLeads = () => {
                     </td>
                     <td className='px-6 py-4'>
                       <div className='text-sm text-gray-900'>{lead.productServiceOffered}</div>
+                      {lead.category && <div className='text-xs text-purple-600 font-semibold mt-1'>{lead.category}</div>}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <div className='text-sm text-gray-900'>{lead.brand}</div>
@@ -413,8 +415,15 @@ const SellLeads = () => {
                       </div>
                     </div>
 
-                    <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-lg text-xs font-semibold mb-0.5'>
-                      <span className='truncate'>{lead.productServiceOffered}</span>
+                    <div className='flex items-center gap-2 flex-wrap mb-0.5'>
+                      <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-lg text-xs font-semibold'>
+                        <span className='truncate'>{lead.productServiceOffered}</span>
+                      </div>
+                      {lead.category && (
+                        <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold'>
+                          <span className='truncate'>{lead.category}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className='flex items-start gap-1 text-xs text-gray-500'>
@@ -568,9 +577,17 @@ const SellLeads = () => {
                 </div>
               </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>Product/Service Offered</label>
-                <p className='mt-1 text-sm text-gray-900'>{selectedLead.productServiceOffered}</p>
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>Product/Service Offered</label>
+                  <p className='mt-1 text-sm text-gray-900'>{selectedLead.productServiceOffered}</p>
+                </div>
+                {selectedLead.category && (
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700'>Category</label>
+                    <p className='mt-1 text-sm text-gray-900'>{selectedLead.category}</p>
+                  </div>
+                )}
               </div>
 
               <div className='grid grid-cols-2 gap-4'>
