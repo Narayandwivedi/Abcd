@@ -373,13 +373,21 @@ View more offers at: ${window.location.origin}/sell-leads`
                       {/* Divider */}
                       <div className='border-t border-orange-100 my-1'></div>
 
-                      {/* Grid Layout for Product Info - 2 columns on mobile, 3 on desktop */}
-                      <div className='grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-1'>
+                      {/* Grid Layout for Product Info - 2 columns on mobile, 4 on desktop */}
+                      <div className='grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-1'>
                         {/* Product/Service */}
                         <div className='flex items-center gap-1.5 col-span-2'>
                           <span className='text-[10px] font-bold text-gray-500 uppercase'>Product:</span>
                           <span className='text-xs md:text-sm font-bold text-gray-900 truncate'>{lead.productServiceOffered}</span>
                         </div>
+
+                        {/* Category */}
+                        {lead.category && (
+                          <div className='flex items-center gap-1.5'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase'>Category:</span>
+                            <span className='text-xs md:text-sm font-semibold text-indigo-700 truncate'>{lead.category}</span>
+                          </div>
+                        )}
 
                         {/* Brand */}
                         <div className='flex items-center gap-1.5'>
@@ -389,7 +397,7 @@ View more offers at: ${window.location.origin}/sell-leads`
 
                         {/* Model */}
                         {lead.modelDetail && (
-                          <div className='flex items-center gap-1.5 col-span-2 md:col-span-3'>
+                          <div className='flex items-center gap-1.5 col-span-2 md:col-span-4'>
                             <span className='text-[10px] font-bold text-gray-500 uppercase'>Model:</span>
                             <span className='text-xs md:text-sm font-semibold text-purple-600 truncate'>{lead.modelDetail}</span>
                           </div>
