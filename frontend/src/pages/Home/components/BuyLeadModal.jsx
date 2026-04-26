@@ -83,7 +83,7 @@ const BuyLeadModal = ({
         </div>
 
         {/* Scrollable Form Content */}
-        <div className='overflow-y-auto flex-1 p-4 md:p-6'>
+        <div className='overflow-y-auto overflow-x-visible flex-1 p-4 md:p-6'>
           <form onSubmit={handleBuyLeadSubmit} className='space-y-2 md:space-y-3 lg:space-y-2'>
             <div className='grid grid-cols-[3fr_2fr] gap-3 md:gap-4'>
               {/* Name */}
@@ -157,7 +157,7 @@ const BuyLeadModal = ({
                   categories={categories}
                   placeholder='Select Category'
                   required={true}
-                  className='border-2 border-gray-300 rounded-lg h-[40px] md:h-[42px] lg:h-[36px]'
+                  className=''
                 />
               </div>
             </div>
