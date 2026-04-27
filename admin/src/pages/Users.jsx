@@ -798,7 +798,7 @@ ABCD Team`
                               <div className='font-semibold text-gray-800'>{user.fullName}</div>
                               <div className='text-xs text-gray-500'>{user.relationship || 'S/O'} {user.relativeName}</div>
                               {user.activeCertificate?.certificateNumber && (
-                                <div className='text-xs text-blue-600 font-semibold mt-1'>Cert: {user.activeCertificate.certificateNumber}</div>
+                                <div className='text-[10px] text-purple-600 font-bold uppercase mt-1'>{user.activeCertificate.certificateNumber}</div>
                               )}
                             </div>
                           </div>
@@ -826,6 +826,19 @@ ABCD Team`
                         </td>
                         <td className='px-6 py-4'>
                           <div className='flex gap-2'>
+                            {user.activeCertificate?.downloadLink && (
+                              <a
+                                href={`${BACKEND_URL}${user.activeCertificate.downloadLink}`}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='p-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition'
+                                title='View Certificate'
+                              >
+                                <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
+                                </svg>
+                              </a>
+                            )}
                             <button onClick={() => openEditModal(user)} className='p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition'>
                               <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'/></svg>
                             </button>
@@ -904,6 +917,9 @@ ABCD Team`
                     </div>
                     <div>
                       <h3 className='font-bold text-gray-900'>{item.fullName}</h3>
+                      {item.activeCertificate?.certificateNumber && (
+                        <p className='text-[10px] text-purple-600 font-bold uppercase'>{item.activeCertificate.certificateNumber}</p>
+                      )}
                       <p className='text-xs text-gray-500'>{item.city}</p>
                     </div>
                   </div>
@@ -917,31 +933,43 @@ ABCD Team`
                       <p className='font-semibold'>{item.city}</p>
                     </div>
                   </div>
-                  <div className='flex justify-between items-center pt-3 border-t border-gray-100'>
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${activeTab === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                      {activeTab === 'approved' ? 'Approved' : 'Pending'}
-                    </span>
-                    <button
-                      onClick={() => {
-                        if (activeTab === 'approved') {
-                          openEditModal(item)
-                        } else {
-                          setCreateFormData(prev => ({
-                            ...prev,
-                            fullName: item.fullName,
-                            mobile: item.whatsappNumber,
-                            city: item.city,
-                            referredBy: item.referralCode,
-                            utrNumber: item.utrNumber,
-                          }));
-                          setShowCreateModal(true);
-                        }
-                      }}
-                      className='text-blue-600 text-xs font-bold'
-                    >
-                      {activeTab === 'approved' ? 'Edit Details' : 'Process Application'}
-                    </button>
-                  </div>
+                    <div className='flex justify-between items-center pt-3 border-t border-gray-100'>
+                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${activeTab === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                        {activeTab === 'approved' ? 'Approved' : 'Pending'}
+                      </span>
+                      <div className='flex gap-4 items-center'>
+                        {activeTab === 'approved' && item.activeCertificate?.downloadLink && (
+                          <a
+                            href={`${BACKEND_URL}${item.activeCertificate.downloadLink}`}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-purple-600 text-xs font-bold'
+                          >
+                            View Certificate
+                          </a>
+                        )}
+                        <button
+                          onClick={() => {
+                            if (activeTab === 'approved') {
+                              openEditModal(item)
+                            } else {
+                              setCreateFormData(prev => ({
+                                ...prev,
+                                fullName: item.fullName,
+                                mobile: item.whatsappNumber,
+                                city: item.city,
+                                referredBy: item.referralCode,
+                                utrNumber: item.utrNumber,
+                              }));
+                              setShowCreateModal(true);
+                            }
+                          }}
+                          className='text-blue-600 text-xs font-bold'
+                        >
+                          {activeTab === 'approved' ? 'Edit Details' : 'Process Application'}
+                        </button>
+                      </div>
+                    </div>
                 </div>
               ))}
             </div>

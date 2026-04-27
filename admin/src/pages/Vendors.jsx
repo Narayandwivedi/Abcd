@@ -808,6 +808,9 @@ ABCD Team`
                             )}
                             <div>
                               <div className='font-semibold text-gray-800'>{vendor.businessName}</div>
+                              {vendor.activeCertificate?.certificateNumber && (
+                                <div className='text-[10px] text-purple-600 font-bold uppercase'>{vendor.activeCertificate.certificateNumber}</div>
+                              )}
                               <div className='text-xs text-gray-500'>Owner: {vendor.ownerName}</div>
                               <div className='text-xs text-gray-500'>{vendor.city}, {vendor.state}</div>
                             </div>
@@ -944,6 +947,9 @@ ABCD Team`
                     </div>
                     <div>
                       <h3 className='font-bold text-gray-900'>{item.businessName}</h3>
+                      {item.activeCertificate?.certificateNumber && (
+                        <p className='text-[10px] text-purple-600 font-bold uppercase'>{item.activeCertificate.certificateNumber}</p>
+                      )}
                       <p className='text-xs text-gray-500'>{item.ownerName}</p>
                     </div>
                   </div>
