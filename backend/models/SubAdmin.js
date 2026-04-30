@@ -147,6 +147,32 @@ const subAdminSchema = new mongoose.Schema({
       default: false,
     },
 
+    // Lead Management
+    canViewBuyLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canApproveBuyLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteBuyLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canViewSellLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canApproveSellLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteSellLeads: {
+      type: Boolean,
+      default: false,
+    },
+
     // Sub Admin Management
     canViewSubAdmins: {
       type: Boolean,

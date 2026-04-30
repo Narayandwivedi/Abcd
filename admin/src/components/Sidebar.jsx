@@ -39,14 +39,14 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       icon: '🛍️',
       path: '/buy-leads',
       description: 'Manage Buy Leads',
-      requiredPermission: 'canManageContent'
+      requiredPermission: 'canViewBuyLeads'
     },
     {
       name: 'Sell Leads',
       icon: '🏷️',
       path: '/sell-leads',
       description: 'Manage Sell Leads',
-      requiredPermission: 'canManageContent'
+      requiredPermission: 'canViewSellLeads'
     },
     {
       name: 'Cities',

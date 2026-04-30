@@ -53,7 +53,13 @@ const SubAdmin = () => {
       canViewCategories: false,
       canCreateCategories: false,
       canEditCategories: false,
-      canDeleteCategories: false
+      canDeleteCategories: false,
+      canViewBuyLeads: false,
+      canApproveBuyLeads: false,
+      canDeleteBuyLeads: false,
+      canViewSellLeads: false,
+      canApproveSellLeads: false,
+      canDeleteSellLeads: false
     }
   })
 
@@ -137,7 +143,13 @@ const SubAdmin = () => {
         canViewCategories: false,
         canCreateCategories: false,
         canEditCategories: false,
-        canDeleteCategories: false
+        canDeleteCategories: false,
+        canViewBuyLeads: false,
+        canApproveBuyLeads: false,
+        canDeleteBuyLeads: false,
+        canViewSellLeads: false,
+        canApproveSellLeads: false,
+        canDeleteSellLeads: false
       }
     })
     setShowModal(true)
@@ -400,6 +412,16 @@ const SubAdmin = () => {
       { key: 'canCreateCategories', label: 'Create Categories' },
       { key: 'canEditCategories', label: 'Edit Categories' },
       { key: 'canDeleteCategories', label: 'Delete Categories' }
+    ],
+    'Buy Lead Management': [
+      { key: 'canViewBuyLeads', label: 'View Buy Leads' },
+      { key: 'canApproveBuyLeads', label: 'Approve Buy Leads' },
+      { key: 'canDeleteBuyLeads', label: 'Delete Buy Leads' }
+    ],
+    'Sell Lead Management': [
+      { key: 'canViewSellLeads', label: 'View Sell Leads' },
+      { key: 'canApproveSellLeads', label: 'Approve Sell Leads' },
+      { key: 'canDeleteSellLeads', label: 'Delete Sell Leads' }
     ],
     'Sub Admin Management': [
       { key: 'canViewSubAdmins', label: 'View Sub Admins' },
