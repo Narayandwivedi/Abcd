@@ -419,7 +419,23 @@ const createVendor = async (req, res) => {
 const updateVendor = async (req, res) => {
   try {
     const { vendorId } = req.params;
-    const { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees } = req.body;
+    let { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees, owners, utrNumber, password, membershipType } = req.body;
+
+    // Handle stringified JSON from FormData
+    if (typeof businessCategories === 'string') {
+      try {
+        businessCategories = JSON.parse(businessCategories);
+      } catch (e) {
+        console.error("Error parsing businessCategories:", e);
+      }
+    }
+    if (typeof owners === 'string') {
+      try {
+        owners = JSON.parse(owners);
+      } catch (e) {
+        console.error("Error parsing owners:", e);
+      }
+    }
 
     // Validate required fields
     if (!ownerName || !businessName || !mobile || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
@@ -482,6 +498,61 @@ const updateVendor = async (req, res) => {
     vendor.city = city;
     vendor.businessCategories = businessCategories;
     vendor.membershipFees = membershipFees;
+    
+    if (utrNumber) vendor.utrNumber = utrNumber;
+    if (membershipType) vendor.membershipType = membershipType;
+
+    // Hash password if provided
+    if (password && password.length >= 6) {
+      const salt = await bcrypt.genSalt(10);
+      vendor.password = await bcrypt.hash(password, salt);
+    }
+
+    // Handle Owners and Photos
+    if (owners && Array.isArray(owners)) {
+      const ownerPhotoFiles = (req.files && req.files.ownerPhotos) ? req.files.ownerPhotos : [];
+      const legacyVendorPhotoFiles = (req.files && req.files.vendorPhoto) ? req.files.vendorPhoto : [];
+      const normalizedOwnerPhotoFiles = ownerPhotoFiles.length > 0 ? ownerPhotoFiles : legacyVendorPhotoFiles;
+
+      const updatedOwners = [];
+      let photoIndex = 0;
+      
+      for (let i = 0; i < owners.length; i++) {
+        let photoPath = vendor.owners[i]?.photo || null; // Keep existing photo by default
+        
+        // If a new photo is provided for this owner, upload it
+        // Note: The frontend sends new photos in normalizedOwnerPhotoFiles.
+        // We match them by index of owners that have a new photo.
+        // But for simplicity, if any photo is sent, we take the next one.
+        if (normalizedOwnerPhotoFiles && photoIndex < normalizedOwnerPhotoFiles.length) {
+          try {
+            photoPath = await handleVendorPhotoUpload(normalizedOwnerPhotoFiles[photoIndex]);
+            photoIndex++;
+          } catch (error) {
+            console.error("Error uploading owner photo:", error);
+          }
+        }
+        
+        updatedOwners.push({
+          name: owners[i].name,
+          photo: photoPath
+        });
+      }
+      vendor.owners = updatedOwners;
+      if (updatedOwners.length > 0 && updatedOwners[0].photo) {
+        vendor.passportPhoto = updatedOwners[0].photo;
+      }
+    }
+
+    // Handle Payment Screenshot
+    const hasPaymentScreenshot = !!(req.files && req.files.paymentScreenshot && req.files.paymentScreenshot[0]);
+    if (hasPaymentScreenshot) {
+      try {
+        vendor.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
+      } catch (error) {
+        console.error("Payment screenshot upload error:", error);
+      }
+    }
 
     // Update email if provided
     if (email && email.trim()) {

@@ -16,7 +16,14 @@ router.post("/vendors", adminAuth, checkPermission('canCreateVendors'),
   ]),
   createVendor
 );
-router.put("/vendors/:vendorId", adminAuth, checkPermission('canEditVendors'), updateVendor);
+router.put("/vendors/:vendorId", adminAuth, checkPermission('canEditVendors'),
+  upload.fields([
+    { name: 'vendorPhoto', maxCount: 1 },
+    { name: 'ownerPhotos', maxCount: 10 },
+    { name: 'paymentScreenshot', maxCount: 1 },
+  ]),
+  updateVendor
+);
 router.put("/vendors/:vendorId/approve", adminAuth, checkPermission('canApproveVendors'), approveVendor);
 router.put("/vendors/:vendorId/reject", adminAuth, checkPermission('canApproveVendors'), rejectVendor);
 router.put("/vendors/:vendorId/set-password", adminAuth, checkPermission('canEditVendors'), setVendorPassword);

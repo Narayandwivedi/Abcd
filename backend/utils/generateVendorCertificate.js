@@ -127,65 +127,84 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           width: doc.page.width
         });
 
-      // Prepare categories and subcategories strings
-      const categoriesStr = vendor.businessCategories?.map(bc => bc.category).join(', ') || 'N/A';
-      const subCategoriesStr = vendor.businessCategories?.flatMap(bc => bc.subCategories?.map(sc => sc.name)).join(', ') || 'N/A';
+      // Add categories and subcategories line by line
+      let currentY = 303;
+      if (vendor.businessCategories && vendor.businessCategories.length > 0) {
+        doc.fontSize(10)
+          .fillColor('#374151')
+          .font('Helvetica');
 
-      // Add category and subcategory
-      doc.fontSize(10)
-        .fillColor('#374151')
-        .font('Helvetica')
-        .text(`Category: ${categoriesStr} | Sub-Category: ${subCategoriesStr}`, 0, 303, {
-          align: 'center',
-          width: doc.page.width
+        vendor.businessCategories.forEach((bc) => {
+          const subCats = bc.subCategories?.map(sc => sc.name).join(', ') || 'N/A';
+          doc.text(`${bc.category} | Sub-Category: ${subCats}`, 0, currentY, {
+            align: 'center',
+            width: doc.page.width
+          });
+          currentY += 15; // Increment Y for next line
         });
+      } else {
+        doc.fontSize(10)
+          .fillColor('#374151')
+          .font('Helvetica')
+          .text('Category: N/A | Sub-Category: N/A', 0, currentY, {
+            align: 'center',
+            width: doc.page.width
+          });
+        currentY += 15;
+      }
 
       // Add city
+      currentY += 3; // Small extra gap
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(`City: ${vendor.city || 'N/A'}`, 0, 321, {
+        .text(`City: ${vendor.city || 'N/A'}`, 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
+      currentY += 18;
 
       // Add membership category
       if (vendor.membershipType) {
         doc.fontSize(12)
           .fillColor('#7c3aed')
           .font('Helvetica-Bold')
-          .text(`Membership Category: ${String(vendor.membershipType).toUpperCase()}`, 0, 339, {
+          .text(`Membership Category: ${String(vendor.membershipType).toUpperCase()}`, 0, currentY, {
             align: 'center',
             width: doc.page.width
           });
+        currentY += 19;
       }
 
       // Add description - CERTIFIED ABCD VENDOR
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica-Bold')
-        .text('is a Certified ABCD Vendor', 0, 358, {
+        .text('is a Certified ABCD Vendor', 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
+      currentY += 20;
 
       // Add certificate number - HIGHLIGHTED with darker color and background
       doc.fontSize(11)
         .fillColor('#000000')
         .font('Helvetica-Bold')
-        .text(`Certificate Number: ${certificateNumber}`, 0, 378, {
+        .text(`Certificate Number: ${certificateNumber}`, 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
+      currentY += 14;
 
       // Add vendor referral code
       doc.fontSize(10)
         .fillColor('#111827')
         .font('Helvetica-Bold')
-        .text(`Referral Code: ${referralCode}`, 0, 392, {
+        .text(`Referral Code: ${referralCode}`, 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
+      currentY += 16;
 
       // Add issue date
       const issueDate = new Date().toLocaleDateString('en-IN', {
@@ -197,16 +216,17 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica')
-        .text(`Issued on: ${issueDate}`, 0, 408, {
+        .text(`Issued on: ${issueDate}`, 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
+      currentY += 13;
 
       // Add valid till date
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica-Bold')
-        .text('Valid till: 31 March 2027', 0, 421, {
+        .text('Valid till: 31 March 2027', 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
@@ -214,27 +234,32 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       // Add some spacing
       doc.moveDown(1);
 
+      // Add some spacing
+      currentY += 12;
+
       // Add full HQ address at bottom center with better spacing
       doc.fontSize(10)
         .fillColor('#7c3aed')
         .font('Helvetica-Bold')
-        .text('H.Q. Raipur', 0, 433, {
+        .text('H.Q. Raipur', 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
+      currentY += 15;
 
       doc.fontSize(9)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('Hanuman Market, Ramsagar Para, Raipur (CG) 492001', 0, 448, {
+        .text('Hanuman Market, Ramsagar Para, Raipur (CG) 492001', 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
+      currentY += 20;
 
       // Add Chief Patron signature image on left side
       const chiefSignaturePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'cheif sign (1).png');
       if (fs.existsSync(chiefSignaturePath)) {
-        doc.image(chiefSignaturePath, 90, 468, {
+        doc.image(chiefSignaturePath, 90, currentY, {
           width: 115,
           height: 38,
           align: 'center'
@@ -242,8 +267,8 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       }
 
       // Add Chief Patron signature line
-      doc.moveTo(90, 510)
-        .lineTo(205, 510)
+      doc.moveTo(90, currentY + 42)
+        .lineTo(205, currentY + 42)
         .strokeColor('#374151')
         .lineWidth(1)
         .stroke();
@@ -252,7 +277,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(9)
         .fillColor('#374151')
         .font('Helvetica-Bold')
-        .text('Dr Ashok Agrawal', 90, 514, {
+        .text('Dr Ashok Agrawal', 90, currentY + 46, {
           align: 'center',
           width: 115
         });
@@ -261,7 +286,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(8)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('(Chief Patron - ABCD)', 90, 527, {
+        .text('(Chief Patron - ABCD)', 90, currentY + 59, {
           align: 'center',
           width: 115
         });
@@ -269,7 +294,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       // Add signature image on right side
       const signaturePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'signature.png');
       if (fs.existsSync(signaturePath)) {
-        doc.image(signaturePath, doc.page.width - 205, 468, {
+        doc.image(signaturePath, doc.page.width - 205, currentY, {
           width: 115,
           height: 38,
           align: 'center'
@@ -277,8 +302,8 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       }
 
       // Add signature line
-      doc.moveTo(doc.page.width - 205, 510)
-        .lineTo(doc.page.width - 90, 510)
+      doc.moveTo(doc.page.width - 205, currentY + 42)
+        .lineTo(doc.page.width - 90, currentY + 42)
         .strokeColor('#374151')
         .lineWidth(1)
         .stroke();
@@ -287,7 +312,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(9)
         .fillColor('#374151')
         .font('Helvetica-Bold')
-        .text('Mr Lalit Agrawal', doc.page.width - 205, 514, {
+        .text('Mr Lalit Agrawal', doc.page.width - 205, currentY + 46, {
           align: 'center',
           width: 115
         });
@@ -296,7 +321,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(8)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('(Chairman-ABCD)', doc.page.width - 205, 527, {
+        .text('(Chairman-ABCD)', doc.page.width - 205, currentY + 59, {
           align: 'center',
           width: 115
         });
@@ -305,7 +330,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(7)
         .fillColor('#6b7280')
         .font('Helvetica-Oblique')
-        .text('Subject to Terms & Conditions', 0, 536, {
+        .text('Subject to Terms & Conditions', 0, currentY + 68, {
           align: 'center',
           width: doc.page.width
         });
