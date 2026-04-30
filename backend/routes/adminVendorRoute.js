@@ -8,7 +8,7 @@ const router = express.Router();
 
 // All routes require admin authentication
 router.get("/vendors", adminAuth, checkPermission('canViewVendors'), getAllVendors);
-router.post("/vendors", adminAuth, checkPermission('canEditVendors'),
+router.post("/vendors", adminAuth, checkPermission('canCreateVendors'),
   upload.fields([
     { name: 'vendorPhoto', maxCount: 1 },
     { name: 'ownerPhotos', maxCount: 10 },

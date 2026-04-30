@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { useAdminAuth } from '../context/AdminAuthContext'
 
 const Categories = () => {
+  const { hasPermission } = useAdminAuth()
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -513,12 +515,14 @@ const Categories = () => {
                 >
                   Edit
                 </button>
-                <button
-                  onClick={() => handleDeleteCategory(category._id, category.name)}
-                  className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
-                >
-                  Delete
-                </button>
+                {hasPermission('canDeleteCategories') && (
+                  <button
+                    onClick={() => handleDeleteCategory(category._id, category.name)}
+                    className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))
@@ -965,12 +969,14 @@ const Categories = () => {
                       >
                         Edit
                       </button>
-                      <button
-                        onClick={() => handleDeleteSubcategory(sub._id, sub.name)}
-                        className='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold transition'
-                      >
-                        Delete
-                      </button>
+                      {hasPermission('canDeleteCategories') && (
+                        <button
+                          onClick={() => handleDeleteSubcategory(sub._id, sub.name)}
+                          className='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold transition'
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { useAdminAuth } from '../context/AdminAuthContext'
 
 const Ads = () => {
+  const { hasPermission } = useAdminAuth()
   const [ads, setAds] = useState([])
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
@@ -340,21 +342,19 @@ const Ads = () => {
         <div className='flex gap-2 mb-4'>
           <button
             onClick={() => setFilterTab('all')}
-            className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-              filterTab === 'all'
+            className={`px-6 py-2 rounded-lg font-semibold transition-all ${filterTab === 'all'
                 ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+              }`}
           >
             All Ads ({stats.total})
           </button>
           <button
             onClick={() => setFilterTab('active')}
-            className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-              filterTab === 'active'
+            className={`px-6 py-2 rounded-lg font-semibold transition-all ${filterTab === 'active'
                 ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+              }`}
           >
             Active Ads ({stats.active})
           </button>
@@ -502,36 +502,36 @@ const Ads = () => {
                       </svg>
                       Edit
                     </button>
-                    <button
-                      onClick={() => handleDeleteAd(ad._id)}
-                      className='flex items-center justify-center gap-1 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-xs font-semibold hover:from-red-700 hover:to-red-800 transition-all shadow-md'
-                    >
-                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
-                      </svg>
-                      Delete
-                    </button>
+                    {hasPermission('canDeleteAds') && (
+                      <button
+                        onClick={() => handleDeleteAd(ad._id)}
+                        className='flex items-center justify-center gap-1 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-xs font-semibold hover:from-red-700 hover:to-red-800 transition-all shadow-md'
+                      >
+                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                        </svg>
+                        Delete
+                      </button>
+                    )}
                   </div>
 
                   {/* Toggle Actions */}
                   <div className='grid grid-cols-2 gap-2'>
                     <button
                       onClick={() => handleToggleApproval(ad._id)}
-                      className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                        ad.isApproved
+                      className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${ad.isApproved
                           ? 'bg-red-100 text-red-700 hover:bg-red-200'
                           : 'bg-green-100 text-green-700 hover:bg-green-200'
-                      }`}
+                        }`}
                     >
                       {ad.isApproved ? '✗ Unapprove' : '✓ Approve'}
                     </button>
                     <button
                       onClick={() => handleToggleVisibility(ad._id)}
-                      className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                        ad.isVisible
+                      className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${ad.isVisible
                           ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                      }`}
+                        }`}
                     >
                       {ad.isVisible ? '🙈 Hide' : '👁 Show'}
                     </button>

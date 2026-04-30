@@ -32,6 +32,10 @@ const subAdminSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    canCreateUsers: {
+      type: Boolean,
+      default: false,
+    },
     canEditUsers: {
       type: Boolean,
       default: false,
@@ -50,6 +54,10 @@ const subAdminSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    canCreateVendors: {
+      type: Boolean,
+      default: false,
+    },
     canEditVendors: {
       type: Boolean,
       default: false,
@@ -65,6 +73,22 @@ const subAdminSchema = new mongoose.Schema({
 
     // Content Management
     canManageContent: {
+      type: Boolean,
+      default: false,
+    },
+    canViewCategories: {
+      type: Boolean,
+      default: false,
+    },
+    canCreateCategories: {
+      type: Boolean,
+      default: false,
+    },
+    canEditCategories: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteCategories: {
       type: Boolean,
       default: false,
     },
@@ -123,12 +147,20 @@ const subAdminSchema = new mongoose.Schema({
       default: false,
     },
 
-    // Settings
-    canViewSettings: {
+    // Sub Admin Management
+    canViewSubAdmins: {
       type: Boolean,
       default: false,
     },
-    canEditSettings: {
+    canCreateSubAdmins: {
+      type: Boolean,
+      default: false,
+    },
+    canEditSubAdmins: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteSubAdmins: {
       type: Boolean,
       default: false,
     },

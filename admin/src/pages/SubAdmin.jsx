@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { useAdminAuth } from '../context/AdminAuthContext'
 
 const SubAdmin = () => {
+  const { hasPermission } = useAdminAuth()
   const [showModal, setShowModal] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [selectedSubAdmin, setSelectedSubAdmin] = useState(null)
@@ -20,10 +22,12 @@ const SubAdmin = () => {
     isActive: true,
     permissions: {
       canViewUsers: false,
+      canCreateUsers: false,
       canEditUsers: false,
       canDeleteUsers: false,
       canApproveUsers: false,
       canViewVendors: false,
+      canCreateVendors: false,
       canEditVendors: false,
       canDeleteVendors: false,
       canApproveVendors: false,
@@ -41,7 +45,15 @@ const SubAdmin = () => {
       canViewChats: false,
       canReplyChats: false,
       canViewSettings: false,
-      canEditSettings: false
+      canEditSettings: false,
+      canViewSubAdmins: false,
+      canCreateSubAdmins: false,
+      canEditSubAdmins: false,
+      canDeleteSubAdmins: false,
+      canViewCategories: false,
+      canCreateCategories: false,
+      canEditCategories: false,
+      canDeleteCategories: false
     }
   })
 
@@ -94,10 +106,12 @@ const SubAdmin = () => {
       isActive: true,
       permissions: {
         canViewUsers: false,
+        canCreateUsers: false,
         canEditUsers: false,
         canDeleteUsers: false,
         canApproveUsers: false,
         canViewVendors: false,
+        canCreateVendors: false,
         canEditVendors: false,
         canDeleteVendors: false,
         canApproveVendors: false,
@@ -115,7 +129,15 @@ const SubAdmin = () => {
         canViewChats: false,
         canReplyChats: false,
         canViewSettings: false,
-        canEditSettings: false
+        canEditSettings: false,
+        canViewSubAdmins: false,
+        canCreateSubAdmins: false,
+        canEditSubAdmins: false,
+        canDeleteSubAdmins: false,
+        canViewCategories: false,
+        canCreateCategories: false,
+        canEditCategories: false,
+        canDeleteCategories: false
       }
     })
     setShowModal(true)
@@ -195,13 +217,13 @@ const SubAdmin = () => {
 
       const body = isEdit
         ? {
-            fullName: formData.fullName,
-            email: formData.email,
-            mobile: formData.mobile,
-            password: formData.password || undefined,
-            permissions: formData.permissions,
-            isActive: formData.isActive
-          }
+          fullName: formData.fullName,
+          email: formData.email,
+          mobile: formData.mobile,
+          password: formData.password || undefined,
+          permissions: formData.permissions,
+          isActive: formData.isActive
+        }
         : formData
 
       const response = await fetch(url, {
@@ -340,12 +362,14 @@ const SubAdmin = () => {
   const permissionGroups = {
     'User Management': [
       { key: 'canViewUsers', label: 'View Users' },
+      { key: 'canCreateUsers', label: 'Create Users' },
       { key: 'canEditUsers', label: 'Edit Users' },
       { key: 'canDeleteUsers', label: 'Delete Users' },
       { key: 'canApproveUsers', label: 'Approve Users' }
     ],
     'Vendor Management': [
       { key: 'canViewVendors', label: 'View Vendors' },
+      { key: 'canCreateVendors', label: 'Create Vendors' },
       { key: 'canEditVendors', label: 'Edit Vendors' },
       { key: 'canDeleteVendors', label: 'Delete Vendors' },
       { key: 'canApproveVendors', label: 'Approve Vendors' }
@@ -371,7 +395,17 @@ const SubAdmin = () => {
     'Content & Settings': [
       { key: 'canManageContent', label: 'Manage Content' },
       { key: 'canViewSettings', label: 'View Settings' },
-      { key: 'canEditSettings', label: 'Edit Settings' }
+      { key: 'canEditSettings', label: 'Edit Settings' },
+      { key: 'canViewCategories', label: 'View Categories' },
+      { key: 'canCreateCategories', label: 'Create Categories' },
+      { key: 'canEditCategories', label: 'Edit Categories' },
+      { key: 'canDeleteCategories', label: 'Delete Categories' }
+    ],
+    'Sub Admin Management': [
+      { key: 'canViewSubAdmins', label: 'View Sub Admins' },
+      { key: 'canCreateSubAdmins', label: 'Create Sub Admins' },
+      { key: 'canEditSubAdmins', label: 'Edit Sub Admins' },
+      { key: 'canDeleteSubAdmins', label: 'Delete Sub Admins' }
     ]
   }
 
@@ -472,11 +506,10 @@ const SubAdmin = () => {
                       <td className='px-6 py-4'>
                         <button
                           onClick={() => toggleStatus(subAdmin._id)}
-                          className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                            subAdmin.isActive
+                          className={`px-3 py-1 rounded-full text-xs font-semibold transition ${subAdmin.isActive
                               ? 'bg-green-100 text-green-700 hover:bg-green-200'
                               : 'bg-red-100 text-red-700 hover:bg-red-200'
-                          }`}
+                            }`}
                         >
                           {subAdmin.isActive ? '✓ Active' : '✗ Inactive'}
                         </button>
@@ -506,15 +539,17 @@ const SubAdmin = () => {
                               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' />
                             </svg>
                           </button>
-                          <button
-                            onClick={() => handleDelete(subAdmin._id)}
-                            className='p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition'
-                            title='Delete Sub Admin'
-                          >
-                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
-                            </svg>
-                          </button>
+                          {hasPermission('canDeleteSubAdmins') && (
+                            <button
+                              onClick={() => handleDelete(subAdmin._id)}
+                              className='p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition'
+                              title='Delete Sub Admin'
+                            >
+                              <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                              </svg>
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -534,11 +569,10 @@ const SubAdmin = () => {
                     <div className='flex-1'>
                       <div className='text-sm font-bold text-gray-800'>{subAdmin.fullName}</div>
                       <div className='text-[10px] text-gray-500'>ID: {subAdmin._id.slice(-6)}</div>
-                      <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        subAdmin.isActive
+                      <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${subAdmin.isActive
                           ? 'bg-green-100 text-green-700'
                           : 'bg-red-100 text-red-700'
-                      }`}>
+                        }`}>
                         {subAdmin.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -576,15 +610,17 @@ const SubAdmin = () => {
                       </svg>
                       Pass
                     </button>
-                    <button
-                      onClick={() => handleDelete(subAdmin._id)}
-                      className='flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition text-[11px] font-semibold'
-                    >
-                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
-                      </svg>
-                      Del
-                    </button>
+                    {hasPermission('canDeleteSubAdmins') && (
+                      <button
+                        onClick={() => handleDelete(subAdmin._id)}
+                        className='flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition text-[11px] font-semibold'
+                      >
+                        <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                        </svg>
+                        Del
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
