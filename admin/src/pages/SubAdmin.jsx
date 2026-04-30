@@ -183,6 +183,11 @@ const SubAdmin = () => {
       return
     }
 
+    if (isEdit && formData.password && formData.password.length < 6) {
+      alert('New password must be at least 6 characters')
+      return
+    }
+
     try {
       const url = isEdit
         ? `${BACKEND_URL}/api/admin/subadmins/${selectedSubAdmin._id}`
@@ -193,6 +198,7 @@ const SubAdmin = () => {
             fullName: formData.fullName,
             email: formData.email,
             mobile: formData.mobile,
+            password: formData.password || undefined,
             permissions: formData.permissions,
             isActive: formData.isActive
           }
@@ -637,20 +643,20 @@ const SubAdmin = () => {
                   />
                 </div>
 
-                {!isEdit && (
-                  <div>
-                    <label className='block text-sm font-semibold text-gray-700 mb-2'>Password *</label>
-                    <input
-                      type='password'
-                      name='password'
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      placeholder='Enter password (min 6 characters)'
-                      className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                      required
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                    Password {isEdit ? <span className="text-gray-400 font-normal">(Leave blank to keep current)</span> : '*'}
+                  </label>
+                  <input
+                    type='password'
+                    name='password'
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    placeholder={isEdit ? 'Enter new password' : 'Enter password (min 6 characters)'}
+                    className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    required={!isEdit}
+                  />
+                </div>
 
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-2'>Status</label>

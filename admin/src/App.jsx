@@ -71,7 +71,7 @@ function AppRoutes() {
       <Route
         path='/users'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canViewUsers'>
             <AdminLayout>
               <Users />
             </AdminLayout>
@@ -81,7 +81,7 @@ function AppRoutes() {
       <Route
         path='/vendors'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canViewVendors'>
             <AdminLayout>
               <Vendors />
             </AdminLayout>
@@ -91,7 +91,7 @@ function AppRoutes() {
       <Route
         path='/products'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <Products />
             </AdminLayout>
@@ -101,7 +101,7 @@ function AppRoutes() {
       <Route
         path='/orders'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <Orders />
             </AdminLayout>
@@ -111,7 +111,7 @@ function AppRoutes() {
       <Route
         path='/categories'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <Categories />
             </AdminLayout>
@@ -121,7 +121,7 @@ function AppRoutes() {
       <Route
         path='/payments'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <Payments />
             </AdminLayout>
@@ -131,7 +131,7 @@ function AppRoutes() {
       <Route
         path='/reports'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <Reports />
             </AdminLayout>
@@ -141,7 +141,7 @@ function AppRoutes() {
       <Route
         path='/settings'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canViewSettings'>
             <AdminLayout>
               <Settings />
             </AdminLayout>
@@ -151,7 +151,7 @@ function AppRoutes() {
       <Route
         path='/subadmin'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='SUPERADMIN_ONLY'>
             <AdminLayout>
               <SubAdmin />
             </AdminLayout>
@@ -161,7 +161,7 @@ function AppRoutes() {
       <Route
         path='/buy-leads'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <BuyLeads />
             </AdminLayout>
@@ -171,7 +171,7 @@ function AppRoutes() {
       <Route
         path='/sell-leads'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <SellLeads />
             </AdminLayout>
@@ -181,7 +181,7 @@ function AppRoutes() {
       <Route
         path='/cities'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <Cities />
             </AdminLayout>
@@ -191,7 +191,7 @@ function AppRoutes() {
       <Route
         path='/ads'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermission='canViewAds'>
             <AdminLayout>
               <Ads />
             </AdminLayout>

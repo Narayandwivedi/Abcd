@@ -5,7 +5,7 @@ import { useAdminAuth } from '../context/AdminAuthContext'
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { admin, logout } = useAdminAuth()
+  const { admin, logout, hasPermission } = useAdminAuth()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [showInstallButton, setShowInstallButton] = useState(false)
@@ -66,43 +66,50 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       name: 'Users',
       icon: '👥',
       path: '/users',
-      description: 'Manage Users'
+      description: 'Manage Users',
+      requiredPermission: 'canViewUsers'
     },
     {
       name: 'Vendors',
       icon: '🏪',
       path: '/vendors',
-      description: 'Manage Vendors'
+      description: 'Manage Vendors',
+      requiredPermission: 'canViewVendors'
     },
     {
       name: 'Buy Leads',
       icon: '🛍️',
       path: '/buy-leads',
-      description: 'Manage Buy Leads'
+      description: 'Manage Buy Leads',
+      requiredPermission: 'canManageContent'
     },
     {
       name: 'Sell Leads',
       icon: '🏷️',
       path: '/sell-leads',
-      description: 'Manage Sell Leads'
+      description: 'Manage Sell Leads',
+      requiredPermission: 'canManageContent'
     },
     {
       name: 'Cities',
       icon: '🏙️',
       path: '/cities',
-      description: 'Manage Cities'
+      description: 'Manage Cities',
+      requiredPermission: 'canManageContent'
     },
     {
       name: 'Categories',
       icon: '📂',
       path: '/categories',
-      description: 'Manage Categories'
+      description: 'Manage Categories',
+      requiredPermission: 'canManageContent'
     },
     {
       name: 'Ads',
       icon: '📢',
       path: '/ads',
-      description: 'Manage Advertisements'
+      description: 'Manage Advertisements',
+      requiredPermission: 'canViewAds'
     },
     // {
     //   name: 'Products',
@@ -126,21 +133,29 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       name: 'Reports',
       icon: '📈',
       path: '/reports',
-      description: 'Sales & Analytics'
+      description: 'Sales & Analytics',
+      requiredPermission: 'canManageContent'
     },
     {
       name: 'Settings',
       icon: '⚙️',
       path: '/settings',
-      description: 'System Settings'
+      description: 'System Settings',
+      requiredPermission: 'SUPERADMIN_ONLY'
     },
     {
       name: 'Sub Admin',
       icon: '👤',
       path: '/subadmin',
-      description: 'Manage Sub Admins'
+      description: 'Manage Sub Admins',
+      requiredPermission: 'SUPERADMIN_ONLY'
     }
   ]
+
+  const visibleMenuItems = menuItems.filter(item => {
+    if (!item.requiredPermission) return true;
+    return hasPermission(item.requiredPermission);
+  });
 
   const isActive = (path) => location.pathname === path
 
@@ -190,7 +205,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
         {/* Menu Items */}
         <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-210px)]">
-          {menuItems.map((item) => (
+          {visibleMenuItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
@@ -244,7 +259,9 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             </div>
             <div className="flex-1">
               <div className="font-semibold text-blue-100 text-xs truncate">{admin?.fullName || 'Admin'}</div>
-              <div className="text-[10px] text-blue-300">Super Admin</div>
+              <div className="text-[10px] text-blue-300">
+                {admin?.role === 'subadmin' ? 'Sub Admin' : 'Super Admin'}
+              </div>
             </div>
           </div>
 
@@ -265,7 +282,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               <div className="flex gap-1.5">
                 <button
                   onClick={handleLogout}
-                  className="flex-1 px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-xs font-semibold transition"
+                  className="flex-1 px-2 py-1 bg-red-50 hover:bg-red-600 text-white rounded-md text-xs font-semibold transition"
                 >
                   Yes
                 </button>

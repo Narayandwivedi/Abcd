@@ -5,6 +5,7 @@ const { getAllCategoriesAdmin, createCategory, updateCategory, deleteCategory, t
 const { getAllAds, createAd, updateAd, deleteAd, toggleAdApproval, toggleAdVisibility } = require("../controllers/adController");
 const { getAllBlogsAdmin, getBlogByIdAdmin, createBlog, updateBlog, deleteBlog, publishBlog, unpublishBlog, toggleFeatured } = require("../controllers/blogController");
 const adminAuth = require("../middleware/adminAuth");
+const checkPermission = require("../middleware/checkPermission");
 const { adminLoginLimiter } = require("../middleware/adminRateLimit");
 const upload = require("../utils/multer");
 
@@ -17,50 +18,52 @@ router.post("/login", adminLoginLimiter, adminLogin);
 router.post("/logout", adminAuth, adminLogout);
 router.get("/me", adminAuth, getCurrentAdmin);
 router.put("/change-password", adminAuth, changeAdminPassword);
-router.get("/users", adminAuth, getAllUsers);
-router.post("/users", adminAuth, upload.single('passportPhoto'), createUser);
-router.put("/users/:userId/approve", adminAuth, approveUser);
-router.put("/users/:userId/reject", adminAuth, rejectUser);
-router.put("/users/:userId/set-password", adminAuth, setUserPassword);
-router.patch("/users/:userId/toggle-status", adminAuth, toggleUserStatus);
-router.put("/users/:userId", adminAuth, updateUser);
-router.delete("/users/:userId", adminAuth, deleteUser);
+
+// User management routes
+router.get("/users", adminAuth, checkPermission('canViewUsers'), getAllUsers);
+router.post("/users", adminAuth, checkPermission('canCreateUsers'), upload.single('passportPhoto'), createUser);
+router.put("/users/:userId/approve", adminAuth, checkPermission('canApproveUsers'), approveUser);
+router.put("/users/:userId/reject", adminAuth, checkPermission('canApproveUsers'), rejectUser);
+router.put("/users/:userId/set-password", adminAuth, checkPermission('canEditUsers'), setUserPassword);
+router.patch("/users/:userId/toggle-status", adminAuth, checkPermission('canEditUsers'), toggleUserStatus);
+router.put("/users/:userId", adminAuth, checkPermission('canEditUsers'), updateUser);
+router.delete("/users/:userId", adminAuth, checkPermission('canDeleteUsers'), deleteUser);
 
 // City management routes
-router.get("/cities", adminAuth, getAllCitiesAdmin);
-router.post("/cities", adminAuth, createCity);
-router.put("/cities/:cityId", adminAuth, updateCity);
-router.delete("/cities/:cityId", adminAuth, deleteCity);
-router.patch("/cities/:cityId/toggle-status", adminAuth, toggleCityStatus);
+router.get("/cities", adminAuth, checkPermission('canManageContent'), getAllCitiesAdmin);
+router.post("/cities", adminAuth, checkPermission('canManageContent'), createCity);
+router.put("/cities/:cityId", adminAuth, checkPermission('canManageContent'), updateCity);
+router.delete("/cities/:cityId", adminAuth, checkPermission('canManageContent'), deleteCity);
+router.patch("/cities/:cityId/toggle-status", adminAuth, checkPermission('canManageContent'), toggleCityStatus);
 
 // Category management routes
-router.get("/categories", adminAuth, getAllCategoriesAdmin);
-router.post("/categories", adminAuth, upload.single('image'), createCategory);
-router.put("/categories/:categoryId", adminAuth, upload.single('image'), updateCategory);
-router.delete("/categories/:categoryId", adminAuth, deleteCategory);
-router.patch("/categories/:categoryId/toggle-status", adminAuth, toggleCategoryStatus);
+router.get("/categories", adminAuth, checkPermission('canManageContent'), getAllCategoriesAdmin);
+router.post("/categories", adminAuth, checkPermission('canManageContent'), upload.single('image'), createCategory);
+router.put("/categories/:categoryId", adminAuth, checkPermission('canManageContent'), upload.single('image'), updateCategory);
+router.delete("/categories/:categoryId", adminAuth, checkPermission('canManageContent'), deleteCategory);
+router.patch("/categories/:categoryId/toggle-status", adminAuth, checkPermission('canManageContent'), toggleCategoryStatus);
 
 // Subcategory management routes
-router.post("/categories/:categoryId/subcategories", adminAuth, addSubcategory);
-router.put("/categories/:categoryId/subcategories/:subcategoryId", adminAuth, updateSubcategory);
-router.delete("/categories/:categoryId/subcategories/:subcategoryId", adminAuth, deleteSubcategory);
+router.post("/categories/:categoryId/subcategories", adminAuth, checkPermission('canManageContent'), addSubcategory);
+router.put("/categories/:categoryId/subcategories/:subcategoryId", adminAuth, checkPermission('canManageContent'), updateSubcategory);
+router.delete("/categories/:categoryId/subcategories/:subcategoryId", adminAuth, checkPermission('canManageContent'), deleteSubcategory);
 
 // Ad management routes
-router.get("/ads", adminAuth, getAllAds);
-router.post("/ads", adminAuth, upload.single('adImg'), createAd);
-router.put("/ads/:adId", adminAuth, upload.single('adImg'), updateAd);
-router.delete("/ads/:adId", adminAuth, deleteAd);
-router.patch("/ads/:adId/toggle-approval", adminAuth, toggleAdApproval);
-router.patch("/ads/:adId/toggle-visibility", adminAuth, toggleAdVisibility);
+router.get("/ads", adminAuth, checkPermission('canViewAds'), getAllAds);
+router.post("/ads", adminAuth, checkPermission('canCreateAds'), upload.single('adImg'), createAd);
+router.put("/ads/:adId", adminAuth, checkPermission('canEditAds'), upload.single('adImg'), updateAd);
+router.delete("/ads/:adId", adminAuth, checkPermission('canDeleteAds'), deleteAd);
+router.patch("/ads/:adId/toggle-approval", adminAuth, checkPermission('canApproveAds'), toggleAdApproval);
+router.patch("/ads/:adId/toggle-visibility", adminAuth, checkPermission('canEditAds'), toggleAdVisibility);
 
 // Blog management routes
-router.get("/blogs", adminAuth, getAllBlogsAdmin);
-router.get("/blogs/:blogId", adminAuth, getBlogByIdAdmin);
-router.post("/blogs", adminAuth, createBlog);
-router.put("/blogs/:blogId", adminAuth, updateBlog);
-router.delete("/blogs/:blogId", adminAuth, deleteBlog);
-router.patch("/blogs/:blogId/publish", adminAuth, publishBlog);
-router.patch("/blogs/:blogId/unpublish", adminAuth, unpublishBlog);
-router.patch("/blogs/:blogId/toggle-featured", adminAuth, toggleFeatured);
+router.get("/blogs", adminAuth, checkPermission('canViewBlogs'), getAllBlogsAdmin);
+router.get("/blogs/:blogId", adminAuth, checkPermission('canViewBlogs'), getBlogByIdAdmin);
+router.post("/blogs", adminAuth, checkPermission('canCreateBlogs'), createBlog);
+router.put("/blogs/:blogId", adminAuth, checkPermission('canEditBlogs'), updateBlog);
+router.delete("/blogs/:blogId", adminAuth, checkPermission('canDeleteBlogs'), deleteBlog);
+router.patch("/blogs/:blogId/publish", adminAuth, checkPermission('canPublishBlogs'), publishBlog);
+router.patch("/blogs/:blogId/unpublish", adminAuth, checkPermission('canPublishBlogs'), unpublishBlog);
+router.patch("/blogs/:blogId/toggle-featured", adminAuth, checkPermission('canEditBlogs'), toggleFeatured);
 
 module.exports = router;
