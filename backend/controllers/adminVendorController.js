@@ -225,19 +225,25 @@ const createVendor = async (req, res) => {
       return res.status(400).json({ success: false, message: "Maximum 10 owners are allowed" });
     }
 
-    if (businessCategories.length > 5) {
-      return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
+    // Count total subcategories across all categories
+    let totalSubCategories = 0;
+    for (const item of businessCategories) {
+      if (!item.category || !Array.isArray(item.subCategories) || item.subCategories.length === 0) {
+        return res.status(400).json({ success: false, message: "Each category must have a name and at least one subcategory" });
+      }
+      totalSubCategories += item.subCategories.length;
+      
+      item.category = item.category.trim();
+      if (item.categoryId) item.categoryId = item.categoryId.trim();
+      
+      item.subCategories = item.subCategories.map(sub => ({
+        name: sub.name?.trim(),
+        id: sub.id?.trim()
+      })).filter(sub => sub.name);
     }
 
-    for (const item of businessCategories) {
-      if (!item.category || !item.subCategory || typeof item.category !== 'string' || typeof item.subCategory !== 'string') {
-        return res.status(400).json({ success: false, message: "Each category must have a category and subCategory text" });
-      }
-      item.category = item.category.trim();
-      item.subCategory = item.subCategory.trim();
-
-      if (item.categoryId) item.categoryId = item.categoryId.trim();
-      if (item.subcategoryId) item.subcategoryId = item.subcategoryId.trim();
+    if (totalSubCategories > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 subcategories allowed across all categories" });
     }
 
     mobile = Number(mobile);
@@ -423,8 +429,17 @@ const updateVendor = async (req, res) => {
       });
     }
 
-    if (businessCategories.length > 5) {
-      return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
+    // Count total subcategories across all categories
+    let totalSubCategories = 0;
+    for (const item of businessCategories) {
+      if (!item.category || !Array.isArray(item.subCategories) || item.subCategories.length === 0) {
+        return res.status(400).json({ success: false, message: "Each category must have a name and at least one subcategory" });
+      }
+      totalSubCategories += item.subCategories.length;
+    }
+
+    if (totalSubCategories > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 subcategories allowed across all categories" });
     }
 
     const vendor = await vendorModel.findById(vendorId).populate('activeCertificate');

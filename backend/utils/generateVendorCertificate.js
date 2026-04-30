@@ -127,11 +127,15 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           width: doc.page.width
         });
 
+      // Prepare categories and subcategories strings
+      const categoriesStr = vendor.businessCategories?.map(bc => bc.category).join(', ') || 'N/A';
+      const subCategoriesStr = vendor.businessCategories?.flatMap(bc => bc.subCategories?.map(sc => sc.name)).join(', ') || 'N/A';
+
       // Add category and subcategory
-      doc.fontSize(11)
+      doc.fontSize(10)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(`Category: ${vendor.category} | Sub-Category: ${vendor.subCategory}`, 0, 303, {
+        .text(`Category: ${categoriesStr} | Sub-Category: ${subCategoriesStr}`, 0, 303, {
           align: 'center',
           width: doc.page.width
         });

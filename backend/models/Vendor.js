@@ -52,7 +52,7 @@ const vendorSchema = new mongoose.Schema({
     required: true,
   },
 
-  // Business Categories - Plain text (max 5)
+  // Business Categories - Grouped (max 5 subcategories total)
   businessCategories: [{
     category: {
       type: String,
@@ -62,13 +62,15 @@ const vendorSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
     },
-    subCategory: {
-      type: String,
-      required: true,
-    },
-    subcategoryId: {
-      type: mongoose.Schema.Types.ObjectId,
-    },
+    subCategories: [{
+      name: {
+        type: String,
+        required: true,
+      },
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+      }
+    }],
   }],
   gstPan: {
     type: String,

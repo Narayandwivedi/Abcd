@@ -478,9 +478,9 @@ ABCD Team`
       return
     }
 
-    const hasEmptyCategory = createForm.businessCategories.some(item => !item.category?.trim() || !item.subCategory?.trim())
+    const hasEmptyCategory = createForm.businessCategories.some(item => !item.category?.trim() || !item.subCategories || item.subCategories.length === 0)
     if (hasEmptyCategory) {
-      alert('Please fill in both category and subcategory for all entries')
+      alert('Please fill in both category and select at least one subcategory for all entries')
       return
     }
 
@@ -558,7 +558,8 @@ ABCD Team`
 
   // Handle edit vendor
   const handleEditVendor = async () => {
-    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.state || !editForm.district || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipFees) {
+    const hasEmptyCategory = editForm.businessCategories.some(item => !item.category?.trim() || !item.subCategories || item.subCategories.length === 0)
+    if (hasEmptyCategory || editForm.businessCategories.length === 0) {
       alert('Please fill all required fields including state, district, city, and at least one category and subcategory')
       return
     }
@@ -823,13 +824,22 @@ ABCD Team`
                           <div className='text-xs text-gray-500'>{vendor.email}</div>
                         </td>
                         <td className='px-6 py-4'>
-                          <div className='flex flex-wrap gap-1'>
+                          <div className='flex flex-col gap-1'>
                             {vendor.businessCategories?.slice(0, 2).map((bc, idx) => (
-                              <span key={idx} className='text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded'>
-                                {bc.category}
-                              </span>
+                              <div key={idx} className='flex flex-col'>
+                                <span className='text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded w-fit mb-0.5'>
+                                  {bc.category}
+                                </span>
+                                <div className='flex flex-wrap gap-1'>
+                                  {bc.subCategories?.map((sc, sidx) => (
+                                    <span key={sidx} className='text-[9px] text-gray-500 bg-gray-50 px-1 rounded'>
+                                      {sc.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
                             ))}
-                            {vendor.businessCategories?.length > 2 && <span className='text-[10px] text-gray-400'>+{vendor.businessCategories.length - 2} more</span>}
+                            {vendor.businessCategories?.length > 2 && <span className='text-[10px] text-gray-400'>+{vendor.businessCategories.length - 2} more categories</span>}
                           </div>
                         </td>
                         <td className='px-6 py-4'>
