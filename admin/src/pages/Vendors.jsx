@@ -472,9 +472,9 @@ ABCD Team`
       return
     }
 
-    const hasInvalidOwners = createForm.owners.some((owner) => !owner.name?.trim() || !owner.photo)
+    const hasInvalidOwners = createForm.owners.some((owner) => !owner.name?.trim())
     if (hasInvalidOwners) {
-      alert('Please add owner name and photo for all owners')
+      alert('Please add owner name for all owners')
       return
     }
 
@@ -1151,7 +1151,7 @@ ABCD Team`
                           />
                         </div>
                         <div>
-                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Photo {index + 1} <span className='text-red-500'>*</span></label>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Photo {index + 1}</label>
                           <input
                             type='file'
                             accept='image/jpeg,image/jpg,image/png,image/webp'

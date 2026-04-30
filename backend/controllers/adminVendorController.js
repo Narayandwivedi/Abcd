@@ -217,7 +217,7 @@ const createVendor = async (req, res) => {
     if (!mobile || owners.length === 0 || !businessName || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Mobile, at least one owner with photo, business name, state, district, city, at least one category-subcategory pair, and membership fees are required"
+        message: "Mobile, at least one owner, business name, state, district, city, at least one category-subcategory pair, and membership fees are required"
       });
     }
 
@@ -310,24 +310,26 @@ const createVendor = async (req, res) => {
     const legacyVendorPhotoFiles = (req.files && req.files.vendorPhoto) ? req.files.vendorPhoto : [];
     const normalizedOwnerPhotoFiles = ownerPhotoFiles.length > 0 ? ownerPhotoFiles : legacyVendorPhotoFiles;
 
-    if (normalizedOwnerPhotoFiles.length !== owners.length) {
-      return res.status(400).json({
-        success: false,
-        message: "Please upload one photo for each owner"
-      });
-    }
-
     try {
       const ownersWithPhotos = [];
+      let photoIndex = 0;
       for (let i = 0; i < owners.length; i++) {
-        const photoPath = await handleVendorPhotoUpload(normalizedOwnerPhotoFiles[i]);
+        let photoPath = null;
+        // If frontend appends photos, we'll try to match them. Since we removed the requirement
+        // we just map available photos sequentially, or null if none available.
+        if (normalizedOwnerPhotoFiles && photoIndex < normalizedOwnerPhotoFiles.length) {
+          photoPath = await handleVendorPhotoUpload(normalizedOwnerPhotoFiles[photoIndex]);
+          photoIndex++;
+        }
         ownersWithPhotos.push({
           name: owners[i].name,
           photo: photoPath
         });
       }
       vendorData.owners = ownersWithPhotos;
-      vendorData.passportPhoto = ownersWithPhotos[0].photo;
+      if (ownersWithPhotos.length > 0 && ownersWithPhotos[0].photo) {
+        vendorData.passportPhoto = ownersWithPhotos[0].photo;
+      }
     } catch (error) {
       console.error("Owner photo upload error:", error);
       return res.status(500).json({
