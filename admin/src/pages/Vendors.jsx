@@ -45,16 +45,25 @@ const Vendors = () => {
   const [creating, setCreating] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editForm, setEditForm] = useState({
-    ownerName: '',
+    owners: [createEmptyOwner()],
     businessName: '',
     mobile: '',
     email: '',
+    gstPan: '',
+    address: '',
     state: '',
     district: '',
     city: '',
+    websiteUrl: '',
+    referralId: '',
+    membershipType: '',
     businessCategories: [],
-    membershipFees: ''
+    membershipFees: '',
+    utrNumber: '',
+    paymentScreenshot: null,
+    password: ''
   })
+  const [previewEditPaymentScreenshot, setPreviewEditPaymentScreenshot] = useState(null)
   const [editing, setEditing] = useState(false)
   const [createStates, setCreateStates] = useState([])
   const [createDistricts, setCreateDistricts] = useState([])
@@ -178,6 +187,87 @@ const Vendors = () => {
     setCreateForm((prev) => ({ ...prev, paymentScreenshot: file }))
     const reader = new FileReader()
     reader.onloadend = () => setPreviewPaymentScreenshot(reader.result)
+    reader.readAsDataURL(file)
+  }
+
+  const addEditOwner = () => {
+    setEditForm((prev) => {
+      if (prev.owners.length >= 10) {
+        alert('Maximum 10 owners allowed')
+        return prev
+      }
+      return { ...prev, owners: [...prev.owners, createEmptyOwner()] }
+    })
+  }
+
+  const removeEditOwner = (index) => {
+    setEditForm((prev) => {
+      if (prev.owners.length <= 1) return prev
+      const removedOwner = prev.owners[index]
+      if (removedOwner?.previewUrl && removedOwner.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(removedOwner.previewUrl)
+      }
+      return { ...prev, owners: prev.owners.filter((_, i) => i !== index) }
+    })
+  }
+
+  const handleEditOwnerNameChange = (index, value) => {
+    setEditForm((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => (i === index ? { ...owner, name: value } : owner))
+    }))
+  }
+
+  const handleEditOwnerPhotoChange = (index, e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid image (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Photo size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    const previewUrl = URL.createObjectURL(file)
+    setEditForm((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => {
+        if (i !== index) return owner
+        if (owner.previewUrl && owner.previewUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(owner.previewUrl)
+        }
+        return { ...owner, photo: file, previewUrl }
+      })
+    }))
+  }
+
+  const handleEditPaymentScreenshotChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    setEditForm((prev) => ({ ...prev, paymentScreenshot: file }))
+    const reader = new FileReader()
+    reader.onloadend = () => setPreviewEditPaymentScreenshot(reader.result)
     reader.readAsDataURL(file)
   }
 
@@ -542,17 +632,43 @@ ABCD Team`
   // Open edit modal with vendor data
   const openEditModal = (vendor) => {
     setSelectedVendor(vendor)
+    
+    // Normalize owners for edit form
+    const normalizedOwners = (vendor.owners && vendor.owners.length > 0) 
+      ? vendor.owners.map(o => ({ 
+          name: o.name, 
+          photo: null, 
+          previewUrl: o.photo ? toAbsoluteFileUrl(o.photo) : '' 
+        }))
+      : [{ name: vendor.ownerName || '', photo: null, previewUrl: '' }]
+
     setEditForm({
-      ownerName: vendor.ownerName || '',
+      owners: normalizedOwners,
       businessName: vendor.businessName || '',
       mobile: vendor.mobile || '',
       email: vendor.email || '',
+      gstPan: vendor.gstPan || '',
+      address: vendor.address || '',
       state: vendor.state || '',
       district: vendor.district || '',
       city: vendor.city || '',
+      websiteUrl: vendor.websiteUrl?.replace(/^https?:\/\//i, '') || '',
+      referralId: vendor.referralId || '',
+      membershipType: vendor.membershipType || '',
       businessCategories: vendor.businessCategories || [],
-      membershipFees: vendor.membershipFees || ''
+      membershipFees: vendor.membershipFees || '',
+      utrNumber: vendor.utrNumber || '',
+      paymentScreenshot: null,
+      password: ''
     })
+    
+    // Set preview for payment screenshot if exists
+    if (vendor.paymentScreenshot) {
+      setPreviewEditPaymentScreenshot(toAbsoluteFileUrl(vendor.paymentScreenshot))
+    } else {
+      setPreviewEditPaymentScreenshot(null)
+    }
+    
     setShowEditModal(true)
   }
 
@@ -571,13 +687,36 @@ ABCD Team`
 
     try {
       setEditing(true)
+      const formData = new FormData()
+      const ownersPayload = editForm.owners.map((owner) => ({ name: owner.name.trim() }))
+
+      formData.append('owners', JSON.stringify(ownersPayload))
+      formData.append('ownerName', ownersPayload[0]?.name || '')
+      formData.append('businessName', editForm.businessName)
+      formData.append('mobile', editForm.mobile)
+      formData.append('state', editForm.state)
+      formData.append('district', editForm.district)
+      formData.append('city', editForm.city)
+      formData.append('businessCategories', JSON.stringify(editForm.businessCategories))
+      formData.append('membershipFees', editForm.membershipFees)
+      if (editForm.email) formData.append('email', editForm.email)
+      if (editForm.gstPan) formData.append('gstPan', editForm.gstPan)
+      if (editForm.address) formData.append('address', editForm.address)
+      if (editForm.websiteUrl) formData.append('websiteUrl', editForm.websiteUrl)
+      if (editForm.referralId) formData.append('referralId', editForm.referralId)
+      if (editForm.membershipType) formData.append('membershipType', editForm.membershipType)
+      if (editForm.utrNumber) formData.append('utrNumber', editForm.utrNumber)
+      if (editForm.password) formData.append('password', editForm.password)
+      if (editForm.paymentScreenshot) formData.append('paymentScreenshot', editForm.paymentScreenshot)
+      
+      editForm.owners.forEach((owner) => {
+        if (owner.photo) formData.append('ownerPhotos', owner.photo)
+      })
+
       const response = await fetch(`${BACKEND_URL}/api/admin/vendors/${selectedVendor._id}`, {
         method: 'PUT',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editForm),
+        body: formData,
       })
       const data = await response.json()
 
@@ -1387,124 +1526,296 @@ ABCD Team`
       {/* Edit Vendor Modal */}
       {showEditModal && selectedVendor && (
         <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
-          <div className='bg-white rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto'>
-            <h2 className='text-2xl font-bold text-gray-800 mb-4'>Edit Vendor</h2>
+          <div className='bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200'>
+            <div className='px-4 md:px-6 py-4 md:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50'>
+              <h2 className='text-xl md:text-2xl font-black text-gray-800'>Edit Vendor</h2>
+              <p className='text-xs md:text-sm text-gray-600 mt-1'>Modify details for {selectedVendor.businessName}</p>
+            </div>
 
-            <div className='space-y-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Owner Name *</label>
-                <input
-                  type='text'
-                  value={editForm.ownerName}
-                  onChange={(e) => setEditForm({...editForm, ownerName: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+            <div className='p-4 md:p-6 space-y-4 md:space-y-5'>
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Basic Details</h3>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Business Name <span className='text-red-500'>*</span></label>
+                    <input
+                      type='text'
+                      value={editForm.businessName}
+                      onChange={(e) => setEditForm({ ...editForm, businessName: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Business Name *</label>
-                <input
-                  type='text'
-                  value={editForm.businessName}
-                  onChange={(e) => setEditForm({...editForm, businessName: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>WhatsApp No. <span className='text-red-500'>*</span></label>
+                    <input
+                      type='tel'
+                      maxLength={10}
+                      value={editForm.mobile}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 10)
+                        setEditForm({ ...editForm, mobile: val })
+                      }}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Mobile * (10 digits)</label>
-                <input
-                  type='tel'
-                  maxLength={10}
-                  value={editForm.mobile}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, '').slice(0, 10)
-                    setEditForm({...editForm, mobile: val})
-                  }}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>GSTN Details / PAN No.</label>
+                    <input
+                      type='text'
+                      value={editForm.gstPan}
+                      onChange={(e) => setEditForm({ ...editForm, gstPan: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Email</label>
-                <input
-                  type='email'
-                  value={editForm.email}
-                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>State *</label>
-                  <select
-                    value={editForm.state}
-                    onChange={(e) => setEditForm({ ...editForm, state: e.target.value, district: '', city: '' })}
-                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
-                  >
-                    <option value=''>Select State</option>
-                    {editStates.map(state => (
-                      <option key={state} value={state}>{state.toUpperCase()}</option>
-                    ))}
-                  </select>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Email</label>
+                    <input
+                      type='email'
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>District *</label>
-                  <select
-                    value={editForm.district}
-                    onChange={(e) => setEditForm({ ...editForm, district: e.target.value, city: '' })}
-                    disabled={!editForm.state || editDistricts.length === 0}
-                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
-                  >
-                    <option value=''>Select District</option>
-                    {editDistricts.map(district => (
-                      <option key={district} value={district}>{district.toUpperCase()}</option>
-                    ))}
-                  </select>
-                </div>
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700'>Owners <span className='text-red-500'>*</span></label>
+                    <button
+                      type='button'
+                      onClick={addEditOwner}
+                      className='px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition'
+                    >
+                      + Add Owner
+                    </button>
+                  </div>
 
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>City *</label>
-                  <select
-                    value={editForm.city}
-                    onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
-                    disabled={!editForm.district || editCities.length === 0}
-                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
-                  >
-                    <option value=''>Select City</option>
-                    {editCities.map(city => (
-                      <option key={city} value={city}>{city.toUpperCase()}</option>
-                    ))}
-                  </select>
+                  {editForm.owners.map((owner, index) => (
+                    <div key={`edit-owner-${index}`} className='border border-gray-200 rounded-xl p-3 bg-white space-y-3'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                        <div>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Name {index + 1} <span className='text-red-500'>*</span></label>
+                          <input
+                            type='text'
+                            value={owner.name}
+                            onChange={(e) => handleEditOwnerNameChange(index, e.target.value)}
+                            className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Photo {index + 1}</label>
+                          <input
+                            type='file'
+                            accept='image/jpeg,image/jpg,image/png,image/webp'
+                            onChange={(e) => handleEditOwnerPhotoChange(index, e)}
+                            className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+                          />
+                        </div>
+                      </div>
+
+                      <div className='flex items-start justify-between'>
+                        {owner.previewUrl ? (
+                          <img src={owner.previewUrl} alt={`Owner ${index + 1}`} className='w-20 h-20 object-cover rounded-lg border border-gray-300' />
+                        ) : <div />}
+                        {editForm.owners.length > 1 && (
+                          <button
+                            type='button'
+                            onClick={() => removeEditOwner(index)}
+                            className='px-3 py-1 text-xs font-semibold text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition'
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <MultiCategorySelector
-                value={editForm.businessCategories}
-                onChange={(businessCategories) => setEditForm({...editForm, businessCategories})}
-                required
-              />
-
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) *</label>
-                <input
-                  type='number'
-                  value={editForm.membershipFees}
-                  onChange={(e) => setEditForm({...editForm, membershipFees: e.target.value})}
-                  min='1'
-                  placeholder='Enter amount e.g. 1000'
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Business Setup</h3>
+                <MultiCategorySelector
+                  value={editForm.businessCategories}
+                  onChange={(businessCategories) => setEditForm({ ...editForm, businessCategories })}
+                  required
                 />
+
+                <div>
+                  <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Address</label>
+                  <textarea
+                    rows='2'
+                    value={editForm.address}
+                    onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                    className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  />
+                </div>
+
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>State <span className='text-red-500'>*</span></label>
+                    <select
+                      value={editForm.state}
+                      onChange={(e) => setEditForm({ ...editForm, state: e.target.value, district: '', city: '' })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white'
+                    >
+                      <option value=''>Select State</option>
+                      {editStates.map(state => (
+                        <option key={state} value={state}>{state.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>District <span className='text-red-500'>*</span></label>
+                    <select
+                      value={editForm.district}
+                      onChange={(e) => setEditForm({ ...editForm, district: e.target.value, city: '' })}
+                      disabled={!editForm.state || editDistricts.length === 0}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white disabled:opacity-50'
+                    >
+                      <option value=''>Select District</option>
+                      {editDistricts.map(district => (
+                        <option key={district} value={district}>{district.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>City <span className='text-red-500'>*</span></label>
+                    <select
+                      value={editForm.city}
+                      onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                      disabled={!editForm.district || editCities.length === 0}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white disabled:opacity-50'
+                    >
+                      <option value=''>Select City</option>
+                      {editCities.map(city => (
+                        <option key={city} value={city}>{city.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Website If Any</label>
+                    <div className='flex items-center rounded-xl border-2 border-gray-200 bg-white overflow-hidden'>
+                      <span className='px-3 text-xs text-gray-500'>https://</span>
+                      <input
+                        type='text'
+                        value={editForm.websiteUrl}
+                        onChange={(e) => setEditForm({ ...editForm, websiteUrl: e.target.value.replace(/^https?:\/\//i, '') })}
+                        className='w-full px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        placeholder='yourbusiness.com'
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Referral ID</label>
+                    <input
+                      type='text'
+                      value={editForm.referralId}
+                      onChange={(e) => setEditForm({ ...editForm, referralId: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-2'>Membership Type</label>
+                    <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
+                      {['Gold', 'Diamond', 'Platinum'].map((type) => (
+                        <label key={type} className='flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white cursor-pointer'>
+                          <input
+                            type='checkbox'
+                            checked={editForm.membershipType === type}
+                            onChange={() => {
+                              const membershipFeeMap = { Gold: '5000', Diamond: '10000', Platinum: '25000' }
+                              const selectedValue = editForm.membershipType === type ? '' : type
+                              setEditForm({
+                                ...editForm,
+                                membershipType: selectedValue,
+                                membershipFees: selectedValue ? membershipFeeMap[selectedValue] : ''
+                              })
+                            }}
+                          />
+                          <span className='text-xs md:text-sm font-semibold'>{type}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) <span className='text-red-500'>*</span></label>
+                    <input
+                      type='number'
+                      value={editForm.membershipFees}
+                      onChange={(e) => setEditForm({...editForm, membershipFees: e.target.value})}
+                      min='1'
+                      placeholder='Enter amount'
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>UTR Number</label>
+                    <input
+                      type='text'
+                      maxLength={12}
+                      value={editForm.utrNumber}
+                      onChange={(e) => setEditForm({ ...editForm, utrNumber: e.target.value.replace(/\D/g, '').slice(0, 12) })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Password (min 6 chars)</label>
+                    <input
+                      type='text'
+                      value={editForm.password}
+                      onChange={(e) => setEditForm({...editForm, password: e.target.value})}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      placeholder='Leave blank to keep current'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Payment Screenshot</label>
+                    <input
+                      type='file'
+                      accept='image/jpeg,image/jpg,image/png,image/webp'
+                      onChange={handleEditPaymentScreenshotChange}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+                    />
+                  </div>
+                </div>
+
+                {previewEditPaymentScreenshot && (
+                  <div className='mt-2 relative'>
+                    <img src={previewEditPaymentScreenshot} alt='Payment screenshot preview' className='w-full h-32 object-cover rounded-xl border border-gray-300' />
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setEditForm({ ...editForm, paymentScreenshot: null })
+                        setPreviewEditPaymentScreenshot(null)
+                      }}
+                      className='absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs'
+                    >
+                      x
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className='flex gap-3 mt-6'>
+            <div className='flex gap-2 md:gap-3 p-4 md:p-6 pt-3 md:pt-4 border-t border-gray-200 bg-white'>
               <button
                 onClick={handleEditVendor}
                 disabled={editing}
-                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50'
+                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 md:py-3 text-sm md:text-base rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50 shadow-md'
               >
                 {editing ? 'Updating...' : 'Update Vendor'}
               </button>
@@ -1513,7 +1824,7 @@ ABCD Team`
                   setShowEditModal(false)
                   setSelectedVendor(null)
                 }}
-                className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition'
+                className='flex-1 bg-gray-100 border border-gray-300 text-gray-700 py-2.5 md:py-3 text-sm md:text-base rounded-xl font-bold hover:bg-gray-200 transition'
               >
                 Cancel
               </button>
