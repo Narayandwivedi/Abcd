@@ -47,12 +47,14 @@ const Users = () => {
     referredBy: '',
     password: '',
     city: '',
-    utrNumber: ''
+    utrNumber: '',
+    applicationNumber: ''
   })
   const [creating, setCreating] = useState(false)
   const [activeTab, setActiveTab] = useState('approved') // approved, applications
   const [applications, setApplications] = useState([])
   const [loadingApplications, setLoadingApplications] = useState(false)
+  const [applicationFilterStatus, setApplicationFilterStatus] = useState('pending') // pending, approved, rejected
 
   const [createStates, setCreateStates] = useState([])
   const [createDistricts, setCreateDistricts] = useState([])
@@ -600,7 +602,8 @@ ABCD Team`
     const matchesSearch = app.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.whatsappNumber?.toString().includes(searchTerm) ||
       app.city?.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
+    const matchesStatus = (app.status || 'pending') === applicationFilterStatus
+    return matchesSearch && matchesStatus
   })
 
   // Handle create form input change
@@ -666,6 +669,7 @@ ABCD Team`
       if (createFormData.referredBy) formData.append('referredBy', createFormData.referredBy)
       if (createFormData.password) formData.append('password', createFormData.password)
       if (createFormData.utrNumber) formData.append('utrNumber', createFormData.utrNumber)
+      if (createFormData.applicationNumber) formData.append('applicationNumber', createFormData.applicationNumber)
 
       const response = await fetch(`${BACKEND_URL}/api/admin/users`, {
         method: 'POST',
@@ -689,12 +693,14 @@ ABCD Team`
           referredBy: '',
           password: '',
           city: '',
-          utrNumber: ''
+          utrNumber: '',
+          applicationNumber: ''
         })
         setCreateSelectedState('')
         setCreateSelectedDistrict('')
         setCreateSelectedCity('')
         fetchUsers()
+        fetchApplications()
       } else {
         toast.error(data.message || 'Failed to create user', { autoClose: 800 })
       }
@@ -755,6 +761,24 @@ ABCD Team`
             onChange={(e) => setSearchTerm(e.target.value)}
             className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
           />
+          {/* Application Status Filter */}
+          {activeTab === 'applications' && (
+            <div className='flex gap-2 mt-3 p-1 bg-gray-100 rounded-xl w-fit'>
+              {['pending', 'approved', 'rejected'].map(status => (
+                <button
+                  key={status}
+                  onClick={() => setApplicationFilterStatus(status)}
+                  className={`px-5 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${applicationFilterStatus === status
+                    ? status === 'approved' ? 'bg-white text-green-600 shadow-sm'
+                      : status === 'rejected' ? 'bg-white text-red-600 shadow-sm'
+                      : 'bg-white text-yellow-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {loading || loadingApplications ? (
@@ -967,6 +991,7 @@ ABCD Team`
                             } else {
                               setCreateFormData(prev => ({
                                 ...prev,
+                                applicationNumber: item.applicationNumber,
                                 fullName: item.fullName,
                                 mobile: item.whatsappNumber,
                                 city: item.city,

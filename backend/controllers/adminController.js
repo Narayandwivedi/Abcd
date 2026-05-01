@@ -6,6 +6,7 @@ const userModel = require("../models/User.js");
 const Admin = require("../models/Admin.js");
 const SubAdmin = require("../models/SubAdmin.js");
 const Certificate = require("../models/Certificate.js");
+const UserApplication = require("../models/UserApplication.js");
 const { generateCertificatePDF, regenerateCertificatePDF } = require("../utils/generateCertificate.js");
 
 // Get all users (for admin)
@@ -618,7 +619,7 @@ const deleteUser = async (req, res) => {
 // Create user (admin) - bypasses payment requirement
 const createUser = async (req, res) => {
   try {
-    const { fullName, mobile, email, gotra, state, district, city, address, relativeName, relationship, referredBy, password, utrNumber } = req.body;
+    const { fullName, mobile, email, gotra, state, district, city, address, relativeName, relationship, referredBy, password, utrNumber, applicationNumber } = req.body;
 
     // Validate required fields
     if (!fullName || !mobile || !gotra || !address || !relativeName) {
@@ -729,6 +730,14 @@ const createUser = async (req, res) => {
     user.activeCertificate = certificate._id;
     user.referralCode = certificateData.referralCode;
     await user.save();
+
+    // If applicationNumber provided, mark that user application as approved
+    if (applicationNumber) {
+      await UserApplication.findOneAndUpdate(
+        { applicationNumber },
+        { status: 'approved' }
+      );
+    }
 
     console.log(`[ADMIN] User created: ${user.fullName} (${user.mobile})`);
 
