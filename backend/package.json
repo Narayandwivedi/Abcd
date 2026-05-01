@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "fix:member-certificates": "node scripts/fixUserCertificates.js",
     "fix:vendor-certificates": "node scripts/fixVendorCertificates.js",
+    "fix:vendor-category-ids": "node scripts/fixVendorCategoryIds.js",
     "sync:applications": "node scripts/syncApplicationStatuses.js"
   },
   "keywords": [],

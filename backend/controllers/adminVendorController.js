@@ -4,6 +4,7 @@ const path = require("path");
 const vendorModel = require("../models/Vendor.js");
 const VendorCertificate = require("../models/VendorCertificate.js");
 const VendorApplication = require("../models/VendorApplication.js");
+const Category = require("../models/Category.js");
 const { generateVendorCertificatePDF } = require("../utils/generateVendorCertificate.js");
 const { handleVendorPhotoUpload, handlePaymentScreenshotUpload } = require("./uploadController");
 
@@ -507,9 +508,22 @@ const updateVendor = async (req, res) => {
     vendor.state = state;
     vendor.district = district;
     vendor.city = city;
-    vendor.businessCategories = businessCategories;
+    // Auto-resolve missing categoryIds by looking up Category collection
+    const resolvedCategories = await Promise.all(
+      businessCategories.map(async (item) => {
+        if (!item.categoryId || item.categoryId === '') {
+          const cat = await Category.findOne({ name: item.category });
+          if (cat) {
+            return { ...item, categoryId: cat._id };
+          }
+        }
+        return item;
+      })
+    );
+
+    vendor.businessCategories = resolvedCategories;
     vendor.membershipFees = membershipFees;
-    
+
     if (utrNumber) vendor.utrNumber = utrNumber;
     if (membershipType) vendor.membershipType = membershipType;
 
