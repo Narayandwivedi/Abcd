@@ -12,6 +12,11 @@ const vendorSchema = new mongoose.Schema({
     required:true,
     unique: true,
   },
+  applicationNumber: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
   ownerName: {
     type: String,
     required: true,

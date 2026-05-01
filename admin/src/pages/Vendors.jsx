@@ -23,7 +23,7 @@ const Vendors = () => {
   const [activeTab, setActiveTab] = useState('approved') // approved, applications
   const [applications, setApplications] = useState([])
   const [loadingApplications, setLoadingApplications] = useState(false)
-  const [applicationFilterStatus, setApplicationFilterStatus] = useState('pending') // pending, rejected
+  const [applicationFilterStatus, setApplicationFilterStatus] = useState('pending') // pending, rejected, approved
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForm, setCreateForm] = useState({
     owners: [createEmptyOwner()],
@@ -42,7 +42,8 @@ const Vendors = () => {
     membershipFees: '',
     utrNumber: '',
     paymentScreenshot: null,
-    password: ''
+    password: '',
+    applicationNumber: ''
   })
   const [previewPaymentScreenshot, setPreviewPaymentScreenshot] = useState(null)
   const [creating, setCreating] = useState(false)
@@ -64,7 +65,8 @@ const Vendors = () => {
     membershipFees: '',
     utrNumber: '',
     paymentScreenshot: null,
-    password: ''
+    password: '',
+    applicationNumber: ''
   })
   const [previewEditPaymentScreenshot, setPreviewEditPaymentScreenshot] = useState(null)
   const [editing, setEditing] = useState(false)
@@ -607,6 +609,7 @@ ABCD Team`
       if (createForm.utrNumber?.trim()) formData.append('utrNumber', createForm.utrNumber.trim())
       if (createForm.password) formData.append('password', createForm.password)
       if (createForm.paymentScreenshot) formData.append('paymentScreenshot', createForm.paymentScreenshot)
+      if (createForm.applicationNumber) formData.append('applicationNumber', createForm.applicationNumber)
       createForm.owners.forEach((owner) => {
         if (owner.photo) formData.append('ownerPhotos', owner.photo)
       })
@@ -623,6 +626,7 @@ ABCD Team`
         setShowCreateModal(false)
         resetCreateForm()
         fetchVendors()
+        fetchApplications()
       } else {
         alert(data.message || 'Failed to create vendor')
       }
@@ -956,6 +960,12 @@ ABCD Team`
                 >
                   Rejected
                 </button>
+                <button
+                  onClick={() => setApplicationFilterStatus('approved')}
+                  className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${applicationFilterStatus === 'approved' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Approved
+                </button>
               </div>
             )}
           </div>
@@ -1110,18 +1120,19 @@ ABCD Team`
                           </div>
                         </td>
                         <td className='px-6 py-4'>
-                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${app.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                            {app.status === 'rejected' ? 'Rejected' : 'Pending Approval'}
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${app.status === 'rejected' ? 'bg-red-100 text-red-700' : (app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700')}`}>
+                            {app.status === 'rejected' ? 'Rejected' : (app.status === 'approved' ? 'Approved' : 'Pending Approval')}
                           </span>
                         </td>
                         <td className='px-6 py-4'>
                           <div className='flex gap-2'>
-                            {app.status !== 'rejected' && (
+                            {(!app.status || app.status === 'pending') && (
                               <button
                                 onClick={() => {
                                   // Auto-fill form fields for creation
                                   setCreateForm(prev => ({
                                     ...prev,
+                                    applicationNumber: app.applicationNumber,
                                     businessName: app.businessName,
                                     mobile: app.whatsappNumber,
                                     city: app.city,
@@ -1138,7 +1149,7 @@ ABCD Team`
                                 Process
                               </button>
                             )}
-                            {app.status !== 'rejected' && (
+                            {(!app.status || app.status === 'pending') && (
                               <button
                                 onClick={() => handleRejectApplication(app._id, app.businessName)}
                                 className='px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition'
@@ -1182,8 +1193,8 @@ ABCD Team`
                     </div>
                   </div>
                   <div className='flex justify-between items-center pt-3 border-t border-gray-100'>
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${activeTab === 'approved' ? 'bg-green-100 text-green-700' : (item.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700')}`}>
-                      {activeTab === 'approved' ? 'Approved' : (item.status === 'rejected' ? 'Rejected' : 'Pending')}
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${activeTab === 'approved' ? 'bg-green-100 text-green-700' : (item.status === 'rejected' ? 'bg-red-100 text-red-700' : (item.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'))}`}>
+                      {activeTab === 'approved' ? 'Approved' : (item.status === 'rejected' ? 'Rejected' : (item.status === 'approved' ? 'Approved' : 'Pending'))}
                     </span>
                     <div className='flex gap-4 items-center'>
                       {activeTab === 'approved' && item.activeCertificate?.downloadLink && (
@@ -1204,12 +1215,13 @@ ABCD Team`
                           Edit Details
                         </button>
                       ) : (
-                        item.status !== 'rejected' && (
+                        (!item.status || item.status === 'pending') && (
                           <div className='flex gap-3'>
                             <button
                               onClick={() => {
                                 setCreateForm(prev => ({
                                   ...prev,
+                                  applicationNumber: item.applicationNumber,
                                   businessName: item.businessName,
                                   mobile: item.whatsappNumber,
                                   city: item.city,

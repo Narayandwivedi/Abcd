@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const vendorModel = require("../models/Vendor.js");
 const VendorCertificate = require("../models/VendorCertificate.js");
+const VendorApplication = require("../models/VendorApplication.js");
 const { generateVendorCertificatePDF } = require("../utils/generateVendorCertificate.js");
 const { handleVendorPhotoUpload, handlePaymentScreenshotUpload } = require("./uploadController");
 
@@ -170,7 +171,8 @@ const createVendor = async (req, res) => {
       referralId,
       membershipType,
       amountPaid,
-      utrNumber
+      utrNumber,
+      applicationNumber
     } = req.body;
 
     if (typeof businessCategories === 'string') {
@@ -305,6 +307,7 @@ const createVendor = async (req, res) => {
     if (utrNumber) vendorData.utrNumber = utrNumber;
     if (membershipType) vendorData.membershipType = membershipType;
     if (amountPaid) vendorData.amountPaid = amountPaid;
+    if (applicationNumber) vendorData.applicationNumber = applicationNumber;
 
     // Hash password if provided
     if (password && password.length >= 6) {
@@ -386,6 +389,14 @@ const createVendor = async (req, res) => {
     vendor.activeCertificate = certificate._id;
     vendor.referralCode = certificateData.referralCode || certificate.certificateNumber;
     await vendor.save();
+
+    // If applicationNumber is provided, mark the application as approved
+    if (applicationNumber) {
+      await VendorApplication.findOneAndUpdate(
+        { applicationNumber: applicationNumber },
+        { status: 'approved' }
+      );
+    }
 
     console.log(`[ADMIN] Vendor created with certificate: ${vendor.businessName} - ${certificate.certificateNumber}`);
 
