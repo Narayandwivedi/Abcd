@@ -115,4 +115,35 @@ const getAllApplications = async (req, res) => {
   }
 };
 
-module.exports = { submitApplication, verifyReferralCode, getAllApplications };
+const rejectApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const application = await VendorApplication.findById(id);
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
+    }
+
+    application.status = 'rejected';
+    // Optionally store the reason if we add a field for it, but for now just mark as rejected
+    await application.save();
+
+    console.log(`[ADMIN] Vendor Application rejected: ${application.businessName}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "Application rejected successfully",
+      application: {
+        _id: application._id,
+        businessName: application.businessName,
+        status: application.status
+      }
+    });
+  } catch (error) {
+    console.error("Reject Application Error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+module.exports = { submitApplication, verifyReferralCode, getAllApplications, rejectApplication };

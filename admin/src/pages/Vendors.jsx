@@ -23,6 +23,7 @@ const Vendors = () => {
   const [activeTab, setActiveTab] = useState('approved') // approved, applications
   const [applications, setApplications] = useState([])
   const [loadingApplications, setLoadingApplications] = useState(false)
+  const [applicationFilterStatus, setApplicationFilterStatus] = useState('pending') // pending, rejected
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForm, setCreateForm] = useState({
     owners: [createEmptyOwner()],
@@ -312,7 +313,9 @@ const Vendors = () => {
   const fetchApplications = async () => {
     try {
       setLoadingApplications(true)
-      const response = await fetch(`${BACKEND_URL}/api/vendor-application/all`)
+      const response = await fetch(`${BACKEND_URL}/api/vendor-application/all`, {
+        credentials: 'include'
+      })
       const data = await response.json()
       if (data.success) {
         setApplications(data.applications)
@@ -830,6 +833,32 @@ ABCD Team`
     }
   }
 
+  // Reject application (temporary registration)
+  const handleRejectApplication = async (applicationId, businessName) => {
+    if (!window.confirm(`Are you sure you want to reject the application from "${businessName}"?`)) return
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/vendor-application/${applicationId}/reject`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        alert('Application rejected successfully!')
+        fetchApplications()
+      } else {
+        alert(data.message || 'Failed to reject application')
+      }
+    } catch (error) {
+      console.error('Error rejecting application:', error)
+      alert('Failed to reject application')
+    }
+  }
+
   // Filter vendors based on search and status
   const filteredVendors = vendors.filter(vendor => {
     // Search filter
@@ -851,7 +880,10 @@ ABCD Team`
       app.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.whatsappNumber?.toString().includes(searchTerm) ||
       app.city?.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
+    
+    const matchesStatus = (app.status || 'pending') === applicationFilterStatus;
+    
+    return matchesSearch && matchesStatus;
   })
 
   return (
@@ -896,16 +928,37 @@ ABCD Team`
         </button>
       </div>      {/* Vendors Table Container */}
       <div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden'>
-        <div className='p-6 border-b border-gray-200'>
-          {/* Search Bar */}
-          <input
-            type='text'
-            placeholder={`Search ${activeTab === 'approved' ? 'vendors' : 'applications'}...`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-        </div>
+          {/* Search Bar & Filters */}
+          <div className='flex flex-col md:flex-row gap-4 items-center'>
+            <div className='relative flex-1 w-full'>
+              <input
+                type='text'
+                placeholder={`Search ${activeTab === 'approved' ? 'vendors' : 'applications'}...`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className='w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+              />
+              <svg className='w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+              </svg>
+            </div>
+            {activeTab === 'applications' && (
+              <div className='flex bg-gray-100 p-1 rounded-xl w-full md:w-auto'>
+                <button
+                  onClick={() => setApplicationFilterStatus('pending')}
+                  className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${applicationFilterStatus === 'pending' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Pending
+                </button>
+                <button
+                  onClick={() => setApplicationFilterStatus('rejected')}
+                  className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${applicationFilterStatus === 'rejected' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Rejected
+                </button>
+              </div>
+            )}
+          </div>
 
         {loading || loadingApplications ? (
           <div className='p-12 text-center text-gray-500'>Loading...</div>
@@ -1057,31 +1110,43 @@ ABCD Team`
                           </div>
                         </td>
                         <td className='px-6 py-4'>
-                          <span className='px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-[10px] font-bold uppercase'>
-                            Pending Approval
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${app.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                            {app.status === 'rejected' ? 'Rejected' : 'Pending Approval'}
                           </span>
                         </td>
                         <td className='px-6 py-4'>
-                          <button
-                            onClick={() => {
-                              // Auto-fill form fields for creation
-                              setCreateForm(prev => ({
-                                ...prev,
-                                businessName: app.businessName,
-                                mobile: app.whatsappNumber,
-                                city: app.city,
-                                membershipType: app.membershipType,
-                                membershipFees: app.membershipAmount,
-                                utrNumber: app.utrNumber,
-                                referralId: app.referralCode,
-                                owners: [{ name: app.ownerName, photo: null, previewUrl: '' }]
-                              }));
-                              setShowCreateModal(true);
-                            }}
-                            className='px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition shadow-md'
-                          >
-                            Process
-                          </button>
+                          <div className='flex gap-2'>
+                            {app.status !== 'rejected' && (
+                              <button
+                                onClick={() => {
+                                  // Auto-fill form fields for creation
+                                  setCreateForm(prev => ({
+                                    ...prev,
+                                    businessName: app.businessName,
+                                    mobile: app.whatsappNumber,
+                                    city: app.city,
+                                    membershipType: app.membershipType,
+                                    membershipFees: app.membershipAmount,
+                                    utrNumber: app.utrNumber,
+                                    referralId: app.referralCode,
+                                    owners: [{ name: app.ownerName, photo: null, previewUrl: '' }]
+                                  }));
+                                  setShowCreateModal(true);
+                                }}
+                                className='px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition shadow-md'
+                              >
+                                Process
+                              </button>
+                            )}
+                            {app.status !== 'rejected' && (
+                              <button
+                                onClick={() => handleRejectApplication(app._id, app.businessName)}
+                                className='px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition'
+                              >
+                                Reject
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -1117,8 +1182,8 @@ ABCD Team`
                     </div>
                   </div>
                   <div className='flex justify-between items-center pt-3 border-t border-gray-100'>
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${activeTab === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                      {activeTab === 'approved' ? 'Approved' : 'Pending'}
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${activeTab === 'approved' ? 'bg-green-100 text-green-700' : (item.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700')}`}>
+                      {activeTab === 'approved' ? 'Approved' : (item.status === 'rejected' ? 'Rejected' : 'Pending')}
                     </span>
                     <div className='flex gap-4 items-center'>
                       {activeTab === 'approved' && item.activeCertificate?.downloadLink && (
@@ -1131,29 +1196,44 @@ ABCD Team`
                           View Certificate
                         </a>
                       )}
-                      <button
-                        onClick={() => {
-                          if (activeTab === 'approved') {
-                            openEditModal(item)
-                          } else {
-                             setCreateForm(prev => ({
-                              ...prev,
-                              businessName: item.businessName,
-                              mobile: item.whatsappNumber,
-                              city: item.city,
-                              membershipType: item.membershipType,
-                              membershipFees: item.membershipAmount,
-                              utrNumber: item.utrNumber,
-                              referralId: item.referralCode,
-                              owners: [{ name: item.ownerName, photo: null, previewUrl: '' }]
-                            }));
-                            setShowCreateModal(true);
-                          }
-                        }}
-                        className='text-blue-600 text-xs font-bold'
-                      >
-                        {activeTab === 'approved' ? 'Edit Details' : 'Process Application'}
-                      </button>
+                      {activeTab === 'approved' ? (
+                        <button
+                          onClick={() => openEditModal(item)}
+                          className='text-blue-600 text-xs font-bold'
+                        >
+                          Edit Details
+                        </button>
+                      ) : (
+                        item.status !== 'rejected' && (
+                          <div className='flex gap-3'>
+                            <button
+                              onClick={() => {
+                                setCreateForm(prev => ({
+                                  ...prev,
+                                  businessName: item.businessName,
+                                  mobile: item.whatsappNumber,
+                                  city: item.city,
+                                  membershipType: item.membershipType,
+                                  membershipFees: item.membershipAmount,
+                                  utrNumber: item.utrNumber,
+                                  referralId: item.referralCode,
+                                  owners: [{ name: item.ownerName, photo: null, previewUrl: '' }]
+                                }));
+                                setShowCreateModal(true);
+                              }}
+                              className='text-blue-600 text-xs font-bold'
+                            >
+                              Process
+                            </button>
+                            <button
+                              onClick={() => handleRejectApplication(item._id, item.businessName)}
+                              className='text-red-600 text-xs font-bold'
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )
+                      )}
                     </div>
                   </div>
                 </div>
