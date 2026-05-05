@@ -1517,13 +1517,13 @@ ABCD Team`
                   <div className='md:col-span-2'>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-2'>Membership Type</label>
                     <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
-                      {['Gold', 'Diamond', 'Platinum'].map((type) => (
+                      {['Gold', 'Diamond', 'Platinum', 'Charted'].map((type) => (
                         <label key={type} className='flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white cursor-pointer'>
                           <input
                             type='checkbox'
                             checked={createForm.membershipType === type}
                             onChange={() => {
-                              const membershipFeeMap = { Gold: '5000', Diamond: '10000', Platinum: '25000' }
+                              const membershipFeeMap = { Gold: '5000', Diamond: '10000', Platinum: '25000', Charted: '0' }
                               const selectedValue = createForm.membershipType === type ? '' : type
                               setCreateForm({
                                 ...createForm,
@@ -1823,18 +1823,18 @@ ABCD Team`
                   <div className='md:col-span-2'>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-2'>Membership Type</label>
                     <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
-                      {['Gold', 'Diamond', 'Platinum'].map((type) => (
+                      {['Gold', 'Diamond', 'Platinum', 'Charted'].map((type) => (
                         <label key={type} className='flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white cursor-pointer'>
                           <input
                             type='checkbox'
                             checked={editForm.membershipType === type}
                             onChange={() => {
-                              const membershipFeeMap = { Gold: '5000', Diamond: '10000', Platinum: '25000' }
+                              const membershipFeeMap = { Gold: '5000', Diamond: '10000', Platinum: '25000', Charted: '0' }
                               const selectedValue = editForm.membershipType === type ? '' : type
                               setEditForm({
                                 ...editForm,
                                 membershipType: selectedValue,
-                                membershipFees: selectedValue ? membershipFeeMap[selectedValue] : ''
+                                membershipFees: selectedValue ? (editForm.membershipType === type ? editForm.membershipFees : membershipFeeMap[selectedValue]) : ''
                               })
                             }}
                           />

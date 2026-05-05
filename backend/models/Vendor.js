@@ -102,7 +102,7 @@ const vendorSchema = new mongoose.Schema({
   },
   membershipType: {
     type: String,
-    enum: ['Silver', 'Gold', 'Diamond', 'Platinum'],
+    enum: ['Silver', 'Gold', 'Diamond', 'Platinum', 'Charted'],
   },
   amountPaid: {
     type: Number,

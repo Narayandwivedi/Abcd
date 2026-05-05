@@ -69,33 +69,33 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       // Add ABCD logo at the top
       const logoPath = path.join(__dirname, '..', '..', 'frontend', 'public', 'abcd logo3.png');
       if (fs.existsSync(logoPath)) {
-        doc.image(logoPath, (doc.page.width - 110) / 2, 40, {
-          width: 110,
-          height: 110
+        doc.image(logoPath, (doc.page.width - 90) / 2, 35, {
+          width: 90,
+          height: 90
         });
       }
 
-      // Add organization name with (ABCD) on same line
-      doc.fontSize(13)
+      // Add organization name
+      doc.fontSize(12)
         .fillColor('#7c3aed')
         .font('Helvetica-Bold')
-        .text('Agrawal Business and Community Development (ABCD)', 0, 160, {
+        .text('Agrawal Business and Community Development (ABCD)', 0, 130, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add title - VENDOR CERTIFICATE
-      doc.fontSize(26)
+      doc.fontSize(24)
         .fillColor('#7c3aed')
         .font('Helvetica-Bold')
-        .text('VENDOR CERTIFICATE', 0, 185, {
+        .text('VENDOR CERTIFICATE', 0, 152, {
           align: 'center',
           width: doc.page.width
         });
 
       // Add decorative line
-      doc.moveTo(150, 218)
-        .lineTo(doc.page.width - 150, 218)
+      doc.moveTo(150, 182)
+        .lineTo(doc.page.width - 150, 182)
         .strokeColor('#c4b5fd')
         .lineWidth(2)
         .stroke();
@@ -104,7 +104,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('This is to certify that', 0, 232, {
+        .text('This is to certify that', 0, 192, {
           align: 'center',
           width: doc.page.width
         });
@@ -113,22 +113,22 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(22)
         .fillColor('#7c3aed')
         .font('Helvetica-Bold')
-        .text(vendor.businessName.toUpperCase(), 0, 253, {
+        .text(vendor.businessName.toUpperCase(), 0, 210, {
           align: 'center',
           width: doc.page.width
         });
 
-      // Add Owner's name - Bold with same color as business name
+      // Add Owner's name
       doc.fontSize(11)
         .fillColor('#7c3aed')
         .font('Helvetica-Bold')
-        .text(`Owner: ${vendor.ownerName}`, 0, 283, {
+        .text(`Owner: ${vendor.ownerName}`, 0, 238, {
           align: 'center',
           width: doc.page.width
         });
 
-      // Add categories and subcategories line by line
-      let currentY = 303;
+      // Add categories and subcategories
+      let currentY = 258;
       if (vendor.businessCategories && vendor.businessCategories.length > 0) {
         doc.fontSize(10)
           .fillColor('#374151')
@@ -140,7 +140,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
             align: 'center',
             width: doc.page.width
           });
-          currentY += 15; // Increment Y for next line
+          currentY += 16; // Better breathing space
         });
       } else {
         doc.fontSize(10)
@@ -150,11 +150,11 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
             align: 'center',
             width: doc.page.width
           });
-        currentY += 15;
+        currentY += 16;
       }
 
       // Add city
-      currentY += 3; // Small extra gap
+      currentY += 4;
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
@@ -162,7 +162,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           align: 'center',
           width: doc.page.width
         });
-      currentY += 18;
+      currentY += 19;
 
       // Add membership category
       if (vendor.membershipType) {
@@ -173,10 +173,10 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
             align: 'center',
             width: doc.page.width
           });
-        currentY += 19;
+        currentY += 21;
       }
 
-      // Add description - CERTIFIED ABCD VENDOR
+      // Add description
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica-Bold')
@@ -186,7 +186,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
         });
       currentY += 20;
 
-      // Add certificate number - HIGHLIGHTED with darker color and background
+      // Add certificate number
       doc.fontSize(11)
         .fillColor('#000000')
         .font('Helvetica-Bold')
@@ -194,9 +194,9 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           align: 'center',
           width: doc.page.width
         });
-      currentY += 14;
+      currentY += 15;
 
-      // Add vendor referral code
+      // Add referral code
       doc.fontSize(10)
         .fillColor('#111827')
         .font('Helvetica-Bold')
@@ -204,9 +204,9 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           align: 'center',
           width: doc.page.width
         });
-      currentY += 16;
+      currentY += 17;
 
-      // Add issue date
+      // Add dates
       const issueDate = new Date().toLocaleDateString('en-IN', {
         day: '2-digit',
         month: 'long',
@@ -216,28 +216,13 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       doc.fontSize(9)
         .fillColor('#6b7280')
         .font('Helvetica')
-        .text(`Issued on: ${issueDate}`, 0, currentY, {
+        .text(`Issued on: ${issueDate}  |  Valid till: 31 March 2027`, 0, currentY, {
           align: 'center',
           width: doc.page.width
         });
-      currentY += 13;
+      currentY += 20;
 
-      // Add valid till date
-      doc.fontSize(9)
-        .fillColor('#6b7280')
-        .font('Helvetica-Bold')
-        .text('Valid till: 31 March 2027', 0, currentY, {
-          align: 'center',
-          width: doc.page.width
-        });
-
-      // Add some spacing
-      doc.moveDown(1);
-
-      // Add some spacing
-      currentY += 12;
-
-      // Add full HQ address at bottom center with better spacing
+      // Add HQ address
       doc.fontSize(10)
         .fillColor('#7c3aed')
         .font('Helvetica-Bold')
@@ -245,7 +230,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
           align: 'center',
           width: doc.page.width
         });
-      currentY += 15;
+      currentY += 14;
 
       doc.fontSize(9)
         .fillColor('#374151')
@@ -256,81 +241,62 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
         });
       currentY += 20;
 
-      // Add Chief Patron signature image on left side
+      // Add signatures
       const chiefSignaturePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'cheif sign (1).png');
-      if (fs.existsSync(chiefSignaturePath)) {
-        doc.image(chiefSignaturePath, 90, currentY, {
-          width: 115,
-          height: 38,
-          align: 'center'
-        });
-      }
-
-      // Add Chief Patron signature line
-      doc.moveTo(90, currentY + 42)
-        .lineTo(205, currentY + 42)
-        .strokeColor('#374151')
-        .lineWidth(1)
-        .stroke();
-
-      // Add Dr Ashok Agrawal text
-      doc.fontSize(9)
-        .fillColor('#374151')
-        .font('Helvetica-Bold')
-        .text('Dr Ashok Agrawal', 90, currentY + 46, {
-          align: 'center',
-          width: 115
-        });
-
-      // Add Chief Patron-ABCD text
-      doc.fontSize(8)
-        .fillColor('#374151')
-        .font('Helvetica')
-        .text('(Chief Patron - ABCD)', 90, currentY + 59, {
-          align: 'center',
-          width: 115
-        });
-
-      // Add signature image on right side
       const signaturePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'signature.png');
+      
+      const sigY = currentY;
+      const sigHeight = 35;
+      
+      if (fs.existsSync(chiefSignaturePath)) {
+        doc.image(chiefSignaturePath, 100, sigY, { width: 100, height: sigHeight });
+      }
+      
       if (fs.existsSync(signaturePath)) {
-        doc.image(signaturePath, doc.page.width - 205, currentY, {
-          width: 115,
-          height: 38,
-          align: 'center'
-        });
+        doc.image(signaturePath, doc.page.width - 200, sigY, { width: 100, height: sigHeight });
       }
 
-      // Add signature line
-      doc.moveTo(doc.page.width - 205, currentY + 42)
-        .lineTo(doc.page.width - 90, currentY + 42)
+      const lineY = sigY + sigHeight + 2;
+      
+      // Left signature
+      doc.moveTo(100, lineY)
+        .lineTo(200, lineY)
         .strokeColor('#374151')
         .lineWidth(1)
         .stroke();
-
-      // Add Mr Lalit Agrawal text
+      
       doc.fontSize(9)
         .fillColor('#374151')
         .font('Helvetica-Bold')
-        .text('Mr Lalit Agrawal', doc.page.width - 205, currentY + 46, {
-          align: 'center',
-          width: 115
-        });
-
-      // Add Chairman-ABCD text
+        .text('Dr Ashok Agrawal', 100, lineY + 3, { align: 'center', width: 100 });
+      
       doc.fontSize(8)
         .fillColor('#374151')
         .font('Helvetica')
-        .text('(Chairman-ABCD)', doc.page.width - 205, currentY + 59, {
-          align: 'center',
-          width: 115
-        });
+        .text('(Chief Patron - ABCD)', 100, lineY + 14, { align: 'center', width: 100 });
 
-      // Add terms & conditions text at LEFT BOTTOM CORNER
+      // Right signature
+      doc.moveTo(doc.page.width - 200, lineY)
+        .lineTo(doc.page.width - 100, lineY)
+        .strokeColor('#374151')
+        .lineWidth(1)
+        .stroke();
+      
+      doc.fontSize(9)
+        .fillColor('#374151')
+        .font('Helvetica-Bold')
+        .text('Mr Lalit Agrawal', doc.page.width - 200, lineY + 3, { align: 'center', width: 100 });
+      
+      doc.fontSize(8)
+        .fillColor('#374151')
+        .font('Helvetica')
+        .text('(Chairman-ABCD)', doc.page.width - 200, lineY + 14, { align: 'center', width: 100 });
+
+      // Disclaimer - Moved higher and using doc.text with explicit Y to avoid page break
       doc.fontSize(7)
         .fillColor('#6b7280')
         .font('Helvetica-Oblique')
-        .text('Subject to Terms & Conditions', 0, currentY + 68, {
+        .text('Subject to Terms & Conditions', 0, 568, {
           align: 'center',
           width: doc.page.width
         });
