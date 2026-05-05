@@ -12,12 +12,7 @@ const submitApplication = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please fill all required fields" });
     }
 
-    // Either screenshot or UTR is required
-    const hasUtr = utrNumber && utrNumber.trim().length > 0;
-    const hasScreenshot = !!(req.file);
-    if (!hasUtr && !hasScreenshot) {
-      return res.status(400).json({ success: false, message: "Please upload a payment screenshot or enter a UTR number" });
-    }
+
 
     const applicationNumber = await generateUserApplicationNumber();
 

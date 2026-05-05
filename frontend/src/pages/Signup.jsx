@@ -90,12 +90,6 @@ const Signup = () => {
     }
     if (!formData.city.trim()) newErrors.city = 'City is required'
     
-    // Either UTR or screenshot is required
-    const hasUtr = formData.utrNumber.trim().length > 0
-    const hasScreenshot = !!paymentScreenshot
-    if (!hasUtr && !hasScreenshot) {
-      newErrors.payment = 'Please upload a payment screenshot or enter a UTR number'
-    }
     return newErrors
   }
 
@@ -265,7 +259,7 @@ const Signup = () => {
             <div className='border-2 border-gray-200 rounded-2xl overflow-hidden'>
               <div className='bg-[#1a237e] px-3 py-2'>
                 <p className='text-white text-xs sm:text-sm font-bold'>Payment Information</p>
-                <p className='text-indigo-200 text-[10px]'>Upload screenshot OR enter UTR number (at least one required)</p>
+                <p className='text-indigo-200 text-[10px]'>Upload screenshot or enter UTR number (optional)</p>
               </div>
 
               <div className='p-3 space-y-3'>
