@@ -20,6 +20,7 @@ import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Cities from './pages/Cities'
 import Ads from './pages/Ads'
+import WhatsAppSessions from './pages/WhatsAppSessions'
 import { useAdminAuth } from './context/AdminAuthContext'
 
 function AdminLayout({ children }) {
@@ -194,6 +195,16 @@ function AppRoutes() {
           <ProtectedRoute requiredPermission='canViewAds'>
             <AdminLayout>
               <Ads />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/whatsapp'
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <WhatsAppSessions />
             </AdminLayout>
           </ProtectedRoute>
         }

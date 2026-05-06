@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'react-toastify'
 
 const CategoryDropdown = ({
   value,
@@ -55,7 +56,7 @@ const CategoryDropdown = ({
       updated = subcategoriesValue.filter(s => s.name !== subcat.name);
     } else {
       if (currentTotalSubcategories >= maxTotalSubcategories) {
-        alert(`Maximum ${maxTotalSubcategories} subcategories allowed in total.`);
+        toast.error(`Maximum ${maxTotalSubcategories} subcategories allowed in total.`);
         return;
       }
       updated = [...subcategoriesValue, { name: subcat.name, id: subcat._id }];

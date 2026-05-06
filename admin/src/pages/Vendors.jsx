@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import MultiCategorySelector from '../components/MultiCategorySelector'
 import { useAdminAuth } from '../context/AdminAuthContext'
+import { toast } from 'react-toastify'
 
 const Vendors = () => {
   const { hasPermission } = useAdminAuth()
@@ -121,7 +122,7 @@ const Vendors = () => {
   const addCreateOwner = () => {
     setCreateForm((prev) => {
       if (prev.owners.length >= 10) {
-        alert('Maximum 10 owners allowed')
+        toast.warn('Maximum 10 owners allowed')
         return prev
       }
       return { ...prev, owners: [...prev.owners, createEmptyOwner()] }
@@ -150,13 +151,13 @@ const Vendors = () => {
 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!validTypes.includes(file.type)) {
-      alert('Please upload a valid image (JPG, PNG, or WebP)')
+      toast.warn('Please upload a valid image (JPG, PNG, or WebP)')
       e.target.value = ''
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('Photo size should be less than 10MB')
+      toast.warn('Photo size should be less than 10MB')
       e.target.value = ''
       return
     }
@@ -178,13 +179,13 @@ const Vendors = () => {
 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!validTypes.includes(file.type)) {
-      alert('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
+      toast.warn('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
       e.target.value = ''
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('Payment screenshot size should be less than 10MB')
+      toast.warn('Payment screenshot size should be less than 10MB')
       e.target.value = ''
       return
     }
@@ -198,7 +199,7 @@ const Vendors = () => {
   const addEditOwner = () => {
     setEditForm((prev) => {
       if (prev.owners.length >= 10) {
-        alert('Maximum 10 owners allowed')
+        toast.warn('Maximum 10 owners allowed')
         return prev
       }
       return { ...prev, owners: [...prev.owners, createEmptyOwner()] }
@@ -229,13 +230,13 @@ const Vendors = () => {
 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!validTypes.includes(file.type)) {
-      alert('Please upload a valid image (JPG, PNG, or WebP)')
+      toast.warn('Please upload a valid image (JPG, PNG, or WebP)')
       e.target.value = ''
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('Photo size should be less than 10MB')
+      toast.warn('Photo size should be less than 10MB')
       e.target.value = ''
       return
     }
@@ -259,13 +260,13 @@ const Vendors = () => {
 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!validTypes.includes(file.type)) {
-      alert('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
+      toast.warn('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
       e.target.value = ''
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('File size should be less than 10MB')
+      toast.warn('File size should be less than 10MB')
       e.target.value = ''
       return
     }
@@ -442,7 +443,7 @@ const Vendors = () => {
       }
     } catch (error) {
       console.error('Error fetching vendors:', error)
-      alert('Failed to fetch vendors')
+      toast.error('Failed to fetch vendors')
     } finally {
       setLoading(false)
     }
@@ -472,14 +473,14 @@ const Vendors = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor approved successfully!')
+        toast.success('Vendor approved successfully!')
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to approve vendor')
+        toast.error(data.message || 'Failed to approve vendor')
       }
     } catch (error) {
       console.error('Error approving vendor:', error)
-      alert('Failed to approve vendor')
+      toast.error('Failed to fetch vendors')
     }
   }
 
@@ -492,7 +493,7 @@ const Vendors = () => {
 
   const handleSetPassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-      alert('Password must be at least 6 characters')
+      toast.warn('Password must be at least 6 characters')
       return
     }
 
@@ -508,16 +509,16 @@ const Vendors = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Password set successfully!')
+        toast.success('Password set successfully!')
         setShowPasswordModal(false)
         setNewPassword('')
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to set password')
+        toast.error(data.message || 'Failed to set password')
       }
     } catch (error) {
       console.error('Error setting password:', error)
-      alert('Failed to set password')
+      toast.error('Failed to set password')
     }
   }
 
@@ -530,7 +531,7 @@ const Vendors = () => {
   // Send WhatsApp message
   const sendWhatsAppMessage = (vendor) => {
     if (!vendor.activeCertificate?.certificateNumber || !vendor.activeCertificate?.downloadLink) {
-      alert('Certificate not generated yet. Please approve the vendor first.')
+      toast.info('Certificate not generated yet. Please approve the vendor first.')
       return
     }
 
@@ -560,29 +561,29 @@ ABCD Team`
   // Create vendor handler
   const handleCreateVendor = async () => {
     if (!createForm.businessName || !createForm.mobile || !createForm.state || !createForm.district || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipFees) {
-      alert('Please fill all required fields including state, district, city, and at least one category and subcategory')
+      toast.warn('Please fill all required fields including state, district, city, and at least one category and subcategory')
       return
     }
 
     if (createForm.mobile.length !== 10) {
-      alert('Mobile number must be exactly 10 digits')
+      toast.warn('Mobile number must be exactly 10 digits')
       return
     }
 
     const hasInvalidOwners = createForm.owners.some((owner) => !owner.name?.trim())
     if (hasInvalidOwners) {
-      alert('Please add owner name for all owners')
+      toast.warn('Please add owner name for all owners')
       return
     }
 
     const hasEmptyCategory = createForm.businessCategories.some(item => !item.category?.trim() || !item.subCategories || item.subCategories.length === 0)
     if (hasEmptyCategory) {
-      alert('Please fill in both category and select at least one subcategory for all entries')
+      toast.warn('Please fill in both category and select at least one subcategory for all entries')
       return
     }
 
     if (createForm.utrNumber && !/^\d{12}$/.test((createForm.utrNumber || '').trim())) {
-      alert('Please enter a valid 12-digit UTR number')
+      toast.warn('Please enter a valid 12-digit UTR number')
       return
     }
 
@@ -622,17 +623,17 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor created successfully!')
+        toast.success('Vendor created successfully!')
         setShowCreateModal(false)
         resetCreateForm()
         fetchVendors()
         fetchApplications()
       } else {
-        alert(data.message || 'Failed to create vendor')
+        toast.error(data.message || 'Failed to create vendor')
       }
     } catch (error) {
       console.error('Error creating vendor:', error)
-      alert('Failed to create vendor')
+      toast.error('Failed to create vendor')
     } finally {
       setCreating(false)
     }
@@ -685,12 +686,12 @@ ABCD Team`
   const handleEditVendor = async () => {
     const hasEmptyCategory = editForm.businessCategories.some(item => !item.category?.trim() || !item.subCategories || item.subCategories.length === 0)
     if (hasEmptyCategory || editForm.businessCategories.length === 0) {
-      alert('Please fill all required fields including state, district, city, and at least one category and subcategory')
+      toast.warn('Please fill all required fields including state, district, city, and at least one category and subcategory')
       return
     }
 
     if (editForm.mobile.toString().length !== 10) {
-      alert('Mobile number must be exactly 10 digits')
+      toast.warn('Mobile number must be exactly 10 digits')
       return
     }
 
@@ -730,7 +731,7 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor updated successfully!')
+        toast.success('Vendor updated successfully!')
         setShowEditModal(false)
         setSelectedVendor(null)
         setEditForm({
@@ -746,11 +747,11 @@ ABCD Team`
         })
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to update vendor')
+        toast.error(data.message || 'Failed to update vendor')
       }
     } catch (error) {
       console.error('Error updating vendor:', error)
-      alert('Failed to update vendor')
+      toast.error('Failed to update vendor')
     } finally {
       setEditing(false)
     }
@@ -772,14 +773,14 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert(data.message)
+        toast.success(data.message)
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to toggle vendor status')
+        toast.error(data.message || 'Failed to toggle vendor status')
       }
     } catch (error) {
       console.error('Error toggling vendor status:', error)
-      alert('Failed to toggle vendor status')
+      toast.error('Failed to toggle vendor status')
     }
   }
 
@@ -798,14 +799,14 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor deleted successfully!')
+        toast.success('Vendor deleted successfully!')
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to delete vendor')
+        toast.error(data.message || 'Failed to delete vendor')
       }
     } catch (error) {
       console.error('Error deleting vendor:', error)
-      alert('Failed to delete vendor')
+      toast.error('Failed to delete vendor')
     }
   }
 
@@ -826,14 +827,15 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor application rejected successfully!')
+        toast.success('Vendor application rejected successfully!')
+        setShowRejectModal(false)
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to reject vendor')
+        toast.error(data.message || 'Failed to reject vendor')
       }
     } catch (error) {
       console.error('Error rejecting vendor:', error)
-      alert('Failed to reject vendor')
+      toast.error('Failed to reject vendor')
     }
   }
 
@@ -852,14 +854,15 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert('Application rejected successfully!')
-        fetchApplications()
+        toast.success('Application rejected successfully!')
+        setShowPublicRejectModal(false)
+        fetchVendors()
       } else {
-        alert(data.message || 'Failed to reject application')
+        toast.error(data.message || 'Failed to reject application')
       }
     } catch (error) {
       console.error('Error rejecting application:', error)
-      alert('Failed to reject application')
+      toast.error('Failed to reject application')
     }
   }
 

@@ -226,6 +226,15 @@ const handleVendorSignup = async (req, res) => {
       console.error("Telegram Vendor Alert Error:", err.message);
     }
 
+    // Send WhatsApp Welcome Message
+    try {
+      const { sendWhatsAppMessage } = require("../utils/whatsapp");
+      const welcomeMsg = `Hello ${vendorObj.ownerName},\n\nThank you for registering with Abcd Vyapar as a vendor. Your application for "${vendorObj.businessName}" is currently under review. We will contact you shortly.\n\nBest Regards,\nTeam Abcd Vyapar`;
+      await sendWhatsAppMessage(vendorObj.mobile, welcomeMsg);
+    } catch (waErr) {
+      console.error("WhatsApp Welcome Message Error:", waErr.message);
+    }
+
     // DO NOT generate JWT token or set cookies - admin will verify first
     return res.status(201).json({
       success: true,

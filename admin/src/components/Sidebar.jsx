@@ -107,6 +107,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       path: '/subadmin',
       description: 'Manage Sub Admins',
       requiredPermission: 'SUPERADMIN_ONLY'
+    },
+    {
+      name: 'WhatsApp',
+      icon: '💬',
+      path: '/whatsapp',
+      description: 'Session Management'
     }
   ]
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAdminAuth } from '../context/AdminAuthContext'
+import { toast } from 'react-toastify'
 
 const SubAdmin = () => {
   const { hasPermission } = useAdminAuth()
@@ -90,11 +91,11 @@ const SubAdmin = () => {
       if (data.success) {
         setSubAdmins(data.subAdmins)
       } else {
-        alert(data.message || 'Failed to fetch sub-admins')
+        toast.error(data.message || 'Failed to fetch sub-admins')
       }
     } catch (error) {
       console.error('Error fetching sub-admins:', error)
-      alert('Failed to fetch sub-admins')
+      toast.error('Failed to fetch sub-admins')
     } finally {
       setLoading(false)
     }
@@ -208,17 +209,17 @@ const SubAdmin = () => {
     e.preventDefault()
 
     if (!formData.fullName || !formData.email || !formData.mobile) {
-      alert('Please fill all required fields')
+      toast.warn('Please fill all required fields')
       return
     }
 
     if (!isEdit && (!formData.password || formData.password.length < 6)) {
-      alert('Password must be at least 6 characters')
+      toast.warn('Password must be at least 6 characters')
       return
     }
 
     if (isEdit && formData.password && formData.password.length < 6) {
-      alert('New password must be at least 6 characters')
+      toast.warn('New password must be at least 6 characters')
       return
     }
 
@@ -250,15 +251,15 @@ const SubAdmin = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert(isEdit ? 'Sub-admin updated successfully!' : 'Sub-admin created successfully!')
+        toast.success(isEdit ? 'Sub-admin updated successfully!' : 'Sub-admin created successfully!')
         setShowModal(false)
         fetchSubAdmins()
       } else {
-        alert(data.message || 'Failed to save sub-admin')
+        toast.error(data.message || 'Failed to save sub-admin')
       }
     } catch (error) {
       console.error('Error saving sub-admin:', error)
-      alert('Failed to save sub-admin')
+      toast.error('Failed to save sub-admin')
     }
   }
 
@@ -278,14 +279,14 @@ const SubAdmin = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Sub-admin deleted successfully!')
+        toast.success('Sub-admin deleted successfully!')
         fetchSubAdmins()
       } else {
-        alert(data.message || 'Failed to delete sub-admin')
+        toast.error(data.message || 'Failed to delete sub-admin')
       }
     } catch (error) {
       console.error('Error deleting sub-admin:', error)
-      alert('Failed to delete sub-admin')
+      toast.error('Failed to delete sub-admin')
     }
   }
 
@@ -303,14 +304,14 @@ const SubAdmin = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert(data.message)
+        toast.success(data.message)
         fetchSubAdmins()
       } else {
-        alert(data.message || 'Failed to toggle status')
+        toast.error(data.message || 'Failed to toggle status')
       }
     } catch (error) {
       console.error('Error toggling status:', error)
-      alert('Failed to toggle status')
+      toast.error('Failed to toggle status')
     }
   }
 
@@ -324,7 +325,7 @@ const SubAdmin = () => {
   // Change password
   const handleChangePassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-      alert('Password must be at least 6 characters')
+      toast.warn('Password must be at least 6 characters')
       return
     }
 
@@ -341,15 +342,15 @@ const SubAdmin = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Password changed successfully!')
+        toast.success('Password changed successfully!')
         setShowPasswordModal(false)
         setNewPassword('')
       } else {
-        alert(data.message || 'Failed to change password')
+        toast.error(data.message || 'Failed to change password')
       }
     } catch (error) {
       console.error('Error changing password:', error)
-      alert('Failed to change password')
+      toast.error('Failed to change password')
     }
   }
 

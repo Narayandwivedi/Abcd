@@ -78,6 +78,20 @@ const approveVendor = async (req, res) => {
 
     console.log(`[ADMIN] Vendor approved and certificate generated: ${vendor.businessName} - ${certificate.certificateNumber}`);
 
+    // Send WhatsApp Message with Certificate
+    try {
+      const { sendWhatsAppMessage } = require("../utils/whatsapp");
+      const downloadUrl = `${process.env.BACKEND_URL}${certificate.downloadLink}`;
+      const msg = `Congratulations ${vendor.ownerName}!\n\nYour vendor profile for "${vendor.businessName}" has been approved. Your Referral Code is ${vendor.referralCode}.\n\nYou can download your vendor certificate here: ${downloadUrl}\n\nBest Regards,\nTeam Abcd Vyapar`;
+      
+      await sendWhatsAppMessage(vendor.mobile, msg, {
+        url: downloadUrl,
+        filename: `${vendor.businessName.replace(/\s+/g, '_')}_Certificate.pdf`
+      });
+    } catch (waErr) {
+      console.error("WhatsApp Approval Message Error:", waErr.message);
+    }
+
     return res.status(200).json({
       success: true,
       message: "Vendor approved successfully and certificate generated",
@@ -400,6 +414,20 @@ const createVendor = async (req, res) => {
     }
 
     console.log(`[ADMIN] Vendor created with certificate: ${vendor.businessName} - ${certificate.certificateNumber}`);
+
+    // Send WhatsApp Message with Certificate
+    try {
+      const { sendWhatsAppMessage } = require("../utils/whatsapp");
+      const downloadUrl = `${process.env.BACKEND_URL}${certificate.downloadLink}`;
+      const msg = `Welcome ${vendor.ownerName}!\n\nYou have been registered as a vendor on Abcd Vyapar. Your Referral Code is ${vendor.referralCode}.\n\nYou can download your vendor certificate here: ${downloadUrl}\n\nBest Regards,\nTeam Abcd Vyapar`;
+      
+      await sendWhatsAppMessage(vendor.mobile, msg, {
+        url: downloadUrl,
+        filename: `${vendor.businessName.replace(/\s+/g, '_')}_Certificate.pdf`
+      });
+    } catch (waErr) {
+      console.error("WhatsApp Creation Message Error:", waErr.message);
+    }
 
     return res.status(201).json({
       success: true,

@@ -1,4 +1,5 @@
 import CategoryDropdown from './CategoryDropdown'
+import { toast } from 'react-toastify'
 
 const MAX_TOTAL_SUBCATEGORIES = 5
 
@@ -15,7 +16,7 @@ const MultiCategorySelector = ({
     // Only allow adding another category if we haven't hit the subcategory limit yet
     const currentTotal = categories.reduce((sum, cat) => sum + (cat.subCategories?.length || 0), 0)
     if (currentTotal >= MAX_TOTAL_SUBCATEGORIES) {
-      alert(`You can only select up to ${MAX_TOTAL_SUBCATEGORIES} subcategories in total.`)
+      toast.error(`You can only select up to ${MAX_TOTAL_SUBCATEGORIES} subcategories in total.`)
       return
     }
     onChange([...categories, { category: '', categoryId: '', subCategories: [] }])
