@@ -26,15 +26,11 @@ const WhatsAppSessions = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [totalMessages, setTotalMessages] = useState(0)
 
-  // Test Message State
-  const [testNumber, setTestNumber] = useState('')
-  const [testMessage, setTestMessage] = useState('')
-  const [sendingTest, setSendingTest] = useState(false)
+
 
   // WhatsApp API Configuration
-  // Use VITE_BACKEND_URL or default to localhost:5005
-  const WHATSAPP_API_URL = 'http://localhost:5005/api/v1'
-  const WHATSAPP_API_KEY = 'f8d34cf7-987e-4c6e-888e-4366108b61de'
+  const WHATSAPP_API_URL = import.meta.env.VITE_WHATSAPP_API_URL || 'http://localhost:5005/api/v1'
+  const WHATSAPP_API_KEY = import.meta.env.VITE_WHATSAPP_API_KEY || 'f8d34cf7-987e-4c6e-888e-4366108b61de'
 
   useEffect(() => {
     fetchSessions()
@@ -126,40 +122,7 @@ const WhatsAppSessions = () => {
     }
   }
 
-  const handleSendTestMessage = async (e) => {
-    e.preventDefault()
-    if (!testNumber || !testMessage) {
-      toast.warn('Please enter both number and message')
-      return
-    }
 
-    try {
-      setSendingTest(true)
-      const response = await fetch(`${WHATSAPP_API_URL}/messages/send`, {
-        method: 'POST',
-        headers: {
-          'x-api-key': WHATSAPP_API_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages: [{ number: testNumber, text: testMessage }]
-        })
-      })
-      const data = await response.json()
-      if (data.success) {
-        toast.success('Test message queued successfully! Job ID: ' + data.jobId)
-        setTestMessage('')
-        if (activeTab === 'messages') fetchMessages()
-      } else {
-        toast.error(data.message || 'Failed to send message')
-      }
-    } catch (error) {
-      console.error('Error sending test message:', error)
-      toast.error('Failed to connect to WhatsApp Engine')
-    } finally {
-      setSendingTest(false)
-    }
-  }
 
   const startSessionAddFlow = () => {
     setNewSessionMobile('')
@@ -305,40 +268,7 @@ const WhatsAppSessions = () => {
           </div>
         </div>
 
-        {/* Quick Send Test Message */}
-        <div className="md:col-span-2 bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-2xl shadow-sm border border-blue-100">
-          <h3 className="font-bold text-indigo-900 flex items-center gap-2 mb-3">
-            <span>🚀</span> Send Test Message
-          </h3>
-          <form onSubmit={handleSendTestMessage} className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="text"
-              placeholder="91xxxxxxxxxx"
-              value={testNumber}
-              onChange={(e) => setTestNumber(e.target.value)}
-              className="flex-1 px-4 py-2 rounded-xl border border-blue-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <input
-              type="text"
-              placeholder="Hello world!"
-              value={testMessage}
-              onChange={(e) => setTestMessage(e.target.value)}
-              className="flex-[2] px-4 py-2 rounded-xl border border-blue-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <button
-              type="submit"
-              disabled={sendingTest || stats.connected === 0}
-              className="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50"
-            >
-              {sendingTest ? 'Sending...' : 'Send'}
-            </button>
-          </form>
-          {stats.connected === 0 && (
-            <p className="text-[10px] text-indigo-600 mt-2 font-medium">
-              * Connect at least one phone to send messages
-            </p>
-          )}
-        </div>
+
       </div>
 
       {/* Tabs */}
