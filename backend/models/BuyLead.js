@@ -31,6 +31,10 @@ const buyLeadSchema = new mongoose.Schema({
     ref: 'Category',
     required: false,
   },
+  notifyVendors: {
+    type: Boolean,
+    default: false,
+  },
   minorCategory: {
     type: String,
     required: false,

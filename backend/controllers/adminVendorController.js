@@ -82,11 +82,11 @@ const approveVendor = async (req, res) => {
     try {
       const { sendWhatsAppMessage } = require("../utils/whatsapp");
       const downloadUrl = `${process.env.BACKEND_URL}${certificate.downloadLink}`;
-      const msg = `Congratulations ${vendor.ownerName}!\n\nYour vendor profile for "${vendor.businessName}" has been approved. Your Referral Code is ${vendor.referralCode}.\n\nYou can download your vendor certificate here: ${downloadUrl}\n\nBest Regards,\nTeam Abcd Vyapar`;
+      const msg = `Congratulations ${vendor.ownerName}!\n\nYour vendor profile for "${vendor.businessName}" has been approved. Your Referral Code is ${vendor.referralCode}.\n\nBest Regards,\nTeam Abcd Vyapar`;
       
       await sendWhatsAppMessage(vendor.mobile, msg, {
         url: downloadUrl,
-        filename: `${vendor.businessName.replace(/\s+/g, '_')}_Certificate.pdf`
+        filename: `ABCDVEDOR_${vendor.referralCode}.pdf`
       });
     } catch (waErr) {
       console.error("WhatsApp Approval Message Error:", waErr.message);
@@ -419,11 +419,11 @@ const createVendor = async (req, res) => {
     try {
       const { sendWhatsAppMessage } = require("../utils/whatsapp");
       const downloadUrl = `${process.env.BACKEND_URL}${certificate.downloadLink}`;
-      const msg = `Welcome ${vendor.ownerName}!\n\nYou have been registered as a vendor on Abcd Vyapar. Your Referral Code is ${vendor.referralCode}.\n\nYou can download your vendor certificate here: ${downloadUrl}\n\nBest Regards,\nTeam Abcd Vyapar`;
+      const msg = `Welcome ${vendor.ownerName}!\n\nYou have been registered as a vendor on Abcd Vyapar. Your Referral Code is ${vendor.referralCode}.\n\nBest Regards,\nTeam Abcd Vyapar`;
       
       await sendWhatsAppMessage(vendor.mobile, msg, {
         url: downloadUrl,
-        filename: `${vendor.businessName.replace(/\s+/g, '_')}_Certificate.pdf`
+        filename: `ABCDVEDOR_${vendor.referralCode}.pdf`
       });
     } catch (waErr) {
       console.error("WhatsApp Creation Message Error:", waErr.message);

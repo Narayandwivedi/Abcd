@@ -1,4 +1,6 @@
 const BuyLead = require('../models/BuyLead');
+const Vendor = require('../models/Vendor');
+const { sendWhatsAppMessage } = require('../utils/whatsapp');
 
 // User Controllers
 
@@ -15,7 +17,8 @@ const createBuyLead = async (req, res) => {
       qualityQuantityDesc,
       priceRange,
       deliveryAddress,
-      categoryId
+      categoryId,
+      notifyVendors
     } = req.body;
 
     // Validate required fields
@@ -44,6 +47,7 @@ const createBuyLead = async (req, res) => {
       priceRange,
       deliveryAddress,
       categoryId,
+      notifyVendors: notifyVendors || false,
       status: 'pending'
     });
 
@@ -184,6 +188,39 @@ const approveBuyLead = async (req, res) => {
     buyLead.rejectionReason = undefined; // Clear any previous rejection reason
 
     await buyLead.save();
+
+    // Send WhatsApp Notifications to Vendors
+    if (buyLead.categoryId) {
+      try {
+        // Find all verified and active vendors in this category
+        const vendors = await Vendor.find({
+          'businessCategories.categoryId': buyLead.categoryId,
+          isActive: true,
+          isVerified: true
+        }).select('mobile ownerName businessName');
+
+        if (vendors.length > 0) {
+          const vendorNumbers = vendors.map(v => v.mobile);
+          
+          const message = `*New Buy Lead Notification* 🛒\n\n` +
+            `Hello! A new buy lead matching your business category has been posted on ABCD Vyapar.\n\n` +
+            `*Lead Details:*\n` +
+            `👤 *Buyer Name:* ${buyLead.name}\n` +
+            `📱 *Mobile No:* ${buyLead.mobileNo}\n` +
+            `📦 *Requirement:* ${buyLead.itemRequired}\n` +
+            `📝 *Details:* ${buyLead.qualityQuantityDesc}\n` +
+            `💰 *Budget:* ${buyLead.priceRange}\n` +
+            `📍 *Location:* ${buyLead.townCity}\n\n` +
+            `Log in to your vendor dashboard to view more details and contact the buyer.\n\n` +
+            `Regards,\nTeam ABCD Vyapar`;
+
+          await sendWhatsAppMessage(vendorNumbers, message);
+          console.log(`[WHATSAPP] Buy lead notifications sent to ${vendors.length} verified vendors`);
+        }
+      } catch (waErr) {
+        console.error('[WHATSAPP] Error sending buy lead notifications:', waErr.message);
+      }
+    }
 
     res.status(200).json({
       success: true,

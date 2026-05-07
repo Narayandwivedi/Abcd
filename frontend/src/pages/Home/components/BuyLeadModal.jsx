@@ -53,7 +53,8 @@ const BuyLeadModal = ({
           minorCategory: '',
           qualityQuantityDesc: '',
           priceRange: '',
-          deliveryAddress: ''
+          deliveryAddress: '',
+          notifyVendors: false
         })
       } else {
         toast.error(data.message || 'Failed to submit buy lead')
@@ -175,17 +176,34 @@ const BuyLeadModal = ({
               />
             </div>
 
-            {/* Price Range */}
-            <div>
-              <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Price Range *</label>
-              <input
-                type='text'
-                value={buyLeadData.priceRange}
-                onChange={(e) => setBuyLeadData({ ...buyLeadData, priceRange: e.target.value })}
-                className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
-                placeholder='e.g., ₹1000 - ₹5000'
-                required
-              />
+            <div className='grid grid-cols-2 gap-4'>
+              {/* Price Range */}
+              <div>
+                <label className='block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2'>Price Range *</label>
+                <input
+                  type='text'
+                  value={buyLeadData.priceRange}
+                  onChange={(e) => setBuyLeadData({ ...buyLeadData, priceRange: e.target.value })}
+                  className='w-full px-3 py-2.5 md:px-3 md:py-2.5 lg:px-3 lg:py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs md:text-sm lg:text-xs'
+                  placeholder='e.g., ₹1000 - ₹5000'
+                  required
+                />
+              </div>
+
+              {/* Notify Vendors Checkbox */}
+              <div className="flex items-center mt-6">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={buyLeadData.notifyVendors}
+                    onChange={(e) => setBuyLeadData({ ...buyLeadData, notifyVendors: e.target.checked })}
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition duration-200"
+                  />
+                  <span className="text-xs md:text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition duration-200">
+                    Notify related vendors via WhatsApp
+                  </span>
+                </label>
+              </div>
             </div>
 
             {/* Delivery Address */}
