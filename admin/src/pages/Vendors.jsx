@@ -601,16 +601,16 @@ ABCD Team`
       formData.append('city', createForm.city)
       formData.append('businessCategories', JSON.stringify(createForm.businessCategories))
       formData.append('membershipFees', createForm.membershipFees)
-      if (createForm.email) formData.append('email', createForm.email)
-      if (createForm.websiteUrl) formData.append('websiteUrl', createForm.websiteUrl)
-      if (createForm.gstPan) formData.append('gstPan', createForm.gstPan)
-      if (createForm.address) formData.append('address', createForm.address)
-      if (createForm.referralId) formData.append('referralId', createForm.referralId)
-      if (createForm.membershipType) formData.append('membershipType', createForm.membershipType)
-      if (createForm.utrNumber?.trim()) formData.append('utrNumber', createForm.utrNumber.trim())
-      if (createForm.password) formData.append('password', createForm.password)
+      formData.append('email', createForm.email || '')
+      formData.append('websiteUrl', createForm.websiteUrl || '')
+      formData.append('gstPan', createForm.gstPan || '')
+      formData.append('address', createForm.address || '')
+      formData.append('referralId', createForm.referralId || '')
+      formData.append('membershipType', createForm.membershipType || '')
+      formData.append('utrNumber', (createForm.utrNumber || '').trim())
+      formData.append('password', createForm.password || '')
+      formData.append('applicationNumber', createForm.applicationNumber || '')
       if (createForm.paymentScreenshot) formData.append('paymentScreenshot', createForm.paymentScreenshot)
-      if (createForm.applicationNumber) formData.append('applicationNumber', createForm.applicationNumber)
       createForm.owners.forEach((owner) => {
         if (owner.photo) formData.append('ownerPhotos', owner.photo)
       })
@@ -709,14 +709,14 @@ ABCD Team`
       formData.append('city', editForm.city)
       formData.append('businessCategories', JSON.stringify(editForm.businessCategories))
       formData.append('membershipFees', editForm.membershipFees)
-      if (editForm.email) formData.append('email', editForm.email)
-      if (editForm.gstPan) formData.append('gstPan', editForm.gstPan)
-      if (editForm.address) formData.append('address', editForm.address)
-      if (editForm.websiteUrl) formData.append('websiteUrl', editForm.websiteUrl)
-      if (editForm.referralId) formData.append('referralId', editForm.referralId)
-      if (editForm.membershipType) formData.append('membershipType', editForm.membershipType)
-      if (editForm.utrNumber) formData.append('utrNumber', editForm.utrNumber)
-      if (editForm.password) formData.append('password', editForm.password)
+      formData.append('email', editForm.email || '')
+      formData.append('gstPan', editForm.gstPan || '')
+      formData.append('address', editForm.address || '')
+      formData.append('websiteUrl', editForm.websiteUrl || '')
+      formData.append('referralId', editForm.referralId || '')
+      formData.append('membershipType', editForm.membershipType || '')
+      formData.append('utrNumber', editForm.utrNumber || '')
+      formData.append('password', editForm.password || '')
       if (editForm.paymentScreenshot) formData.append('paymentScreenshot', editForm.paymentScreenshot)
       
       editForm.owners.forEach((owner) => {
@@ -735,15 +735,23 @@ ABCD Team`
         setShowEditModal(false)
         setSelectedVendor(null)
         setEditForm({
-          ownerName: '',
+          owners: [createEmptyOwner()],
           businessName: '',
           mobile: '',
           email: '',
+          gstPan: '',
+          address: '',
           state: '',
           district: '',
           city: '',
+          websiteUrl: '',
+          referralId: '',
+          membershipType: '',
           businessCategories: [],
-          membershipFees: ''
+          membershipFees: '',
+          utrNumber: '',
+          paymentScreenshot: null,
+          password: ''
         })
         fetchVendors()
       } else {

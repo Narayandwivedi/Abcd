@@ -168,7 +168,7 @@ const getVendorsByCategory = async (req, res) => {
 
     // 3. Find vendors
     const vendors = await Vendor.find(vendorQuery)
-      .select('businessName ownerName mobile email city state businessCategories passportPhoto owners')
+      .select('businessName ownerName mobile email city state district address slug businessCategories passportPhoto owners')
       .sort({ businessName: 1 });
 
     return res.status(200).json({

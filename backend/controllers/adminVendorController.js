@@ -462,7 +462,7 @@ const createVendor = async (req, res) => {
 const updateVendor = async (req, res) => {
   try {
     const { vendorId } = req.params;
-    let { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees, owners, utrNumber, password, membershipType } = req.body;
+    let { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees, owners, utrNumber, password, membershipType, address, gstPan, websiteUrl, referralId } = req.body;
 
     // Handle stringified JSON from FormData
     if (typeof businessCategories === 'string') {
@@ -557,6 +557,10 @@ const updateVendor = async (req, res) => {
 
     if (utrNumber) vendor.utrNumber = utrNumber;
     if (membershipType) vendor.membershipType = membershipType;
+    if (address !== undefined) vendor.address = address?.trim();
+    if (gstPan !== undefined) vendor.gstPan = gstPan?.trim();
+    if (websiteUrl !== undefined) vendor.websiteUrl = normalizeWebsiteUrl(websiteUrl);
+    if (referralId !== undefined) vendor.referralId = referralId?.trim();
 
     // Hash password if provided
     if (password && password.length >= 6) {

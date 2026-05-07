@@ -914,12 +914,12 @@ ABCD Team`
                             onClick={() => {
                               setCreateFormData(prev => ({
                                 ...prev,
+                                applicationNumber: app.applicationNumber,
                                 fullName: app.fullName,
                                 mobile: app.whatsappNumber,
                                 city: app.city,
                                 referredBy: app.referralCode,
                                 utrNumber: app.utrNumber,
-                                city: app.city,
                               }));
                               setShowCreateModal(true);
                             }}

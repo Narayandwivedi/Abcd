@@ -136,13 +136,20 @@ const CategoryPage = () => {
                         {vendor.businessName}
                       </h3>
                       <p className='text-xs text-gray-600 font-medium mb-1 truncate'>{vendor.ownerName}</p>
-                      <div className='flex items-center gap-1.5 text-xs text-gray-500'>
-                        <svg className='w-3.5 h-3.5 text-blue-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <div className='flex items-center gap-1.5 text-xs text-gray-500 mb-0.5'>
+                        <svg className='w-3.5 h-3.5 text-blue-500 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                           <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
                           <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
                         </svg>
-                        <span className='truncate'>{vendor.city}, {vendor.state}</span>
+                        <span className='truncate font-semibold text-gray-700'>
+                          {[vendor.city, vendor.district, vendor.state].filter(Boolean).join(', ')}
+                        </span>
                       </div>
+                      {vendor.address && (
+                        <p className='text-[10px] text-gray-500 line-clamp-2 leading-tight' title={vendor.address}>
+                          {vendor.address}
+                        </p>
+                      )}
                     </div>
                   </div>
 
