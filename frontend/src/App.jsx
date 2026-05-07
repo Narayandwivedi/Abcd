@@ -21,6 +21,16 @@ import Download from './pages/Download'
 import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Vouchers from './pages/Vouchers'
+import VendorDetail from './pages/VendorDetail'
+
+// Scroll to top on every route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation()
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [pathname])
+  return null
+}
 
 const App = () => {
   const location = useLocation()
@@ -135,6 +145,17 @@ const App = () => {
       }
     }
 
+    // Vendor detail pages: /:state/:district/:city/:slug
+    const parts = pathname.split('/').filter(Boolean)
+    if (parts.length === 4) {
+      return {
+        title: 'Vendor Profile - ABCD Vyapar',
+        description:
+          'View vendor profile, contact details, and business categories on ABCD Vyapar.',
+        canonicalPath: pathname,
+      }
+    }
+
     if (pathname === '/login') {
       return {
         title: 'Login - ABCD Vyapar',
@@ -194,6 +215,7 @@ const App = () => {
         structuredData={isHomePage ? homeStructuredData : null}
       />
       {!isAuthPage && <Navbar />}
+      <ScrollToTop />
       <div className='pb-0 md:pb-0'>
         <Routes>
           <Route path='/' element={<Home />} />
@@ -211,6 +233,7 @@ const App = () => {
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/category/:categorySlug' element={<CategoryPage />} />
           <Route path='/:type/:id' element={<AdDetail />} />
+          <Route path='/:state/:district/:city/:slug' element={<VendorDetail />} />
         </Routes>
       </div>
       {!isAuthPage && <Footer />}

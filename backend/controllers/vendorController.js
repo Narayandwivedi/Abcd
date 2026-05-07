@@ -66,7 +66,38 @@ const getApplicationStatus = async (req, res) => {
   }
 };
 
+// Public: Get vendor by slug for Vendor Detail Page
+const getVendorBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    const vendor = await vendorModel.findOne({ slug, isVerified: true, isActive: true })
+      .select('-password -paymentScreenshot -utrNumber -googleId -profilePicture -__v')
+      .populate('activeCertificate', 'certificateNumber issueDate expiryDate status');
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: 'Vendor not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      vendor,
+    });
+  } catch (err) {
+    console.error('Get vendor by slug error:', err.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch vendor',
+      error: err.message,
+    });
+  }
+};
+
 module.exports = {
   getVendorDetails,
   getApplicationStatus,
+  getVendorBySlug,
 };

@@ -36,7 +36,11 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
   password: {
     type: String,
   },

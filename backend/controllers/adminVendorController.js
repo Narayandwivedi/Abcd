@@ -382,6 +382,9 @@ const createVendor = async (req, res) => {
       }
     }
 
+    const { generateUniqueVendorSlug } = require('../utils/slugify');
+    vendorData.slug = await generateUniqueVendorSlug(businessName);
+
     const vendor = await vendorModel.create(vendorData);
 
     // Generate certificate
@@ -612,6 +615,12 @@ const updateVendor = async (req, res) => {
       vendor.email = email.trim();
     } else {
       vendor.email = undefined; // Remove email if not provided
+    }
+
+    // Regenerate slug if business name changed
+    if (!vendor.slug || vendor.businessName !== businessName) {
+      const { generateUniqueVendorSlug } = require('../utils/slugify');
+      vendor.slug = await generateUniqueVendorSlug(businessName, vendor._id);
     }
 
     await vendor.save();

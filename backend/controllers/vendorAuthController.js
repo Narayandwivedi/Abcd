@@ -212,6 +212,9 @@ const handleVendorSignup = async (req, res) => {
       }
     }
 
+    const { generateUniqueVendorSlug } = require('../utils/slugify');
+    newVendorData.slug = await generateUniqueVendorSlug(businessName);
+
     // Create new vendor WITHOUT logging them in (similar to user signup)
     const newVendor = await vendorModel.create(newVendorData);
 

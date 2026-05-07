@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 
 const CategoryPage = () => {
   const { categorySlug } = useParams()
@@ -9,6 +9,24 @@ const CategoryPage = () => {
   const [category, setCategory] = useState(null)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
+  const toSlug = (text) => {
+    if (!text) return ''
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '')
+  }
+
+  const getVendorUrl = (vendor) => {
+    const state = toSlug(vendor.state)
+    const district = toSlug(vendor.district || vendor.city)
+    const city = toSlug(vendor.city)
+    const slug = vendor.slug || toSlug(vendor.businessName)
+    return `/${state}/${district}/${city}/${slug}`
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,9 +103,10 @@ const CategoryPage = () => {
           /* Vendor Grid */
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn'>
             {vendors.map((vendor) => (
-              <div 
-                key={vendor._id} 
-                className='group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 hover:-translate-y-1'
+              <Link
+                to={getVendorUrl(vendor)}
+                key={vendor._id}
+                className='group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 hover:-translate-y-1 block'
               >
                 <div className='p-5'>
                   <div className='flex items-start gap-4'>
@@ -127,9 +146,9 @@ const CategoryPage = () => {
                     </div>
                   </div>
 
-                  <div className='mt-6 grid grid-cols-2 gap-3'>
+                  <div className='mt-4 grid grid-cols-2 gap-3'>
                     <button
-                      onClick={() => handleCall(vendor.mobile)}
+                      onClick={(e) => { e.preventDefault(); handleCall(vendor.mobile) }}
                       className='flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300'
                     >
                       <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -138,7 +157,7 @@ const CategoryPage = () => {
                       Call
                     </button>
                     <button
-                      onClick={() => handleWhatsApp(vendor.mobile, vendor.businessName)}
+                      onClick={(e) => { e.preventDefault(); handleWhatsApp(vendor.mobile, vendor.businessName) }}
                       className='flex items-center justify-center gap-2 bg-green-50 hover:bg-green-600 text-green-600 hover:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300'
                     >
                       <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 24 24'>
@@ -148,7 +167,7 @@ const CategoryPage = () => {
                     </button>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
