@@ -278,12 +278,26 @@ const CategoryPage = () => {
 
                       {/* Subcategories related to this category - Moved full width below */}
                       {vendor.businessCategories?.find(bc => bc.categoryId === category?._id)?.subCategories?.length > 0 && (
-                        <div className='grid grid-cols-2 gap-2 mt-3'>
-                          {vendor.businessCategories.find(bc => bc.categoryId === category?._id).subCategories.map((sub, idx) => (
-                            <span key={idx} className='bg-blue-50 text-blue-700 px-3 py-1.5 rounded-xl text-[9px] font-bold border border-blue-100 uppercase tracking-tight text-center flex items-center justify-center min-h-[2.8em] leading-tight'>
-                              {sub.name}
-                            </span>
-                          ))}
+                        <div className='grid grid-cols-2 gap-2.5 mt-4'>
+                          {vendor.businessCategories.find(bc => bc.categoryId === category?._id).subCategories.map((sub, idx) => {
+                            const palettes = [
+                              'from-indigo-50 to-blue-100 text-indigo-700 border-indigo-200/60 shadow-indigo-50',
+                              'from-emerald-50 to-teal-100 text-emerald-700 border-emerald-200/60 shadow-emerald-50',
+                              'from-amber-50 to-orange-100 text-amber-700 border-amber-200/60 shadow-amber-50',
+                              'from-rose-50 to-pink-100 text-rose-700 border-rose-200/60 shadow-rose-50',
+                              'from-purple-50 to-violet-100 text-purple-700 border-purple-200/60 shadow-purple-50'
+                            ];
+                            const palette = palettes[idx % palettes.length];
+                            
+                            return (
+                              <span 
+                                key={idx} 
+                                className={`bg-gradient-to-br ${palette} px-3 py-2 rounded-2xl text-[9px] font-semibold border uppercase tracking-tight text-center flex items-center justify-center min-h-[3em] leading-tight shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5`}
+                              >
+                                {sub.name}
+                              </span>
+                            );
+                          })}
                         </div>
                       )}
 
