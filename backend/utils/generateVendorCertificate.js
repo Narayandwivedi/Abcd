@@ -111,8 +111,11 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
 
       // Details block - shifted up to ensure single page
       currentY += 5;
+      const vendorCity = vendor.city 
+        ? vendor.city.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+        : 'N/A';
       doc.fontSize(11).fillColor('#374151').font('Helvetica')
-        .text(`City: ${vendor.city || 'N/A'}`, 0, currentY, { align: 'center', width: doc.page.width });
+        .text(`City: ${vendorCity}`, 0, currentY, { align: 'center', width: doc.page.width });
       currentY += 19;
 
       if (vendor.membershipType) {
