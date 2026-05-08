@@ -179,9 +179,9 @@ const CategoryPage = () => {
                         </button>
                       </div>
 
-                      {/* Integrated Offer Strips (Full Width - Compact) */}
+                      {/* Integrated Offer Strips (Indented) */}
                       {offers.filter(o => o.vendorId === vendor._id).length > 0 && (
-                        <div className='mt-3 -mx-5 flex flex-col gap-0.5'>
+                        <div className='mt-3 -mx-2 flex flex-col gap-1.5'>
                           {offers.filter(o => o.vendorId === vendor._id).map((vendorOffer, idx) => {
                             const palettes = [
                               'linear-gradient(to right, #4f46e5, #2563eb)', // Blue/Indigo
@@ -190,11 +190,11 @@ const CategoryPage = () => {
                               'linear-gradient(to right, #d97706, #b45309)', // Amber/Orange
                             ];
                             const palette = palettes[idx % palettes.length];
-                            
+
                             return (
-                              <div 
-                                key={vendorOffer._id} 
-                                className='relative py-1 px-5 animate-fadeIn flex items-center justify-between gap-3 border-y border-white/5'
+                              <div
+                                key={vendorOffer._id}
+                                className='relative py-1.5 px-3 rounded-xl animate-fadeIn flex items-center justify-between gap-3 border border-white/10 shadow-sm'
                                 style={{ background: palette }}
                               >
                                 <div className='flex items-center gap-2 overflow-hidden text-left'>
@@ -207,13 +207,13 @@ const CategoryPage = () => {
                                     {vendorOffer.title}
                                   </span>
                                 </div>
-                                <button 
-                                  onClick={(e) => { 
-                                    e.preventDefault(); 
-                                    e.stopPropagation(); 
-                                    setSelectedOfferDetails(vendorOffer); 
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setSelectedOfferDetails(vendorOffer);
                                   }}
-                                  className='flex-shrink-0 bg-white/20 hover:bg-white/30 text-white px-1.5 py-0.5 rounded-md text-[8px] font-bold border border-white/20 transition-colors whitespace-nowrap'
+                                  className='flex-shrink-0 bg-white/20 hover:bg-white/30 text-white px-2 py-0.5 rounded-lg text-[8px] font-bold border border-white/20 transition-colors whitespace-nowrap'
                                 >
                                   DETAILS
                                 </button>
@@ -252,43 +252,45 @@ const CategoryPage = () => {
         {selectedOfferDetails && (
           <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fadeIn'>
             <div className='bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden animate-slideUp'>
-              <div className='bg-gradient-to-r from-indigo-600 to-blue-700 p-6 text-white'>
-                <div className='flex justify-between items-start mb-2'>
-                  <h3 className='text-xl font-bold'>{selectedOfferDetails.title}</h3>
-                  <button
+              <div className='bg-gradient-to-r from-indigo-600 to-blue-700 p-5 sm:p-8 text-white relative'>
+                <div className='flex justify-between items-start mb-3'>
+                  <div className='pr-8'>
+                    <h3 className='text-lg sm:text-2xl font-black leading-tight tracking-tight'>
+                      {selectedOfferDetails.title}
+                    </h3>
+                  </div>
+                  <button 
                     onClick={() => setSelectedOfferDetails(null)}
-                    className='p-1 hover:bg-white/20 rounded-full transition-colors'
+                    className='absolute top-5 right-5 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300'
                   >
-                    <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                    <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2.5} d='M6 18L18 6M6 6l12 12' />
                     </svg>
                   </button>
                 </div>
-                <div className='inline-block bg-yellow-400 text-indigo-900 px-3 py-1 rounded-full text-sm font-black shadow-lg'>
+                <div className='inline-flex items-center gap-2 bg-yellow-400 text-indigo-900 px-3 py-1 rounded-xl text-[12px] sm:text-base font-black shadow-lg animate-bounce-subtle'>
+                  <svg className='w-3 h-3' fill='currentColor' viewBox='0 0 24 24'>
+                    <path d='M12.75 3.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM12.75 18.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM18.75 12.75a.75.75 0 000-1.5h-1.5a.75.75 0 000 1.5h1.5zM3.75 12.75a.75.75 0 000-1.5h-1.5a.75.75 0 000 1.5h1.5zM16.945 16.945a.75.75 0 001.06 0l1.06-1.06a.75.75 0 00-1.06-1.06l-1.06 1.06a.75.75 0 000 1.06zM5.055 5.055a.75.75 0 001.06 0l1.06-1.06a.75.75 0 00-1.06-1.06L5.055 4a.75.75 0 000 1.06zM16.945 5.055a.75.75 0 000 1.06l1.06 1.06a.75.75 0 101.06-1.06l-1.06-1.06a.75.75 0 00-1.06 0zM5.055 16.945a.75.75 0 000 1.06l1.06 1.06a.75.75 0 101.06-1.06l-1.06-1.06a.75.75 0 00-1.06 0z' />
+                  </svg>
                   {selectedOfferDetails.discountPercentage}% OFF
                 </div>
               </div>
-              <div className='p-6'>
-                <p className='text-gray-700 leading-relaxed mb-6 italic text-lg'>
-                  "{selectedOfferDetails.description}"
-                </p>
-                <div className='bg-gray-50 p-4 rounded-2xl flex items-center gap-4'>
-                  <div className='w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600'>
-                    <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' />
-                    </svg>
-                  </div>
+
+              <div className='p-5 sm:p-10 pb-8 sm:pb-12 bg-white'>
+                <div className='space-y-5'>
                   <div>
-                    <p className='text-[10px] text-gray-500 font-bold uppercase tracking-widest'>Available At</p>
-                    <p className='text-sm font-bold text-gray-900'>Verified Business</p>
+                    <p className='text-[9px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1.5'>Offer Description</p>
+                    <p className='text-gray-700 leading-relaxed font-medium text-[14px] sm:text-lg'>
+                      {selectedOfferDetails.description}
+                    </p>
                   </div>
+
+                  <div className='h-px bg-gray-100'></div>
+                  
+                  <p className='text-[10px] text-center text-gray-400 font-bold uppercase tracking-widest'>
+                    Tap anywhere outside to close
+                  </p>
                 </div>
-                <button
-                  onClick={() => setSelectedOfferDetails(null)}
-                  className='w-full mt-6 bg-indigo-600 text-white py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200'
-                >
-                  Got it!
-                </button>
               </div>
             </div>
           </div>

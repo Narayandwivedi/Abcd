@@ -384,19 +384,21 @@ const Offers = () => {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Title * (e.g. Festival Special)</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Title *</label>
                 <input
                   type='text' value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder='eg: 10% discount on medicine'
                   className='w-full px-4 py-2 border rounded-lg' required
                 />
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Description * (e.g. 10% flat discount on upto 499)</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>Description *</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder='enter full detail of discount'
                   className='w-full px-4 py-2 border rounded-lg' rows="2" required
                 ></textarea>
               </div>
@@ -407,6 +409,7 @@ const Offers = () => {
                   <input
                     type='number' value={formData.discountPercentage}
                     onChange={(e) => setFormData({ ...formData, discountPercentage: e.target.value })}
+                    placeholder='eg: 10'
                     className='w-full px-4 py-2 border rounded-lg' required
                   />
                 </div>
