@@ -73,22 +73,22 @@ const CategoryPage = () => {
   return (
     <div className='min-h-screen bg-gray-50 pb-20 md:pb-8'>
       {/* Header */}
-      <div className='bg-gradient-to-r from-blue-600 to-purple-600 text-white sticky top-0 z-40 transition-all duration-300 shadow-lg text-center'>
-        <div className='container mx-auto px-4 py-3 md:py-6'>
-          <div className='flex items-center gap-4'>
+      <div className='bg-gradient-to-r from-blue-600 to-purple-600 text-white sticky top-0 z-40 transition-all duration-300 shadow-lg'>
+        <div className='container mx-auto px-4 py-1.5 md:py-2'>
+          <div className='flex items-center gap-2.5'>
             <button
               onClick={() => navigate('/')}
-              className='bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all duration-300 hover:scale-110'
+              className='bg-white/20 hover:bg-white/30 rounded-full p-1 transition-all duration-300 hover:scale-110'
             >
-              <svg className='w-5 h-5 md:w-6 md:h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+              <svg className='w-3.5 h-3.5 md:w-4.5 md:h-4.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2.5} d='M15 19l-7-7 7-7' />
               </svg>
             </button>
             <div className='text-left'>
-              <h1 className='text-xl md:text-3xl font-bold tracking-tight'>
+              <h1 className='text-base md:text-lg font-bold tracking-tight leading-tight'>
                 {category ? category.name : categorySlug?.charAt(0).toUpperCase() + categorySlug?.slice(1)}
               </h1>
-              <p className='text-xs md:text-base text-blue-100 font-medium'>
+              <p className='text-[9px] md:text-[11px] text-blue-100 font-medium opacity-90'>
                 {loading ? 'Searching...' : `${vendors.length} Verified Vendors Available`}
               </p>
             </div>
@@ -140,16 +140,16 @@ const CategoryPage = () => {
                     className='flex-shrink-0 snap-start w-[160px] md:w-[calc(20%-12px)]'
                     onClick={() => setSelectedOfferDetails(offer)}
                   >
-                    <div className={`bg-gradient-to-br ${palette} rounded-2xl p-3.5 text-white shadow-lg relative overflow-hidden h-32 flex flex-col justify-between group cursor-pointer hover:shadow-xl transition-all duration-500 hover:-translate-y-0.5`}>
+                    <div className={`bg-gradient-to-br ${palette} rounded-2xl p-3.5 text-white shadow-lg relative overflow-hidden h-[104px] md:h-32 flex flex-col justify-between group cursor-pointer hover:shadow-xl transition-all duration-500 hover:-translate-y-0.5`}>
                       {/* Decorative elements */}
                       <div className='absolute top-0 right-0 -mr-6 -mt-6 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-1000'></div>
 
                       <div className='relative z-10'>
                         <div className='flex justify-between items-start mb-2'>
-                          <div className='bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border border-white/10'>
+                          <div className='hidden md:block bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border border-white/10'>
                             {offer.isDemo ? 'Demo' : 'Offer'}
                           </div>
-                          <div className='w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20'>
+                          <div className='hidden md:flex w-6 h-6 bg-white/20 rounded-lg items-center justify-center backdrop-blur-sm border border-white/20'>
                             <svg className='w-3 h-3 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2.5} d='M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' />
                             </svg>
@@ -158,7 +158,7 @@ const CategoryPage = () => {
                         <h3 className='text-[11px] font-black leading-tight mb-1 line-clamp-1 group-hover:text-yellow-200 transition-colors'>
                           {offer.title}
                         </h3>
-                        <p className='text-white/80 text-[8px] font-medium line-clamp-3 leading-tight opacity-90'>
+                        <p className='text-white/80 text-[9px] font-medium line-clamp-3 leading-tight opacity-90'>
                           {offer.description}
                         </p>
                       </div>
