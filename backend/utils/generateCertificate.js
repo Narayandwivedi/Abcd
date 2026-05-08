@@ -143,7 +143,7 @@ const generateCertificatePDF = async (user) => {
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(locationString.toUpperCase(), 0, 321, {
+        .text(locationString.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '), 0, 321, {
           align: 'center',
           width: doc.page.width
         });
@@ -440,7 +440,7 @@ const regenerateCertificatePDF = async (user, existingCertificateNumber) => {
       doc.fontSize(11)
         .fillColor('#374151')
         .font('Helvetica')
-        .text(locationString.toUpperCase(), 0, 321, {
+        .text(locationString.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '), 0, 321, {
           align: 'center',
           width: doc.page.width
         });
