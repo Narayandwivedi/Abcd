@@ -237,6 +237,16 @@ const CategoryPage = () => {
                                 {vendor.businessName}
                               </h3>
                               <p className='text-xs text-gray-600 font-medium mb-1 truncate'>{vendor.ownerName}</p>
+                              {/* Subcategories related to this category */}
+                              {vendor.businessCategories?.find(bc => bc.categoryId === category?._id)?.subCategories?.length > 0 && (
+                                <div className='grid grid-cols-2 gap-1 mb-1.5'>
+                                  {vendor.businessCategories.find(bc => bc.categoryId === category?._id).subCategories.map((sub, idx) => (
+                                    <span key={idx} className='bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-md text-[9px] font-bold border border-blue-100 uppercase tracking-tighter text-center'>
+                                      {sub.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                             <div className='flex items-center gap-1.5 flex-shrink-0'>
                               <button
