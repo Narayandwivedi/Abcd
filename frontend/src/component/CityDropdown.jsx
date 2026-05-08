@@ -28,7 +28,9 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
       const result = await response.json()
 
       if (result.success) {
-        const cityNames = result.data.map(c => c.city)
+        const cityNames = result.data.map(c => 
+          c.city.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+        )
         setCities(cityNames)
       }
     } catch (error) {
@@ -63,7 +65,7 @@ const CityDropdown = ({ value, onChange, className = '', placeholder = 'Select y
   )
 
   const handleCitySelect = (city) => {
-    onChange(city.toUpperCase())
+    onChange(city)
     setIsOpen(false)
     setSearchQuery('')
   }
