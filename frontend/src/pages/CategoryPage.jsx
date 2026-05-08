@@ -96,10 +96,10 @@ const CategoryPage = () => {
         </div>
       </div>
 
-      <div className='container mx-auto px-4 py-6'>
-        {/* Offer Box Section */}
+      <div className='container mx-auto px-2 py-4'>
+        {/* Offer Box Section - Hidden for now as per user request */}
         {!loading && (
-          <div className='mb-4'>
+          <div className='mb-4 hidden'>
             <div className='flex items-center justify-between mb-2'>
               <div className='flex items-center gap-2'>
                 <div className='bg-yellow-400 p-1.5 rounded-lg shadow-md shadow-yellow-200 animate-bounce-subtle'>
@@ -231,9 +231,31 @@ const CategoryPage = () => {
                         </div>
 
                         <div className='flex-1 overflow-hidden ml-1'>
-                          <h3 className='text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate'>
-                            {vendor.businessName}
-                          </h3>
+                          <div className='flex items-start justify-between gap-2 mb-1'>
+                            <h3 className='text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate'>
+                              {vendor.businessName}
+                            </h3>
+                            <div className='flex items-center gap-1.5 flex-shrink-0'>
+                              <button
+                                onClick={(e) => { e.preventDefault(); handleCall(vendor.mobile) }}
+                                className='w-7 h-7 flex items-center justify-center bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white rounded-full transition-all duration-300 shadow-sm'
+                                title='Call'
+                              >
+                                <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2.5} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={(e) => { e.preventDefault(); handleWhatsApp(vendor.mobile, vendor.businessName) }}
+                                className='w-7 h-7 flex items-center justify-center bg-green-50 hover:bg-green-600 text-green-600 hover:text-white rounded-full transition-all duration-300 shadow-sm'
+                                title='Chat'
+                              >
+                                <svg className='w-3.5 h-3.5' fill='currentColor' viewBox='0 0 24 24'>
+                                  <path d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.001 20c-1.85 0-3.61-.477-5.138-1.325l-.369-.204-3.813.999 1.018-3.715-.224-.356C2.622 13.882 2 12.012 2 10 2 4.477 6.477 0 12 0s10 4.477 10 10-4.477 10-10 10z' />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
                           <p className='text-xs text-gray-600 font-medium mb-1 truncate'>{vendor.ownerName}</p>
                           <div className='flex items-center gap-1.5 text-xs text-gray-500 mb-0.5'>
                             <svg className='w-3.5 h-3.5 text-blue-500 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -250,27 +272,6 @@ const CategoryPage = () => {
                             </p>
                           )}
                         </div>
-                      </div>
-
-                      <div className='mt-4 grid grid-cols-2 gap-3'>
-                        <button
-                          onClick={(e) => { e.preventDefault(); handleCall(vendor.mobile) }}
-                          className='flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300'
-                        >
-                          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
-                          </svg>
-                          Call
-                        </button>
-                        <button
-                          onClick={(e) => { e.preventDefault(); handleWhatsApp(vendor.mobile, vendor.businessName) }}
-                          className='flex items-center justify-center gap-2 bg-green-50 hover:bg-green-600 text-green-600 hover:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300'
-                        >
-                          <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 24 24'>
-                            <path d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.001 20c-1.85 0-3.61-.477-5.138-1.325l-.369-.204-3.813.999 1.018-3.715-.224-.356C2.622 13.882 2 12.012 2 10 2 4.477 6.477 0 12 0s10 4.477 10 10-4.477 10-10 10z' />
-                          </svg>
-                          Chat
-                        </button>
                       </div>
 
                       {/* Integrated Offer Strips (Indented) */}
