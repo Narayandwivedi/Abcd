@@ -122,7 +122,7 @@ const CategoryPage = () => {
               </div>
             </div>
 
-            <div className='flex gap-2 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory'>
+            <div className='flex gap-2 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-4 px-3'>
               {displayOffers.map((offer, index) => {
                 const palettes = [
                   'from-indigo-600 to-blue-600',
