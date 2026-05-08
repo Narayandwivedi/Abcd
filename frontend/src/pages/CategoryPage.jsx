@@ -232,7 +232,7 @@ const CategoryPage = () => {
 
                         <div className='flex-1 overflow-hidden ml-1'>
                           <div className='flex items-start justify-between gap-2 mb-1'>
-                            <div>
+                            <div className='flex-1 min-w-0'>
                               <h3 className='text-[15px] font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate'>
                                 {vendor.businessName}
                               </h3>
