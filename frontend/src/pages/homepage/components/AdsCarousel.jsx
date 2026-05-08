@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 const SLIDE_INTERVAL_MS = 1200
@@ -17,18 +18,40 @@ const getAdImageUrl = (imagePath) => {
   return `${BACKEND_URL}${imagePath.startsWith('/') ? imagePath : `/${imagePath}`}`
 }
 
-const openAdLink = (link) => {
-  if (!link) {
-    return
+const getVendorUrl = (vendor) => {
+  if (!vendor) return ''
+  const toSlug = (text) => {
+    if (!text) return ''
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '')
   }
 
-  const targetUrl = /^https?:\/\//i.test(link) ? link : `https://${link}`
-  window.open(targetUrl, '_blank', 'noopener,noreferrer')
+  const state = toSlug(vendor.state)
+  const district = toSlug(vendor.district || vendor.city)
+  const city = toSlug(vendor.city)
+  const slug = vendor.slug || toSlug(vendor.businessName)
+  return `/${state}/${district}/${city}/${slug}`
 }
 
-const AdCard = ({ ad, index, visibleCount }) => {
+const AdCard = ({ ad, index, visibleCount, navigate }) => {
   const imageUrl = getAdImageUrl(ad.adImg)
-  const isClickable = Boolean(ad.link)
+  const isVendorLink = Boolean(ad.vendorId)
+  const isExternalLink = Boolean(ad.link)
+  const isClickable = isVendorLink || isExternalLink
+
+  const handleAdClick = () => {
+    if (isVendorLink) {
+      const url = getVendorUrl(ad.vendorId)
+      if (url) navigate(url)
+    } else if (isExternalLink) {
+      const targetUrl = /^https?:\/\//i.test(ad.link) ? ad.link : `https://${ad.link}`
+      window.open(targetUrl, '_blank', 'noopener,noreferrer')
+    }
+  }
 
   return (
     <div
@@ -37,7 +60,7 @@ const AdCard = ({ ad, index, visibleCount }) => {
     >
       <button
         type='button'
-        onClick={() => openAdLink(ad.link)}
+        onClick={handleAdClick}
         disabled={!isClickable}
         className={`relative h-48 md:h-56 w-full rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden ${
           isClickable ? 'cursor-pointer hover:shadow-lg' : 'cursor-default'
@@ -56,6 +79,7 @@ const AdCard = ({ ad, index, visibleCount }) => {
 }
 
 const AdsCarousel = () => {
+  const navigate = useNavigate()
   const [ads, setAds] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -269,6 +293,7 @@ const AdsCarousel = () => {
                 ad={ad}
                 index={index}
                 visibleCount={effectiveVisibleCount}
+                navigate={navigate}
               />
             ))}
           </div>
@@ -301,6 +326,7 @@ const AdsCarousel = () => {
                 ad={ad}
                 index={index}
                 visibleCount={effectiveVisibleCount}
+                navigate={navigate}
               />
             ))}
           </div>
