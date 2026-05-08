@@ -10,6 +10,17 @@ const CategoryPage = () => {
   const [offers, setOffers] = useState([])
   const [selectedOfferDetails, setSelectedOfferDetails] = useState(null)
 
+  const demoOffers = [
+    { _id: 'demo-1', title: 'Special Welcome Discount', description: 'Get 10% off on your first consultation or service booking.', discountPercentage: 10, isDemo: true },
+    { _id: 'demo-2', title: 'Zero Processing Fees', description: 'Enjoy our services with 0% processing fees for a limited time.', discountPercentage: 0, isDemo: true },
+    { _id: 'demo-3', title: 'Loyalty Reward', description: 'Additional 10% discount for our regular business partners.', discountPercentage: 10, isDemo: true },
+    { _id: 'demo-4', title: 'Mega Seasonal Sale', description: 'Massive 20% savings on all premium membership plans this month.', discountPercentage: 20, isDemo: true },
+    { _id: 'demo-5', title: 'Flash Deal', description: 'Limited time flash deal: Flat 15% OFF on selected categories.', discountPercentage: 15, isDemo: true },
+    { _id: 'demo-6', title: 'Weekend Special', description: 'Book on weekends and get an extra 10% discount on total billing.', discountPercentage: 10, isDemo: true },
+  ]
+
+  const displayOffers = offers.length > 0 ? offers : demoOffers
+
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
   const toSlug = (text) => {
@@ -86,6 +97,89 @@ const CategoryPage = () => {
       </div>
 
       <div className='container mx-auto px-4 py-6'>
+        {/* Offer Box Section */}
+        {!loading && (
+          <div className='mb-4'>
+            <div className='flex items-center justify-between mb-2'>
+              <div className='flex items-center gap-2'>
+                <div className='bg-yellow-400 p-1.5 rounded-lg shadow-md shadow-yellow-200 animate-bounce-subtle'>
+                  <svg className='w-4 h-4 text-gray-900' fill='currentColor' viewBox='0 0 24 24'>
+                    <path d='M12.75 3.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM12.75 18.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM18.75 12.75a.75.75 0 000-1.5h-1.5a.75.75 0 000 1.5h1.5zM3.75 12.75a.75.75 0 000-1.5h-1.5a.75.75 0 000 1.5h1.5zM16.945 16.945a.75.75 0 001.06 0l1.06-1.06a.75.75 0 00-1.06-1.06l-1.06 1.06a.75.75 0 000 1.06zM5.055 5.055a.75.75 0 001.06 0l1.06-1.06a.75.75 0 00-1.06-1.06L5.055 4a.75.75 0 000 1.06zM16.945 5.055a.75.75 0 000 1.06l1.06 1.06a.75.75 0 101.06-1.06l-1.06-1.06a.75.75 0 00-1.06 0zM5.055 16.945a.75.75 0 000 1.06l1.06 1.06a.75.75 0 101.06-1.06l-1.06-1.06a.75.75 0 00-1.06 0z' />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className='text-base md:text-lg font-black text-gray-900 tracking-tight'>Exclusive Offers</h2>
+                  <p className='text-[9px] text-gray-500 font-bold uppercase tracking-wider'>Handpicked for you</p>
+                </div>
+              </div>
+              <div className='flex gap-2'>
+                <span className='hidden md:block text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-100'>
+                  5 cards per row
+                </span>
+                <span className='text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-full border border-gray-100'>
+                  Scroll →
+                </span>
+              </div>
+            </div>
+
+            <div className='flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-4 px-4'>
+              {displayOffers.map((offer, index) => {
+                const palettes = [
+                  'from-indigo-600 to-blue-600',
+                  'from-purple-600 to-pink-600',
+                  'from-emerald-500 to-teal-600',
+                  'from-rose-500 to-orange-500',
+                  'from-blue-600 to-cyan-500',
+                  'from-amber-500 to-yellow-600'
+                ];
+                const palette = palettes[index % palettes.length];
+
+                return (
+                  <div
+                    key={offer._id}
+                    className='flex-shrink-0 w-[150px] md:w-[calc(20%-13px)] snap-start'
+                    onClick={() => setSelectedOfferDetails(offer)}
+                  >
+                    <div className={`bg-gradient-to-br ${palette} rounded-2xl p-3.5 text-white shadow-lg relative overflow-hidden h-32 flex flex-col justify-between group cursor-pointer hover:shadow-xl transition-all duration-500 hover:-translate-y-0.5`}>
+                      {/* Decorative elements */}
+                      <div className='absolute top-0 right-0 -mr-6 -mt-6 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-1000'></div>
+                      
+                      <div className='relative z-10'>
+                        <div className='flex justify-between items-start mb-2'>
+                          <div className='bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border border-white/10'>
+                            {offer.isDemo ? 'Demo' : 'Offer'}
+                          </div>
+                          <div className='w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20'>
+                            <svg className='w-3 h-3 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2.5} d='M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' />
+                            </svg>
+                          </div>
+                        </div>
+                        <h3 className='text-[11px] font-black leading-tight mb-1 line-clamp-1 group-hover:text-yellow-200 transition-colors'>
+                          {offer.title}
+                        </h3>
+                        <p className='text-white/80 text-[8px] font-medium line-clamp-2 leading-tight opacity-90'>
+                          {offer.description}
+                        </p>
+                      </div>
+
+                      <div className='relative z-10 flex items-end justify-between'>
+                        <div className='flex items-baseline gap-0.5'>
+                          <span className='text-xl font-black tracking-tighter'>{offer.discountPercentage}%</span>
+                          <span className='text-[7px] font-bold opacity-70 uppercase tracking-tighter'>OFF</span>
+                        </div>
+                        <div className='bg-white text-gray-900 px-2 py-1 rounded-lg text-[7px] font-black shadow-md group-hover:bg-yellow-300 transition-colors uppercase tracking-tight'>
+                          Details
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {loading ? (
           /* Loading Skeletons */
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
