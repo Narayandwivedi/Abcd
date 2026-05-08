@@ -233,10 +233,10 @@ const CategoryPage = () => {
                         <div className='flex-1 overflow-hidden ml-1'>
                           <div className='flex items-start justify-between gap-2 mb-1'>
                             <div>
-                              <h3 className='text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate'>
+                              <h3 className='text-[15px] font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate'>
                                 {vendor.businessName}
                               </h3>
-                              <p className='text-xs text-gray-600 font-medium mb-1 truncate'>{vendor.ownerName}</p>
+                              <p className='text-[11px] text-gray-600 font-medium mb-1 truncate'>{vendor.ownerName}</p>
                             </div>
                             <div className='flex items-center gap-1.5 flex-shrink-0'>
                               <button
