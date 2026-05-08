@@ -118,8 +118,8 @@ const CategoryPage = () => {
                         <div className='relative'>
                           <div className='w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center overflow-hidden border border-blue-50 group-hover:scale-105 transition-transform duration-500'>
                             {vendor.passportPhoto ? (
-                              <img 
-                                src={`${BACKEND_URL}/${vendor.passportPhoto}`} 
+                              <img
+                                src={`${BACKEND_URL}/${vendor.passportPhoto}`}
                                 alt={vendor.businessName}
                                 className='w-full h-full object-cover'
                               />
@@ -135,7 +135,7 @@ const CategoryPage = () => {
                             </svg>
                           </div>
                         </div>
-                        
+
                         <div className='flex-1 overflow-hidden ml-1'>
                           <h3 className='text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate'>
                             {vendor.businessName}
@@ -178,52 +178,52 @@ const CategoryPage = () => {
                           Chat
                         </button>
                       </div>
+
+                      {/* Integrated Offer Strips (Full Width - Compact) */}
+                      {offers.filter(o => o.vendorId === vendor._id).length > 0 && (
+                        <div className='mt-3 -mx-5 flex flex-col gap-0.5'>
+                          {offers.filter(o => o.vendorId === vendor._id).map((vendorOffer, idx) => {
+                            const palettes = [
+                              'linear-gradient(to right, #4f46e5, #2563eb)', // Blue/Indigo
+                              'linear-gradient(to right, #e11d48, #be123c)', // Rose/Crimson
+                              'linear-gradient(to right, #059669, #047857)', // Emerald/Green
+                              'linear-gradient(to right, #d97706, #b45309)', // Amber/Orange
+                            ];
+                            const palette = palettes[idx % palettes.length];
+                            
+                            return (
+                              <div 
+                                key={vendorOffer._id} 
+                                className='relative py-1 px-5 animate-fadeIn flex items-center justify-between gap-3 border-y border-white/5'
+                                style={{ background: palette }}
+                              >
+                                <div className='flex items-center gap-2 overflow-hidden text-left'>
+                                  <div className='bg-white/20 p-1 rounded-md'>
+                                    <svg className='w-2.5 h-2.5 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2.5} d='M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' />
+                                    </svg>
+                                  </div>
+                                  <span className='text-[9px] md:text-[10px] font-semibold text-white uppercase tracking-tight truncate'>
+                                    {vendorOffer.title}
+                                  </span>
+                                </div>
+                                <button 
+                                  onClick={(e) => { 
+                                    e.preventDefault(); 
+                                    e.stopPropagation(); 
+                                    setSelectedOfferDetails(vendorOffer); 
+                                  }}
+                                  className='flex-shrink-0 bg-white/20 hover:bg-white/30 text-white px-1.5 py-0.5 rounded-md text-[8px] font-bold border border-white/20 transition-colors whitespace-nowrap'
+                                >
+                                  DETAILS
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </Link>
-
-                  {/* Offer Footer Strips (Outside Link, attached to card) */}
-                  <div className='flex flex-col gap-1.5 mt-1'>
-                    {offers.filter(o => o.vendorId === vendor._id).map((vendorOffer, idx) => {
-                      const palettes = [
-                        'linear-gradient(to right, #4f46e5, #2563eb)', // Blue/Indigo
-                        'linear-gradient(to right, #e11d48, #be123c)', // Rose/Crimson
-                        'linear-gradient(to right, #059669, #047857)', // Emerald/Green
-                        'linear-gradient(to right, #d97706, #b45309)', // Amber/Orange
-                      ];
-                      const palette = palettes[idx % palettes.length];
-                      
-                      return (
-                        <div 
-                          key={vendorOffer._id} 
-                          className='relative py-1.5 px-4 rounded-xl shadow-md border-t border-white/10 animate-fadeIn'
-                          style={{ background: palette }}
-                        >
-                          <div className='flex items-center justify-between gap-3'>
-                            <div className='flex items-center gap-2 overflow-hidden'>
-                              <div className='bg-white/20 p-1 rounded-md'>
-                                <svg className='w-3 h-3 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' />
-                                </svg>
-                              </div>
-                              <span className='text-[10px] font-semibold text-white uppercase tracking-tight truncate'>
-                                {vendorOffer.title}
-                              </span>
-                            </div>
-                            <button 
-                              onClick={(e) => { 
-                                e.preventDefault(); 
-                                e.stopPropagation(); 
-                                setSelectedOfferDetails(vendorOffer); 
-                              }}
-                              className='flex-shrink-0 bg-white/20 hover:bg-white/30 text-white px-2 py-0.5 rounded-lg text-[9px] font-bold border border-white/30 transition-colors whitespace-nowrap'
-                            >
-                              Details →
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
                   {offers.filter(o => o.vendorId === vendor._id).length === 0 && <div className='h-4'></div>}
                 </div>
               )
@@ -248,53 +248,53 @@ const CategoryPage = () => {
           </div>
         )}
 
-      {/* Offer Details Modal */}
-      {selectedOfferDetails && (
-        <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fadeIn'>
-          <div className='bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden animate-slideUp'>
-            <div className='bg-gradient-to-r from-indigo-600 to-blue-700 p-6 text-white'>
-              <div className='flex justify-between items-start mb-2'>
-                <h3 className='text-xl font-bold'>{selectedOfferDetails.title}</h3>
-                <button 
+        {/* Offer Details Modal */}
+        {selectedOfferDetails && (
+          <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fadeIn'>
+            <div className='bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden animate-slideUp'>
+              <div className='bg-gradient-to-r from-indigo-600 to-blue-700 p-6 text-white'>
+                <div className='flex justify-between items-start mb-2'>
+                  <h3 className='text-xl font-bold'>{selectedOfferDetails.title}</h3>
+                  <button
+                    onClick={() => setSelectedOfferDetails(null)}
+                    className='p-1 hover:bg-white/20 rounded-full transition-colors'
+                  >
+                    <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                    </svg>
+                  </button>
+                </div>
+                <div className='inline-block bg-yellow-400 text-indigo-900 px-3 py-1 rounded-full text-sm font-black shadow-lg'>
+                  {selectedOfferDetails.discountPercentage}% OFF
+                </div>
+              </div>
+              <div className='p-6'>
+                <p className='text-gray-700 leading-relaxed mb-6 italic text-lg'>
+                  "{selectedOfferDetails.description}"
+                </p>
+                <div className='bg-gray-50 p-4 rounded-2xl flex items-center gap-4'>
+                  <div className='w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600'>
+                    <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className='text-[10px] text-gray-500 font-bold uppercase tracking-widest'>Available At</p>
+                    <p className='text-sm font-bold text-gray-900'>Verified Business</p>
+                  </div>
+                </div>
+                <button
                   onClick={() => setSelectedOfferDetails(null)}
-                  className='p-1 hover:bg-white/20 rounded-full transition-colors'
+                  className='w-full mt-6 bg-indigo-600 text-white py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200'
                 >
-                  <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
-                  </svg>
+                  Got it!
                 </button>
               </div>
-              <div className='inline-block bg-yellow-400 text-indigo-900 px-3 py-1 rounded-full text-sm font-black shadow-lg'>
-                {selectedOfferDetails.discountPercentage}% OFF
-              </div>
-            </div>
-            <div className='p-6'>
-              <p className='text-gray-700 leading-relaxed mb-6 italic text-lg'>
-                "{selectedOfferDetails.description}"
-              </p>
-              <div className='bg-gray-50 p-4 rounded-2xl flex items-center gap-4'>
-                <div className='w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600'>
-                  <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' />
-                  </svg>
-                </div>
-                <div>
-                  <p className='text-[10px] text-gray-500 font-bold uppercase tracking-widest'>Available At</p>
-                  <p className='text-sm font-bold text-gray-900'>Verified Business</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setSelectedOfferDetails(null)}
-                className='w-full mt-6 bg-indigo-600 text-white py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200'
-              >
-                Got it!
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
-  </div>
   )
 }
 
