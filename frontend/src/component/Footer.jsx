@@ -128,7 +128,17 @@ const Footer = () => {
         </div>
 
         <div className='border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm'>
-          <p>&copy; {new Date().getFullYear()} ABCD. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} ABCD. All rights reserved. 
+            <a 
+              href="https://Softwarebytes.in" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="opacity-[0.03] text-[8px] cursor-default ml-2"
+              aria-hidden="true"
+            >
+              Developed by Softwarebytes
+            </a>
+          </p>
         </div>
       </div>
     </footer>
