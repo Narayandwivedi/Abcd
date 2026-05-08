@@ -72,8 +72,7 @@ const getVendorBySlug = async (req, res) => {
     const { slug } = req.params;
 
     const vendor = await vendorModel.findOne({ slug, isVerified: true, isActive: true })
-      .select('-password -paymentScreenshot -utrNumber -googleId -profilePicture -__v')
-      .populate('activeCertificate', 'certificateNumber issueDate expiryDate status');
+      .select('-password -paymentScreenshot -utrNumber -googleId -profilePicture -activeCertificate -referralCode -__v');
 
     if (!vendor) {
       return res.status(404).json({

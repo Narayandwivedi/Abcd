@@ -267,35 +267,11 @@ const VendorDetail = () => {
                   </div>
                 </div>
               )}
-              {vendor.referralCode && (
-                <div className='flex items-center gap-3'>
-                  <div className='w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0'>
-                    <span className='text-amber-500 text-sm font-bold'>#</span>
-                  </div>
-                  <div>
-                    <p className='text-xs text-gray-400 font-medium'>Referral Code</p>
-                    <p className='text-sm text-gray-800 font-semibold'>{vendor.referralCode}</p>
-                  </div>
-                </div>
-              )}
+
             </div>
           </div>
 
-          {/* Certificate */}
-          {vendor.activeCertificate && vendor.activeCertificate.status === 'active' && (
-            <div className='bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-2xl p-5'>
-              <div className='flex items-center gap-3'>
-                <div className='text-3xl'>🏅</div>
-                <div>
-                  <p className='text-sm font-bold text-green-800'>Certified Vendor</p>
-                  <p className='text-xs text-green-600'>Certificate No: {vendor.activeCertificate.certificateNumber}</p>
-                  {vendor.activeCertificate.expiryDate && (
-                    <p className='text-xs text-green-600'>Valid until: {new Date(vendor.activeCertificate.expiryDate).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'})}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+
         </div>
       </div>
     </div>
