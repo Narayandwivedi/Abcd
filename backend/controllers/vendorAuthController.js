@@ -105,14 +105,6 @@ const handleVendorSignup = async (req, res) => {
       });
     }
 
-    // Check if vendor already exists by mobile
-    const existingByMobile = await vendorModel.findOne({ mobile });
-    if (existingByMobile) {
-      return res.status(400).json({
-        success: false,
-        message: "Mobile number already exists",
-      });
-    }
 
     // Check if vendor already exists by email
     if (email) {
@@ -248,12 +240,6 @@ const handleVendorSignup = async (req, res) => {
     console.error("❌ Vendor Signup Error:", err);
     // Handle duplicate key error
     if (err.code === 11000) {
-      if (err.keyPattern && err.keyPattern.mobile) {
-        return res.status(400).json({
-          success: false,
-          message: "Mobile number already exists",
-        });
-      }
       if (err.keyPattern && err.keyPattern.email) {
         return res.status(400).json({
           success: false,

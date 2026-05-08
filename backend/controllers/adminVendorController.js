@@ -272,14 +272,6 @@ const createVendor = async (req, res) => {
       });
     }
 
-    // Check if mobile already exists
-    const existingVendor = await vendorModel.findOne({ mobile });
-    if (existingVendor) {
-      return res.status(400).json({
-        success: false,
-        message: "Vendor with this mobile number already exists"
-      });
-    }
 
     // Check if email is provided and already exists
     if (email && email.trim()) {
@@ -510,16 +502,6 @@ const updateVendor = async (req, res) => {
       });
     }
 
-    // Check if mobile is being changed and if it already exists
-    if (mobile !== vendor.mobile) {
-      const existingMobile = await vendorModel.findOne({ mobile, _id: { $ne: vendorId } });
-      if (existingMobile) {
-        return res.status(400).json({
-          success: false,
-          message: "Mobile number already exists"
-        });
-      }
-    }
 
     // Check if email is provided and already exists (excluding current vendor)
     if (email && email.trim()) {

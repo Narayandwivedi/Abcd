@@ -10,7 +10,6 @@ const vendorSchema = new mongoose.Schema({
   mobile: {
     type: Number,
     required:true,
-    unique: true,
   },
   applicationNumber: {
     type: String,
