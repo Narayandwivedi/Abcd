@@ -265,7 +265,10 @@ const CategoryPage = () => {
                               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
                             </svg>
                             <span className='truncate font-semibold text-gray-700'>
-                              {[vendor.city, vendor.district, vendor.state].filter(Boolean).join(', ')}
+                              {[vendor.city, vendor.district, vendor.state]
+                                .filter(Boolean)
+                                .map(s => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '))
+                                .join(', ')}
                             </span>
                           </div>
                           {vendor.address && (
