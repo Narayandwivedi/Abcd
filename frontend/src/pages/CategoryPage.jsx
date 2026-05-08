@@ -122,7 +122,7 @@ const CategoryPage = () => {
               </div>
             </div>
 
-            <div className='flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-4 px-4'>
+            <div className='flex gap-2 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-4 px-4'>
               {displayOffers.map((offer, index) => {
                 const palettes = [
                   'from-indigo-600 to-blue-600',
@@ -137,13 +137,13 @@ const CategoryPage = () => {
                 return (
                   <div
                     key={offer._id}
-                    className='flex-shrink-0 w-[150px] md:w-[calc(20%-13px)] snap-start'
+                    className='flex-shrink-0 snap-start w-[130px] md:w-[calc(20%-12px)]'
                     onClick={() => setSelectedOfferDetails(offer)}
                   >
                     <div className={`bg-gradient-to-br ${palette} rounded-2xl p-3.5 text-white shadow-lg relative overflow-hidden h-32 flex flex-col justify-between group cursor-pointer hover:shadow-xl transition-all duration-500 hover:-translate-y-0.5`}>
                       {/* Decorative elements */}
                       <div className='absolute top-0 right-0 -mr-6 -mt-6 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-1000'></div>
-                      
+
                       <div className='relative z-10'>
                         <div className='flex justify-between items-start mb-2'>
                           <div className='bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border border-white/10'>
@@ -158,14 +158,14 @@ const CategoryPage = () => {
                         <h3 className='text-[11px] font-black leading-tight mb-1 line-clamp-1 group-hover:text-yellow-200 transition-colors'>
                           {offer.title}
                         </h3>
-                        <p className='text-white/80 text-[8px] font-medium line-clamp-2 leading-tight opacity-90'>
+                        <p className='text-white/80 text-[8px] font-medium line-clamp-3 leading-tight opacity-90'>
                           {offer.description}
                         </p>
                       </div>
 
                       <div className='relative z-10 flex items-end justify-between'>
                         <div className='flex items-baseline gap-0.5'>
-                          <span className='text-xl font-black tracking-tighter'>{offer.discountPercentage}%</span>
+                          <span className='text-base font-black tracking-tighter'>{offer.discountPercentage}%</span>
                           <span className='text-[7px] font-bold opacity-70 uppercase tracking-tighter'>OFF</span>
                         </div>
                         <div className='bg-white text-gray-900 px-2 py-1 rounded-lg text-[7px] font-black shadow-md group-hover:bg-yellow-300 transition-colors uppercase tracking-tight'>
@@ -353,7 +353,7 @@ const CategoryPage = () => {
                       {selectedOfferDetails.title}
                     </h3>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setSelectedOfferDetails(null)}
                     className='absolute top-5 right-5 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300'
                   >
@@ -380,7 +380,7 @@ const CategoryPage = () => {
                   </div>
 
                   <div className='h-px bg-gray-100'></div>
-                  
+
                   <p className='text-[10px] text-center text-gray-400 font-bold uppercase tracking-widest'>
                     Tap anywhere outside to close
                   </p>
