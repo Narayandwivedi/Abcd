@@ -207,8 +207,8 @@ const CategoryPage = () => {
                     to={getVendorUrl(vendor)}
                     className='bg-white rounded-t-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 block z-10'
                   >
-                    <div className='p-5'>
-                      <div className='flex items-start gap-4'>
+                    <div className='p-3'>
+                      <div className='flex items-start gap-3'>
                         <div className='relative'>
                           <div className='w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center overflow-hidden border border-blue-50 group-hover:scale-105 transition-transform duration-500'>
                             {vendor.passportPhoto ? (
