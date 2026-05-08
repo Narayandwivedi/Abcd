@@ -66,4 +66,12 @@ router.patch("/blogs/:blogId/publish", adminAuth, checkPermission('canPublishBlo
 router.patch("/blogs/:blogId/unpublish", adminAuth, checkPermission('canPublishBlogs'), unpublishBlog);
 router.patch("/blogs/:blogId/toggle-featured", adminAuth, checkPermission('canEditBlogs'), toggleFeatured);
 
+// Offer management routes
+const { getAllOffers, createOffer, updateOffer, deleteOffer, toggleOfferStatus } = require("../controllers/adminOfferController");
+router.get("/offers", adminAuth, checkPermission('canManageContent'), getAllOffers);
+router.post("/offers", adminAuth, checkPermission('canManageContent'), upload.single('offerImage'), createOffer);
+router.put("/offers/:offerId", adminAuth, checkPermission('canManageContent'), upload.single('offerImage'), updateOffer);
+router.delete("/offers/:offerId", adminAuth, checkPermission('canManageContent'), deleteOffer);
+router.patch("/offers/:offerId/toggle-status", adminAuth, checkPermission('canManageContent'), toggleOfferStatus);
+
 module.exports = router;

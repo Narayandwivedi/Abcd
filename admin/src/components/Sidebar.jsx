@@ -69,6 +69,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       description: 'Manage Advertisements',
       requiredPermission: 'canViewAds'
     },
+    {
+      name: 'Offers',
+      icon: '🎁',
+      path: '/offers',
+      description: 'Discounts & Deals',
+      requiredPermission: 'canManageContent'
+    },
     // {
     //   name: 'Products',
     //   icon: '📦',
