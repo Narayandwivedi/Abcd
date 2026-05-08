@@ -122,7 +122,7 @@ const CategoryPage = () => {
               </div>
             </div>
 
-            <div className='flex gap-2 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-4 px-4'>
+            <div className='flex gap-2 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory'>
               {displayOffers.map((offer, index) => {
                 const palettes = [
                   'from-indigo-600 to-blue-600',
@@ -137,7 +137,7 @@ const CategoryPage = () => {
                 return (
                   <div
                     key={offer._id}
-                    className='flex-shrink-0 snap-start w-[160px] md:w-[calc(20%-12px)]'
+                    className='flex-shrink-0 snap-start w-[155px] md:w-[calc(20%-12px)]'
                     onClick={() => setSelectedOfferDetails(offer)}
                   >
                     <div className={`bg-gradient-to-br ${palette} rounded-2xl p-3.5 text-white shadow-lg relative overflow-hidden h-[104px] md:h-32 flex flex-col justify-between group cursor-pointer hover:shadow-xl transition-all duration-500 hover:-translate-y-0.5`}>
