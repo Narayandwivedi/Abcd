@@ -55,15 +55,15 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       const writeStream = fs.createWriteStream(filePath);
       doc.pipe(writeStream);
 
-      // Add decorative border - Purple theme for vendors
+      // Add decorative border - Professional Navy and Gold theme for vendors
       doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40)
         .lineWidth(3)
-        .strokeColor('#7c3aed')
+        .strokeColor('#1e3a8a')
         .stroke();
 
       doc.rect(30, 30, doc.page.width - 60, doc.page.height - 60)
         .lineWidth(1)
-        .strokeColor('#c4b5fd')
+        .strokeColor('#b45309')
         .stroke();
 
       // Add ABCD logo
@@ -73,26 +73,26 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       }
 
       // Organization name
-      doc.fontSize(12).fillColor('#7c3aed').font('Helvetica-Bold')
+      doc.fontSize(12).fillColor('#1e3a8a').font('Helvetica-Bold')
         .text('Agrawal Business and Community Development (ABCD)', 0, 130, { align: 'center', width: doc.page.width });
 
       // Title
-      doc.fontSize(24).fillColor('#7c3aed').font('Helvetica-Bold')
+      doc.fontSize(24).fillColor('#1e3a8a').font('Helvetica-Bold')
         .text('VENDOR CERTIFICATE', 0, 150, { align: 'center', width: doc.page.width });
 
       // Decorative line
-      doc.moveTo(150, 180).lineTo(doc.page.width - 150, 180).strokeColor('#c4b5fd').lineWidth(2).stroke();
+      doc.moveTo(150, 180).lineTo(doc.page.width - 150, 180).strokeColor('#b45309').lineWidth(2).stroke();
 
       // "This is to certify that"
       doc.fontSize(11).fillColor('#374151').font('Helvetica')
         .text('This is to certify that', 0, 190, { align: 'center', width: doc.page.width });
 
       // Business name
-      doc.fontSize(22).fillColor('#7c3aed').font('Helvetica-Bold')
+      doc.fontSize(22).fillColor('#1e3a8a').font('Helvetica-Bold')
         .text(vendor.businessName.toUpperCase(), 0, 208, { align: 'center', width: doc.page.width });
 
       // Owner name
-      doc.fontSize(11).fillColor('#7c3aed').font('Helvetica-Bold')
+      doc.fontSize(11).fillColor('#1e3a8a').font('Helvetica-Bold')
         .text(`Owner: ${vendor.ownerName}`, 0, 235, { align: 'center', width: doc.page.width });
 
       // Categories (dynamic)
@@ -119,7 +119,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       currentY += 19;
 
       if (vendor.membershipType) {
-        doc.fontSize(12).fillColor('#7c3aed').font('Helvetica-Bold')
+        doc.fontSize(12).fillColor('#b45309').font('Helvetica-Bold')
           .text(`Membership Category: ${String(vendor.membershipType).toUpperCase()}`, 0, currentY, { align: 'center', width: doc.page.width });
         currentY += 20;
       }
@@ -146,7 +146,7 @@ const generateVendorCertificatePDF = async (vendor, existingCertificateNumber = 
       const fixedDisclaimerY = 520;
 
       // HQ Address
-      doc.fontSize(10).fillColor('#7c3aed').font('Helvetica-Bold')
+      doc.fontSize(10).fillColor('#1e3a8a').font('Helvetica-Bold')
         .text('H.Q. Raipur', 0, fixedHqY, { align: 'center', width: doc.page.width });
       doc.fontSize(9).fillColor('#374151').font('Helvetica')
         .text('Hanuman Market, Ramsagar Para, Raipur (CG) 492001', 0, fixedHqY + 14, { align: 'center', width: doc.page.width });

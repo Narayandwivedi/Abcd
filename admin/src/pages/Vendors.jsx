@@ -1025,7 +1025,7 @@ ABCD Team`
                             <div>
                               <div className='font-semibold text-gray-800'>{vendor.businessName}</div>
                               {vendor.activeCertificate?.certificateNumber && (
-                                <div className='text-[10px] text-purple-600 font-bold uppercase'>{vendor.activeCertificate.certificateNumber}</div>
+                                <div className='text-[10px] text-amber-700 font-bold uppercase'>{vendor.activeCertificate.certificateNumber}</div>
                               )}
                               <div className='text-xs text-gray-500'>Owner: {vendor.ownerName}</div>
                               <div className='text-xs text-gray-500'>{vendor.city}, {vendor.state}</div>
@@ -1075,7 +1075,7 @@ ABCD Team`
                                 href={toAbsoluteFileUrl(vendor.activeCertificate.downloadLink)}
                                 target='_blank'
                                 rel='noopener noreferrer'
-                                className='p-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition'
+                                className='p-2 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition'
                                 title='View Certificate'
                               >
                                 <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -1188,7 +1188,7 @@ ABCD Team`
                     <div>
                       <h3 className='font-bold text-gray-900'>{item.businessName}</h3>
                       {item.activeCertificate?.certificateNumber && (
-                        <p className='text-[10px] text-purple-600 font-bold uppercase'>{item.activeCertificate.certificateNumber}</p>
+                        <p className='text-[10px] text-amber-700 font-bold uppercase'>{item.activeCertificate.certificateNumber}</p>
                       )}
                       <p className='text-xs text-gray-500'>{item.ownerName}</p>
                     </div>
@@ -1213,7 +1213,7 @@ ABCD Team`
                           href={toAbsoluteFileUrl(item.activeCertificate.downloadLink)}
                           target='_blank'
                           rel='noopener noreferrer'
-                          className='text-purple-600 text-xs font-bold'
+                          className='text-amber-700 text-xs font-bold'
                         >
                           View Certificate
                         </a>

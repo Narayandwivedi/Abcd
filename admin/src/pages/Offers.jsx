@@ -239,6 +239,21 @@ const Offers = () => {
     setShowVendorDropdown(false)
   }
 
+  // Reset category if not valid for selected vendor
+  useEffect(() => {
+    if (formData.vendorId && formData.categoryId) {
+      const selectedVendor = vendors.find(v => v._id === formData.vendorId)
+      const currentCategory = categories.find(c => c._id === formData.categoryId)
+      
+      if (selectedVendor && currentCategory) {
+        const isValid = selectedVendor.businessCategories?.some(bc => bc.category === currentCategory.name)
+        if (!isValid) {
+          setFormData(prev => ({ ...prev, categoryId: '' }))
+        }
+      }
+    }
+  }, [formData.vendorId, vendors, categories])
+
   const filteredVendors = vendors.filter(vendor =>
     vendor.businessName.toLowerCase().includes(vendorSearchTerm.toLowerCase()) ||
     vendor.ownerName.toLowerCase().includes(vendorSearchTerm.toLowerCase())
@@ -248,6 +263,14 @@ const Offers = () => {
     offer.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     offer.vendorId?.businessName.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  // Filter categories based on selected vendor
+  const availableCategories = formData.vendorId 
+    ? categories.filter(c => {
+        const selectedVendor = vendors.find(v => v._id === formData.vendorId)
+        return selectedVendor?.businessCategories?.some(bc => bc.category === c.name)
+      })
+    : []
 
   return (
     <div className='p-4 md:p-6'>
@@ -374,11 +397,12 @@ const Offers = () => {
                   <select
                     value={formData.categoryId}
                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                    className='w-full px-4 py-2 border rounded-lg outline-none'
+                    className='w-full px-4 py-2 border rounded-lg outline-none disabled:bg-gray-50'
                     required
+                    disabled={!formData.vendorId}
                   >
-                    <option value="">Select Category</option>
-                    {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                    <option value="">{formData.vendorId ? 'Select Category' : 'Please select a vendor first'}</option>
+                    {availableCategories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                   </select>
                 </div>
               </div>
