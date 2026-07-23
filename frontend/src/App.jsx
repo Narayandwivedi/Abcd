@@ -24,6 +24,7 @@ import Vouchers from './pages/Vouchers'
 import VendorDetail from './pages/VendorDetail'
 import SamajCensus from './pages/SamajCensus'
 import FamilyCensus from './pages/FamilyCensus'
+import Census from './pages/Census'
 
 // Scroll to top on every route change
 const ScrollToTop = () => {
@@ -37,7 +38,7 @@ const ScrollToTop = () => {
 const App = () => {
   const location = useLocation()
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
-  const isCensusPage = location.pathname === '/samaj-census' || location.pathname === '/family-census'
+  const isCensusPage = location.pathname === '/census' || location.pathname === '/samaj-census' || location.pathname === '/family-census'
   const isHomePage = location.pathname === '/'
   const getSeoConfig = (pathname) => {
     if (pathname === '/') {
@@ -193,6 +194,14 @@ const App = () => {
       }
     }
 
+    if (pathname === '/census') {
+      return {
+        title: 'Agrawal Samaj Census Portal - ABCD Vyapar',
+        description: 'Participate in the Agrawal Samaj Census. Register your Samaj location or family member data to strengthen our community network.',
+        canonicalPath: '/census',
+      }
+    }
+
     if (pathname === '/forgot-password') {
       return {
         title: 'Forgot Password - ABCD Vyapar',
@@ -251,6 +260,7 @@ const App = () => {
           <Route path='/contact' element={<Contact />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/category/:categorySlug' element={<CategoryPage />} />
+          <Route path='/census' element={<Census />} />
           <Route path='/samaj-census' element={<SamajCensus />} />
           <Route path='/family-census' element={<FamilyCensus />} />
           <Route path='/:type/:id' element={<AdDetail />} />

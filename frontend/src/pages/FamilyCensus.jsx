@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
-import { Users, UserPlus, Trash2 } from 'lucide-react'
+import { Users, UserPlus, Trash2, Eye, Edit3, X, AlertTriangle } from 'lucide-react'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
 
@@ -89,6 +89,15 @@ function SectionCard({ title, children }) {
   )
 }
 
+function PreviewRow({ label, value }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center py-2.5 border-b border-gray-50 last:border-b-0">
+      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider min-w-[160px]">{label}</span>
+      <span className="text-sm text-gray-800 font-medium mt-0.5 sm:mt-0">{value || '—'}</span>
+    </div>
+  )
+}
+
 function getTodayDate() {
   return new Date().toISOString().split('T')[0]
 }
@@ -107,6 +116,8 @@ export default function FamilyCensus() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
+  const [showPreview, setShowPreview] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -147,12 +158,7 @@ export default function FamilyCensus() {
     return errs
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const errs = validate()
-    setErrors(errs)
-    if (Object.keys(errs).length > 0) return
-
+  const submitToApi = async () => {
     setSubmitting(true)
     try {
       await axios.post(`${BACKEND_URL}/api/families`, {
@@ -170,6 +176,7 @@ export default function FamilyCensus() {
           age: m.age ? Number(m.age) : 0,
         })),
       })
+      setShowPreview(false)
       toast.success('Family Registered Successfully!')
       setForm({
         leaderName: '',
@@ -189,6 +196,19 @@ export default function FamilyCensus() {
     }
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const errs = validate()
+    setErrors(errs)
+    if (Object.keys(errs).length > 0) return
+    setShowPreview(true)
+  }
+
+  const handleConfirmSave = async () => {
+    setShowConfirm(false)
+    await submitToApi()
+  }
+
   const handleReset = () => {
     setForm({
       leaderName: '',
@@ -202,6 +222,119 @@ export default function FamilyCensus() {
       members: [],
     })
     setErrors({})
+    setShowPreview(false)
+    setShowConfirm(false)
+  }
+
+  if (showPreview) {
+    return (
+      <>
+        <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+          <div className="max-w-[900px] mx-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
+                <Eye size={20} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Preview Family Details</h1>
+                <p className="text-sm text-gray-500">Please review all information before saving</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5">
+              <SectionCard title="Family Information">
+                <PreviewRow label="Family Leader Name" value={form.leaderName} />
+                <PreviewRow label="Mobile Number" value={form.leaderMobile} />
+                <PreviewRow label="Complete Address" value={form.address} />
+                <PreviewRow label="State" value={form.state} />
+                <PreviewRow label="District" value={form.district} />
+                <PreviewRow label="City" value={form.city} />
+                <PreviewRow label="Pincode" value={form.pincode} />
+                <PreviewRow label="Remarks" value={form.remarks} />
+              </SectionCard>
+
+              <SectionCard title="Family Members">
+                {form.members.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-4">No members added</p>
+                ) : (
+                  form.members.map((member, idx) => (
+                    <div key={idx} className={idx < form.members.length - 1 ? 'border-b border-gray-100 pb-4 mb-4' : ''}>
+                      <p className="text-xs font-bold text-[#C67A2D] uppercase tracking-wider mb-3">Member {idx + 1}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                        <PreviewRow label="Name" value={member.name} />
+                        <PreviewRow label="Relation" value={member.relation} />
+                        <PreviewRow label="Mobile" value={member.mobile} />
+                        <PreviewRow label="Age" value={member.age} />
+                        <PreviewRow label="Gender" value={member.gender} />
+                        <PreviewRow label="Occupation" value={member.occupation} />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </SectionCard>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pb-8">
+              <button
+                type="button"
+                onClick={() => setShowPreview(false)}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-[14px] text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Edit3 size={16} /> Edit Details
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowConfirm(true)}
+                className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/20 hover:shadow-xl hover:shadow-[#C67A2D]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
+              >
+                Save Family
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {showConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
+            <div className="relative bg-white rounded-[20px] shadow-2xl p-8 max-w-md w-full animate-fade-in">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X size={16} className="text-gray-500" />
+              </button>
+              <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto">
+                <AlertTriangle size={28} className="text-amber-500" />
+              </div>
+              <h3 className="text-lg font-bold text-[#4A3520] text-center mt-4">Confirm Save</h3>
+              <p className="text-sm text-gray-500 text-center mt-2 leading-relaxed">
+                Are you sure you want to save this Family data? Please verify all details before confirming.
+              </p>
+              <div className="flex gap-3 mt-8">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(false)}
+                  className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-all duration-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmSave}
+                  disabled={submitting}
+                  className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] hover:shadow-lg hover:shadow-[#C67A2D]/25 transition-all duration-200 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {submitting ? (
+                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
+                  ) : 'Yes, Save'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    )
   }
 
   return (
@@ -420,12 +553,9 @@ export default function FamilyCensus() {
             </button>
             <button
               type="submit"
-              disabled={submitting}
-              className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/20 hover:shadow-xl hover:shadow-[#C67A2D]/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:hover:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/20 hover:shadow-xl hover:shadow-[#C67A2D]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
             >
-              {submitting ? (
-                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
-              ) : 'Save Family'}
+              <Eye size={18} /> Preview & Save
             </button>
           </div>
         </form>
