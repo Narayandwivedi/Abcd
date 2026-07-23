@@ -563,7 +563,7 @@ export default function SamajCensus() {
               <button
                 type="button"
                 onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                className="w-full flex items-center justify-between px-6 sm:px-8 py-4 bg-gradient-to-r from-[#FFF8F0] to-white cursor-pointer transition-colors"
+                className="w-full flex items-center justify-between px-6 sm:px-8 py-4 bg-white cursor-pointer transition-colors"
               >
                 <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
                 <ChevronDown
