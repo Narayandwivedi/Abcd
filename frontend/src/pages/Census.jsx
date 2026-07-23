@@ -18,9 +18,9 @@ export default function Census() {
               to="/samaj-census"
               className="block w-full"
             >
-              <div className="bg-[#F97316] text-white px-6 py-5 rounded-xl font-semibold text-center text-lg hover:bg-[#EA580C] active:bg-[#D2450A]">
+          <div className="bg-[#F97316] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center hover:bg-[#EA580C] active:bg-[#D2450A]">
                 <p className="leading-tight">Submit New Agrawal Samaj Branch</p>
-                <p className="text-xs font-medium mt-1 opacity-80">नया अग्रवाल समाज शाखा पंजीकृत करें</p>
+                <p className="text-xs font-medium mt-1">नया अग्रवाल समाज शाखा पंजीकृत करें</p>
               </div>
             </Link>
 
@@ -28,14 +28,14 @@ export default function Census() {
               to="/family-census"
               className="block w-full"
             >
-              <div className="bg-[#2563EB] text-white px-6 py-5 rounded-xl font-semibold text-center text-lg hover:bg-[#1D4ED8] active:bg-[#1E40AF]">
+              <div className="bg-[#2563EB] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center hover:bg-[#1D4ED8] active:bg-[#1E40AF]">
                 <p className="leading-tight">Submit New Family Member Data</p>
-                <p className="text-xs font-medium mt-1 opacity-80">नया परिवार सदस्य डेटा पंजीकृत करें</p>
+                <p className="text-xs font-medium mt-1">नया परिवार सदस्य डेटा पंजीकृत करें</p>
               </div>
             </Link>
           </div>
 
-          <div className="mt-16 sm:mt-20 max-w-3xl mx-auto">
+          <div className="mt-8 sm:mt-12 max-w-3xl mx-auto">
             <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-8 sm:p-10">
               <div className="absolute -top-4 left-8">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
@@ -48,7 +48,7 @@ export default function Census() {
                   <span className="hidden md:inline">Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.</span>
                 </p>
 
-                <div className="mt-6 pt-6 border-t border-gray-100">
+                <div className="mt-1 pt-2 border-t border-gray-100">
                   <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agarwal</p>
                   <p className="text-sm text-gray-500">Chairman, ABCD</p>
                   <a
