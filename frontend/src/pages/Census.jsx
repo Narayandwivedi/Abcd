@@ -18,7 +18,7 @@ export default function Census() {
               to="/samaj-census"
               className="block w-full"
             >
-              <div className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center">
+          <div className="bg-[#F97316] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center hover:bg-[#EA580C] active:bg-[#D2450A]">
                 <p className="leading-tight">Submit New Agrawal Samaj Branch</p>
                 <p className="text-xs font-medium mt-1">नया अग्रवाल समाज शाखा पंजीकृत करें</p>
               </div>
@@ -28,7 +28,7 @@ export default function Census() {
               to="/family-census"
               className="block w-full"
             >
-              <div className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center">
+              <div className="bg-[#2563EB] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center hover:bg-[#1D4ED8] active:bg-[#1E40AF]">
                 <p className="leading-tight">Submit New Family Member Data</p>
                 <p className="text-xs font-medium mt-1">नया परिवार सदस्य डेटा पंजीकृत करें</p>
               </div>
