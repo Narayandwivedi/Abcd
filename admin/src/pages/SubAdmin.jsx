@@ -47,10 +47,6 @@ const SubAdmin = () => {
       canReplyChats: false,
       canViewSettings: false,
       canEditSettings: false,
-      canViewSubAdmins: false,
-      canCreateSubAdmins: false,
-      canEditSubAdmins: false,
-      canDeleteSubAdmins: false,
       canViewCategories: false,
       canCreateCategories: false,
       canEditCategories: false,
@@ -137,10 +133,6 @@ const SubAdmin = () => {
         canReplyChats: false,
         canViewSettings: false,
         canEditSettings: false,
-        canViewSubAdmins: false,
-        canCreateSubAdmins: false,
-        canEditSubAdmins: false,
-        canDeleteSubAdmins: false,
         canViewCategories: false,
         canCreateCategories: false,
         canEditCategories: false,
@@ -424,12 +416,7 @@ const SubAdmin = () => {
       { key: 'canApproveSellLeads', label: 'Approve Sell Leads' },
       { key: 'canDeleteSellLeads', label: 'Delete Sell Leads' }
     ],
-    'Sub Admin Management': [
-      { key: 'canViewSubAdmins', label: 'View Sub Admins' },
-      { key: 'canCreateSubAdmins', label: 'Create Sub Admins' },
-      { key: 'canEditSubAdmins', label: 'Edit Sub Admins' },
-      { key: 'canDeleteSubAdmins', label: 'Delete Sub Admins' }
-    ]
+
   }
 
   return (
