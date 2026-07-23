@@ -6,7 +6,7 @@ export default function Census() {
     <>
       <img src="/census.avif" alt="" className="w-full h-auto min-h-[21vh] md:min-h-0 object-cover md:object-contain" />
 
-      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 pt-6 pb-12 sm:py-16 lg:py-20">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Choose an Option</h2>
