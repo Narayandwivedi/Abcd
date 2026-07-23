@@ -61,8 +61,8 @@ const Footer = () => {
             </div>
 
             <Link to='/census' className='block mt-4'>
-              <div className='relative bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white px-5 py-3 rounded-xl font-bold text-center shadow-lg shadow-[#C67A2D]/30 animate-pulse hover:scale-[1.02] transition-transform'>
-                <p className='text-base font-extrabold'>Agrawal Samaj Census</p>
+              <div className='relative bg-gradient-to-r from-emerald-500 to-teal-700 text-white px-3 py-2 text-xs md:px-5 md:py-3 md:text-base rounded-xl font-bold text-center shadow-lg shadow-emerald-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                <p className='font-extrabold'>Agrawal Samaj Census</p>
               </div>
             </Link>
 
