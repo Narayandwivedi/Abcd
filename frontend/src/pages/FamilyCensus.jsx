@@ -3,7 +3,7 @@ import { toast } from 'react-toastify'
 import axios from 'axios'
 import { Users, UserPlus, Trash2, Eye, Edit3, X, AlertTriangle } from 'lucide-react'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
 const RELATION_OPTIONS = [
   'Self', 'Husband', 'Wife', 'Son', 'Daughter', 'Father', 'Mother',
