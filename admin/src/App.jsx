@@ -22,6 +22,8 @@ import Cities from './pages/Cities'
 import Ads from './pages/Ads'
 import Offers from './pages/Offers'
 import WhatsAppSessions from './pages/WhatsAppSessions'
+import AdminSamajCensus from './pages/AdminSamajCensus'
+import AdminFamilyCensus from './pages/AdminFamilyCensus'
 import { useAdminAuth } from './context/AdminAuthContext'
 
 function AdminLayout({ children }) {
@@ -206,6 +208,26 @@ function AppRoutes() {
           <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <Offers />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/samaj-census'
+        element={
+          <ProtectedRoute requiredPermission='canManageContent'>
+            <AdminLayout>
+              <AdminSamajCensus />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/family-census'
+        element={
+          <ProtectedRoute requiredPermission='canManageContent'>
+            <AdminLayout>
+              <AdminFamilyCensus />
             </AdminLayout>
           </ProtectedRoute>
         }

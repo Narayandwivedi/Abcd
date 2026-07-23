@@ -95,6 +95,20 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     //   description: 'Payment Management'
     // },
     {
+      name: 'Samaj Census',
+      icon: '🏛️',
+      path: '/samaj-census',
+      description: 'Manage Samaj Records',
+      requiredPermission: 'canManageContent'
+    },
+    {
+      name: 'Family Census',
+      icon: '👨‍👩‍👧‍👦',
+      path: '/family-census',
+      description: 'Manage Family Records',
+      requiredPermission: 'canManageContent'
+    },
+    {
       name: 'Reports',
       icon: '📈',
       path: '/reports',

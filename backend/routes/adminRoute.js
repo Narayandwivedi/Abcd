@@ -66,6 +66,12 @@ router.patch("/blogs/:blogId/publish", adminAuth, checkPermission('canPublishBlo
 router.patch("/blogs/:blogId/unpublish", adminAuth, checkPermission('canPublishBlogs'), unpublishBlog);
 router.patch("/blogs/:blogId/toggle-featured", adminAuth, checkPermission('canEditBlogs'), toggleFeatured);
 
+// Samaj Census management routes
+const { getAllSamajAdmin, getSamajByIdAdmin, updateSamajAdmin, deleteSamajAdmin, toggleSamajStatus } = require("../controllers/adminSamajController");
+
+// Family Census management routes
+const { getAllFamiliesAdmin, getFamilyByIdAdmin, updateFamilyAdmin, deleteFamilyAdmin, toggleFamilyStatus } = require("../controllers/adminFamilyController");
+
 // Offer management routes
 const { getAllOffers, createOffer, updateOffer, deleteOffer, toggleOfferStatus } = require("../controllers/adminOfferController");
 router.get("/offers", adminAuth, checkPermission('canManageContent'), getAllOffers);
@@ -73,5 +79,19 @@ router.post("/offers", adminAuth, checkPermission('canManageContent'), upload.si
 router.put("/offers/:offerId", adminAuth, checkPermission('canManageContent'), upload.single('offerImage'), updateOffer);
 router.delete("/offers/:offerId", adminAuth, checkPermission('canManageContent'), deleteOffer);
 router.patch("/offers/:offerId/toggle-status", adminAuth, checkPermission('canManageContent'), toggleOfferStatus);
+
+// Samaj Census routes
+router.get("/samaj-census", adminAuth, checkPermission('canManageContent'), getAllSamajAdmin);
+router.get("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), getSamajByIdAdmin);
+router.put("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), updateSamajAdmin);
+router.delete("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), deleteSamajAdmin);
+router.patch("/samaj-census/:id/toggle-status", adminAuth, checkPermission('canManageContent'), toggleSamajStatus);
+
+// Family Census routes
+router.get("/family-census", adminAuth, checkPermission('canManageContent'), getAllFamiliesAdmin);
+router.get("/family-census/:id", adminAuth, checkPermission('canManageContent'), getFamilyByIdAdmin);
+router.put("/family-census/:id", adminAuth, checkPermission('canManageContent'), updateFamilyAdmin);
+router.delete("/family-census/:id", adminAuth, checkPermission('canManageContent'), deleteFamilyAdmin);
+router.patch("/family-census/:id/toggle-status", adminAuth, checkPermission('canManageContent'), toggleFamilyStatus);
 
 module.exports = router;
