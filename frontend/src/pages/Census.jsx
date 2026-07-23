@@ -11,9 +11,6 @@ export default function Census() {
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Choose an Option</h2>
             <div className="mx-auto mt-3 w-16 h-1 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
-            <p className="mt-4 text-gray-500 text-sm sm:text-base">
-              Select the type of census registration you'd like to complete
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
@@ -50,7 +47,7 @@ export default function Census() {
                   record of the Agrawal community for future generations."
                 </p>
                 <div className="mt-6 pt-6 border-t border-gray-100">
-                  <p className="text-base font-bold text-[#4A3520]">Quotsy - Lalit Kumar Agarwal</p>
+                  <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agarwal</p>
                   <p className="text-sm text-gray-500">Chairman, ABCD</p>
                   <a
                     href="tel:7000484146"
