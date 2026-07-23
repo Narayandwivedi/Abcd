@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { Users, UserPlus, Trash2 } from 'lucide-react'
@@ -95,6 +95,7 @@ function getTodayDate() {
 
 export default function FamilyCensus() {
   const [form, setForm] = useState({
+    samaj: '',
     leaderName: '',
     leaderMobile: '',
     address: '',
@@ -105,8 +106,15 @@ export default function FamilyCensus() {
     remarks: '',
     members: [],
   })
+  const [samajList, setSamajList] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/api/samaj`)
+      .then((res) => setSamajList(res.data.data || []))
+      .catch(() => toast.error('Failed to load Samaj list'))
+  }, [])
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -156,6 +164,7 @@ export default function FamilyCensus() {
     setSubmitting(true)
     try {
       await axios.post(`${BACKEND_URL}/api/families`, {
+        samaj: form.samaj || null,
         leaderName: form.leaderName,
         leaderMobile: form.leaderMobile,
         address: form.address,
@@ -172,6 +181,7 @@ export default function FamilyCensus() {
       })
       toast.success('Family Registered Successfully!')
       setForm({
+        samaj: '',
         leaderName: '',
         leaderMobile: '',
         address: '',
@@ -191,6 +201,7 @@ export default function FamilyCensus() {
 
   const handleReset = () => {
     setForm({
+      samaj: '',
       leaderName: '',
       leaderMobile: '',
       address: '',
@@ -241,6 +252,19 @@ export default function FamilyCensus() {
                   onChange={(e) => handleChange('leaderMobile', e.target.value)}
                   placeholder="Enter Mobile Number"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <Select
+                  label="Samaj"
+                  value={form.samaj}
+                  onChange={(e) => handleChange('samaj', e.target.value)}
+                >
+                  <option value="">-- Select Samaj --</option>
+                  {samajList.map((s) => (
+                    <option key={s._id} value={s._id}>{s.samajName}</option>
+                  ))}
+                </Select>
               </div>
 
               <Textarea
