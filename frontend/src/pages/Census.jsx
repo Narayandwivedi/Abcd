@@ -41,11 +41,11 @@ export default function Census() {
                 </div>
               </div>
               <div className="pl-2">
-                <p className="text-lg sm:text-xl text-gray-700 italic leading-relaxed font-medium">
-                  "This census is a crucial step toward documenting and strengthening our community.
-                  Every Samaj and every family counts. Let's come together and build a comprehensive
-                  record of the Agrawal community for future generations."
+                <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-2">
+                  <span className="md:hidden">Participate in the census to preserve our community heritage.</span>
+                  <span className="hidden md:inline">Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.</span>
                 </p>
+
                 <div className="mt-6 pt-6 border-t border-gray-100">
                   <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agarwal</p>
                   <p className="text-sm text-gray-500">Chairman, ABCD</p>
