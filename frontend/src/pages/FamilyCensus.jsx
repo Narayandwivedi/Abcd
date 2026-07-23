@@ -19,17 +19,7 @@ const emptyMember = () => ({
   occupation: '',
 })
 
-const INDIAN_STATES = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
-  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
-  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
-  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
-  'Andaman & Nicobar', 'Chandigarh', 'Dadra & Nagar Haveli',
-  'Daman & Diu', 'Delhi', 'Jammu & Kashmir', 'Ladakh',
-  'Lakshadweep', 'Puducherry',
-]
+
 
 function Input({ label, required, error, className, ...props }) {
   return (
@@ -108,8 +98,6 @@ export default function FamilyCensus() {
     leaderName: '',
     leaderMobile: '',
     address: '',
-    state: '',
-    district: '',
     city: '',
     pincode: '',
     remarks: '',
@@ -160,8 +148,6 @@ export default function FamilyCensus() {
     if (!form.leaderName.trim()) errs.leaderName = 'Family Leader Name Is Required'
     if (!form.leaderMobile.trim()) errs.leaderMobile = 'Mobile Number Is Required'
     if (!form.address.trim()) errs.address = 'Address Is Required'
-    if (!form.state) errs.state = 'State Is Required'
-    if (!form.district.trim()) errs.district = 'District Is Required'
     if (!form.city.trim()) errs.city = 'City Is Required'
     return errs
   }
@@ -174,8 +160,6 @@ export default function FamilyCensus() {
         leaderName: form.leaderName,
         leaderMobile: form.leaderMobile,
         address: form.address,
-        state: form.state,
-        district: form.district,
         city: form.city,
         pincode: form.pincode,
         remarks: form.remarks,
@@ -192,8 +176,6 @@ export default function FamilyCensus() {
         leaderName: '',
         leaderMobile: '',
         address: '',
-        state: '',
-        district: '',
         city: '',
         pincode: '',
         remarks: '',
@@ -225,9 +207,7 @@ export default function FamilyCensus() {
       leaderName: '',
       leaderMobile: '',
       address: '',
-      state: '',
-      district: '',
-      city: '',
+        city: '',
       pincode: '',
       remarks: '',
       members: [],
@@ -257,8 +237,6 @@ export default function FamilyCensus() {
                 <PreviewRow label="Family Leader Name" value={form.leaderName} />
                 <PreviewRow label="Mobile Number" value={form.leaderMobile} />
                 <PreviewRow label="Complete Address" value={form.address} />
-                <PreviewRow label="State" value={form.state} />
-                <PreviewRow label="District" value={form.district} />
                 <PreviewRow label="City" value={form.city} />
                 <PreviewRow label="Pincode" value={form.pincode} />
                 <PreviewRow label="Remarks" value={form.remarks} />
@@ -367,7 +345,7 @@ export default function FamilyCensus() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
           <SectionCard title="Family Information">
             <div className="flex flex-col gap-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 <Input
                   label="Family Leader Name"
                   required
@@ -385,9 +363,6 @@ export default function FamilyCensus() {
                   onChange={(e) => handleChange('leaderMobile', e.target.value)}
                   placeholder="Enter Mobile Number"
                 />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Select
                   label="Samaj"
                   value={form.samaj}
@@ -400,35 +375,20 @@ export default function FamilyCensus() {
                 </Select>
               </div>
 
-              <Textarea
-                label="Complete Address"
-                required
-                error={errors.address}
-                value={form.address}
-                onChange={(e) => handleChange('address', e.target.value)}
-                placeholder="Enter Complete Address"
-              />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <Select
-                  label="State"
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <Textarea
+                  label="Complete Address"
                   required
-                  error={errors.state}
-                  value={form.state}
-                  onChange={(e) => handleChange('state', e.target.value)}
-                >
-                  <option value="">-- Select State --</option>
-                  {INDIAN_STATES.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </Select>
+                  error={errors.address}
+                  value={form.address}
+                  onChange={(e) => handleChange('address', e.target.value)}
+                  placeholder="Enter Complete Address"
+                />
                 <Input
-                  label="District"
-                  required
-                  error={errors.district}
-                  value={form.district}
-                  onChange={(e) => handleChange('district', e.target.value)}
-                  placeholder="Enter District"
+                  label="Pincode"
+                  value={form.pincode}
+                  onChange={(e) => handleChange('pincode', e.target.value)}
+                  placeholder="Enter Pincode"
                 />
                 <Input
                   label="City"
@@ -437,12 +397,6 @@ export default function FamilyCensus() {
                   value={form.city}
                   onChange={(e) => handleChange('city', e.target.value)}
                   placeholder="Enter City"
-                />
-                <Input
-                  label="Pincode"
-                  value={form.pincode}
-                  onChange={(e) => handleChange('pincode', e.target.value)}
-                  placeholder="Enter Pincode"
                 />
               </div>
 

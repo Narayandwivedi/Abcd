@@ -6,14 +6,11 @@ export default function Census() {
     <>
       <img src="/census.avif" alt="" className="w-full h-auto min-h-[21vh] md:min-h-0 object-cover md:object-contain" />
 
-      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 pt-6 pb-12 sm:py-16 lg:py-20">
         <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-6 md:mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Choose an Option</h2>
             <div className="mx-auto mt-3 w-16 h-1 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
-            <p className="mt-4 text-gray-500 text-sm sm:text-base">
-              Select the type of census registration you'd like to complete
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
@@ -22,7 +19,8 @@ export default function Census() {
               className="block w-full"
             >
               <div className="bg-[#F97316] text-white px-6 py-5 rounded-xl font-semibold text-center text-lg hover:bg-[#EA580C] active:bg-[#D2450A]">
-                Submit New Agrawal Samaj Location
+                <p className="leading-tight">Submit New Agrawal Samaj Branch</p>
+                <p className="text-xs font-medium mt-1 opacity-80">नया अग्रवाल समाज शाखा पंजीकृत करें</p>
               </div>
             </Link>
 
@@ -31,7 +29,8 @@ export default function Census() {
               className="block w-full"
             >
               <div className="bg-[#2563EB] text-white px-6 py-5 rounded-xl font-semibold text-center text-lg hover:bg-[#1D4ED8] active:bg-[#1E40AF]">
-                Submit New Family Member Data
+                <p className="leading-tight">Submit New Family Member Data</p>
+                <p className="text-xs font-medium mt-1 opacity-80">नया परिवार सदस्य डेटा पंजीकृत करें</p>
               </div>
             </Link>
           </div>
@@ -44,13 +43,13 @@ export default function Census() {
                 </div>
               </div>
               <div className="pl-2">
-                <p className="text-lg sm:text-xl text-gray-700 italic leading-relaxed font-medium">
-                  "This census is a crucial step toward documenting and strengthening our community.
-                  Every Samaj and every family counts. Let's come together and build a comprehensive
-                  record of the Agrawal community for future generations."
+                <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-2">
+                  <span className="md:hidden">Participate in the census to preserve our community heritage.</span>
+                  <span className="hidden md:inline">Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.</span>
                 </p>
+
                 <div className="mt-6 pt-6 border-t border-gray-100">
-                  <p className="text-base font-bold text-[#4A3520]">Quotsy - Lalit Kumar Agarwal</p>
+                  <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agarwal</p>
                   <p className="text-sm text-gray-500">Chairman, ABCD</p>
                   <a
                     href="tel:7000484146"

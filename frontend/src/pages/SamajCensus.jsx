@@ -35,13 +35,13 @@ const titleCase = (str) => {
 
 function Input({ label, required, className, ...props }) {
   return (
-    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
-      <span className="text-gray-700 text-sm font-semibold">
+    <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0">
+      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
       <input
         {...props}
-        className={`w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white ${className || ''}`}
+        className={`w-full px-2.5 py-2 sm:px-3.5 sm:py-2.5 border border-gray-200 rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white ${className || ''}`}
       />
     </label>
   )
@@ -119,6 +119,7 @@ export default function SamajCensus() {
   const [cityLoading, setCityLoading] = useState(true)
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const [additionalInfoOpen, setAdditionalInfoOpen] = useState(false)
   const cityRef = useRef(null)
   const cityInputRef = useRef(null)
 
@@ -180,7 +181,6 @@ export default function SamajCensus() {
 
   const validate = () => {
     if (!form.samajName.trim()) { toast.error('Samaj Name Is Required.'); return false }
-    if (!form.officeAddress.trim()) { toast.error('Office Address Is Required.'); return false }
     if (!form.mobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
     if (!form.city.trim()) { toast.error('City Is Required.'); return false }
     if (!form.submittedBy.trim()) { toast.error('Submitted By Name Is Required.'); return false }
@@ -395,24 +395,16 @@ export default function SamajCensus() {
             <SectionHeader icon="🏛️" title="Samaj Information" />
             <SectionCard title="Basic Details">
               <div className="flex flex-col gap-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Samaj Name" />
-                  <Input label="Samaj Mobile Number" required value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter Mobile Number" />
-                </div>
-                <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
-              </div>
-            </SectionCard>
-
-            <div className="mt-5">
-              <SectionCard title="Location Details">
-                <div className="flex flex-col gap-5">
-                  <div className="relative" ref={cityRef}>
-                    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
-                      <span className="text-gray-700 text-sm font-semibold">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
+                  <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
+                  <Input label="Samaj Mobile" required value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter Mobile" />
+                  <div className="relative min-w-0" ref={cityRef}>
+                    <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm">
+                      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
                         City <span className="text-red-500">*</span>
                       </span>
                       <div className="relative">
-                        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                        <Search size={14} className="absolute left-2 sm:left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                         <input
                           ref={cityInputRef}
                           value={form.city && !cityDropdownOpen ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : citySearch}
@@ -446,11 +438,11 @@ export default function SamajCensus() {
                             }
                           }}
                           placeholder="Select City"
-                          className="w-full pl-9 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white"
+                          className="w-full pl-7 sm:pl-9 pr-8 sm:pr-10 px-2.5 py-2 sm:px-3.5 sm:py-2.5 border border-gray-200 rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white"
                         />
                         <ChevronDown
-                          size={18}
-                          className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer transition-transform duration-200 ${cityDropdownOpen ? 'rotate-180' : ''}`}
+                          size={16}
+                          className={`absolute right-2 sm:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer transition-transform duration-200 ${cityDropdownOpen ? 'rotate-180' : ''}`}
                           onClick={() => {
                             if (!cityDropdownOpen) {
                               const formatted = form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''
@@ -513,30 +505,18 @@ export default function SamajCensus() {
                       </div>
                     )}
                   </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                    <div className="lg:col-span-2">
-                      <Textarea label="Samaj Office Address" required value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
-                    </div>
-                    <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
-                  </div>
                 </div>
-              </SectionCard>
-            </div>
+              </div>
+            </SectionCard>
           </div>
 
           <div>
             <SectionHeader icon="👤" title="Samaj Head / Contact Person" />
             <SectionCard title="Contact Person Details">
               <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-400">
-                    {form.contactPersons.length} contact person{form.contactPersons.length !== 1 ? 's' : ''}
-                  </span>
-                  <button type="button" onClick={addContactPerson} className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20">
-                    <UserPlus size={14} /> Add More Heads
-                  </button>
-                </div>
+                <span className="text-xs text-gray-400">
+                  {form.contactPersons.length} contact person{form.contactPersons.length !== 1 ? 's' : ''}
+                </span>
 
                 {form.contactPersons.map((cp, idx) => (
                   <div key={idx} className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-sm animate-fade-in">
@@ -564,25 +544,50 @@ export default function SamajCensus() {
                         <Input label="Email Address" type="email" value={cp.email} onChange={(e) => handleContactPersonChange(idx, 'email', e.target.value)} placeholder="Enter email address" />
                         <Input label="Alternate Mobile" value={cp.alternateMobile} onChange={(e) => handleContactPersonChange(idx, 'alternateMobile', e.target.value)} placeholder="Enter alternate mobile (Optional)" />
                       </div>
-                      {idx === 0 && (
-                        <div className="flex items-center justify-end gap-1.5 mt-2">
-                          <button type="button" onClick={addContactPerson} className="hidden lg:flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20">
-                            <UserPlus size={14} /> Add More Heads
-                          </button>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
+
+                <div className="flex items-center justify-end mt-2">
+                  <button type="button" onClick={addContactPerson} className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20">
+                    <UserPlus size={15} /> Add More Heads
+                  </button>
+                </div>
               </div>
             </SectionCard>
           </div>
 
           <div>
-            <SectionHeader icon="📋" title="Additional Information" />
-            <SectionCard title="Remarks">
-              <Textarea label="Remarks" value={form.remarks} onChange={handleChange} name="remarks" placeholder="Enter Any Additional Remarks Or Notes..." />
-            </SectionCard>
+            <SectionHeader icon="📋" title="Additional Information (Optional)" />
+            <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
+                className="w-full flex items-center justify-between px-6 sm:px-8 py-4 bg-gradient-to-r from-[#FFF8F0] to-white cursor-pointer transition-colors"
+              >
+                <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
+                <ChevronDown
+                  size={20}
+                  className={`text-[#C67A2D] transition-transform duration-300 ${additionalInfoOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+              <div
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="p-6 sm:p-8 flex flex-col gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
+                    <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Textarea label="Samaj Office Address" value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
+                    <Textarea label="Remarks" value={form.remarks} onChange={handleChange} name="remarks" placeholder="Enter Any Additional Remarks Or Notes..." />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
