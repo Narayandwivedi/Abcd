@@ -8,7 +8,7 @@ export default function Census() {
 
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 pt-6 pb-12 sm:py-16 lg:py-20">
         <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-6 md:mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Choose an Option</h2>
             <div className="mx-auto mt-3 w-16 h-1 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
           </div>
