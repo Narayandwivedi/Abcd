@@ -35,7 +35,7 @@ export default function Census() {
             </Link>
           </div>
 
-          <div className="mt-16 sm:mt-20 max-w-3xl mx-auto">
+          <div className="mt-8 sm:mt-12 max-w-3xl mx-auto">
             <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-8 sm:p-10">
               <div className="absolute -top-4 left-8">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
