@@ -395,7 +395,7 @@ export default function SamajCensus() {
             <SectionHeader icon="🏛️" title="Samaj Information" />
             <SectionCard title="Basic Details">
               <div className="flex flex-col gap-5">
-                <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
                   <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
                   <Input label="Samaj Mobile" required value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter Mobile" />
                   <div className="relative min-w-0" ref={cityRef}>
@@ -563,7 +563,7 @@ export default function SamajCensus() {
               <button
                 type="button"
                 onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                className="w-full flex items-center justify-between px-6 sm:px-8 py-4 bg-gradient-to-r from-[#FFF8F0] to-white cursor-pointer transition-colors"
+                className="w-full flex items-center justify-between px-6 sm:px-8 py-4 bg-white cursor-pointer transition-colors"
               >
                 <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
                 <ChevronDown
