@@ -4,7 +4,7 @@ import { Quote } from 'lucide-react'
 export default function Census() {
   return (
     <>
-      <img src="/census.avif" alt="" className="w-full h-auto min-h-[23vh] md:min-h-0 object-cover md:object-contain" />
+      <img src="/census.avif" alt="" className="w-full h-auto min-h-[21vh] md:min-h-0 object-cover md:object-contain" />
 
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
         <div className="max-w-[1200px] mx-auto">
