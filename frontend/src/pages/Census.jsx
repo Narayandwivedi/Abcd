@@ -13,7 +13,7 @@ export default function Census() {
             <div className="mx-auto mt-3 w-16 h-1 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-8">
             <Link
               to="/samaj-census"
               className="block w-full"
