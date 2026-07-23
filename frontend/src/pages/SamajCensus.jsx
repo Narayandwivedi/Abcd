@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
-import { UserPlus, Trash2, Eye, Edit3, X, AlertTriangle } from 'lucide-react'
+import { UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, Search, ChevronDown } from 'lucide-react'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
 
@@ -18,14 +18,19 @@ const emptyForm = {
   officeAddress: '',
   mobile: '',
   email: '',
-  state: '',
-  district: '',
   city: '',
+  district: '',
+  state: '',
   pincode: '',
   contactPersons: [{ name: '', designation: '', mobile: '', email: '', alternateMobile: '' }],
   remarks: '',
   submittedBy: '',
   submittedByMobile: '',
+}
+
+const titleCase = (str) => {
+  if (!str) return ''
+  return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 }
 
 function Input({ label, required, className, ...props }) {
@@ -103,34 +108,54 @@ function PreviewRow({ label, value }) {
   )
 }
 
-const INDIAN_STATES = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
-  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
-  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
-  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
-  'Andaman & Nicobar', 'Chandigarh', 'Dadra & Nagar Haveli',
-  'Daman & Diu', 'Delhi', 'Jammu & Kashmir', 'Ladakh',
-  'Lakshadweep', 'Puducherry',
-]
-
 export default function SamajCensus() {
   const [form, setForm] = useState({ ...emptyForm, contactPersons: [emptyContactPerson()] })
   const [submitting, setSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [cityList, setCityList] = useState([])
+  const [citySearch, setCitySearch] = useState('')
+  const [cityLoading, setCityLoading] = useState(true)
+  const [cityDropdownOpen, setCityDropdownOpen] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const cityRef = useRef(null)
+  const cityInputRef = useRef(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/api/cities?limit=1000`)
+      .then((res) => {
+        if (res.data.success) {
+          setCityList(res.data.data)
+        }
+        setCityLoading(false)
+      })
+      .catch(() => {
+        toast.error('Failed to load cities')
+        setCityLoading(false)
+      })
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (cityRef.current && !cityRef.current.contains(e.target)) {
+        setCityDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const handleReset = () => {
     setForm({ ...emptyForm, contactPersons: [emptyContactPerson()] })
     setShowPreview(false)
     setShowConfirm(false)
+    setCitySearch('')
   }
 
   const handleContactPersonChange = (index, field, value) => {
@@ -157,8 +182,6 @@ export default function SamajCensus() {
     if (!form.samajName.trim()) { toast.error('Samaj Name Is Required.'); return false }
     if (!form.officeAddress.trim()) { toast.error('Office Address Is Required.'); return false }
     if (!form.mobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
-    if (!form.state.trim()) { toast.error('State Is Required.'); return false }
-    if (!form.district.trim()) { toast.error('District Is Required.'); return false }
     if (!form.city.trim()) { toast.error('City Is Required.'); return false }
     if (!form.submittedBy.trim()) { toast.error('Submitted By Name Is Required.'); return false }
     if (!form.submittedByMobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
@@ -264,9 +287,7 @@ export default function SamajCensus() {
               </SectionCard>
 
               <SectionCard title="Location Details">
-                <PreviewRow label="State" value={form.state} />
-                <PreviewRow label="District" value={form.district} />
-                <PreviewRow label="City" value={form.city} />
+                <PreviewRow label="City" value={form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''} />
                 <PreviewRow label="Pincode" value={form.pincode} />
               </SectionCard>
 
@@ -304,7 +325,7 @@ export default function SamajCensus() {
               <button
                 type="button"
                 onClick={() => setShowConfirm(true)}
-                className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/20 hover:shadow-xl hover:shadow-[#C67A2D]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
               >
                 Save Samaj
               </button>
@@ -342,7 +363,7 @@ export default function SamajCensus() {
                   type="button"
                   onClick={handleConfirmSave}
                   disabled={submitting}
-                  className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] hover:shadow-lg hover:shadow-[#C67A2D]/25 transition-all duration-200 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] transition-all duration-200 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
@@ -378,25 +399,127 @@ export default function SamajCensus() {
                   <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Samaj Name" />
                   <Input label="Samaj Mobile Number" required value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter Mobile Number" />
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                  <Textarea label="Samaj Office Address" required value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
-                  <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
-                </div>
+                <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
               </div>
             </SectionCard>
 
             <div className="mt-5">
               <SectionCard title="Location Details">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <Select label="State" required value={form.state} onChange={handleChange} name="state">
-                    <option value="">-- Select State --</option>
-                    {INDIAN_STATES.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </Select>
-                  <Input label="District" required value={form.district} onChange={handleChange} name="district" placeholder="Enter District" />
-                  <Input label="City" required value={form.city} onChange={handleChange} name="city" placeholder="Enter City" />
-                  <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
+                <div className="flex flex-col gap-5">
+                  <div className="relative" ref={cityRef}>
+                    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
+                      <span className="text-gray-700 text-sm font-semibold">
+                        City <span className="text-red-500">*</span>
+                      </span>
+                      <div className="relative">
+                        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                        <input
+                          ref={cityInputRef}
+                          value={form.city && !cityDropdownOpen ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : citySearch}
+                          onChange={(e) => { setCitySearch(e.target.value); setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city) setForm((prev) => ({ ...prev, city: '', district: '', state: '' })) }}
+                          onFocus={() => { setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city && !citySearch) setCitySearch(`${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}`) }}
+                          onKeyDown={(e) => {
+                            const filtered = cityList.filter((c) => {
+                              if (!citySearch) return true
+                              const currentDisplay = form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''
+                              if (citySearch === currentDisplay) return true
+                              const q = citySearch.toLowerCase()
+                              return c.city.toLowerCase().includes(q) || c.district.toLowerCase().includes(q) || c.state.toLowerCase().includes(q)
+                            })
+                            const visible = filtered.slice(0, 50)
+                            if (e.key === 'ArrowDown') {
+                              e.preventDefault()
+                              setHighlightedIndex((prev) => (prev < visible.length - 1 ? prev + 1 : prev))
+                            } else if (e.key === 'ArrowUp') {
+                              e.preventDefault()
+                              setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1))
+                            } else if (e.key === 'Enter' && highlightedIndex >= 0 && visible[highlightedIndex]) {
+                              e.preventDefault()
+                              const c = visible[highlightedIndex]
+                              setForm((prev) => ({ ...prev, city: titleCase(c.city), district: titleCase(c.district), state: titleCase(c.state) }))
+                              setCitySearch('')
+                              setCityDropdownOpen(false)
+                              setHighlightedIndex(-1)
+                            } else if (e.key === 'Escape') {
+                              setCityDropdownOpen(false)
+                              setHighlightedIndex(-1)
+                            }
+                          }}
+                          placeholder="Select City"
+                          className="w-full pl-9 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white"
+                        />
+                        <ChevronDown
+                          size={18}
+                          className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer transition-transform duration-200 ${cityDropdownOpen ? 'rotate-180' : ''}`}
+                          onClick={() => {
+                            if (!cityDropdownOpen) {
+                              const formatted = form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''
+                              setCitySearch(formatted)
+                              setHighlightedIndex(-1)
+                              setCityDropdownOpen(true)
+                              cityInputRef.current?.focus()
+                            } else {
+                              setCityDropdownOpen(false)
+                            }
+                          }}
+                        />
+                      </div>
+                    </label>
+                    {cityDropdownOpen && (
+                      <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/50 max-h-56 overflow-y-auto">
+                        {cityLoading ? (
+                          <div className="px-4 py-6 text-sm text-gray-400 flex flex-col items-center justify-center gap-2">
+                            <div className="w-5 h-5 border-2 border-[#C67A2D]/30 border-t-[#C67A2D] rounded-full animate-spin" />
+                            Loading cities...
+                          </div>
+                        ) : (
+                          (() => {
+                            const filtered = cityList.filter((c) => {
+                              if (!citySearch) return true
+                              const currentDisplay = form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''
+                              if (citySearch === currentDisplay) return true
+                              const q = citySearch.toLowerCase()
+                              return c.city.toLowerCase().includes(q) || c.district.toLowerCase().includes(q) || c.state.toLowerCase().includes(q)
+                            })
+                            if (filtered.length === 0) {
+                              return (
+                                <div className="px-4 py-6 text-sm text-gray-400 text-center">No cities found</div>
+                              )
+                            }
+                            return filtered.slice(0, 50).map((c, i) => {
+                              const isSelected = form.city && titleCase(c.city) === titleCase(form.city) && titleCase(c.district) === titleCase(form.district)
+                              const isHighlighted = i === highlightedIndex
+                              return (
+                                <div
+                                  key={`${c.city}-${c.district}-${c.state}`}
+                                  onClick={() => {
+                                    setForm((prev) => ({ ...prev, city: titleCase(c.city), district: titleCase(c.district), state: titleCase(c.state) }))
+                                    setCitySearch('')
+                                    setCityDropdownOpen(false)
+                                    setHighlightedIndex(-1)
+                                  }}
+                                  onMouseEnter={() => setHighlightedIndex(i)}
+                                  className={`px-4 py-2.5 text-sm cursor-pointer transition-colors border-b border-gray-50 last:border-b-0 ${
+                                    isSelected ? 'bg-[#FFF8F0] text-[#C67A2D] font-semibold' : isHighlighted ? 'bg-[#FFF8F0] text-[#C67A2D]' : 'text-gray-700 hover:bg-[#FFF8F0] hover:text-[#C67A2D]'
+                                  }`}
+                                >
+                                  <div>{titleCase(c.city)}</div>
+                                  <div className="text-xs text-gray-400">{titleCase(c.district)} • {titleCase(c.state)}</div>
+                                </div>
+                              )
+                            })
+                          })()
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div className="lg:col-span-2">
+                      <Textarea label="Samaj Office Address" required value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
+                    </div>
+                    <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
+                  </div>
                 </div>
               </SectionCard>
             </div>
@@ -476,7 +599,7 @@ export default function SamajCensus() {
             <button type="button" onClick={handleReset} className="w-full sm:w-auto px-8 py-3.5 rounded-[14px] text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer">
               Reset Form
             </button>
-            <button type="submit" className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/20 hover:shadow-xl hover:shadow-[#C67A2D]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2">
+            <button type="submit" className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2">
               <Eye size={18} /> Preview & Save
             </button>
           </div>
@@ -486,3 +609,4 @@ export default function SamajCensus() {
     </>
   )
 }
+

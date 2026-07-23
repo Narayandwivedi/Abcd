@@ -21,7 +21,7 @@ export default function Census() {
               to="/samaj-census"
               className="block w-full"
             >
-              <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-5 rounded-xl font-bold text-center text-lg shadow-lg shadow-amber-500/30 animate-pulse hover:scale-[1.02] transition-transform">
+              <div className="bg-[#F97316] text-white px-6 py-5 rounded-xl font-semibold text-center text-lg hover:bg-[#EA580C] active:bg-[#D2450A]">
                 Submit New Agrawal Samaj Location
               </div>
             </Link>
@@ -30,7 +30,7 @@ export default function Census() {
               to="/family-census"
               className="block w-full"
             >
-              <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-5 rounded-xl font-bold text-center text-lg shadow-lg shadow-sky-500/30 animate-pulse hover:scale-[1.02] transition-transform">
+              <div className="bg-[#2563EB] text-white px-6 py-5 rounded-xl font-semibold text-center text-lg hover:bg-[#1D4ED8] active:bg-[#1E40AF]">
                 Submit New Family Member Data
               </div>
             </Link>
