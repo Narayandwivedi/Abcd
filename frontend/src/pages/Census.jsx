@@ -48,7 +48,7 @@ export default function Census() {
                   <span className="hidden md:inline">Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.</span>
                 </p>
 
-                <div className="mt-6 pt-6 border-t border-gray-100">
+                <div className="mt-1 pt-2 border-t border-gray-100">
                   <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agarwal</p>
                   <p className="text-sm text-gray-500">Chairman, ABCD</p>
                   <a
