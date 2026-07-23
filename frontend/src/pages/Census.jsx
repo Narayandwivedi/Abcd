@@ -1,32 +1,10 @@
 import { Link } from 'react-router-dom'
-import { Building2, Users, ArrowRight, Quote } from 'lucide-react'
+import { Quote } from 'lucide-react'
 
 export default function Census() {
   return (
     <>
-      <div className="relative bg-gradient-to-br from-[#4A3520] via-[#5C4030] to-[#3A2510] overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-72 h-72 rounded-full bg-[#C67A2D] blur-3xl" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-[#A8651E] blur-3xl" />
-        </div>
-        <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-6">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs font-semibold text-white/80 tracking-wide">AGRAWAL SAMAJ CENSUS 2026</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-white leading-tight">
-            Agrawal Samaj
-            <br />
-            <span className="bg-gradient-to-r from-[#F5A623] to-[#C67A2D] bg-clip-text text-transparent">
-              Census Portal
-            </span>
-          </h1>
-          <p className="mt-5 text-base sm:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
-            Help us build a comprehensive directory of the Agrawal community.
-            Register your Samaj or Family details to strengthen our community network.
-          </p>
-        </div>
-      </div>
+      <img src="/census.avif" alt="" className="w-full h-auto object-contain" />
 
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
         <div className="max-w-[1200px] mx-auto">
@@ -41,41 +19,19 @@ export default function Census() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             <Link
               to="/samaj-census"
-              className="group block bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-[#C67A2D]/10 hover:-translate-y-1 transition-all duration-300"
+              className="block w-full"
             >
-              <div className="h-2 bg-gradient-to-r from-[#C67A2D] to-[#F5A623]" />
-              <div className="p-6 sm:p-8">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFF8F0] to-[#F5E6D0] flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                  <Building2 size={28} className="text-[#C67A2D]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#4A3520]">Submit New Agrawal Samaj Location</h3>
-                <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-                  Register a new Samaj with office address, contact details, and leadership information.
-                </p>
-                <div className="mt-6 flex items-center gap-2 text-[#C67A2D] font-semibold text-sm group-hover:gap-3 transition-all">
-                  <span>Fill Samaj Details</span>
-                  <ArrowRight size={16} className="transition-all group-hover:translate-x-1" />
-                </div>
+              <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-5 rounded-xl font-bold text-center text-lg shadow-lg shadow-amber-500/30 animate-pulse hover:scale-[1.02] transition-transform">
+                Submit New Agrawal Samaj Location
               </div>
             </Link>
 
             <Link
               to="/family-census"
-              className="group block bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-[#C67A2D]/10 hover:-translate-y-1 transition-all duration-300"
+              className="block w-full"
             >
-              <div className="h-2 bg-gradient-to-r from-[#A8651E] to-[#C67A2D]" />
-              <div className="p-6 sm:p-8">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFF8F0] to-[#F5E6D0] flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                  <Users size={28} className="text-[#C67A2D]" />
-                </div>
-                <h3 className="text-xl font-bold text-[#4A3520]">Submit New Family Member Data</h3>
-                <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-                  Register your family with leader details, address, and comprehensive member information.
-                </p>
-                <div className="mt-6 flex items-center gap-2 text-[#C67A2D] font-semibold text-sm group-hover:gap-3 transition-all">
-                  <span>Fill Family Details</span>
-                  <ArrowRight size={16} className="transition-all group-hover:translate-x-1" />
-                </div>
+              <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-5 rounded-xl font-bold text-center text-lg shadow-lg shadow-sky-500/30 animate-pulse hover:scale-[1.02] transition-transform">
+                Submit New Family Member Data
               </div>
             </Link>
           </div>
