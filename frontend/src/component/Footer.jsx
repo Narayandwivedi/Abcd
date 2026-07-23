@@ -60,6 +60,12 @@ const Footer = () => {
               <p className='font-bold text-yellow-400'>RAIPUR (CG) 492001</p>
             </div>
 
+            <Link to='/census' className='block mt-4'>
+              <div className='relative bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white px-5 py-3 rounded-xl font-bold text-center shadow-lg shadow-[#C67A2D]/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                <p className='text-base font-extrabold'>Agrawal Samaj Census</p>
+              </div>
+            </Link>
+
             <div className='hidden md:flex mt-6 flex-col gap-4 max-w-xs'>
               <Link to='/signup' className='block'>
                 <div className='relative bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-4 py-3 rounded-xl font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>

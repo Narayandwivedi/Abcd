@@ -172,24 +172,6 @@ const subAdminSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
-
-    // Sub Admin Management
-    canViewSubAdmins: {
-      type: Boolean,
-      default: false,
-    },
-    canCreateSubAdmins: {
-      type: Boolean,
-      default: false,
-    },
-    canEditSubAdmins: {
-      type: Boolean,
-      default: false,
-    },
-    canDeleteSubAdmins: {
-      type: Boolean,
-      default: false,
-    },
   },
   lastLogin: {
     type: Date,

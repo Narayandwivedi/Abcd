@@ -14,6 +14,7 @@ const familyMemberSchema = new mongoose.Schema(
 
 const familySchema = new mongoose.Schema(
   {
+    samaj: { type: mongoose.Schema.Types.ObjectId, ref: 'Samaj', default: null },
     leaderName: { type: String, required: [true, 'Family leader name is required'], trim: true },
     leaderMobile: { type: String, trim: true },
     address: { type: String, trim: true },

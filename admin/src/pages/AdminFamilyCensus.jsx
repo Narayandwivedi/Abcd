@@ -25,10 +25,11 @@ const AdminFamilyCensus = () => {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0 })
+  const [samajList, setSamajList] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedFamily, setSelectedFamily] = useState(null)
   const [formData, setFormData] = useState({
-    leaderName: '', leaderMobile: '', address: '',
+    samaj: '', leaderName: '', leaderMobile: '', address: '',
     state: '', district: '', city: '', pincode: '',
     remarks: '', members: [],
   })
@@ -36,6 +37,13 @@ const AdminFamilyCensus = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
   useEffect(() => { fetchFamilies() }, [])
+
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/api/samaj`)
+      .then(res => res.json())
+      .then(data => { if (data.success) setSamajList(data.data) })
+      .catch(() => toast.error('Failed to load Samaj list'))
+  }, [])
 
   const fetchFamilies = async () => {
     try {
@@ -118,6 +126,7 @@ const AdminFamilyCensus = () => {
   const openEditModal = (family) => {
     setSelectedFamily(family)
     setFormData({
+      samaj: family.samaj || '',
       leaderName: family.leaderName || '',
       leaderMobile: family.leaderMobile || '',
       address: family.address || '',
@@ -278,6 +287,17 @@ const AdminFamilyCensus = () => {
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>Mobile</label>
                   <input type='text' value={formData.leaderMobile} onChange={(e) => setFormData({ ...formData, leaderMobile: e.target.value })}
                     className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                </div>
+              </div>
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Samaj</label>
+                  <select value={formData.samaj} onChange={(e) => setFormData({ ...formData, samaj: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'>
+                    <option value=''>-- Select Samaj --</option>
+                    {samajList.map(s => <option key={s._id} value={s._id}>{s.samajName}</option>)}
+                  </select>
                 </div>
               </div>
 
