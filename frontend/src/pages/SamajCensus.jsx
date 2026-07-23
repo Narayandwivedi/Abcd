@@ -395,7 +395,7 @@ export default function SamajCensus() {
             <SectionHeader icon="🏛️" title="Samaj Information" />
             <SectionCard title="Basic Details">
               <div className="flex flex-col gap-5">
-                <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
                   <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
                   <Input label="Samaj Mobile" required value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter Mobile" />
                   <div className="relative min-w-0" ref={cityRef}>
