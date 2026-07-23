@@ -19,7 +19,7 @@ export default function Census() {
               className="block w-full"
             >
               <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-5 rounded-xl font-bold text-center text-lg shadow-lg shadow-amber-500/30 animate-pulse hover:scale-[1.02] transition-transform">
-                Submit New Agrawal Samaj Location
+                Submit New Agrawal Samaj Branch
               </div>
             </Link>
 
