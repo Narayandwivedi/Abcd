@@ -216,7 +216,7 @@ export default function FamilyCensus() {
           </h1>
           <div className="mx-auto mt-4 w-20 h-1 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
           <p className="mt-6 text-base sm:text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed">
-            Register and manage family records in a secure, centralized, and user-friendly census management system. Keep community information organized, accurate, and easily accessible.
+            Fill In The Details Below To Register A New Family In The Census Portal.
           </p>
         </div>
 
