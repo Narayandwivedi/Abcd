@@ -1,0 +1,339 @@
+import { useState } from 'react'
+import { toast } from 'react-toastify'
+import axios from 'axios'
+import { UserPlus, Trash2 } from 'lucide-react'
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
+
+const emptyContactPerson = () => ({
+  name: '',
+  designation: '',
+  mobile: '',
+  email: '',
+  alternateMobile: '',
+})
+
+const emptyForm = {
+  samajName: '',
+  officeAddress: '',
+  mobile: '',
+  email: '',
+  state: '',
+  district: '',
+  city: '',
+  pincode: '',
+  contactPersons: [{ name: '', designation: '', mobile: '', email: '', alternateMobile: '' }],
+  remarks: '',
+  submittedBy: '',
+  submittedByMobile: '',
+}
+
+function Input({ label, required, className, ...props }) {
+  return (
+    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
+      <span className="text-gray-700 text-sm font-semibold">
+        {label} {required && <span className="text-red-500">*</span>}
+      </span>
+      <input
+        {...props}
+        className={`w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white ${className || ''}`}
+      />
+    </label>
+  )
+}
+
+function Textarea({ label, required, ...props }) {
+  return (
+    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
+      <span className="text-gray-700 text-sm font-semibold">
+        {label} {required && <span className="text-red-500">*</span>}
+      </span>
+      <textarea
+        {...props}
+        className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white resize-y min-h-[80px]"
+      />
+    </label>
+  )
+}
+
+function Select({ label, required, children, ...props }) {
+  return (
+    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
+      <span className="text-gray-700 text-sm font-semibold">
+        {label} {required && <span className="text-red-500">*</span>}
+      </span>
+      <select
+        {...props}
+        className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white"
+      >
+        {children}
+      </select>
+    </label>
+  )
+}
+
+function SectionCard({ title, children }) {
+  return (
+    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden">
+      <div className="px-6 sm:px-8 py-4 border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white">
+        <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">{title}</h3>
+      </div>
+      <div className="p-6 sm:p-8">{children}</div>
+    </div>
+  )
+}
+
+function SectionHeader({ icon, title }) {
+  return (
+    <div className="flex items-center gap-3 mb-6">
+      <div className="w-8 h-8 rounded-lg bg-[#C67A2D]/10 flex items-center justify-center">
+        <span className="text-[#C67A2D] text-base">{icon}</span>
+      </div>
+      <h2 className="text-lg font-bold text-[#4A3520]">{title}</h2>
+    </div>
+  )
+}
+
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman & Nicobar', 'Chandigarh', 'Dadra & Nagar Haveli',
+  'Daman & Diu', 'Delhi', 'Jammu & Kashmir', 'Ladakh',
+  'Lakshadweep', 'Puducherry',
+]
+
+export default function SamajCensus() {
+  const [form, setForm] = useState({ ...emptyForm, contactPersons: [emptyContactPerson()] })
+  const [submitting, setSubmitting] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleReset = () => {
+    setForm({ ...emptyForm, contactPersons: [emptyContactPerson()] })
+  }
+
+  const handleContactPersonChange = (index, field, value) => {
+    const updated = [...form.contactPersons]
+    updated[index] = { ...updated[index], [field]: value }
+    setForm((prev) => ({ ...prev, contactPersons: updated }))
+  }
+
+  const addContactPerson = () => {
+    setForm((prev) => ({
+      ...prev,
+      contactPersons: [...prev.contactPersons, emptyContactPerson()],
+    }))
+  }
+
+  const removeContactPerson = (index) => {
+    setForm((prev) => ({
+      ...prev,
+      contactPersons: prev.contactPersons.filter((_, i) => i !== index),
+    }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!form.samajName.trim()) { toast.error('Samaj Name Is Required.'); return }
+    if (!form.officeAddress.trim()) { toast.error('Office Address Is Required.'); return }
+    if (!form.mobile.trim()) { toast.error('Mobile Number Is Required.'); return }
+    if (!form.state.trim()) { toast.error('State Is Required.'); return }
+    if (!form.district.trim()) { toast.error('District Is Required.'); return }
+    if (!form.city.trim()) { toast.error('City Is Required.'); return }
+    if (!form.submittedBy.trim()) { toast.error('Submitted By Name Is Required.'); return }
+    if (!form.submittedByMobile.trim()) { toast.error('Mobile Number Is Required.'); return }
+    if (!/^\d{10}$/.test(form.submittedByMobile.trim())) { toast.error('Please Enter A Valid 10-Digit Mobile Number.'); return }
+
+    for (let i = 0; i < form.contactPersons.length; i++) {
+      const cp = form.contactPersons[i]
+      if (!cp.name.trim()) { toast.error(`Contact Person ${i + 1}: Name is required.`); return }
+      if (!cp.designation.trim()) { toast.error(`Contact Person ${i + 1}: Designation is required.`); return }
+      if (!cp.mobile.trim()) { toast.error(`Contact Person ${i + 1}: Mobile Number is required.`); return }
+    }
+
+    setSubmitting(true)
+    try {
+      await axios.post(`${BACKEND_URL}/api/samaj`, {
+        samajName: form.samajName,
+        officeAddress: form.officeAddress,
+        mobile: form.mobile,
+        email: form.email,
+        state: form.state,
+        district: form.district,
+        city: form.city,
+        pincode: form.pincode,
+        leaders: form.contactPersons.map((cp) => ({
+          name: cp.name,
+          designation: cp.designation,
+          mobile: cp.mobile,
+        })),
+        remarks: form.remarks,
+        isActive: true,
+      })
+      setShowSuccess(true)
+      toast.success('Samaj Registered Successfully!')
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed To Save Samaj. Please Try Again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (showSuccess) {
+    return (
+      <div className="bg-[#FFF8F0] min-h-screen flex items-center justify-center px-4">
+        <div className="bg-white rounded-[20px] shadow-lg shadow-gray-200/50 p-12 max-w-md w-full text-center">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center mx-auto shadow-lg shadow-[#C67A2D]/30">
+            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-[#4A3520] mt-6">Samaj Registered Successfully!</h3>
+          <p className="text-sm text-gray-500 mt-2">The Samaj Information Has Been Saved Successfully.</p>
+          <button
+            onClick={() => { setShowSuccess(false); handleReset() }}
+            className="mt-8 px-8 py-3 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] hover:shadow-lg hover:shadow-[#C67A2D]/25 transition-all duration-300 cursor-pointer"
+          >
+            Register Another Samaj
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div className="max-w-[1200px] mx-auto">
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Samaj Census</h1>
+          <p className="text-sm sm:text-base text-gray-500 mt-2">
+            Fill In The Details Below To Register A New Samaj In The Census Portal.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+          <div>
+            <SectionHeader icon="🏛️" title="Samaj Information" />
+            <SectionCard title="Basic Details">
+              <div className="flex flex-col gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Samaj Name" />
+                  <Input label="Samaj Mobile Number" required value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter Mobile Number" />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <Textarea label="Samaj Office Address" required value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
+                  <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
+                </div>
+              </div>
+            </SectionCard>
+
+            <div className="mt-5">
+              <SectionCard title="Location Details">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <Select label="State" required value={form.state} onChange={handleChange} name="state">
+                    <option value="">-- Select State --</option>
+                    {INDIAN_STATES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </Select>
+                  <Input label="District" required value={form.district} onChange={handleChange} name="district" placeholder="Enter District" />
+                  <Input label="City" required value={form.city} onChange={handleChange} name="city" placeholder="Enter City" />
+                  <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
+                </div>
+              </SectionCard>
+            </div>
+          </div>
+
+          <div>
+            <SectionHeader icon="👤" title="Samaj Head / Contact Person" />
+            <SectionCard title="Contact Person Details">
+              <div className="flex flex-col gap-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400">
+                    {form.contactPersons.length} contact person{form.contactPersons.length !== 1 ? 's' : ''}
+                  </span>
+                  <button type="button" onClick={addContactPerson} className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20">
+                    <UserPlus size={14} /> Add More Heads
+                  </button>
+                </div>
+
+                {form.contactPersons.map((cp, idx) => (
+                  <div key={idx} className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-sm animate-fade-in">
+                    {idx > 0 && (
+                      <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-[#FFF8F0] to-white border-b border-gray-100">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-sm">
+                            <span className="text-xs font-bold text-white">{idx + 1}</span>
+                          </div>
+                          <span className="text-sm font-semibold text-gray-700">Contact Person {idx + 1}</span>
+                        </div>
+                        <button type="button" onClick={() => removeContactPerson(idx)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 cursor-pointer">
+                          <Trash2 size={13} /> Remove
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="p-5 flex flex-col gap-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <Input label="Full Name" required value={cp.name} onChange={(e) => handleContactPersonChange(idx, 'name', e.target.value)} placeholder="Enter full name" />
+                        <Input label="Designation" required value={cp.designation} onChange={(e) => handleContactPersonChange(idx, 'designation', e.target.value)} placeholder="Enter designation" />
+                        <Input label="Mobile Number" required type="tel" value={cp.mobile} onChange={(e) => handleContactPersonChange(idx, 'mobile', e.target.value)} placeholder="Enter mobile number" />
+                      </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <Input label="Email Address" type="email" value={cp.email} onChange={(e) => handleContactPersonChange(idx, 'email', e.target.value)} placeholder="Enter email address" />
+                        <Input label="Alternate Mobile" value={cp.alternateMobile} onChange={(e) => handleContactPersonChange(idx, 'alternateMobile', e.target.value)} placeholder="Enter alternate mobile (Optional)" />
+                      </div>
+                      {idx === 0 && (
+                        <div className="flex items-center justify-end gap-1.5 mt-2">
+                          <button type="button" onClick={addContactPerson} className="hidden lg:flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20">
+                            <UserPlus size={14} /> Add More Heads
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+          </div>
+
+          <div>
+            <SectionHeader icon="📋" title="Additional Information" />
+            <SectionCard title="Remarks">
+              <Textarea label="Remarks" value={form.remarks} onChange={handleChange} name="remarks" placeholder="Enter Any Additional Remarks Or Notes..." />
+            </SectionCard>
+          </div>
+
+          <div>
+            <SectionHeader icon="📝" title="Form Submission Details" />
+            <SectionCard title="Submitted By">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <Input label="This Form Is Submitted By" required value={form.submittedBy} onChange={handleChange} name="submittedBy" placeholder="Enter Full Name" />
+                <Input label="Mobile Number" required type="tel" value={form.submittedByMobile} onChange={handleChange} name="submittedByMobile" placeholder="Enter Mobile Number" />
+              </div>
+            </SectionCard>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 pb-8">
+            <button type="button" onClick={handleReset} className="w-full sm:w-auto px-8 py-3.5 rounded-[14px] text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer">
+              Reset Form
+            </button>
+            <button type="submit" disabled={submitting} className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/20 hover:shadow-xl hover:shadow-[#C67A2D]/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:hover:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2">
+              {submitting ? (
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
+              ) : 'Save Samaj'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}

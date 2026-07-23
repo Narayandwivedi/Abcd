@@ -22,6 +22,8 @@ import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Vouchers from './pages/Vouchers'
 import VendorDetail from './pages/VendorDetail'
+import SamajCensus from './pages/SamajCensus'
+import FamilyCensus from './pages/FamilyCensus'
 
 // Scroll to top on every route change
 const ScrollToTop = () => {
@@ -35,6 +37,7 @@ const ScrollToTop = () => {
 const App = () => {
   const location = useLocation()
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
+  const isCensusPage = location.pathname === '/samaj-census' || location.pathname === '/family-census'
   const isHomePage = location.pathname === '/'
   const getSeoConfig = (pathname) => {
     if (pathname === '/') {
@@ -174,6 +177,22 @@ const App = () => {
       }
     }
 
+    if (pathname === '/samaj-census') {
+      return {
+        title: 'Samaj Census - ABCD Vyapar',
+        description: 'Register your Samaj in the Agrawal Samaj Census portal. Fill in community details and contact information.',
+        canonicalPath: '/samaj-census',
+      }
+    }
+
+    if (pathname === '/family-census') {
+      return {
+        title: 'Family Census - ABCD Vyapar',
+        description: 'Register your family in the Agrawal Samaj Census portal. Submit family details and member information.',
+        canonicalPath: '/family-census',
+      }
+    }
+
     if (pathname === '/forgot-password') {
       return {
         title: 'Forgot Password - ABCD Vyapar',
@@ -232,12 +251,14 @@ const App = () => {
           <Route path='/contact' element={<Contact />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/category/:categorySlug' element={<CategoryPage />} />
+          <Route path='/samaj-census' element={<SamajCensus />} />
+          <Route path='/family-census' element={<FamilyCensus />} />
           <Route path='/:type/:id' element={<AdDetail />} />
           <Route path='/:state/:district/:city/:slug' element={<VendorDetail />} />
         </Routes>
       </div>
       {!isAuthPage && <Footer />}
-      {!isAuthPage && <BottomNav />}
+      {!isAuthPage && !isCensusPage && <BottomNav />}
 
       {/* Toast Notification Container */}
       <ToastContainer

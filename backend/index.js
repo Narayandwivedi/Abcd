@@ -37,6 +37,8 @@ const chatRoute = require('./routes/chatRoute')
 const userChatRoute = require('./routes/userChatRoute')
 const vendorApplicationRoute = require('./routes/vendorApplicationRoute')
 const userApplicationRoute = require('./routes/userApplicationRoute')
+const samajRoute = require('./routes/samajRoutes')
+const familyRoute = require('./routes/familyRoutes')
 
 // CORS configuration
 const corsOptions = {
@@ -85,6 +87,8 @@ app.use('/api/chats', chatRoute)
 app.use('/api/user/chat', userChatRoute)
 app.use('/api/vendor-application', vendorApplicationRoute)
 app.use('/api/user-application', userApplicationRoute)
+app.use('/api/samaj', samajRoute)
+app.use('/api/families', familyRoute)
 
 
 // server listen - only after DB connection

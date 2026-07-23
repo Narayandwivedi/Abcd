@@ -25,6 +25,12 @@ const Footer = () => {
               <li>
                 <Link to='/privacy' className='text-gray-400 hover:text-white transition'>Privacy Policy</Link>
               </li>
+              <li>
+                <Link to='/samaj-census' className='text-gray-400 hover:text-white transition'>Samaj Census</Link>
+              </li>
+              <li>
+                <Link to='/family-census' className='text-gray-400 hover:text-white transition'>Family Census</Link>
+              </li>
               <li className='hidden md:block'>
                 <Link to='/about' className='text-gray-400 hover:text-white transition'>About</Link>
               </li>
