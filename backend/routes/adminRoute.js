@@ -67,10 +67,10 @@ router.patch("/blogs/:blogId/unpublish", adminAuth, checkPermission('canPublishB
 router.patch("/blogs/:blogId/toggle-featured", adminAuth, checkPermission('canEditBlogs'), toggleFeatured);
 
 // Samaj Census management routes
-const { getAllSamajAdmin, getSamajByIdAdmin, updateSamajAdmin, deleteSamajAdmin, toggleSamajStatus } = require("../controllers/adminSamajController");
+const { getAllSamajAdmin, getSamajByIdAdmin, updateSamajAdmin, deleteSamajAdmin, toggleSamajStatus, setSamajVerificationStatus } = require("../controllers/adminSamajController");
 
 // Family Census management routes
-const { getAllFamiliesAdmin, getFamilyByIdAdmin, updateFamilyAdmin, deleteFamilyAdmin, toggleFamilyStatus } = require("../controllers/adminFamilyController");
+const { getAllFamiliesAdmin, getFamilyByIdAdmin, updateFamilyAdmin, deleteFamilyAdmin, toggleFamilyStatus, setFamilyVerificationStatus } = require("../controllers/adminFamilyController");
 
 // Offer management routes
 const { getAllOffers, createOffer, updateOffer, deleteOffer, toggleOfferStatus } = require("../controllers/adminOfferController");
@@ -86,6 +86,7 @@ router.get("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), 
 router.put("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), updateSamajAdmin);
 router.delete("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), deleteSamajAdmin);
 router.patch("/samaj-census/:id/toggle-status", adminAuth, checkPermission('canManageContent'), toggleSamajStatus);
+router.patch("/samaj-census/:id/verification-status", adminAuth, checkPermission('canManageContent'), setSamajVerificationStatus);
 
 // Family Census routes
 router.get("/family-census", adminAuth, checkPermission('canManageContent'), getAllFamiliesAdmin);
@@ -93,5 +94,6 @@ router.get("/family-census/:id", adminAuth, checkPermission('canManageContent'),
 router.put("/family-census/:id", adminAuth, checkPermission('canManageContent'), updateFamilyAdmin);
 router.delete("/family-census/:id", adminAuth, checkPermission('canManageContent'), deleteFamilyAdmin);
 router.patch("/family-census/:id/toggle-status", adminAuth, checkPermission('canManageContent'), toggleFamilyStatus);
+router.patch("/family-census/:id/verification-status", adminAuth, checkPermission('canManageContent'), setFamilyVerificationStatus);
 
 module.exports = router;

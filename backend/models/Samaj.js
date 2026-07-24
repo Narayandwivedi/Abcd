@@ -24,6 +24,7 @@ const samajSchema = new mongoose.Schema(
     isActive: { type: Boolean, default: true },
     submittedBy: { type: String, trim: true },
     submittedByMobile: { type: String, trim: true },
+    verificationStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   },
   { timestamps: true }
 );

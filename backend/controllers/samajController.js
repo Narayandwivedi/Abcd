@@ -11,7 +11,9 @@ exports.createSamaj = async (req, res) => {
 
 exports.getAllSamaj = async (req, res) => {
   try {
-    const samajList = await Samaj.find().sort({ createdAt: -1 });
+    const filter = {};
+    if (req.query.status) filter.verificationStatus = req.query.status;
+    const samajList = await Samaj.find(filter).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: samajList });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

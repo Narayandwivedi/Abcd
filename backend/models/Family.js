@@ -27,6 +27,7 @@ const familySchema = new mongoose.Schema(
     members: { type: [familyMemberSchema], default: [] },
     submittedBy: { type: String, trim: true },
     submittedByMobile: { type: String, trim: true },
+    verificationStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   },
   { timestamps: true }
 );

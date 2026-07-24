@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
-import { Phone, Mail, MapPin, Users, FileText, UserCheck, Calendar } from 'lucide-react'
+import { Phone, Mail, MapPin, Users, FileText, UserCheck, Calendar, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react'
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -20,7 +20,8 @@ const AdminSamajCensus = () => {
   const [samajList, setSamajList] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0 })
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, approved: 0, pending: 0, rejected: 0 })
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedSamaj, setSelectedSamaj] = useState(null)
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ const AdminSamajCensus = () => {
       const data = await response.json()
       if (data.success) {
         setSamajList(data.data)
-        setStats({ total: data.total, active: data.active, inactive: data.inactive })
+        setStats({ total: data.total, active: data.active, inactive: data.inactive, approved: data.approved, pending: data.pending, rejected: data.rejected })
       }
     } catch (error) {
       toast.error('Failed to fetch samaj records')
@@ -112,6 +113,26 @@ const AdminSamajCensus = () => {
     }
   }
 
+  const handleSetVerificationStatus = async (id, status) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/samaj-census/${id}/verification-status`, {
+        method: 'PATCH', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+      const data = await response.json()
+      if (data.success) {
+        const messages = { approved: 'Samaj approved!', rejected: 'Samaj rejected', pending: 'Samaj marked as pending' }
+        toast.success(messages[status])
+        fetchSamaj()
+      } else {
+        toast.error(data.message || 'Failed to update verification status')
+      }
+    } catch (error) {
+      toast.error('Failed to update verification status')
+    }
+  }
+
   const openEditModal = (samaj) => {
     setSelectedSamaj(samaj)
     setFormData({
@@ -147,11 +168,13 @@ const AdminSamajCensus = () => {
     setFormData({ ...formData, leaders: formData.leaders.filter((_, i) => i !== index) })
   }
 
-  const filteredList = samajList.filter(s =>
-    s.samajName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.mobile?.includes(searchTerm)
-  )
+  const filteredList = samajList.filter(s => {
+    const matchesSearch = s.samajName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.mobile?.includes(searchTerm)
+    const matchesStatus = statusFilter === 'all' || s.verificationStatus === statusFilter
+    return matchesSearch && matchesStatus
+  })
 
   return (
     <div className='p-3 md:p-6'>
@@ -160,7 +183,7 @@ const AdminSamajCensus = () => {
         <p className='text-sm md:text-base text-gray-600'>Manage all Samaj records</p>
       </div>
 
-      <div className='grid grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6'>
+      <div className='grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 mb-4 md:mb-6'>
         <div className='bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-xl shadow-lg'>
           <div className='text-xs md:text-sm font-semibold opacity-90'>Total</div>
           <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.total}</div>
@@ -169,20 +192,52 @@ const AdminSamajCensus = () => {
           <div className='text-xs md:text-sm font-semibold opacity-90'>Active</div>
           <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.active}</div>
         </div>
-        <div className='bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-xl shadow-lg'>
+        <div className='bg-gradient-to-br from-gray-500 to-gray-600 text-white p-4 rounded-xl shadow-lg'>
           <div className='text-xs md:text-sm font-semibold opacity-90'>Inactive</div>
           <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.inactive}</div>
         </div>
+        <div className='bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-4 rounded-xl shadow-lg'>
+          <div className='text-xs md:text-sm font-semibold opacity-90'>Approved</div>
+          <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.approved}</div>
+        </div>
+        <div className='bg-gradient-to-br from-amber-500 to-amber-600 text-white p-4 rounded-xl shadow-lg'>
+          <div className='text-xs md:text-sm font-semibold opacity-90'>Pending</div>
+          <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.pending}</div>
+        </div>
+        <div className='bg-gradient-to-br from-red-500 to-red-600 text-white p-4 rounded-xl shadow-lg'>
+          <div className='text-xs md:text-sm font-semibold opacity-90'>Rejected</div>
+          <div className='text-2xl md:text-3xl font-bold mt-1'>{stats.rejected}</div>
+        </div>
       </div>
 
-      <div className='bg-white rounded-xl shadow-md p-4 mb-4'>
+      <div className='bg-white rounded-xl shadow-md p-4 mb-4 flex flex-col sm:flex-row gap-3'>
         <input
           type='text'
           placeholder='Search by name, city or mobile...'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
         />
+        <div className='flex items-center gap-1.5 sm:w-auto overflow-x-auto'>
+          {[
+            { key: 'all', label: 'All' },
+            { key: 'pending', label: 'Pending' },
+            { key: 'approved', label: 'Approved' },
+            { key: 'rejected', label: 'Rejected' },
+          ].map((opt) => (
+            <button
+              key={opt.key}
+              onClick={() => setStatusFilter(opt.key)}
+              className={`shrink-0 px-3.5 py-2 rounded-lg text-sm font-semibold transition ${
+                statusFilter === opt.key
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading ? (
@@ -224,6 +279,42 @@ const AdminSamajCensus = () => {
                   <div className='flex items-center gap-3 mt-3 text-xs text-orange-50'>
                     <span className='flex items-center gap-1'><Users size={12} /> {samaj.leaders?.length || 0} leader{samaj.leaders?.length !== 1 ? 's' : ''}</span>
                     {createdDate && <span className='flex items-center gap-1'><Calendar size={12} /> {createdDate}</span>}
+                  </div>
+                </div>
+
+                <div className={`px-5 py-2.5 flex flex-col gap-2 border-b ${
+                  samaj.verificationStatus === 'approved' ? 'bg-emerald-50 border-emerald-100'
+                    : samaj.verificationStatus === 'rejected' ? 'bg-red-50 border-red-100'
+                    : 'bg-amber-50 border-amber-100'
+                }`}>
+                  <span className={`flex items-center gap-1.5 text-xs font-semibold ${
+                    samaj.verificationStatus === 'approved' ? 'text-emerald-700'
+                      : samaj.verificationStatus === 'rejected' ? 'text-red-700'
+                      : 'text-amber-700'
+                  }`}>
+                    {samaj.verificationStatus === 'approved' ? <ShieldCheck size={14} />
+                      : samaj.verificationStatus === 'rejected' ? <ShieldX size={14} />
+                      : <ShieldAlert size={14} />}
+                    {samaj.verificationStatus === 'approved' ? 'Verified & Approved'
+                      : samaj.verificationStatus === 'rejected' ? 'Rejected'
+                      : 'Pending Verification'}
+                  </span>
+                  <div className='flex items-center gap-1.5'>
+                    <button
+                      onClick={() => handleSetVerificationStatus(samaj._id, 'approved')}
+                      disabled={samaj.verificationStatus === 'approved'}
+                      className='flex-1 px-2 py-1 rounded-lg text-xs font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition disabled:opacity-40 disabled:cursor-not-allowed'
+                    >Approve</button>
+                    <button
+                      onClick={() => handleSetVerificationStatus(samaj._id, 'pending')}
+                      disabled={samaj.verificationStatus === 'pending'}
+                      className='flex-1 px-2 py-1 rounded-lg text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition disabled:opacity-40 disabled:cursor-not-allowed'
+                    >Pending</button>
+                    <button
+                      onClick={() => handleSetVerificationStatus(samaj._id, 'rejected')}
+                      disabled={samaj.verificationStatus === 'rejected'}
+                      className='flex-1 px-2 py-1 rounded-lg text-xs font-semibold bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-40 disabled:cursor-not-allowed'
+                    >Reject</button>
                   </div>
                 </div>
 

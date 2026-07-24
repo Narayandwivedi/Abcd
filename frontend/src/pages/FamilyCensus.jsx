@@ -143,7 +143,7 @@ export default function FamilyCensus() {
   const [showConfirm, setShowConfirm] = useState(false)
 
   useEffect(() => {
-    axios.get(`${BACKEND_URL}/api/samaj`)
+    axios.get(`${BACKEND_URL}/api/samaj?status=approved`)
       .then((res) => setSamajList(res.data.data || []))
       .catch(() => toast.error('Failed to load Samaj list'))
   }, [])
