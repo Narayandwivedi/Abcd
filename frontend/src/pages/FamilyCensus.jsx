@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { Users, UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, ChevronDown } from 'lucide-react'
+import BackgroundMusic from '../component/BackgroundMusic'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -246,6 +247,7 @@ export default function FamilyCensus() {
   if (showPreview) {
     return (
       <>
+        <BackgroundMusic />
         <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <div className="max-w-[900px] mx-auto">
             <div className="flex items-center gap-3 mb-6">
@@ -362,6 +364,7 @@ export default function FamilyCensus() {
 
   return (
     <>
+      <BackgroundMusic />
       <img src="/mobile family hero.avif" alt="" className="w-full h-auto object-contain md:hidden" />
       <img src="/familyhero.avif" alt="" className="hidden md:block w-full h-auto object-contain" />
       <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-4 sm:py-12 lg:py-16">

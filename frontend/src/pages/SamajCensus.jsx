@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, Search, ChevronDown } from 'lucide-react'
+import BackgroundMusic from '../component/BackgroundMusic'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -266,6 +267,7 @@ export default function SamajCensus() {
   if (showSuccess) {
     return (
       <>
+        <BackgroundMusic />
         <img src="/samaj hero.png" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
         <div className="bg-[#FFF8F0] min-h-screen flex items-center justify-center px-4">
         <div className="bg-white rounded-[20px] shadow-lg shadow-gray-200/50 p-12 max-w-md w-full text-center">
@@ -291,6 +293,7 @@ export default function SamajCensus() {
   if (showPreview) {
     return (
       <>
+        <BackgroundMusic />
         <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <div className="max-w-[900px] mx-auto">
             <div className="flex items-center gap-3 mb-6">
@@ -404,6 +407,7 @@ export default function SamajCensus() {
 
   return (
     <>
+      <BackgroundMusic />
       <img src="/samaj hero.png" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-4 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
