@@ -559,7 +559,7 @@ export default function SamajCensus() {
 
           <div>
             <SectionHeader icon="📋" title="Additional Information (Optional)" />
-            <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden">
+<div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
               <button
                 type="button"
                 onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}

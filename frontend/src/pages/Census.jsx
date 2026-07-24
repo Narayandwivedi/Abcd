@@ -18,7 +18,7 @@ export default function Census() {
               to="/samaj-census"
               className="block w-full"
             >
-          <div className="bg-[#F97316] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center hover:bg-[#EA580C] active:bg-[#D2450A]">
+          <div className="bg-gradient-to-r from-[#F97316] to-[#D97706] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center shadow-md shadow-orange-500/30 hover:shadow-lg hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
                 <p className="leading-tight">Submit New Agrawal Samaj Branch</p>
                 <p className="text-xs font-medium mt-1">नया अग्रवाल समाज शाखा पंजीकृत करें</p>
               </div>
@@ -28,7 +28,7 @@ export default function Census() {
               to="/family-census"
               className="block w-full"
             >
-              <div className="bg-[#2563EB] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center hover:bg-[#1D4ED8] active:bg-[#1E40AF]">
+              <div className="bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
                 <p className="leading-tight">Submit New Family Member Data</p>
                 <p className="text-xs font-medium mt-1">नया परिवार सदस्य डेटा पंजीकृत करें</p>
               </div>
