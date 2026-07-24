@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Quote } from 'lucide-react'
+import { Quote, Building2, Users } from 'lucide-react'
 
 export default function Census() {
   return (
@@ -16,21 +16,33 @@ export default function Census() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-8">
             <Link
               to="/samaj-census"
-              className="block w-full"
+              className="group block w-full"
             >
-          <div className="bg-gradient-to-r from-[#F97316] to-[#D97706] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center shadow-md shadow-orange-500/30 hover:shadow-lg hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                <p className="leading-tight">Submit New Agrawal Samaj Branch</p>
-                <p className="text-xs font-medium mt-1">नया अग्रवाल समाज शाखा पंजीकृत करें</p>
+              <div className="relative overflow-hidden flex items-center gap-3 md:gap-4 bg-gradient-to-br from-[#FB923C] via-[#F97316] to-[#C2410C] text-white px-4 py-4 md:px-7 md:py-6 rounded-2xl font-semibold text-center shadow-lg shadow-orange-500/25 ring-1 ring-white/10 hover:shadow-xl hover:shadow-orange-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300">
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
+                <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/25">
+                  <Building2 size={20} className="text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="leading-tight text-sm md:text-lg">Submit New Agrawal Samaj Branch</p>
+                  <p className="text-xs font-medium mt-1 text-orange-50/90">नया अग्रवाल समाज शाखा पंजीकृत करें</p>
+                </div>
               </div>
             </Link>
 
             <Link
               to="/family-census"
-              className="block w-full"
+              className="group block w-full"
             >
-              <div className="bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] text-white px-3 py-4 text-sm md:px-6 md:py-5 md:text-lg rounded-xl font-semibold text-center shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                <p className="leading-tight">Submit New Family Member Data</p>
-                <p className="text-xs font-medium mt-1">नया परिवार सदस्य डेटा पंजीकृत करें</p>
+              <div className="relative overflow-hidden flex items-center gap-3 md:gap-4 bg-gradient-to-br from-[#60A5FA] via-[#2563EB] to-[#1E3A8A] text-white px-4 py-4 md:px-7 md:py-6 rounded-2xl font-semibold text-center shadow-lg shadow-blue-500/25 ring-1 ring-white/10 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300">
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
+                <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/25">
+                  <Users size={20} className="text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="leading-tight text-sm md:text-lg">Submit New Family Member Data</p>
+                  <p className="text-xs font-medium mt-1 text-blue-50/90">नया परिवार सदस्य डेटा पंजीकृत करें</p>
+                </div>
               </div>
             </Link>
           </div>
