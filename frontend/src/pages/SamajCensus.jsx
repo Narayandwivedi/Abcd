@@ -33,6 +33,8 @@ const titleCase = (str) => {
   return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 }
 
+const sanitizeMobile = (value) => value.replace(/\D/g, '').slice(0, 10)
+
 const filterAndSortCities = (cityList, citySearch, currentDisplay) => {
   if (!citySearch || citySearch === currentDisplay) return cityList
   const q = citySearch.toLowerCase()
@@ -140,9 +142,11 @@ export default function SamajCensus() {
   const cityRef = useRef(null)
   const cityInputRef = useRef(null)
 
+  const MOBILE_FIELDS = ['mobile', 'submittedByMobile']
+
   const handleChange = (e) => {
     const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+    setForm((prev) => ({ ...prev, [name]: MOBILE_FIELDS.includes(name) ? sanitizeMobile(value) : value }))
   }
 
   useEffect(() => {
@@ -178,7 +182,7 @@ export default function SamajCensus() {
 
   const handleContactPersonChange = (index, field, value) => {
     const updated = [...form.contactPersons]
-    updated[index] = { ...updated[index], [field]: value }
+    updated[index] = { ...updated[index], [field]: (field === 'mobile' || field === 'alternateMobile') ? sanitizeMobile(value) : value }
     setForm((prev) => ({ ...prev, contactPersons: updated }))
   }
 
@@ -199,6 +203,7 @@ export default function SamajCensus() {
   const validate = () => {
     if (!form.samajName.trim()) { toast.error('Samaj Name Is Required.'); return false }
     if (!form.mobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
+    if (!/^\d{10}$/.test(form.mobile.trim())) { toast.error('Please Enter A Valid 10-Digit Mobile Number.'); return false }
     if (!form.city.trim()) { toast.error('City Is Required.'); return false }
     if (!form.submittedBy.trim()) { toast.error('Submitted By Name Is Required.'); return false }
     if (!form.submittedByMobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
@@ -209,6 +214,8 @@ export default function SamajCensus() {
       if (!cp.name.trim()) { toast.error(`Contact Person ${i + 1}: Name is required.`); return false }
       if (!cp.designation.trim()) { toast.error(`Contact Person ${i + 1}: Designation is required.`); return false }
       if (!cp.mobile.trim()) { toast.error(`Contact Person ${i + 1}: Mobile Number is required.`); return false }
+      if (!/^\d{10}$/.test(cp.mobile.trim())) { toast.error(`Contact Person ${i + 1}: Please Enter A Valid 10-Digit Mobile Number.`); return false }
+      if (cp.alternateMobile && !/^\d{10}$/.test(cp.alternateMobile.trim())) { toast.error(`Contact Person ${i + 1}: Please Enter A Valid 10-Digit Alternate Mobile Number.`); return false }
     }
     return true
   }
@@ -416,7 +423,7 @@ export default function SamajCensus() {
               <div className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
                   <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
-                  <Input label="Samaj Mobile" required value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter Mobile" />
+                  <Input label="Samaj Mobile" required type="tel" inputMode="numeric" maxLength={10} value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter 10-Digit Mobile Number" />
                   <div className="relative min-w-0" ref={cityRef}>
                     <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm">
                       <span className="text-gray-700 text-xs sm:text-sm font-semibold">
@@ -551,11 +558,11 @@ export default function SamajCensus() {
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <Input label="Full Name" required value={cp.name} onChange={(e) => handleContactPersonChange(idx, 'name', e.target.value)} placeholder="Enter full name" />
                         <Input label="Designation" required value={cp.designation} onChange={(e) => handleContactPersonChange(idx, 'designation', e.target.value)} placeholder="Enter designation" />
-                        <Input label="Mobile Number" required type="tel" value={cp.mobile} onChange={(e) => handleContactPersonChange(idx, 'mobile', e.target.value)} placeholder="Enter mobile number" />
+                        <Input label="Mobile Number" required type="tel" inputMode="numeric" maxLength={10} value={cp.mobile} onChange={(e) => handleContactPersonChange(idx, 'mobile', e.target.value)} placeholder="Enter 10-digit mobile number" />
                       </div>
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <Input label="Email Address" type="email" value={cp.email} onChange={(e) => handleContactPersonChange(idx, 'email', e.target.value)} placeholder="Enter email address" />
-                        <Input label="Alternate Mobile" value={cp.alternateMobile} onChange={(e) => handleContactPersonChange(idx, 'alternateMobile', e.target.value)} placeholder="Enter alternate mobile (Optional)" />
+                        <Input label="Alternate Mobile" type="tel" inputMode="numeric" maxLength={10} value={cp.alternateMobile} onChange={(e) => handleContactPersonChange(idx, 'alternateMobile', e.target.value)} placeholder="Enter alternate mobile (Optional)" />
                       </div>
                     </div>
                   </div>
@@ -608,7 +615,7 @@ export default function SamajCensus() {
             <SectionCard title="Submitted By">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Input label="This Form Is Submitted By" required value={form.submittedBy} onChange={handleChange} name="submittedBy" placeholder="Enter Full Name" />
-                <Input label="Mobile Number" required type="tel" value={form.submittedByMobile} onChange={handleChange} name="submittedByMobile" placeholder="Enter Mobile Number" />
+                <Input label="Mobile Number" required type="tel" inputMode="numeric" maxLength={10} value={form.submittedByMobile} onChange={handleChange} name="submittedByMobile" placeholder="Enter 10-Digit Mobile Number" />
               </div>
             </SectionCard>
           </div>

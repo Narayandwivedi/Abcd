@@ -114,6 +114,8 @@ const titleCase = (str) => {
   return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 }
 
+const sanitizeMobile = (value) => value.replace(/\D/g, '').slice(0, 10)
+
 export default function FamilyCensus() {
   const [form, setForm] = useState({
     samaj: '',
@@ -172,8 +174,10 @@ export default function FamilyCensus() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const MOBILE_FIELDS = ['leaderMobile', 'submittedByMobile']
+
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }))
+    setForm((prev) => ({ ...prev, [field]: MOBILE_FIELDS.includes(field) ? sanitizeMobile(value) : value }))
     if (errors[field]) {
       setErrors((prev) => {
         const next = { ...prev }
@@ -185,7 +189,7 @@ export default function FamilyCensus() {
 
   const handleMemberChange = (index, field, value) => {
     const updated = [...form.members]
-    updated[index] = { ...updated[index], [field]: value }
+    updated[index] = { ...updated[index], [field]: field === 'mobile' ? sanitizeMobile(value) : value }
     setForm((prev) => ({ ...prev, members: updated }))
   }
 
@@ -204,6 +208,7 @@ export default function FamilyCensus() {
     const errs = {}
     if (!form.leaderName.trim()) errs.leaderName = 'Family Leader Name Is Required'
     if (!form.leaderMobile.trim()) errs.leaderMobile = 'Mobile Number Is Required'
+    else if (!/^\d{10}$/.test(form.leaderMobile.trim())) errs.leaderMobile = 'Please Enter A Valid 10-Digit Mobile Number'
     if (!form.city.trim()) errs.city = 'City Is Required'
     if (!form.submittedBy.trim()) errs.submittedBy = 'Submitted By Name Is Required'
     if (!form.submittedByMobile.trim()) errs.submittedByMobile = 'Mobile Number Is Required'
@@ -437,9 +442,11 @@ export default function FamilyCensus() {
                   required
                   error={errors.leaderMobile}
                   type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
                   value={form.leaderMobile}
                   onChange={(e) => handleChange('leaderMobile', e.target.value)}
-                  placeholder="Enter Mobile Number"
+                  placeholder="Enter 10-Digit Mobile Number"
                 />
                 <Select
                   label="Samaj"
@@ -659,9 +666,11 @@ export default function FamilyCensus() {
                       <Input
                         label="Mobile Number"
                         type="tel"
+                        inputMode="numeric"
+                        maxLength={10}
                         value={member.mobile}
                         onChange={(e) => handleMemberChange(idx, 'mobile', e.target.value)}
-                        placeholder="Enter mobile number"
+                        placeholder="Enter 10-digit mobile number"
                       />
                       <Input
                         label="Age"
@@ -709,9 +718,11 @@ export default function FamilyCensus() {
                 required
                 error={errors.submittedByMobile}
                 type="tel"
+                inputMode="numeric"
+                maxLength={10}
                 value={form.submittedByMobile}
                 onChange={(e) => handleChange('submittedByMobile', e.target.value)}
-                placeholder="Enter Mobile Number"
+                placeholder="Enter 10-Digit Mobile Number"
               />
             </div>
           </SectionCard>
