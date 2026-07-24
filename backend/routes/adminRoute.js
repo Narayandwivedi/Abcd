@@ -81,19 +81,19 @@ router.delete("/offers/:offerId", adminAuth, checkPermission('canManageContent')
 router.patch("/offers/:offerId/toggle-status", adminAuth, checkPermission('canManageContent'), toggleOfferStatus);
 
 // Samaj Census routes
-router.get("/samaj-census", adminAuth, checkPermission('canManageContent'), getAllSamajAdmin);
-router.get("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), getSamajByIdAdmin);
-router.put("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), updateSamajAdmin);
-router.delete("/samaj-census/:id", adminAuth, checkPermission('canManageContent'), deleteSamajAdmin);
-router.patch("/samaj-census/:id/toggle-status", adminAuth, checkPermission('canManageContent'), toggleSamajStatus);
-router.patch("/samaj-census/:id/verification-status", adminAuth, checkPermission('canManageContent'), setSamajVerificationStatus);
+router.get("/samaj-census", adminAuth, checkPermission('canManageSamajCensus'), getAllSamajAdmin);
+router.get("/samaj-census/:id", adminAuth, checkPermission('canManageSamajCensus'), getSamajByIdAdmin);
+router.put("/samaj-census/:id", adminAuth, checkPermission('canManageSamajCensus'), updateSamajAdmin);
+router.delete("/samaj-census/:id", adminAuth, checkPermission('canManageSamajCensus'), deleteSamajAdmin);
+router.patch("/samaj-census/:id/toggle-status", adminAuth, checkPermission('canManageSamajCensus'), toggleSamajStatus);
+router.patch("/samaj-census/:id/verification-status", adminAuth, checkPermission('canManageSamajCensus'), setSamajVerificationStatus);
 
 // Family Census routes
-router.get("/family-census", adminAuth, checkPermission('canManageContent'), getAllFamiliesAdmin);
-router.get("/family-census/:id", adminAuth, checkPermission('canManageContent'), getFamilyByIdAdmin);
-router.put("/family-census/:id", adminAuth, checkPermission('canManageContent'), updateFamilyAdmin);
-router.delete("/family-census/:id", adminAuth, checkPermission('canManageContent'), deleteFamilyAdmin);
-router.patch("/family-census/:id/toggle-status", adminAuth, checkPermission('canManageContent'), toggleFamilyStatus);
-router.patch("/family-census/:id/verification-status", adminAuth, checkPermission('canManageContent'), setFamilyVerificationStatus);
+router.get("/family-census", adminAuth, checkPermission('canManageFamilyCensus'), getAllFamiliesAdmin);
+router.get("/family-census/:id", adminAuth, checkPermission('canManageFamilyCensus'), getFamilyByIdAdmin);
+router.put("/family-census/:id", adminAuth, checkPermission('canManageFamilyCensus'), updateFamilyAdmin);
+router.delete("/family-census/:id", adminAuth, checkPermission('canManageFamilyCensus'), deleteFamilyAdmin);
+router.patch("/family-census/:id/toggle-status", adminAuth, checkPermission('canManageFamilyCensus'), toggleFamilyStatus);
+router.patch("/family-census/:id/verification-status", adminAuth, checkPermission('canManageFamilyCensus'), setFamilyVerificationStatus);
 
 module.exports = router;

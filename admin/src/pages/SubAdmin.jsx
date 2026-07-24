@@ -56,7 +56,9 @@ const SubAdmin = () => {
       canDeleteBuyLeads: false,
       canViewSellLeads: false,
       canApproveSellLeads: false,
-      canDeleteSellLeads: false
+      canDeleteSellLeads: false,
+      canManageSamajCensus: false,
+      canManageFamilyCensus: false
     }
   })
 
@@ -142,7 +144,9 @@ const SubAdmin = () => {
         canDeleteBuyLeads: false,
         canViewSellLeads: false,
         canApproveSellLeads: false,
-        canDeleteSellLeads: false
+        canDeleteSellLeads: false,
+        canManageSamajCensus: false,
+        canManageFamilyCensus: false
       }
     })
     setShowModal(true)
@@ -415,6 +419,10 @@ const SubAdmin = () => {
       { key: 'canViewSellLeads', label: 'View Sell Leads' },
       { key: 'canApproveSellLeads', label: 'Approve Sell Leads' },
       { key: 'canDeleteSellLeads', label: 'Delete Sell Leads' }
+    ],
+    'Census Management': [
+      { key: 'canManageSamajCensus', label: 'Manage Samaj Census' },
+      { key: 'canManageFamilyCensus', label: 'Manage Family Census' }
     ],
 
   }
