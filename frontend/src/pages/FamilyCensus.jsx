@@ -460,6 +460,10 @@ export default function FamilyCensus() {
                       <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                       <input
                         ref={cityInputRef}
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck="false"
+                        name="family-city-search"
                         value={form.city && !cityDropdownOpen ? `${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}` : citySearch}
                         onChange={(e) => { setCitySearch(e.target.value); setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city) setForm((prev) => ({ ...prev, city: '', district: '', state: '' })) }}
                         onFocus={() => { setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city && !citySearch) setCitySearch(`${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}`) }}
