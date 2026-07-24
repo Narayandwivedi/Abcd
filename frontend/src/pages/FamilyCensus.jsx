@@ -22,13 +22,13 @@ const emptyMember = () => ({
 
 function Input({ label, required, error, className, ...props }) {
   return (
-    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
+    <label className="flex flex-col gap-1 font-medium text-sm flex-1 min-w-0">
       <span className="text-gray-700 text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
       <input
         {...props}
-        className={`w-full px-3.5 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white ${className || ''}`}
+        className={`w-full px-3 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white ${className || ''}`}
       />
       {error && <span className="text-xs text-red-500 mt-0.5">{error}</span>}
     </label>
@@ -37,13 +37,13 @@ function Input({ label, required, error, className, ...props }) {
 
 function Textarea({ label, required, error, ...props }) {
   return (
-    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
+    <label className="flex flex-col gap-1 font-medium text-sm flex-1 min-w-0">
       <span className="text-gray-700 text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
       <textarea
         {...props}
-        className={`w-full px-3.5 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white resize-y min-h-[80px]`}
+        className={`w-full px-3 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white resize-y min-h-[80px]`}
       />
       {error && <span className="text-xs text-red-500 mt-0.5">{error}</span>}
     </label>
@@ -52,13 +52,13 @@ function Textarea({ label, required, error, ...props }) {
 
 function Select({ label, required, error, children, ...props }) {
   return (
-    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
+    <label className="flex flex-col gap-1.5! sm:gap-2! -mt-1 sm:mt-0 font-medium text-sm flex-1 min-w-0">
       <span className="text-gray-700 text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
       <select
         {...props}
-        className={`w-full px-3.5 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white`}
+        className={`w-full px-3 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white`}
       >
         {children}
       </select>
@@ -67,24 +67,42 @@ function Select({ label, required, error, children, ...props }) {
   )
 }
 
-function SectionCard({ title, children }) {
+const CARD_ACCENTS = {
+  bronze: 'bg-gradient-to-r from-[#4A3520] to-[#C67A2D] shadow-md shadow-[#4A3520]/20',
+  plum: 'bg-gradient-to-r from-[#9D174D] to-[#831843] shadow-md shadow-[#9D174D]/20',
+  navy: 'bg-gradient-to-r from-[#1E3A8A] to-[#1E293B] shadow-md shadow-[#1E3A8A]/20',
+}
+
+function SectionCard({ title, children, compactHeader, accent }) {
   return (
-    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
-      <div className="px-6 sm:px-8 py-4 border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white">
-        <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">{title}</h3>
+    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden">
+      <div
+        className={`px-6 sm:px-8 ${compactHeader ? 'py-2.5' : 'py-4'} ${
+          accent ? CARD_ACCENTS[accent] : 'border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white'
+        }`}
+      >
+        <h3 className={`text-base font-bold tracking-wide ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{title}</h3>
       </div>
-      <div className="p-6 sm:p-8">{children}</div>
+      <div className="p-4 sm:p-5">{children}</div>
     </div>
   )
 }
 
-function SectionHeader({ icon, title }) {
+function SectionHeader({ icon, title, subtitle, accent }) {
+  const textClass = `text-lg font-bold ${accent ? 'text-white' : 'text-[#4A3520]'}`
   return (
-    <div className="flex items-center gap-3 mb-6">
-      <div className="w-8 h-8 rounded-lg bg-[#C67A2D]/10 flex items-center justify-center">
-        <span className="text-[#C67A2D] text-base">{icon}</span>
+    <div
+      className={`flex items-center gap-3 w-fit mb-3 ${
+        accent ? 'rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-[#0F766E] to-[#134E4A] shadow-md shadow-[#0F766E]/20' : ''
+      }`}
+    >
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${accent ? 'bg-white/20' : 'bg-[#C67A2D]/10'}`}>
+        <span className={`text-base ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{icon}</span>
       </div>
-      <h2 className="text-lg font-bold text-[#4A3520]">{title}</h2>
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0">
+        <h2 className={textClass}>{title}</h2>
+        {subtitle && <span className={textClass}>{subtitle}</span>}
+      </div>
     </div>
   )
 }
@@ -96,10 +114,6 @@ function PreviewRow({ label, value }) {
       <span className="text-sm text-gray-800 font-medium mt-0.5 sm:mt-0">{value || '—'}</span>
     </div>
   )
-}
-
-function getTodayDate() {
-  return new Date().toISOString().split('T')[0]
 }
 
 const titleCase = (str) => {
@@ -386,51 +400,48 @@ export default function FamilyCensus() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-          <SectionCard title="Family Information">
-            <div className="flex flex-col gap-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <Input
-                  label="Family Leader Name"
-                  required
-                  error={errors.leaderName}
-                  value={form.leaderName}
-                  onChange={(e) => handleChange('leaderName', e.target.value)}
-                  placeholder="Enter Family Leader Name"
-                />
-                <Input
-                  label="Mobile Number"
-                  required
-                  error={errors.leaderMobile}
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={10}
-                  value={form.leaderMobile}
-                  onChange={(e) => handleChange('leaderMobile', e.target.value)}
-                  placeholder="Enter 10-Digit Mobile Number"
-                />
-                <Select
-                  label="Samaj"
-                  value={form.samaj}
-                  onChange={(e) => handleChange('samaj', e.target.value)}
-                >
-                  <option value="">-- Select Samaj --</option>
-                  {samajList.map((s) => (
-                    <option key={s._id} value={s._id}>{s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName}</option>
-                  ))}
-                </Select>
-              </div>
-
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <SectionCard title="Family Information" compactHeader accent="bronze">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-3 [&>label]:gap-2">
+              <Input
+                label="Family Leader Name"
+                required
+                error={errors.leaderName}
+                value={form.leaderName}
+                onChange={(e) => handleChange('leaderName', e.target.value)}
+                placeholder="Enter Family Leader Name"
+              />
+              <Input
+                label="Mobile Number"
+                required
+                error={errors.leaderMobile}
+                type="tel"
+                inputMode="numeric"
+                maxLength={10}
+                value={form.leaderMobile}
+                onChange={(e) => handleChange('leaderMobile', e.target.value)}
+                placeholder="Enter 10-Digit Mobile Number"
+              />
+              <Select
+                label="Samaj"
+                value={form.samaj}
+                onChange={(e) => handleChange('samaj', e.target.value)}
+              >
+                <option value="">-- Select Samaj --</option>
+                {samajList.map((s) => (
+                  <option key={s._id} value={s._id}>{s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName}</option>
+                ))}
+              </Select>
             </div>
           </SectionCard>
 
           <div>
-            <SectionHeader icon="📋" title="Additional Information (Optional)" />
+            <SectionHeader icon="📋" title="Additional Information" subtitle="(Optional)" accent />
             <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
               <button
                 type="button"
                 onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                className="w-full flex items-center justify-between px-6 sm:px-8 py-4 bg-white cursor-pointer transition-colors"
+                className="w-full flex items-center justify-between px-5 sm:px-6 py-2 bg-white cursor-pointer transition-colors"
               >
                 <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
                 <ChevronDown
@@ -443,8 +454,8 @@ export default function FamilyCensus() {
                   additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="p-6 sm:p-8 flex flex-col gap-5">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div className="p-4 sm:p-5 flex flex-col gap-3 [&_label]:gap-2">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-3">
                     <Textarea
                       label="Complete Address"
                       value={form.address}
@@ -469,8 +480,8 @@ export default function FamilyCensus() {
             </div>
           </div>
 
-          <SectionCard title="Family Members">
-            <div className="flex flex-col gap-4">
+          <SectionCard title="Family Members" compactHeader accent="navy">
+            <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400">
                   {form.members.length} member{form.members.length !== 1 ? 's' : ''} added
@@ -503,12 +514,12 @@ export default function FamilyCensus() {
                   key={idx}
                   className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-sm animate-fade-in"
                 >
-                  <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-[#FFF8F0] to-white border-b border-gray-100">
+                  <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-[#4338CA] to-[#312E81] shadow-md shadow-[#4338CA]/20">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-sm">
+                      <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center shadow-sm">
                         <span className="text-xs font-bold text-white">{idx + 1}</span>
                       </div>
-                      <span className="text-sm font-semibold text-gray-700">Member {idx + 1}</span>
+                      <span className="text-sm font-semibold text-white">Member {idx + 1}</span>
                     </div>
                     {form.members.length > 1 && (
                       <button
@@ -521,8 +532,8 @@ export default function FamilyCensus() {
                     )}
                   </div>
 
-                  <div className="p-5 flex flex-col gap-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 flex flex-col gap-3 [&_label]:gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-3">
                       <Input
                         label="Member Name"
                         value={member.name}
@@ -540,7 +551,7 @@ export default function FamilyCensus() {
                         ))}
                       </Select>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3 gap-y-3">
                       <Input
                         label="Mobile Number"
                         type="tel"
@@ -581,8 +592,8 @@ export default function FamilyCensus() {
             </div>
           </SectionCard>
 
-          <SectionCard title="Submitted By">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <SectionCard title="Submitted By" compactHeader accent="plum">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-3 [&>label]:gap-2">
               <Input
                 label="This Form Is Submitted By"
                 required
@@ -605,7 +616,7 @@ export default function FamilyCensus() {
             </div>
           </SectionCard>
 
-          <div className="flex flex-row items-center justify-between gap-3 sm:gap-4 pt-4 pb-8">
+          <div className="flex flex-row items-center justify-between gap-3 sm:gap-4 pt-2 pb-6">
             <button
               type="button"
               onClick={handleReset}
