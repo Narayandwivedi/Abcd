@@ -407,9 +407,9 @@ export default function SamajCensus() {
     <>
       <img src="/samaj hero mobile.avif" alt="" className="w-full h-auto object-contain md:hidden" />
       <img src="/samaj hero.avif" alt="" className="hidden md:block w-full h-auto object-contain" />
-      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-4 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
-        <div className="mb-8">
+        <div className="mb-4 md:mb-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Samaj Census</h1>
           <p className="text-sm sm:text-base text-gray-500 mt-2">
             Fill In The Details Below To Register A New Samaj In The Census Portal.
