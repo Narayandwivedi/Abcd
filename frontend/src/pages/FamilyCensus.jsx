@@ -404,14 +404,14 @@ export default function FamilyCensus() {
     <>
       <img src="/mobile family hero.avif" alt="" className="w-full h-auto object-contain md:hidden" />
       <img src="/familyhero.avif" alt="" className="hidden md:block w-full h-auto object-contain" />
-      <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-4 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
-        <div className="text-center mb-12 pt-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#4A3520] leading-tight">
+        <div className="text-center mb-4 md:mb-12 pt-2 md:pt-4">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[#4A3520] leading-tight">
             Agrawal Samaj Census Portal
           </h1>
-          <div className="mx-auto mt-4 w-20 h-1 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
-          <p className="mt-6 text-base sm:text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed">
+          <div className="mx-auto mt-3 md:mt-4 w-20 h-1 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
+          <p className="mt-2 md:mt-6 text-base sm:text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed">
             Fill In The Details Below To Register A New Family In The Census Portal.
           </p>
         </div>
