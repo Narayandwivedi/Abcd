@@ -99,14 +99,14 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       icon: '🏛️',
       path: '/samaj-census',
       description: 'Manage Samaj Records',
-      requiredPermission: 'canManageContent'
+      requiredPermission: 'canManageSamajCensus'
     },
     {
       name: 'Family Census',
       icon: '👨‍👩‍👧‍👦',
       path: '/family-census',
       description: 'Manage Family Records',
-      requiredPermission: 'canManageContent'
+      requiredPermission: 'canManageFamilyCensus'
     },
     {
       name: 'Reports',

@@ -290,120 +290,117 @@ export default function SamajCensus() {
     )
   }
 
-  if (showPreview) {
-    return (
-      <>
-        <BackgroundMusic />
-        <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-          <div className="max-w-[900px] mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
-                <Eye size={20} className="text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Preview Samaj Details</h1>
-                <p className="text-sm text-gray-500">Please review all information before saving</p>
-              </div>
+  const previewModal = showPreview && (
+    <div className="fixed inset-0 z-50 bg-[#FFF8F0] overflow-y-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+        <div className="max-w-[900px] mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
+              <Eye size={20} className="text-white" />
             </div>
-
-            <div className="flex flex-col gap-5">
-              <SectionCard title="Samaj Information">
-                <PreviewRow label="Samaj Name" value={form.samajName} />
-                <PreviewRow label="Mobile Number" value={form.mobile} />
-                <PreviewRow label="Office Address" value={form.officeAddress} />
-                <PreviewRow label="Email" value={form.email} />
-              </SectionCard>
-
-              <SectionCard title="Location Details">
-                <PreviewRow label="City" value={form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''} />
-                <PreviewRow label="Pincode" value={form.pincode} />
-              </SectionCard>
-
-              <SectionCard title="Contact Persons">
-                {form.contactPersons.map((cp, idx) => (
-                  <div key={idx} className={idx < form.contactPersons.length - 1 ? 'border-b border-gray-100 pb-4 mb-4' : ''}>
-                    <p className="text-xs font-bold text-[#C67A2D] uppercase tracking-wider mb-3">Contact Person {idx + 1}</p>
-                    <PreviewRow label="Name" value={cp.name} />
-                    <PreviewRow label="Designation" value={cp.designation} />
-                    <PreviewRow label="Mobile" value={cp.mobile} />
-                    <PreviewRow label="Email" value={cp.email} />
-                    <PreviewRow label="Alternate Mobile" value={cp.alternateMobile} />
-                  </div>
-                ))}
-              </SectionCard>
-
-              <SectionCard title="Additional Information">
-                <PreviewRow label="Remarks" value={form.remarks} />
-              </SectionCard>
-
-              <SectionCard title="Submitted By">
-                <PreviewRow label="Name" value={form.submittedBy} />
-                <PreviewRow label="Mobile Number" value={form.submittedByMobile} />
-              </SectionCard>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Preview Samaj Details</h1>
+              <p className="text-sm text-gray-500">Please review all information before saving</p>
             </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pb-8">
+          <div className="flex flex-col gap-5">
+            <SectionCard title="Samaj Information">
+              <PreviewRow label="Samaj Name" value={form.samajName} />
+              <PreviewRow label="Mobile Number" value={form.mobile} />
+              <PreviewRow label="Office Address" value={form.officeAddress} />
+              <PreviewRow label="Email" value={form.email} />
+            </SectionCard>
+
+            <SectionCard title="Location Details">
+              <PreviewRow label="City" value={form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''} />
+              <PreviewRow label="Pincode" value={form.pincode} />
+            </SectionCard>
+
+            <SectionCard title="Contact Persons">
+              {form.contactPersons.map((cp, idx) => (
+                <div key={idx} className={idx < form.contactPersons.length - 1 ? 'border-b border-gray-100 pb-4 mb-4' : ''}>
+                  <p className="text-xs font-bold text-[#C67A2D] uppercase tracking-wider mb-3">Contact Person {idx + 1}</p>
+                  <PreviewRow label="Name" value={cp.name} />
+                  <PreviewRow label="Designation" value={cp.designation} />
+                  <PreviewRow label="Mobile" value={cp.mobile} />
+                  <PreviewRow label="Email" value={cp.email} />
+                  <PreviewRow label="Alternate Mobile" value={cp.alternateMobile} />
+                </div>
+              ))}
+            </SectionCard>
+
+            <SectionCard title="Additional Information">
+              <PreviewRow label="Remarks" value={form.remarks} />
+            </SectionCard>
+
+            <SectionCard title="Submitted By">
+              <PreviewRow label="Name" value={form.submittedBy} />
+              <PreviewRow label="Mobile Number" value={form.submittedByMobile} />
+            </SectionCard>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pb-8">
+            <button
+              type="button"
+              onClick={() => setShowPreview(false)}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-[14px] text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Edit3 size={16} /> Edit Details
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowConfirm(true)}
+              className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+            >
+              Save Samaj
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {showConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
+          <div className="relative bg-white rounded-[20px] shadow-2xl p-8 max-w-md w-full animate-fade-in">
+            <button
+              type="button"
+              onClick={() => setShowConfirm(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <X size={16} className="text-gray-500" />
+            </button>
+            <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto">
+              <AlertTriangle size={28} className="text-amber-500" />
+            </div>
+            <h3 className="text-lg font-bold text-[#4A3520] text-center mt-4">Confirm Save</h3>
+            <p className="text-sm text-gray-500 text-center mt-2 leading-relaxed">
+              Are you sure you want to save this Samaj data? Please verify all details before confirming.
+            </p>
+            <div className="flex gap-3 mt-8">
               <button
                 type="button"
-                onClick={() => setShowPreview(false)}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-[14px] text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-all duration-200 cursor-pointer"
               >
-                <Edit3 size={16} /> Edit Details
+                Cancel
               </button>
               <button
                 type="button"
-                onClick={() => setShowConfirm(true)}
-                className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                onClick={handleConfirmSave}
+                disabled={submitting}
+                className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] transition-all duration-200 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                Save Samaj
+                {submitting ? (
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
+                ) : 'Yes, Save'}
               </button>
             </div>
           </div>
         </div>
-
-        {showConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
-            <div className="relative bg-white rounded-[20px] shadow-2xl p-8 max-w-md w-full animate-fade-in">
-              <button
-                type="button"
-                onClick={() => setShowConfirm(false)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <X size={16} className="text-gray-500" />
-              </button>
-              <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto">
-                <AlertTriangle size={28} className="text-amber-500" />
-              </div>
-              <h3 className="text-lg font-bold text-[#4A3520] text-center mt-4">Confirm Save</h3>
-              <p className="text-sm text-gray-500 text-center mt-2 leading-relaxed">
-                Are you sure you want to save this Samaj data? Please verify all details before confirming.
-              </p>
-              <div className="flex gap-3 mt-8">
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm(false)}
-                  className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-all duration-200 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmSave}
-                  disabled={submitting}
-                  className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] transition-all duration-200 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
-                >
-                  {submitting ? (
-                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
-                  ) : 'Yes, Save'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
-    )
-  }
+      )}
+    </div>
+  )
 
   return (
     <>
@@ -646,6 +643,7 @@ export default function SamajCensus() {
         </form>
       </div>
     </div>
+    {previewModal}
     </>
   )
 }

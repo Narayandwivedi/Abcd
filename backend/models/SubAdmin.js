@@ -172,6 +172,16 @@ const subAdminSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+
+    // Census Management
+    canManageSamajCensus: {
+      type: Boolean,
+      default: false,
+    },
+    canManageFamilyCensus: {
+      type: Boolean,
+      default: false,
+    },
   },
   lastLogin: {
     type: Date,
