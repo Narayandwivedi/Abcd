@@ -197,73 +197,98 @@ const AdminFamilyCensus = () => {
         />
       </div>
 
-      <div className='bg-white rounded-xl shadow-md overflow-hidden'>
-        <div className='overflow-x-auto'>
-          <table className='w-full'>
-            <thead className='bg-gray-50 border-b border-gray-200'>
-              <tr>
-                <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase'>#</th>
-                <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase'>Leader Name</th>
-                <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase'>Mobile</th>
-                <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase'>City / State</th>
-                <th className='px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase'>Members</th>
-                <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase'>Status</th>
-                <th className='px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase'>Actions</th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-gray-200'>
-              {loading ? (
-                <tr>
-                  <td colSpan='7' className='px-4 py-8 text-center text-gray-500'>
-                    <div className='flex items-center justify-center'>
-                      <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
-                      <span className='ml-3'>Loading...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredList.length === 0 ? (
-                <tr>
-                  <td colSpan='7' className='px-4 py-8 text-center text-gray-500'>
-                    {searchTerm ? 'No records found matching your search' : 'No family records available'}
-                  </td>
-                </tr>
-              ) : (
-                filteredList.map((family, index) => (
-                  <tr key={family._id} className='hover:bg-gray-50 transition-colors'>
-                    <td className='px-4 py-3 text-sm text-gray-600'>{index + 1}</td>
-                    <td className='px-4 py-3 text-sm font-semibold text-gray-800'>{family.leaderName}</td>
-                    <td className='px-4 py-3 text-sm text-gray-600'>{family.leaderMobile || '—'}</td>
-                    <td className='px-4 py-3 text-sm text-gray-600'>{[family.city, family.state].filter(Boolean).join(', ') || '—'}</td>
-                    <td className='px-4 py-3 text-sm text-center text-gray-600'>{family.members?.length || 0}</td>
-                    <td className='px-4 py-3'>
-                      <button
-                        onClick={() => handleToggleStatus(family._id)}
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          family.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        } transition`}
-                      >
-                        {family.isActive ? 'Active' : 'Inactive'}
-                      </button>
-                    </td>
-                    <td className='px-4 py-3'>
-                      <div className='flex items-center justify-center gap-2'>
-                        <button
-                          onClick={() => openEditModal(family)}
-                          className='bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-semibold transition'
-                        >Edit</button>
-                        <button
-                          onClick={() => handleDelete(family._id, family.leaderName)}
-                          className='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-semibold transition'
-                        >Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {loading ? (
+        <div className='bg-white rounded-xl shadow-md py-12 flex items-center justify-center'>
+          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
+          <span className='ml-3 text-gray-500'>Loading...</span>
         </div>
-      </div>
+      ) : filteredList.length === 0 ? (
+        <div className='bg-white rounded-xl shadow-md py-12 text-center text-gray-500'>
+          {searchTerm ? 'No records found matching your search' : 'No family records available'}
+        </div>
+      ) : (
+        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+          {filteredList.map((family) => {
+            const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
+              || family.samaj?.samajName
+            return (
+              <div key={family._id} className='bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg transition-shadow'>
+                <div className='px-5 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white'>
+                  <div className='flex items-start justify-between gap-2'>
+                    <div>
+                      <h3 className='font-bold text-lg leading-tight'>{family.leaderName}</h3>
+                      {samajName && <p className='text-xs text-blue-100 mt-0.5'>{samajName}</p>}
+                    </div>
+                    <button
+                      onClick={() => handleToggleStatus(family._id)}
+                      className={`shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition ${
+                        family.isActive ? 'bg-green-400/90 text-green-900 hover:bg-green-300' : 'bg-white/20 text-white hover:bg-white/30'
+                      }`}
+                    >
+                      {family.isActive ? 'Active' : 'Inactive'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className='p-5 flex-1 flex flex-col gap-3 text-sm'>
+                  <div className='flex flex-wrap gap-x-5 gap-y-1.5 text-gray-600'>
+                    <span><span className='font-semibold text-gray-500'>Mobile:</span> {family.leaderMobile || '—'}</span>
+                    <span><span className='font-semibold text-gray-500'>Pincode:</span> {family.pincode || '—'}</span>
+                  </div>
+
+                  <div className='text-gray-600'>
+                    <span className='font-semibold text-gray-500'>Address:</span> {family.address || '—'}
+                  </div>
+                  <div className='text-gray-600'>
+                    <span className='font-semibold text-gray-500'>Location:</span> {[family.city, family.district, family.state].filter(Boolean).join(', ') || '—'}
+                  </div>
+
+                  {family.remarks && (
+                    <div className='text-gray-600'>
+                      <span className='font-semibold text-gray-500'>Remarks:</span> {family.remarks}
+                    </div>
+                  )}
+
+                  <div>
+                    <p className='font-semibold text-gray-500 mb-1.5'>Members ({family.members?.length || 0})</p>
+                    {family.members?.length > 0 ? (
+                      <div className='flex flex-col gap-1.5'>
+                        {family.members.map((m, idx) => (
+                          <div key={idx} className='bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
+                            <div className='flex items-center justify-between'>
+                              <span className='font-semibold text-gray-800'>{m.name || '—'}</span>
+                              <span className='text-xs text-gray-400'>{m.relation || '—'}</span>
+                            </div>
+                            <div className='text-xs text-gray-500 mt-0.5 flex flex-wrap gap-x-3'>
+                              {m.mobile && <span>📞 {m.mobile}</span>}
+                              {m.age && <span>Age: {m.age}</span>}
+                              {m.gender && <span>{m.gender}</span>}
+                              {m.occupation && <span>{m.occupation}</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className='text-xs text-gray-400 italic'>No members added</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-2'>
+                  <button
+                    onClick={() => openEditModal(family)}
+                    className='flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  >Edit</button>
+                  <button
+                    onClick={() => handleDelete(family._id, family.leaderName)}
+                    className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  >Delete</button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {showEditModal && (
         <div className='fixed inset-0 bg-black/60 flex items-start justify-center z-50 p-4 pt-8 overflow-y-auto'>

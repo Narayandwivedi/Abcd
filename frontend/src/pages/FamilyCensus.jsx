@@ -202,7 +202,6 @@ export default function FamilyCensus() {
     const errs = {}
     if (!form.leaderName.trim()) errs.leaderName = 'Family Leader Name Is Required'
     if (!form.leaderMobile.trim()) errs.leaderMobile = 'Mobile Number Is Required'
-    if (!form.address.trim()) errs.address = 'Address Is Required'
     if (!form.city.trim()) errs.city = 'City Is Required'
     return errs
   }
@@ -297,8 +296,8 @@ export default function FamilyCensus() {
               <SectionCard title="Family Information">
                 <PreviewRow label="Family Leader Name" value={form.leaderName} />
                 <PreviewRow label="Mobile Number" value={form.leaderMobile} />
-                <PreviewRow label="Complete Address" value={form.address} />
                 <PreviewRow label="City" value={form.city ? `${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}` : ''} />
+                <PreviewRow label="Complete Address" value={form.address} />
                 <PreviewRow label="Pincode" value={form.pincode} />
                 <PreviewRow label="Remarks" value={form.remarks} />
               </SectionCard>
@@ -436,21 +435,7 @@ export default function FamilyCensus() {
                 </Select>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <Textarea
-                  label="Complete Address"
-                  required
-                  error={errors.address}
-                  value={form.address}
-                  onChange={(e) => handleChange('address', e.target.value)}
-                  placeholder="Enter Complete Address"
-                />
-                <Input
-                  label="Pincode"
-                  value={form.pincode}
-                  onChange={(e) => handleChange('pincode', e.target.value)}
-                  placeholder="Enter Pincode"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="relative min-w-0" ref={cityRef}>
                   <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
                     <span className="text-gray-700 text-sm font-semibold">
@@ -553,6 +538,21 @@ export default function FamilyCensus() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <Textarea
+                  label="Complete Address"
+                  value={form.address}
+                  onChange={(e) => handleChange('address', e.target.value)}
+                  placeholder="Enter Complete Address (Optional)"
+                />
+                <Input
+                  label="Pincode"
+                  value={form.pincode}
+                  onChange={(e) => handleChange('pincode', e.target.value)}
+                  placeholder="Enter Pincode"
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
