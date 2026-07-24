@@ -232,6 +232,8 @@ export default function SamajCensus() {
         })),
         remarks: form.remarks,
         isActive: true,
+        submittedBy: form.submittedBy,
+        submittedByMobile: form.submittedByMobile,
       })
       setShowPreview(false)
       setShowSuccess(true)

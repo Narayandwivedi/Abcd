@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { Phone, MapPin, Users, FileText, UserCheck, Calendar, Building2 } from 'lucide-react'
 
 const RELATION_OPTIONS = [
   'Self', 'Husband', 'Wife', 'Son', 'Daughter', 'Father', 'Mother',
@@ -31,7 +32,7 @@ const AdminFamilyCensus = () => {
   const [formData, setFormData] = useState({
     samaj: '', leaderName: '', leaderMobile: '', address: '',
     state: '', district: '', city: '', pincode: '',
-    remarks: '', members: [],
+    remarks: '', members: [], submittedBy: '', submittedByMobile: '',
   })
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
@@ -141,6 +142,8 @@ const AdminFamilyCensus = () => {
             age: m.age || '', gender: m.gender || '', occupation: m.occupation || '',
           }))
         : [],
+      submittedBy: family.submittedBy || '',
+      submittedByMobile: family.submittedByMobile || '',
     })
     setShowEditModal(true)
   }
@@ -207,17 +210,24 @@ const AdminFamilyCensus = () => {
           {searchTerm ? 'No records found matching your search' : 'No family records available'}
         </div>
       ) : (
-        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5'>
           {filteredList.map((family) => {
             const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
               || family.samaj?.samajName
+            const createdDate = family.createdAt
+              ? new Date(family.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+              : null
             return (
-              <div key={family._id} className='bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg transition-shadow'>
-                <div className='px-5 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white'>
+              <div key={family._id} className='bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300'>
+                <div className='relative px-5 py-4 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 text-white'>
                   <div className='flex items-start justify-between gap-2'>
-                    <div>
-                      <h3 className='font-bold text-lg leading-tight'>{family.leaderName}</h3>
-                      {samajName && <p className='text-xs text-blue-100 mt-0.5'>{samajName}</p>}
+                    <div className='min-w-0'>
+                      <h3 className='font-bold text-lg leading-tight truncate'>{family.leaderName}</h3>
+                      {samajName && (
+                        <p className='text-xs text-blue-100 mt-1 flex items-center gap-1'>
+                          <Building2 size={12} /> {samajName}
+                        </p>
+                      )}
                     </div>
                     <button
                       onClick={() => handleToggleStatus(family._id)}
@@ -228,40 +238,48 @@ const AdminFamilyCensus = () => {
                       {family.isActive ? 'Active' : 'Inactive'}
                     </button>
                   </div>
+                  <div className='flex items-center gap-3 mt-3 text-xs text-blue-50'>
+                    <span className='flex items-center gap-1'><Users size={12} /> {family.members?.length || 0} member{family.members?.length !== 1 ? 's' : ''}</span>
+                    {createdDate && <span className='flex items-center gap-1'><Calendar size={12} /> {createdDate}</span>}
+                  </div>
                 </div>
 
-                <div className='p-5 flex-1 flex flex-col gap-3 text-sm'>
+                <div className='p-5 flex-1 flex flex-col gap-3.5 text-sm'>
                   <div className='flex flex-wrap gap-x-5 gap-y-1.5 text-gray-600'>
-                    <span><span className='font-semibold text-gray-500'>Mobile:</span> {family.leaderMobile || '—'}</span>
-                    <span><span className='font-semibold text-gray-500'>Pincode:</span> {family.pincode || '—'}</span>
+                    <span className='flex items-center gap-1.5'><Phone size={13} className='text-blue-500' /> {family.leaderMobile || '—'}</span>
+                    {family.pincode && <span className='text-gray-500'>Pin: {family.pincode}</span>}
                   </div>
 
-                  <div className='text-gray-600'>
-                    <span className='font-semibold text-gray-500'>Address:</span> {family.address || '—'}
-                  </div>
-                  <div className='text-gray-600'>
-                    <span className='font-semibold text-gray-500'>Location:</span> {[family.city, family.district, family.state].filter(Boolean).join(', ') || '—'}
+                  <div className='flex items-start gap-1.5 text-gray-600'>
+                    <MapPin size={14} className='text-blue-500 mt-0.5 shrink-0' />
+                    <div>
+                      {family.address && <div>{family.address}</div>}
+                      <div className='text-gray-500'>{[family.city, family.district, family.state].filter(Boolean).join(', ') || '—'}</div>
+                    </div>
                   </div>
 
                   {family.remarks && (
-                    <div className='text-gray-600'>
-                      <span className='font-semibold text-gray-500'>Remarks:</span> {family.remarks}
+                    <div className='flex items-start gap-1.5 text-gray-600'>
+                      <FileText size={14} className='text-blue-500 mt-0.5 shrink-0' />
+                      <span>{family.remarks}</span>
                     </div>
                   )}
 
                   <div>
-                    <p className='font-semibold text-gray-500 mb-1.5'>Members ({family.members?.length || 0})</p>
+                    <p className='font-semibold text-gray-500 mb-1.5 flex items-center gap-1.5'>
+                      <Users size={13} /> Members ({family.members?.length || 0})
+                    </p>
                     {family.members?.length > 0 ? (
                       <div className='flex flex-col gap-1.5'>
                         {family.members.map((m, idx) => (
                           <div key={idx} className='bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
                             <div className='flex items-center justify-between'>
                               <span className='font-semibold text-gray-800'>{m.name || '—'}</span>
-                              <span className='text-xs text-gray-400'>{m.relation || '—'}</span>
+                              <span className='text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full'>{m.relation || '—'}</span>
                             </div>
-                            <div className='text-xs text-gray-500 mt-0.5 flex flex-wrap gap-x-3'>
-                              {m.mobile && <span>📞 {m.mobile}</span>}
-                              {m.age && <span>Age: {m.age}</span>}
+                            <div className='text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-0.5'>
+                              {m.mobile && <span className='flex items-center gap-1'><Phone size={10} /> {m.mobile}</span>}
+                              {m.age ? <span>Age: {m.age}</span> : null}
                               {m.gender && <span>{m.gender}</span>}
                               {m.occupation && <span>{m.occupation}</span>}
                             </div>
@@ -272,6 +290,17 @@ const AdminFamilyCensus = () => {
                       <p className='text-xs text-gray-400 italic'>No members added</p>
                     )}
                   </div>
+
+                  {(family.submittedBy || family.submittedByMobile) && (
+                    <div className='mt-auto pt-3 border-t border-dashed border-gray-200 flex items-center gap-2 text-xs text-gray-500'>
+                      <UserCheck size={14} className='text-emerald-500 shrink-0' />
+                      <span>
+                        <span className='font-semibold text-gray-600'>Submitted by:</span>{' '}
+                        {family.submittedBy || '—'}
+                        {family.submittedByMobile && <span className='text-gray-400'> · {family.submittedByMobile}</span>}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-2'>
@@ -408,6 +437,19 @@ const AdminFamilyCensus = () => {
                 <label className='block text-sm font-semibold text-gray-700 mb-1'>Remarks</label>
                 <textarea value={formData.remarks} onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y' rows='2' />
+              </div>
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-100 pt-4'>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Submitted By</label>
+                  <input type='text' value={formData.submittedBy} onChange={(e) => setFormData({ ...formData, submittedBy: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                </div>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Submitted By Mobile</label>
+                  <input type='text' value={formData.submittedByMobile} onChange={(e) => setFormData({ ...formData, submittedByMobile: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                </div>
               </div>
 
               <div className='flex gap-3 pt-2'>

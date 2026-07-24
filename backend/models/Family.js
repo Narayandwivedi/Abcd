@@ -25,6 +25,8 @@ const familySchema = new mongoose.Schema(
     remarks: { type: String, trim: true },
     isActive: { type: Boolean, default: true },
     members: { type: [familyMemberSchema], default: [] },
+    submittedBy: { type: String, trim: true },
+    submittedByMobile: { type: String, trim: true },
   },
   { timestamps: true }
 );

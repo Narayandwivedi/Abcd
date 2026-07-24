@@ -22,6 +22,8 @@ const samajSchema = new mongoose.Schema(
     pincode: { type: String, trim: true },
     remarks: { type: String, trim: true },
     isActive: { type: Boolean, default: true },
+    submittedBy: { type: String, trim: true },
+    submittedByMobile: { type: String, trim: true },
   },
   { timestamps: true }
 );

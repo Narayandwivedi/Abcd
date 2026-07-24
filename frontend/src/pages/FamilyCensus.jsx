@@ -229,6 +229,8 @@ export default function FamilyCensus() {
           ...m,
           age: m.age ? Number(m.age) : 0,
         })),
+        submittedBy: form.submittedBy,
+        submittedByMobile: form.submittedByMobile,
       })
       setShowPreview(false)
       toast.success('Family Registered Successfully!')

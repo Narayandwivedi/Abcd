@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { Phone, Mail, MapPin, Users, FileText, UserCheck, Calendar } from 'lucide-react'
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -26,6 +27,7 @@ const AdminSamajCensus = () => {
     samajName: '', officeAddress: '', mobile: '', email: '',
     state: '', district: '', city: '', pincode: '',
     leaders: [emptyLeader()], remarks: '',
+    submittedBy: '', submittedByMobile: '',
   })
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
@@ -125,6 +127,8 @@ const AdminSamajCensus = () => {
         ? samaj.leaders.map(l => ({ designation: l.designation || '', name: l.name || '', mobile: l.mobile || '' }))
         : [emptyLeader()],
       remarks: samaj.remarks || '',
+      submittedBy: samaj.submittedBy || '',
+      submittedByMobile: samaj.submittedByMobile || '',
     })
     setShowEditModal(true)
   }
@@ -191,77 +195,105 @@ const AdminSamajCensus = () => {
           {searchTerm ? 'No records found matching your search' : 'No samaj records available'}
         </div>
       ) : (
-        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
-          {filteredList.map((samaj) => (
-            <div key={samaj._id} className='bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg transition-shadow'>
-              <div className='px-5 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white'>
-                <div className='flex items-start justify-between gap-2'>
-                  <div>
-                    <h3 className='font-bold text-lg leading-tight'>{samaj.samajName}</h3>
-                    {samaj.email && <p className='text-xs text-orange-100 mt-0.5'>{samaj.email}</p>}
-                  </div>
-                  <button
-                    onClick={() => handleToggleStatus(samaj._id)}
-                    className={`shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition ${
-                      samaj.isActive ? 'bg-green-400/90 text-green-900 hover:bg-green-300' : 'bg-white/20 text-white hover:bg-white/30'
-                    }`}
-                  >
-                    {samaj.isActive ? 'Active' : 'Inactive'}
-                  </button>
-                </div>
-              </div>
-
-              <div className='p-5 flex-1 flex flex-col gap-3 text-sm'>
-                <div className='flex flex-wrap gap-x-5 gap-y-1.5 text-gray-600'>
-                  <span><span className='font-semibold text-gray-500'>Mobile:</span> {samaj.mobile || '—'}</span>
-                  <span><span className='font-semibold text-gray-500'>Pincode:</span> {samaj.pincode || '—'}</span>
-                </div>
-
-                <div className='text-gray-600'>
-                  <span className='font-semibold text-gray-500'>Office Address:</span> {samaj.officeAddress || '—'}
-                </div>
-                <div className='text-gray-600'>
-                  <span className='font-semibold text-gray-500'>Location:</span> {[samaj.city, samaj.district, samaj.state].filter(Boolean).join(', ') || '—'}
-                </div>
-
-                {samaj.remarks && (
-                  <div className='text-gray-600'>
-                    <span className='font-semibold text-gray-500'>Remarks:</span> {samaj.remarks}
-                  </div>
-                )}
-
-                <div>
-                  <p className='font-semibold text-gray-500 mb-1.5'>Leaders ({samaj.leaders?.length || 0})</p>
-                  {samaj.leaders?.length > 0 ? (
-                    <div className='flex flex-col gap-1.5'>
-                      {samaj.leaders.map((l, idx) => (
-                        <div key={idx} className='bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
-                          <div className='flex items-center justify-between'>
-                            <span className='font-semibold text-gray-800'>{l.name || '—'}</span>
-                            <span className='text-xs text-gray-400'>{l.designation || '—'}</span>
-                          </div>
-                          {l.mobile && <div className='text-xs text-gray-500 mt-0.5'>📞 {l.mobile}</div>}
-                        </div>
-                      ))}
+        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5'>
+          {filteredList.map((samaj) => {
+            const createdDate = samaj.createdAt
+              ? new Date(samaj.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+              : null
+            return (
+              <div key={samaj._id} className='bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300'>
+                <div className='relative px-5 py-4 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 text-white'>
+                  <div className='flex items-start justify-between gap-2'>
+                    <div className='min-w-0'>
+                      <h3 className='font-bold text-lg leading-tight truncate'>{samaj.samajName}</h3>
+                      {samaj.email && (
+                        <p className='text-xs text-orange-100 mt-1 flex items-center gap-1 truncate'>
+                          <Mail size={12} /> {samaj.email}
+                        </p>
+                      )}
                     </div>
-                  ) : (
-                    <p className='text-xs text-gray-400 italic'>No leaders added</p>
+                    <button
+                      onClick={() => handleToggleStatus(samaj._id)}
+                      className={`shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition ${
+                        samaj.isActive ? 'bg-green-400/90 text-green-900 hover:bg-green-300' : 'bg-white/20 text-white hover:bg-white/30'
+                      }`}
+                    >
+                      {samaj.isActive ? 'Active' : 'Inactive'}
+                    </button>
+                  </div>
+                  <div className='flex items-center gap-3 mt-3 text-xs text-orange-50'>
+                    <span className='flex items-center gap-1'><Users size={12} /> {samaj.leaders?.length || 0} leader{samaj.leaders?.length !== 1 ? 's' : ''}</span>
+                    {createdDate && <span className='flex items-center gap-1'><Calendar size={12} /> {createdDate}</span>}
+                  </div>
+                </div>
+
+                <div className='p-5 flex-1 flex flex-col gap-3.5 text-sm'>
+                  <div className='flex flex-wrap gap-x-5 gap-y-1.5 text-gray-600'>
+                    <span className='flex items-center gap-1.5'><Phone size={13} className='text-orange-500' /> {samaj.mobile || '—'}</span>
+                    {samaj.pincode && <span className='text-gray-500'>Pin: {samaj.pincode}</span>}
+                  </div>
+
+                  <div className='flex items-start gap-1.5 text-gray-600'>
+                    <MapPin size={14} className='text-orange-500 mt-0.5 shrink-0' />
+                    <div>
+                      {samaj.officeAddress && <div>{samaj.officeAddress}</div>}
+                      <div className='text-gray-500'>{[samaj.city, samaj.district, samaj.state].filter(Boolean).join(', ') || '—'}</div>
+                    </div>
+                  </div>
+
+                  {samaj.remarks && (
+                    <div className='flex items-start gap-1.5 text-gray-600'>
+                      <FileText size={14} className='text-orange-500 mt-0.5 shrink-0' />
+                      <span>{samaj.remarks}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <p className='font-semibold text-gray-500 mb-1.5 flex items-center gap-1.5'>
+                      <Users size={13} /> Leaders ({samaj.leaders?.length || 0})
+                    </p>
+                    {samaj.leaders?.length > 0 ? (
+                      <div className='flex flex-col gap-1.5'>
+                        {samaj.leaders.map((l, idx) => (
+                          <div key={idx} className='bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
+                            <div className='flex items-center justify-between'>
+                              <span className='font-semibold text-gray-800'>{l.name || '—'}</span>
+                              <span className='text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full'>{l.designation || '—'}</span>
+                            </div>
+                            {l.mobile && <div className='text-xs text-gray-500 mt-1 flex items-center gap-1'><Phone size={10} /> {l.mobile}</div>}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className='text-xs text-gray-400 italic'>No leaders added</p>
+                    )}
+                  </div>
+
+                  {(samaj.submittedBy || samaj.submittedByMobile) && (
+                    <div className='mt-auto pt-3 border-t border-dashed border-gray-200 flex items-center gap-2 text-xs text-gray-500'>
+                      <UserCheck size={14} className='text-emerald-500 shrink-0' />
+                      <span>
+                        <span className='font-semibold text-gray-600'>Submitted by:</span>{' '}
+                        {samaj.submittedBy || '—'}
+                        {samaj.submittedByMobile && <span className='text-gray-400'> · {samaj.submittedByMobile}</span>}
+                      </span>
+                    </div>
                   )}
                 </div>
-              </div>
 
-              <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-2'>
-                <button
-                  onClick={() => openEditModal(samaj)}
-                  className='flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
-                >Edit</button>
-                <button
-                  onClick={() => handleDelete(samaj._id, samaj.samajName)}
-                  className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
-                >Delete</button>
+                <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-2'>
+                  <button
+                    onClick={() => openEditModal(samaj)}
+                    className='flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  >Edit</button>
+                  <button
+                    onClick={() => handleDelete(samaj._id, samaj.samajName)}
+                    className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  >Delete</button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
@@ -356,6 +388,19 @@ const AdminSamajCensus = () => {
                 <label className='block text-sm font-semibold text-gray-700 mb-1'>Remarks</label>
                 <textarea value={formData.remarks} onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y' rows='2' />
+              </div>
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-100 pt-4'>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Submitted By</label>
+                  <input type='text' value={formData.submittedBy} onChange={(e) => setFormData({ ...formData, submittedBy: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                </div>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Submitted By Mobile</label>
+                  <input type='text' value={formData.submittedByMobile} onChange={(e) => setFormData({ ...formData, submittedByMobile: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                </div>
               </div>
 
               <div className='flex gap-3 pt-2'>
