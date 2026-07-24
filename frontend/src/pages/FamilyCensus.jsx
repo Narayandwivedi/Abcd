@@ -53,7 +53,7 @@ function Textarea({ label, required, error, ...props }) {
 
 function Select({ label, required, error, children, ...props }) {
   return (
-    <label className="flex flex-col gap-1 font-medium text-sm flex-1 min-w-0">
+    <label className="flex flex-col gap-1.5! sm:gap-2! -mt-1 sm:mt-0 font-medium text-sm flex-1 min-w-0">
       <span className="text-gray-700 text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
