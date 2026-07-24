@@ -8,20 +8,21 @@ export default function BackgroundMusic({ src = '/music.mp3', volume = 0.18 }) {
     if (!audio) return
     audio.volume = volume
 
-    const tryPlay = () => audio.play().catch(() => {})
+    const events = ['touchstart', 'touchend', 'pointerdown', 'mousedown', 'click', 'keydown']
+    const unlock = () => events.forEach((evt) => document.removeEventListener(evt, startOnInteraction, true))
+    const tryPlay = () => audio.play().then(unlock).catch(() => {})
     tryPlay()
 
     const startOnInteraction = () => {
       tryPlay()
-      document.removeEventListener('click', startOnInteraction)
-      document.removeEventListener('touchstart', startOnInteraction)
     }
-    document.addEventListener('click', startOnInteraction)
-    document.addEventListener('touchstart', startOnInteraction)
+    // capture: true so an ancestor/descendant calling stopPropagation() on its own
+    // click/touch handler (dropdowns, modals, etc.) can't swallow the gesture before
+    // it reaches this listener.
+    events.forEach((evt) => document.addEventListener(evt, startOnInteraction, true))
 
     return () => {
-      document.removeEventListener('click', startOnInteraction)
-      document.removeEventListener('touchstart', startOnInteraction)
+      events.forEach((evt) => document.removeEventListener(evt, startOnInteraction, true))
     }
   }, [volume])
 
