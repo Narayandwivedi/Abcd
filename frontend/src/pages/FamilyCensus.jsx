@@ -19,6 +19,23 @@ const emptyMember = () => ({
   occupation: '',
 })
 
+const filterAndSortCities = (cityList, citySearch, currentDisplay) => {
+  if (!citySearch || citySearch === currentDisplay) return cityList
+  const q = citySearch.toLowerCase()
+  const rank = (c) => {
+    const city = c.city.toLowerCase()
+    if (city.startsWith(q)) return 0
+    if (city.includes(q)) return 1
+    if (c.district.toLowerCase().includes(q) || c.state.toLowerCase().includes(q)) return 2
+    return -1
+  }
+  return cityList
+    .map((c) => ({ c, r: rank(c) }))
+    .filter(({ r }) => r !== -1)
+    .sort((a, b) => a.r - b.r || a.c.city.localeCompare(b.c.city))
+    .map(({ c }) => c)
+}
+
 
 
 function Input({ label, required, error, className, ...props }) {
@@ -447,13 +464,8 @@ export default function FamilyCensus() {
                         onChange={(e) => { setCitySearch(e.target.value); setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city) setForm((prev) => ({ ...prev, city: '', district: '', state: '' })) }}
                         onFocus={() => { setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city && !citySearch) setCitySearch(`${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}`) }}
                         onKeyDown={(e) => {
-                          const filtered = cityList.filter((c) => {
-                            if (!citySearch) return true
-                            const currentDisplay = form.city ? `${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}` : ''
-                            if (citySearch === currentDisplay) return true
-                            const q = citySearch.toLowerCase()
-                            return c.city.toLowerCase().includes(q) || c.district.toLowerCase().includes(q) || c.state.toLowerCase().includes(q)
-                          })
+                          const currentDisplay = form.city ? `${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}` : ''
+                          const filtered = filterAndSortCities(cityList, citySearch, currentDisplay)
                           const visible = filtered.slice(0, 50)
                           if (e.key === 'ArrowDown') {
                             e.preventDefault()
@@ -495,7 +507,7 @@ export default function FamilyCensus() {
                     {errors.city && <span className="text-xs text-red-500 mt-0.5">{errors.city}</span>}
                   </label>
                   {cityDropdownOpen && (
-                    <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/50 max-h-56 overflow-y-auto">
+                    <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/50 max-h-80 overflow-y-auto">
                       {cityLoading ? (
                         <div className="px-4 py-6 text-sm text-gray-400 flex flex-col items-center justify-center gap-2">
                           <div className="w-5 h-5 border-2 border-[#C67A2D]/30 border-t-[#C67A2D] rounded-full animate-spin" />
@@ -503,13 +515,8 @@ export default function FamilyCensus() {
                         </div>
                       ) : (
                         (() => {
-                          const filtered = cityList.filter((c) => {
-                            if (!citySearch) return true
-                            const currentDisplay = form.city ? `${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}` : ''
-                            if (citySearch === currentDisplay) return true
-                            const q = citySearch.toLowerCase()
-                            return c.city.toLowerCase().includes(q) || c.district.toLowerCase().includes(q) || c.state.toLowerCase().includes(q)
-                          })
+                          const currentDisplay = form.city ? `${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}` : ''
+                          const filtered = filterAndSortCities(cityList, citySearch, currentDisplay)
                           if (filtered.length === 0) {
                             return (
                               <div className="px-4 py-6 text-sm text-gray-400 text-center">No cities found</div>
