@@ -68,24 +68,42 @@ function Select({ label, required, error, children, ...props }) {
   )
 }
 
-function SectionCard({ title, children, compactHeader }) {
+const CARD_ACCENTS = {
+  bronze: 'bg-gradient-to-r from-[#4A3520] to-[#C67A2D] shadow-md shadow-[#4A3520]/20',
+  plum: 'bg-gradient-to-r from-[#9D174D] to-[#831843] shadow-md shadow-[#9D174D]/20',
+  navy: 'bg-gradient-to-r from-[#1E3A8A] to-[#1E293B] shadow-md shadow-[#1E3A8A]/20',
+}
+
+function SectionCard({ title, children, compactHeader, accent }) {
   return (
-    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
-      <div className={`px-6 sm:px-8 border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white ${compactHeader ? 'py-2.5' : 'py-4'}`}>
-        <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">{title}</h3>
+    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden">
+      <div
+        className={`px-6 sm:px-8 ${compactHeader ? 'py-2.5' : 'py-4'} ${
+          accent ? CARD_ACCENTS[accent] : 'border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white'
+        }`}
+      >
+        <h3 className={`text-base font-bold tracking-wide ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{title}</h3>
       </div>
       <div className="p-4 sm:p-5">{children}</div>
     </div>
   )
 }
 
-function SectionHeader({ icon, title }) {
+function SectionHeader({ icon, title, subtitle, accent }) {
+  const textClass = `text-lg font-bold ${accent ? 'text-white' : 'text-[#4A3520]'}`
   return (
-    <div className="flex items-center gap-3 mb-3">
-      <div className="w-8 h-8 rounded-lg bg-[#C67A2D]/10 flex items-center justify-center">
-        <span className="text-[#C67A2D] text-base">{icon}</span>
+    <div
+      className={`flex items-center gap-3 w-fit mb-3 ${
+        accent ? 'rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-[#0F766E] to-[#134E4A] shadow-md shadow-[#0F766E]/20' : ''
+      }`}
+    >
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${accent ? 'bg-white/20' : 'bg-[#C67A2D]/10'}`}>
+        <span className={`text-base ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{icon}</span>
       </div>
-      <h2 className="text-lg font-bold text-[#4A3520]">{title}</h2>
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0">
+        <h2 className={textClass}>{title}</h2>
+        {subtitle && <span className={textClass}>{subtitle}</span>}
+      </div>
     </div>
   )
 }
@@ -385,7 +403,7 @@ export default function FamilyCensus() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <SectionCard title="Family Information" compactHeader>
+          <SectionCard title="Family Information" compactHeader accent="bronze">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-3 [&>label]:gap-2">
               <Input
                 label="Family Leader Name"
@@ -420,7 +438,7 @@ export default function FamilyCensus() {
           </SectionCard>
 
           <div>
-            <SectionHeader icon="📋" title="Additional Information (Optional)" />
+            <SectionHeader icon="📋" title="Additional Information" subtitle="(Optional)" accent />
             <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
               <button
                 type="button"
@@ -464,7 +482,7 @@ export default function FamilyCensus() {
             </div>
           </div>
 
-          <SectionCard title="Family Members" compactHeader>
+          <SectionCard title="Family Members" compactHeader accent="navy">
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400">
@@ -498,12 +516,12 @@ export default function FamilyCensus() {
                   key={idx}
                   className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-sm animate-fade-in"
                 >
-                  <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-[#FFF8F0] to-white border-b border-gray-100">
+                  <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-[#4338CA] to-[#312E81] shadow-md shadow-[#4338CA]/20">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-sm">
+                      <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center shadow-sm">
                         <span className="text-xs font-bold text-white">{idx + 1}</span>
                       </div>
-                      <span className="text-sm font-semibold text-gray-700">Member {idx + 1}</span>
+                      <span className="text-sm font-semibold text-white">Member {idx + 1}</span>
                     </div>
                     {form.members.length > 1 && (
                       <button
@@ -576,7 +594,7 @@ export default function FamilyCensus() {
             </div>
           </SectionCard>
 
-          <SectionCard title="Submitted By" compactHeader>
+          <SectionCard title="Submitted By" compactHeader accent="plum">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-3 [&>label]:gap-2">
               <Input
                 label="This Form Is Submitted By"

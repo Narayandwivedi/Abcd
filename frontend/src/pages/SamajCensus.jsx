@@ -97,26 +97,45 @@ function Select({ label, required, children, ...props }) {
   )
 }
 
-function SectionCard({ title, children, compactHeader, hideHeader, bodyClassName }) {
+function SectionCard({ title, children, compactHeader, hideHeader, noBar, bodyClassName }) {
   return (
     <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
-      {!hideHeader && (
+      {!hideHeader && !noBar && (
         <div className={`px-6 sm:px-8 border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white rounded-t-[20px] ${compactHeader ? 'py-2.5' : 'py-4'}`}>
           <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">{title}</h3>
         </div>
       )}
-      <div className={bodyClassName || 'p-6 sm:p-8'}>{children}</div>
+      <div className={bodyClassName || 'p-6 sm:p-8'}>
+        {!hideHeader && noBar && (
+          <h3 className="text-base font-bold text-[#C67A2D] tracking-wide mb-3">{title}</h3>
+        )}
+        {children}
+      </div>
     </div>
   )
 }
 
-function SectionHeader({ icon, title, compact }) {
+const HEADER_ACCENTS = {
+  bronze: 'bg-gradient-to-r from-[#4A3520] to-[#C67A2D] shadow-md shadow-[#4A3520]/20',
+  teal: 'bg-gradient-to-r from-[#0F766E] to-[#134E4A] shadow-md shadow-[#0F766E]/20',
+  indigo: 'bg-gradient-to-r from-[#4338CA] to-[#312E81] shadow-md shadow-[#4338CA]/20',
+}
+
+function SectionHeader({ icon, title, subtitle, compact, accent }) {
+  const textClass = `text-lg font-bold ${accent ? 'text-white' : 'text-[#4A3520]'}`
   return (
-    <div className={`flex items-center gap-3 ${compact ? 'mb-2 sm:mb-3' : 'mb-6'}`}>
-      <div className="w-8 h-8 rounded-lg bg-[#C67A2D]/10 flex items-center justify-center">
-        <span className="text-[#C67A2D] text-base">{icon}</span>
+    <div
+      className={`flex items-center gap-3 w-fit ${compact ? 'mb-2 sm:mb-3' : 'mb-6'} ${
+        accent ? `rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 ${HEADER_ACCENTS[accent]}` : ''
+      }`}
+    >
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${accent ? 'bg-white/20' : 'bg-[#C67A2D]/10'}`}>
+        <span className={`text-base ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{icon}</span>
       </div>
-      <h2 className="text-lg font-bold text-[#4A3520]">{title}</h2>
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0">
+        <h2 className={textClass}>{title}</h2>
+        {subtitle && <span className={textClass}>{subtitle}</span>}
+      </div>
     </div>
   )
 }
@@ -432,8 +451,8 @@ export default function SamajCensus() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
           <div>
-            <SectionHeader icon="🏛️" title="Samaj Information" compact />
-            <SectionCard title="Basic Details" compactHeader bodyClassName="p-6 sm:p-8 pt-3 sm:pt-4">
+            <SectionHeader icon="🏛️" title="Samaj Information" compact accent="bronze" />
+            <SectionCard title="Basic Details" noBar bodyClassName="p-6 sm:p-8 pt-4 sm:pt-5">
               <div className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
                   <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
@@ -545,7 +564,7 @@ export default function SamajCensus() {
           </div>
 
           <div className="-mt-4 sm:mt-0">
-            <SectionHeader icon="👤" title="Samaj Head / Contact Person" compact />
+            <SectionHeader icon="👤" title="Samaj Head / Contact Person" compact accent="teal" />
             <SectionCard title="Contact Person Details" hideHeader bodyClassName="px-3 sm:px-8 pt-1 sm:pt-3 pb-2 sm:pb-5">
               <div className="flex flex-col gap-2 sm:gap-3 [&_label]:gap-1.5 sm:[&_label]:gap-2">
                 {form.contactPersons.map((cp, idx) => (
@@ -588,12 +607,12 @@ export default function SamajCensus() {
           </div>
 
           <div className="-mt-4 sm:mt-0">
-            <SectionHeader icon="📋" title="Additional Information (Optional)" compact />
+            <SectionHeader icon="📋" title="Additional Information" subtitle="(Optional)" compact accent="indigo" />
 <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
               <button
                 type="button"
                 onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                className="w-full flex items-center justify-between px-4 sm:px-8 py-2 sm:py-3 bg-white cursor-pointer transition-colors"
+                className="w-full flex items-center justify-between px-4 sm:px-8 py-2 sm:py-3 cursor-pointer transition-colors"
               >
                 <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
                 <ChevronDown
@@ -622,7 +641,7 @@ export default function SamajCensus() {
 
           <div className="-mt-4 sm:mt-0">
             <SectionHeader icon="📝" title="Form Submission Details" compact />
-            <SectionCard title="Submitted By" compactHeader bodyClassName="px-3 sm:px-8 py-2 sm:py-5">
+            <SectionCard title="Submitted By" noBar bodyClassName="px-3 sm:px-8 pt-4 sm:pt-5 pb-2 sm:pb-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 [&_label]:gap-1.5 sm:[&_label]:gap-2">
                 <Input label="This Form Is Submitted By" required value={form.submittedBy} onChange={handleChange} name="submittedBy" placeholder="Enter Full Name" />
                 <Input label="Mobile Number" required type="tel" inputMode="numeric" maxLength={10} value={form.submittedByMobile} onChange={handleChange} name="submittedByMobile" placeholder="Enter 10-Digit Mobile Number" />
