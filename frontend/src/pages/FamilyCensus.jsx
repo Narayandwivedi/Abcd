@@ -305,6 +305,10 @@ export default function FamilyCensus() {
               <SectionCard title="Family Information">
                 <PreviewRow label="Family Leader Name" value={form.leaderName} />
                 <PreviewRow label="Mobile Number" value={form.leaderMobile} />
+                <PreviewRow label="Samaj" value={(() => {
+                  const s = samajList.find((x) => x._id === form.samaj)
+                  return s ? (s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName) : ''
+                })()} />
                 <PreviewRow label="City" value={form.city ? `${titleCase(form.city)} - ${titleCase(form.district)} - ${titleCase(form.state)}` : ''} />
                 <PreviewRow label="Complete Address" value={form.address} />
                 <PreviewRow label="Pincode" value={form.pincode} />
@@ -444,7 +448,7 @@ export default function FamilyCensus() {
                 >
                   <option value="">-- Select Samaj --</option>
                   {samajList.map((s) => (
-                    <option key={s._id} value={s._id}>{s.samajName}</option>
+                    <option key={s._id} value={s._id}>{s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName}</option>
                   ))}
                 </Select>
               </div>
