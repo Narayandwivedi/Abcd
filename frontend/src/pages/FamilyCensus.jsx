@@ -727,17 +727,17 @@ export default function FamilyCensus() {
             </div>
           </SectionCard>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 pb-8">
+          <div className="flex flex-row items-center justify-between gap-3 sm:gap-4 pt-4 pb-8">
             <button
               type="button"
               onClick={handleReset}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-[14px] text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer"
+              className="flex-1 sm:flex-none sm:w-auto px-4 sm:px-8 py-3 sm:py-3.5 rounded-[14px] text-xs sm:text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
+              className="flex-1 sm:flex-none sm:w-auto px-4 sm:px-10 py-3 sm:py-3.5 rounded-[14px] text-xs sm:text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
             >
               <Eye size={18} /> Preview & Save
             </button>
