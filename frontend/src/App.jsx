@@ -25,6 +25,7 @@ import VendorDetail from './pages/VendorDetail'
 import SamajCensus from './pages/SamajCensus'
 import FamilyCensus from './pages/FamilyCensus'
 import Census from './pages/Census'
+import BackgroundMusic from './component/BackgroundMusic'
 
 // Scroll to top on every route change
 const ScrollToTop = () => {
@@ -244,6 +245,7 @@ const App = () => {
       />
       {!isAuthPage && <Navbar />}
       <ScrollToTop />
+      {isCensusPage && <BackgroundMusic />}
       <div className='pb-0 md:pb-0'>
         <Routes>
           <Route path='/' element={<Home />} />

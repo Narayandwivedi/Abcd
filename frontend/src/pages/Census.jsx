@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom'
 import { Quote, Building2, Users } from 'lucide-react'
-import BackgroundMusic from '../component/BackgroundMusic'
 
 export default function Census() {
   return (
     <>
-      <BackgroundMusic />
       <img src="/census.avif" alt="" className="w-full h-auto min-h-[21vh] md:min-h-0 object-cover md:object-contain" />
 
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 pt-3 pb-12 sm:py-16 lg:py-20">
