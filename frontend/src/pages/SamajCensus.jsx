@@ -266,8 +266,7 @@ export default function SamajCensus() {
   if (showSuccess) {
     return (
       <>
-        <img src="/samaj hero mobile.avif" alt="" className="w-full h-auto object-contain md:hidden" />
-        <img src="/samaj hero.avif" alt="" className="hidden md:block w-full h-auto object-contain" />
+        <img src="/samaj hero.png" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
         <div className="bg-[#FFF8F0] min-h-screen flex items-center justify-center px-4">
         <div className="bg-white rounded-[20px] shadow-lg shadow-gray-200/50 p-12 max-w-md w-full text-center">
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center mx-auto shadow-lg shadow-[#C67A2D]/30">
@@ -405,8 +404,7 @@ export default function SamajCensus() {
 
   return (
     <>
-      <img src="/samaj hero mobile.avif" alt="" className="w-full h-auto object-contain md:hidden" />
-      <img src="/samaj hero.avif" alt="" className="hidden md:block w-full h-auto object-contain" />
+      <img src="/samaj hero.png" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-4 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
         <div className="mb-4 md:mb-8">
