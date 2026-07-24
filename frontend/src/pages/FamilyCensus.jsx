@@ -126,6 +126,8 @@ export default function FamilyCensus() {
     pincode: '',
     remarks: '',
     members: [],
+    submittedBy: '',
+    submittedByMobile: '',
   })
   const [samajList, setSamajList] = useState([])
   const [cityList, setCityList] = useState([])
@@ -203,6 +205,9 @@ export default function FamilyCensus() {
     if (!form.leaderName.trim()) errs.leaderName = 'Family Leader Name Is Required'
     if (!form.leaderMobile.trim()) errs.leaderMobile = 'Mobile Number Is Required'
     if (!form.city.trim()) errs.city = 'City Is Required'
+    if (!form.submittedBy.trim()) errs.submittedBy = 'Submitted By Name Is Required'
+    if (!form.submittedByMobile.trim()) errs.submittedByMobile = 'Mobile Number Is Required'
+    else if (!/^\d{10}$/.test(form.submittedByMobile.trim())) errs.submittedByMobile = 'Please Enter A Valid 10-Digit Mobile Number'
     return errs
   }
 
@@ -238,6 +243,8 @@ export default function FamilyCensus() {
         pincode: '',
         remarks: '',
         members: [],
+        submittedBy: '',
+        submittedByMobile: '',
       })
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed To Save Family. Please Try Again.')
@@ -320,6 +327,11 @@ export default function FamilyCensus() {
                     </div>
                   ))
                 )}
+              </SectionCard>
+
+              <SectionCard title="Submitted By">
+                <PreviewRow label="Name" value={form.submittedBy} />
+                <PreviewRow label="Mobile Number" value={form.submittedByMobile} />
               </SectionCard>
             </div>
 
@@ -673,6 +685,28 @@ export default function FamilyCensus() {
                   </div>
                 </div>
               ))}
+            </div>
+          </SectionCard>
+
+          <SectionCard title="Submitted By">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <Input
+                label="This Form Is Submitted By"
+                required
+                error={errors.submittedBy}
+                value={form.submittedBy}
+                onChange={(e) => handleChange('submittedBy', e.target.value)}
+                placeholder="Enter Full Name"
+              />
+              <Input
+                label="Mobile Number"
+                required
+                error={errors.submittedByMobile}
+                type="tel"
+                value={form.submittedByMobile}
+                onChange={(e) => handleChange('submittedByMobile', e.target.value)}
+                placeholder="Enter Mobile Number"
+              />
             </div>
           </SectionCard>
 
