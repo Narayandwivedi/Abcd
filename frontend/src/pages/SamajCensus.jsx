@@ -79,8 +79,8 @@ function Select({ label, required, children, ...props }) {
 
 function SectionCard({ title, children }) {
   return (
-    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden">
-      <div className="px-6 sm:px-8 py-4 border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white">
+    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
+      <div className="px-6 sm:px-8 py-4 border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white rounded-t-[20px]">
         <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">{title}</h3>
       </div>
       <div className="p-6 sm:p-8">{children}</div>
