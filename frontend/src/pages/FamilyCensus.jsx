@@ -365,8 +365,7 @@ export default function FamilyCensus() {
   return (
     <>
       <BackgroundMusic />
-      <img src="/mobile family hero.avif" alt="" className="w-full h-auto object-contain md:hidden" />
-      <img src="/familyhero.avif" alt="" className="hidden md:block w-full h-auto object-contain" />
+      <img src="/samaj hero.png" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
       <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-4 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-4 md:mb-12 pt-2 md:pt-4">
