@@ -604,7 +604,6 @@ export default function SamajCensus() {
           </div>
 
           <div>
-            <SectionHeader icon="📋" title="Additional Information" subtitle="(Optional)" compact accent="indigo" />
 <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
               <button
                 type="button"
