@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
-import { Users, UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, ChevronDown } from 'lucide-react'
+import { Users, UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, ChevronDown, ArrowLeft } from 'lucide-react'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -632,6 +633,15 @@ export default function FamilyCensus() {
             >
               <Eye size={18} /> Preview & Save
             </button>
+          </div>
+
+          <div className="flex justify-center pb-4">
+            <Link
+              to="/census"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-[#C67A2D] transition-colors"
+            >
+              <ArrowLeft size={14} /> Back To Census
+            </Link>
           </div>
         </form>
       </div>

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
-import { UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, Search, ChevronDown } from 'lucide-react'
+import { UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, Search, ChevronDown, ArrowLeft } from 'lucide-react'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -652,6 +653,15 @@ export default function SamajCensus() {
             <button type="submit" className="flex-1 sm:flex-none sm:w-auto px-4 sm:px-10 py-3 sm:py-3.5 rounded-[14px] text-xs sm:text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2">
               <Eye size={18} /> Preview & Save
             </button>
+          </div>
+
+          <div className="flex justify-center pb-4">
+            <Link
+              to="/census"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-[#C67A2D] transition-colors"
+            >
+              <ArrowLeft size={14} /> Back To Census
+            </Link>
           </div>
         </form>
       </div>
