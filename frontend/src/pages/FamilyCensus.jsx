@@ -384,7 +384,7 @@ export default function FamilyCensus() {
             Fill In The Details Below To Register Your Family.
           </p>
           <div className="mt-2 flex items-center gap-2.5">
-            <img src="/image.jpeg" alt="Lalit Kumar Agrawal" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0 ring-2 ring-[#C67A2D]/20" />
+            <img src="/image.jpeg" alt="Lalit Kumar Agrawal" className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg object-cover object-[center_25%] shrink-0 ring-2 ring-[#C67A2D]/20" />
             <div className="flex flex-col">
               <span className="font-semibold text-[#4A3520] text-sm leading-tight">Lalit Kumar Agrawal</span>
               <span className="text-xs text-gray-500 leading-tight">Chairman, ABCD</span>
