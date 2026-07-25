@@ -52,9 +52,9 @@ const filterAndSortCities = (cityList, citySearch, currentDisplay) => {
     .map(({ c }) => c)
 }
 
-function Input({ label, required, className, ...props }) {
+function Input({ label, required, className, wrapperClassName, ...props }) {
   return (
-    <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0">
+    <label className={`flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0 ${wrapperClassName || ''}`}>
       <span className="text-gray-700 text-xs sm:text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
@@ -428,8 +428,8 @@ export default function SamajCensus() {
       <div className="max-w-[1200px] mx-auto">
         <div className="mb-3 md:mb-8">
           <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Samaj Census</h1>
-          <p className="text-sm sm:text-base text-gray-500 mt-1">
-            Fill In The Details Below To Register A New Samaj In The Census Portal.
+          <p className="text-xs sm:text-base text-gray-500 -mt-1 sm:mt-1 whitespace-nowrap">
+            Fill In The Details Below To Register Your Samaj.
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             <span className="font-semibold text-[#4A3520]">Lalit Kumar Agarwal</span>
@@ -451,8 +451,8 @@ export default function SamajCensus() {
             <SectionHeader icon="🏛️" title="Samaj Information" compact accent="bronze" />
             <SectionCard title="Basic Details" noBar bodyClassName="p-4 sm:p-8 pt-3 sm:pt-5">
               <div className="flex flex-col gap-5">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
-                  <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
+                  <Input label="Samaj Name" required wrapperClassName="col-span-2 sm:col-span-1" value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
                   <Input label="Samaj Mobile" required type="tel" inputMode="numeric" maxLength={10} value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter 10-Digit Mobile Number" />
                   <div className="relative min-w-0" ref={cityRef}>
                     <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm">
