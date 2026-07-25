@@ -20,9 +20,9 @@ const emptyMember = () => ({
 })
 
 
-function Input({ label, required, error, className, ...props }) {
+function Input({ label, required, error, className, wrapperClassName, ...props }) {
   return (
-    <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0">
+    <label className={`flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0 ${wrapperClassName || ''}`}>
       <span className="text-gray-700 text-xs sm:text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
@@ -293,7 +293,7 @@ export default function FamilyCensus() {
                     <p className="text-xs font-bold text-[#C67A2D] uppercase tracking-wider mb-3">Member {idx + 1}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                       <PreviewRow label="Name" value={member.name} />
-                      <PreviewRow label="Relation" value={member.relation} />
+                      <PreviewRow label="Relation With Family Leader" value={member.relation} />
                       <PreviewRow label="Mobile" value={member.mobile} />
                       <PreviewRow label="Age" value={member.age} />
                       <PreviewRow label="Gender" value={member.gender} />
@@ -537,7 +537,7 @@ export default function FamilyCensus() {
                         placeholder="Enter member name"
                       />
                       <Select
-                        label="Relation"
+                        label="Relation With Family Leader"
                         value={member.relation}
                         onChange={(e) => handleMemberChange(idx, 'relation', e.target.value)}
                       >
@@ -547,9 +547,10 @@ export default function FamilyCensus() {
                         ))}
                       </Select>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
                       <Input
                         label="Mobile Number"
+                        wrapperClassName="col-span-2 sm:col-span-1"
                         type="tel"
                         inputMode="numeric"
                         maxLength={10}
