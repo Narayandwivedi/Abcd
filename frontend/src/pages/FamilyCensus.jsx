@@ -437,11 +437,11 @@ export default function FamilyCensus() {
                   </Select>
                 </div>
 
-                <div className="mt-3 -mx-4 sm:-mx-5 border-t border-gray-100">
+                <div className="mt-2 -mx-4 sm:-mx-5 -mb-3 sm:-mb-5 pb-1.5 border-t border-gray-100">
                   <button
                     type="button"
                     onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                    className="w-full flex items-center justify-between px-4 sm:px-5 py-2 mt-3 bg-white cursor-pointer transition-colors"
+                    className="w-full flex items-center justify-between px-4 sm:px-5 py-1.5 bg-white cursor-pointer transition-colors"
                   >
                     <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
                     <ChevronDown

@@ -564,11 +564,11 @@ export default function SamajCensus() {
                 </div>
               </div>
 
-              <div className="mt-3 -mx-4 sm:-mx-8 border-t border-gray-100">
+              <div className="mt-2 -mx-4 sm:-mx-8 -mb-4 sm:-mb-8 pb-1.5 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                  className="w-full flex items-center justify-between px-4 sm:px-8 py-2 sm:py-3 mt-3 cursor-pointer transition-colors"
+                  className="w-full flex items-center justify-between px-4 sm:px-8 py-1.5 cursor-pointer transition-colors"
                 >
                   <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
                   <ChevronDown
