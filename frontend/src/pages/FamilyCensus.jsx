@@ -433,7 +433,6 @@ export default function FamilyCensus() {
           </SectionCard>
 
           <div>
-            <SectionHeader icon="📋" title="Additional Information" subtitle="(Optional)" accent />
             <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
               <button
                 type="button"
