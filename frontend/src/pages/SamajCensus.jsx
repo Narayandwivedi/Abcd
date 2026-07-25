@@ -97,15 +97,15 @@ function Select({ label, required, children, ...props }) {
   )
 }
 
-function SectionCard({ title, children, compactHeader, hideHeader, noBar, bodyClassName }) {
+function SectionCard({ title, children, compactHeader, hideHeader, noBar, bodyClassName, fillHeight }) {
   return (
-    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
+    <div className={`bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 ${fillHeight ? 'lg:h-full lg:flex lg:flex-col' : ''}`}>
       {!hideHeader && !noBar && (
         <div className={`px-6 sm:px-8 border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white rounded-t-[20px] ${compactHeader ? 'py-2.5' : 'py-4'}`}>
           <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">{title}</h3>
         </div>
       )}
-      <div className={bodyClassName || 'p-6 sm:p-8'}>
+      <div className={`${bodyClassName || 'p-6 sm:p-8'} ${fillHeight ? 'lg:flex-1 lg:flex lg:flex-col' : ''}`}>
         {!hideHeader && noBar && (
           <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide mb-3">{title}</h3>
         )}
@@ -448,9 +448,11 @@ export default function SamajCensus() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-8">
-          <div>
+          <div className="flex flex-col gap-3 sm:gap-8 lg:grid lg:grid-cols-2 lg:items-stretch">
+          <div className="flex flex-col gap-3 sm:gap-8 lg:h-full">
+          <div className="lg:flex-1 lg:flex lg:flex-col">
             <SectionHeader icon="🏛️" title="Samaj Information" compact accent="bronze" />
-            <SectionCard title="Basic Details" noBar bodyClassName="p-4 sm:p-8 pt-3 sm:pt-5">
+            <SectionCard title="Basic Details" noBar bodyClassName="p-4 sm:p-8 pt-3 sm:pt-5" fillHeight>
               <div className="flex flex-col gap-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
                   <Input label="Samaj Name" required wrapperClassName="col-span-2 sm:col-span-1" value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
@@ -558,12 +560,43 @@ export default function SamajCensus() {
                   </div>
                 </div>
               </div>
+
+              <div className="mt-3 -mx-4 sm:-mx-8 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
+                  className="w-full flex items-center justify-between px-4 sm:px-8 py-2 sm:py-3 mt-3 cursor-pointer transition-colors"
+                >
+                  <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
+                  <ChevronDown
+                    size={20}
+                    className={`text-[#C67A2D] transition-transform duration-300 ${additionalInfoOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                <div
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                    additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-4 sm:px-8 pb-1 flex flex-col gap-3 sm:gap-5">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-5">
+                      <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
+                      <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:gap-6">
+                      <Textarea label="Samaj Office Address" value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
+                      <Textarea label="Remarks" value={form.remarks} onChange={handleChange} name="remarks" placeholder="Enter Any Additional Remarks Or Notes..." />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </SectionCard>
           </div>
+          </div>
 
-          <div>
+          <div className="lg:h-full lg:flex lg:flex-col">
             <SectionHeader icon="👤" title="Samaj Head / Contact Person" compact accent="teal" />
-            <SectionCard title="Contact Person Details" hideHeader bodyClassName="px-3 sm:px-8 pt-1 sm:pt-3 pb-2 sm:pb-5">
+            <SectionCard title="Contact Person Details" hideHeader bodyClassName="px-3 sm:px-8 pt-1 sm:pt-3 pb-2 sm:pb-5" fillHeight>
               <div className="flex flex-col gap-2 sm:gap-3 [&_label]:gap-1.5 sm:[&_label]:gap-2">
                 {form.contactPersons.map((cp, idx) => (
                   <div key={idx} className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-sm animate-fade-in">
@@ -603,37 +636,6 @@ export default function SamajCensus() {
               </div>
             </SectionCard>
           </div>
-
-          <div>
-<div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
-              <button
-                type="button"
-                onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                className="w-full flex items-center justify-between px-4 sm:px-8 py-2 sm:py-3 cursor-pointer transition-colors"
-              >
-                <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
-                <ChevronDown
-                  size={20}
-                  className={`text-[#C67A2D] transition-transform duration-300 ${additionalInfoOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-              <div
-                className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-                }`}
-              >
-                <div className="px-4 sm:px-8 pt-2 sm:pt-4 pb-4 sm:pb-8 flex flex-col gap-3 sm:gap-5">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
-                    <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
-                    <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
-                  </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
-                    <Textarea label="Samaj Office Address" value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
-                    <Textarea label="Remarks" value={form.remarks} onChange={handleChange} name="remarks" placeholder="Enter Any Additional Remarks Or Notes..." />
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div>

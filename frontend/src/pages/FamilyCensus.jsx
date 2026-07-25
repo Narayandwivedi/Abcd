@@ -399,83 +399,84 @@ export default function FamilyCensus() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-6">
-          <SectionCard title="Family Information" compactHeader accent="bronze">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
-              <Input
-                label="Family Leader Name"
-                required
-                error={errors.leaderName}
-                value={form.leaderName}
-                onChange={(e) => handleChange('leaderName', e.target.value)}
-                placeholder="Enter Family Leader Name"
-              />
-              <Input
-                label="Mobile Number"
-                required
-                error={errors.leaderMobile}
-                type="tel"
-                inputMode="numeric"
-                maxLength={10}
-                value={form.leaderMobile}
-                onChange={(e) => handleChange('leaderMobile', e.target.value)}
-                placeholder="Enter 10-Digit Mobile Number"
-              />
-              <Select
-                label="Samaj"
-                value={form.samaj}
-                onChange={(e) => handleChange('samaj', e.target.value)}
-              >
-                <option value="">-- Select Samaj --</option>
-                {samajList.map((s) => (
-                  <option key={s._id} value={s._id}>{s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName}</option>
-                ))}
-              </Select>
-            </div>
-          </SectionCard>
-
-          <div>
-            <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
-              <button
-                type="button"
-                onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                className="w-full flex items-center justify-between px-5 sm:px-6 py-2 bg-white cursor-pointer transition-colors"
-              >
-                <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
-                <ChevronDown
-                  size={20}
-                  className={`text-[#C67A2D] transition-transform duration-300 ${additionalInfoOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-              <div
-                className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-                }`}
-              >
-                <div className="p-3 sm:p-5 flex flex-col gap-2 sm:gap-3 [&_label]:gap-2">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
-                    <Textarea
-                      label="Complete Address"
-                      value={form.address}
-                      onChange={(e) => handleChange('address', e.target.value)}
-                      placeholder="Enter Complete Address"
-                    />
-                    <Input
-                      label="Pincode"
-                      value={form.pincode}
-                      onChange={(e) => handleChange('pincode', e.target.value)}
-                      placeholder="Enter Pincode"
-                    />
-                  </div>
+          <div className="flex flex-col gap-3 sm:gap-6 lg:grid lg:grid-cols-2 lg:items-start">
+            <div className="flex flex-col gap-3 sm:gap-6">
+              <SectionCard title="Family Information" compactHeader accent="bronze">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
                   <Input
-                    label="Remarks"
-                    value={form.remarks}
-                    onChange={(e) => handleChange('remarks', e.target.value)}
-                    placeholder="Any Remarks (Optional)"
+                    label="Family Leader Name"
+                    required
+                    error={errors.leaderName}
+                    value={form.leaderName}
+                    onChange={(e) => handleChange('leaderName', e.target.value)}
+                    placeholder="Enter Family Leader Name"
                   />
+                  <Input
+                    label="Mobile Number"
+                    required
+                    error={errors.leaderMobile}
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={form.leaderMobile}
+                    onChange={(e) => handleChange('leaderMobile', e.target.value)}
+                    placeholder="Enter 10-Digit Mobile Number"
+                  />
+                  <Select
+                    label="Samaj"
+                    value={form.samaj}
+                    onChange={(e) => handleChange('samaj', e.target.value)}
+                  >
+                    <option value="">-- Select Samaj --</option>
+                    {samajList.map((s) => (
+                      <option key={s._id} value={s._id}>{s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName}</option>
+                    ))}
+                  </Select>
                 </div>
-              </div>
+
+                <div className="mt-3 -mx-4 sm:-mx-5 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
+                    className="w-full flex items-center justify-between px-4 sm:px-5 py-2 mt-3 bg-white cursor-pointer transition-colors"
+                  >
+                    <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
+                    <ChevronDown
+                      size={20}
+                      className={`text-[#C67A2D] transition-transform duration-300 ${additionalInfoOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <div
+                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                      additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}
+                  >
+                    <div className="px-4 sm:px-5 pb-1 flex flex-col gap-2 sm:gap-3 [&_label]:gap-2">
+                      <div className="grid grid-cols-1 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
+                        <Textarea
+                          label="Complete Address"
+                          value={form.address}
+                          onChange={(e) => handleChange('address', e.target.value)}
+                          placeholder="Enter Complete Address"
+                        />
+                        <Input
+                          label="Pincode"
+                          value={form.pincode}
+                          onChange={(e) => handleChange('pincode', e.target.value)}
+                          placeholder="Enter Pincode"
+                        />
+                      </div>
+                      <Input
+                        label="Remarks"
+                        value={form.remarks}
+                        onChange={(e) => handleChange('remarks', e.target.value)}
+                        placeholder="Any Remarks (Optional)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </SectionCard>
             </div>
-          </div>
 
           <SectionCard title="Family Members" compactHeader accent="navy">
             <div className="flex flex-col gap-3">
@@ -594,6 +595,7 @@ export default function FamilyCensus() {
               )}
             </div>
           </SectionCard>
+          </div>
 
           <SectionCard title="Submitted By" compactHeader accent="plum">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
