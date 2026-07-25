@@ -26,7 +26,6 @@ import SamajCensus from './pages/SamajCensus'
 import FamilyCensus from './pages/FamilyCensus'
 import Census from './pages/Census'
 import BackgroundMusic from './component/BackgroundMusic'
-import { Agentation } from 'agentation'
 
 // Scroll to top on every route change
 const ScrollToTop = () => {
@@ -286,7 +285,6 @@ const App = () => {
         pauseOnHover
         theme="colored"
       />
-      {import.meta.env.DEV && <Agentation />}
     </div>
   )
 }
