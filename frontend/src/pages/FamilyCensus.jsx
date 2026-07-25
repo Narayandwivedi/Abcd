@@ -22,13 +22,13 @@ const emptyMember = () => ({
 
 function Input({ label, required, error, className, ...props }) {
   return (
-    <label className="flex flex-col gap-1 font-medium text-sm flex-1 min-w-0">
-      <span className="text-gray-700 text-sm font-semibold">
+    <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0">
+      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
       <input
         {...props}
-        className={`w-full px-3 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white ${className || ''}`}
+        className={`w-full px-2.5 py-2 sm:px-3.5 sm:py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:ring-2 bg-white ${className || ''}`}
       />
       {error && <span className="text-xs text-red-500 mt-0.5">{error}</span>}
     </label>
@@ -37,13 +37,13 @@ function Input({ label, required, error, className, ...props }) {
 
 function Textarea({ label, required, error, ...props }) {
   return (
-    <label className="flex flex-col gap-1 font-medium text-sm flex-1 min-w-0">
-      <span className="text-gray-700 text-sm font-semibold">
+    <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0">
+      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
       <textarea
         {...props}
-        className={`w-full px-3 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white resize-y min-h-[80px]`}
+        className={`w-full px-2.5 py-2 sm:px-3.5 sm:py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:ring-2 bg-white resize-y min-h-[80px]`}
       />
       {error && <span className="text-xs text-red-500 mt-0.5">{error}</span>}
     </label>
@@ -52,13 +52,13 @@ function Textarea({ label, required, error, ...props }) {
 
 function Select({ label, required, error, children, ...props }) {
   return (
-    <label className="flex flex-col gap-1.5! sm:gap-2! -mt-1 sm:mt-0 font-medium text-sm flex-1 min-w-0">
-      <span className="text-gray-700 text-sm font-semibold">
+    <label className="flex flex-col gap-1 sm:gap-1.5! -mt-1 sm:mt-0 font-medium text-xs sm:text-sm flex-1 min-w-0">
+      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
       <select
         {...props}
-        className={`w-full px-3 py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 bg-white`}
+        className={`w-full px-2.5 py-2 sm:px-3.5 sm:py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:ring-2 bg-white`}
       >
         {children}
       </select>
@@ -83,7 +83,7 @@ function SectionCard({ title, children, compactHeader, accent }) {
       >
         <h3 className={`text-base font-bold tracking-wide ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{title}</h3>
       </div>
-      <div className="p-4 sm:p-5">{children}</div>
+      <div className="p-3 sm:p-5">{children}</div>
     </div>
   )
 }
@@ -397,9 +397,9 @@ export default function FamilyCensus() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-6">
           <SectionCard title="Family Information" compactHeader accent="bronze">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-3 [&>label]:gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
               <Input
                 label="Family Leader Name"
                 required
@@ -450,8 +450,8 @@ export default function FamilyCensus() {
                   additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="p-4 sm:p-5 flex flex-col gap-3 [&_label]:gap-2">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-3">
+                <div className="p-3 sm:p-5 flex flex-col gap-2 sm:gap-3 [&_label]:gap-2">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
                     <Textarea
                       label="Complete Address"
                       value={form.address}
@@ -528,8 +528,8 @@ export default function FamilyCensus() {
                     )}
                   </div>
 
-                  <div className="p-4 flex flex-col gap-3 [&_label]:gap-2">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-3">
+                  <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-3 [&_label]:gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
                       <Input
                         label="Member Name"
                         value={member.name}
@@ -547,7 +547,7 @@ export default function FamilyCensus() {
                         ))}
                       </Select>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3 gap-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
                       <Input
                         label="Mobile Number"
                         type="tel"
@@ -589,7 +589,7 @@ export default function FamilyCensus() {
           </SectionCard>
 
           <SectionCard title="Submitted By" compactHeader accent="plum">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-3 [&>label]:gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
               <Input
                 label="This Form Is Submitted By"
                 required
