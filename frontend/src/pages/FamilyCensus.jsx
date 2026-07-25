@@ -482,13 +482,6 @@ export default function FamilyCensus() {
                 <span className="text-xs text-gray-400">
                   {form.members.length} member{form.members.length !== 1 ? 's' : ''} added
                 </span>
-                <button
-                  type="button"
-                  onClick={addMember}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20"
-                >
-                  <UserPlus size={14} /> Add Member
-                </button>
               </div>
 
               {form.members.length === 0 && (
@@ -586,6 +579,18 @@ export default function FamilyCensus() {
                   </div>
                 </div>
               ))}
+
+              {form.members.length > 0 && (
+                <div className="flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={addMember}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20"
+                  >
+                    <UserPlus size={14} /> Add More Member
+                  </button>
+                </div>
+              )}
             </div>
           </SectionCard>
 
