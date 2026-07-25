@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-export default function BackgroundMusic({ src = '/music.mp3', volume = 0.18 }) {
+export default function BackgroundMusic({ src = '/music.mp3', volume = 0.6 }) {
   const audioRef = useRef(null)
 
   useEffect(() => {
