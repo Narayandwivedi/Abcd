@@ -424,14 +424,14 @@ export default function SamajCensus() {
   return (
     <>
       <img src="/samaj hero.avif" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
-      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-4 sm:py-12 lg:py-16">
+      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-3 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
-        <div className="mb-4 md:mb-8">
+        <div className="mb-3 md:mb-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Samaj Census</h1>
-          <p className="text-sm sm:text-base text-gray-500 mt-2">
+          <p className="text-sm sm:text-base text-gray-500 mt-1">
             Fill In The Details Below To Register A New Samaj In The Census Portal.
           </p>
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             <span className="font-semibold text-[#4A3520]">Lalit Kumar Agarwal</span>
             <span className="text-gray-400">•</span>
             <a
@@ -446,10 +446,10 @@ export default function SamajCensus() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-8">
           <div>
             <SectionHeader icon="🏛️" title="Samaj Information" compact accent="bronze" />
-            <SectionCard title="Basic Details" noBar bodyClassName="p-6 sm:p-8 pt-4 sm:pt-5">
+            <SectionCard title="Basic Details" noBar bodyClassName="p-4 sm:p-8 pt-3 sm:pt-5">
               <div className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
                   <Input label="Samaj Name" required value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
@@ -560,7 +560,7 @@ export default function SamajCensus() {
             </SectionCard>
           </div>
 
-          <div className="-mt-4 sm:mt-0">
+          <div>
             <SectionHeader icon="👤" title="Samaj Head / Contact Person" compact accent="teal" />
             <SectionCard title="Contact Person Details" hideHeader bodyClassName="px-3 sm:px-8 pt-1 sm:pt-3 pb-2 sm:pb-5">
               <div className="flex flex-col gap-2 sm:gap-3 [&_label]:gap-1.5 sm:[&_label]:gap-2">
@@ -603,7 +603,7 @@ export default function SamajCensus() {
             </SectionCard>
           </div>
 
-          <div className="-mt-4 sm:mt-0">
+          <div>
             <SectionHeader icon="📋" title="Additional Information" subtitle="(Optional)" compact accent="indigo" />
 <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
               <button
@@ -622,12 +622,12 @@ export default function SamajCensus() {
                   additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="px-6 sm:px-8 pt-2 sm:pt-4 pb-6 sm:pb-8 flex flex-col gap-5">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div className="px-4 sm:px-8 pt-2 sm:pt-4 pb-4 sm:pb-8 flex flex-col gap-3 sm:gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
                     <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
                     <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
                   </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
                     <Textarea label="Samaj Office Address" value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
                     <Textarea label="Remarks" value={form.remarks} onChange={handleChange} name="remarks" placeholder="Enter Any Additional Remarks Or Notes..." />
                   </div>
@@ -636,7 +636,7 @@ export default function SamajCensus() {
             </div>
           </div>
 
-          <div className="-mt-4 sm:mt-0">
+          <div>
             <SectionHeader icon="📝" title="Form Submission Details" compact />
             <SectionCard title="Submitted By" noBar bodyClassName="px-3 sm:px-8 pt-4 sm:pt-5 pb-2 sm:pb-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 [&_label]:gap-1.5 sm:[&_label]:gap-2">
@@ -646,7 +646,7 @@ export default function SamajCensus() {
             </SectionCard>
           </div>
 
-          <div className="flex flex-row items-center justify-between gap-2 -mt-6 pb-2">
+          <div className="flex flex-row items-center justify-between gap-2 pb-2">
             <button type="button" onClick={handleReset} className="flex-1 sm:flex-none sm:w-auto px-4 sm:px-8 py-3 sm:py-3.5 rounded-[14px] text-xs sm:text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer">
               Reset Form
             </button>
