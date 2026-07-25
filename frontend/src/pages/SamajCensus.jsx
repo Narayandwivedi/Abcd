@@ -101,12 +101,12 @@ function SectionCard({ title, children, compactHeader, hideHeader, noBar, bodyCl
     <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50">
       {!hideHeader && !noBar && (
         <div className={`px-6 sm:px-8 border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white rounded-t-[20px] ${compactHeader ? 'py-2.5' : 'py-4'}`}>
-          <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">{title}</h3>
+          <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">{title}</h3>
         </div>
       )}
       <div className={bodyClassName || 'p-6 sm:p-8'}>
         {!hideHeader && noBar && (
-          <h3 className="text-base font-bold text-[#C67A2D] tracking-wide mb-3">{title}</h3>
+          <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide mb-3">{title}</h3>
         )}
         {children}
       </div>
@@ -121,15 +121,15 @@ const HEADER_ACCENTS = {
 }
 
 function SectionHeader({ icon, title, subtitle, compact, accent }) {
-  const textClass = `text-lg font-bold ${accent ? 'text-white' : 'text-[#4A3520]'}`
+  const textClass = `text-sm sm:text-lg font-bold ${accent ? 'text-white' : 'text-[#4A3520]'}`
   return (
     <div
-      className={`flex items-center gap-3 w-fit ${compact ? 'mb-2 sm:mb-3' : 'mb-6'} ${
-        accent ? `rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 ${HEADER_ACCENTS[accent]}` : ''
+      className={`flex items-center gap-2 sm:gap-3 w-fit ${compact ? 'mb-2 sm:mb-3' : 'mb-6'} ${
+        accent ? `rounded-xl px-2.5 py-1.5 sm:px-4 sm:py-2.5 ${HEADER_ACCENTS[accent]}` : ''
       }`}
     >
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${accent ? 'bg-white/20' : 'bg-[#C67A2D]/10'}`}>
-        <span className={`text-base ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{icon}</span>
+      <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${accent ? 'bg-white/20' : 'bg-[#C67A2D]/10'}`}>
+        <span className={`text-sm sm:text-base ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{icon}</span>
       </div>
       <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0">
         <h2 className={textClass}>{title}</h2>
@@ -427,7 +427,7 @@ export default function SamajCensus() {
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-3 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
         <div className="mb-3 md:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Samaj Census</h1>
+          <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Samaj Census</h1>
           <p className="text-sm sm:text-base text-gray-500 mt-1">
             Fill In The Details Below To Register A New Samaj In The Census Portal.
           </p>
@@ -611,7 +611,7 @@ export default function SamajCensus() {
                 onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
                 className="w-full flex items-center justify-between px-4 sm:px-8 py-2 sm:py-3 cursor-pointer transition-colors"
               >
-                <h3 className="text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
+                <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
                 <ChevronDown
                   size={20}
                   className={`text-[#C67A2D] transition-transform duration-300 ${additionalInfoOpen ? 'rotate-180' : ''}`}
