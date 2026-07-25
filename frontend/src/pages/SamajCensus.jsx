@@ -595,8 +595,8 @@ export default function SamajCensus() {
                 ))}
 
                 <div className="flex items-center justify-end">
-                  <button type="button" onClick={addContactPerson} className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20">
-                    <UserPlus size={15} /> Add More Heads
+                  <button type="button" onClick={addContactPerson} className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20">
+                    <UserPlus size={13} className="sm:w-[15px] sm:h-[15px]" /> Add More Heads
                   </button>
                 </div>
               </div>
