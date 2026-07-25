@@ -377,15 +377,12 @@ export default function FamilyCensus() {
       <img src="/samaj hero.avif" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
       <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-4 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
-        <div className="text-center mb-4 md:mb-12 pt-2 md:pt-4">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[#4A3520] leading-tight">
-            Agrawal Samaj Census Portal
-          </h1>
-          <div className="mx-auto mt-3 md:mt-4 w-20 h-1 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
-          <p className="mt-2 md:mt-6 text-base sm:text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed">
-            Fill In The Details Below To Register A New Family In The Census Portal.
+        <div className="mb-3 md:mb-8">
+          <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Family Census</h1>
+          <p className="text-xs sm:text-base text-gray-500 -mt-1 sm:mt-1 whitespace-nowrap">
+            Fill In The Details Below To Register Your Family.
           </p>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             <span className="font-semibold text-[#4A3520]">Lalit Kumar Agarwal</span>
             <span className="text-gray-400">•</span>
             <a
