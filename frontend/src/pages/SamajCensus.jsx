@@ -425,7 +425,7 @@ export default function SamajCensus() {
   return (
     <>
       <img src="/samaj hero.avif" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
-      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-3 sm:py-12 lg:py-16">
+      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-1.5 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
         <div className="mb-3 md:mb-8">
           <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Samaj Census</h1>
