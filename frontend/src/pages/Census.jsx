@@ -60,18 +60,25 @@ export default function Census() {
                   <span className="hidden md:inline">Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.</span>
                 </p>
 
-                <div className="mt-1 pt-1 border-t border-gray-100">
-                  <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agrawal</p>
-                  <p className="text-sm text-gray-500">Chairman, ABCD</p>
-                  <a
-                    href="tel:7000484146"
-                    className="inline-flex items-center gap-1.5 mt-1 text-sm text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-                    </svg>
-                    7000484146
-                  </a>
+                <div className="mt-1 pt-1 border-t border-gray-100 flex items-center gap-3">
+                  <img
+                    src="/image.jpeg"
+                    alt="Lalit Kumar Agrawal"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover object-[center_25%] shrink-0 ring-2 ring-[#C67A2D]/20"
+                  />
+                  <div>
+                    <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agrawal</p>
+                    <p className="text-sm text-gray-500">Chairman, ABCD</p>
+                    <a
+                      href="tel:7000484146"
+                      className="inline-flex items-center gap-1.5 mt-1 text-sm text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                      </svg>
+                      7000484146
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
