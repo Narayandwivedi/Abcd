@@ -64,7 +64,7 @@ export default function Census() {
                   <img
                     src="/image.jpeg"
                     alt="Lalit Kumar Agrawal"
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover object-[center_25%] shrink-0 ring-2 ring-[#C67A2D]/20"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover object-[center_25%] shrink-0 ring-2 ring-[#C67A2D]/20"
                   />
                   <div>
                     <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agrawal</p>
