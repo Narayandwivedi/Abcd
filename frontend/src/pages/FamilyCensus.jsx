@@ -384,7 +384,7 @@ export default function FamilyCensus() {
             Fill In The Details Below To Register Your Family.
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="font-semibold text-[#4A3520]">Lalit Kumar Agarwal</span>
+            <span className="font-semibold text-[#4A3520]">Lalit Kumar Agrawal</span>
             <span className="text-gray-400">•</span>
             <a
               href="tel:7000484146"
