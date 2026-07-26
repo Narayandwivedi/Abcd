@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import * as XLSX from 'xlsx'
-import { Phone, MapPin, Users, FileText, UserCheck, Calendar, Building2, ShieldCheck, ShieldAlert, ShieldX, Download } from 'lucide-react'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import { Phone, MapPin, Users, FileText, UserCheck, Calendar, Building2, ShieldCheck, ShieldAlert, ShieldX, Download, FileDown } from 'lucide-react'
 
 const RELATION_OPTIONS = [
   'Self', 'Husband', 'Wife', 'Son', 'Daughter', 'Father', 'Mother',
@@ -231,6 +233,66 @@ const AdminFamilyCensus = () => {
     XLSX.writeFile(workbook, `Family_Census_${new Date().toISOString().slice(0, 10)}.xlsx`)
   }
 
+  const handleExportPDF = () => {
+    if (filteredList.length === 0) { toast.warning('No records to export'); return }
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' })
+    const pageWidth = doc.internal.pageSize.getWidth()
+
+    doc.setFontSize(16)
+    doc.text('Family Census Report', pageWidth / 2, 30, { align: 'center' })
+    doc.setFontSize(9)
+    doc.setTextColor(100)
+    doc.text(`Generated on ${new Date().toLocaleDateString('en-IN')} | Total Records: ${filteredList.length}`, pageWidth / 2, 46, { align: 'center' })
+
+    const head = [['#', 'Leader Name', 'Mobile', 'Samaj', 'Address', 'City', 'District', 'State', 'Pincode', 'Members', 'Status', 'Verification']]
+    const body = filteredList.map((family, idx) => {
+      const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
+        || family.samaj?.samajName || '-'
+      const membersText = family.members?.length
+        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'})`).join(', ')
+        : '-'
+      return [
+        idx + 1,
+        family.leaderName || '-',
+        family.leaderMobile || '-',
+        samajName,
+        family.address || '-',
+        family.city || '-',
+        family.district || '-',
+        family.state || '-',
+        family.pincode || '-',
+        membersText,
+        family.isActive ? 'Active' : 'Inactive',
+        family.verificationStatus || '-',
+      ]
+    })
+
+    autoTable(doc, {
+      head, body,
+      startY: 58,
+      margin: { top: 40, left: 20, right: 20, bottom: 20 },
+      styles: { fontSize: 7, cellPadding: 4, overflow: 'linebreak', valign: 'middle' },
+      headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [239, 246, 255] },
+      columnStyles: {
+        0: { cellWidth: 20 },
+        4: { cellWidth: 90 },
+        9: { cellWidth: 110 },
+      },
+    })
+
+    const pageCount = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.setTextColor(120)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth - 20, doc.internal.pageSize.getHeight() - 10, { align: 'right' })
+    }
+
+    doc.save(`Family_Census_${new Date().toISOString().slice(0, 10)}.pdf`)
+  }
+
   return (
     <div className='p-3 md:p-6'>
       <div className='mb-4 md:mb-6 flex items-start justify-between gap-3'>
@@ -238,12 +300,20 @@ const AdminFamilyCensus = () => {
           <h1 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>Family Census</h1>
           <p className='text-sm md:text-base text-gray-600'>Manage all Family records</p>
         </div>
-        <button
-          onClick={handleExportExcel}
-          className='shrink-0 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-md'
-        >
-          <Download size={16} /> Export Excel
-        </button>
+        <div className='shrink-0 flex items-center gap-2'>
+          <button
+            onClick={handleExportExcel}
+            className='flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-md'
+          >
+            <Download size={16} /> Export Excel
+          </button>
+          <button
+            onClick={handleExportPDF}
+            className='flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-md'
+          >
+            <FileDown size={16} /> Export PDF
+          </button>
+        </div>
       </div>
 
       <div className='grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 mb-4 md:mb-6'>
