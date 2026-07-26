@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
-import { Phone, Mail, MapPin, Users, FileText, UserCheck, Calendar, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react'
+import * as XLSX from 'xlsx'
+import { Phone, Mail, MapPin, Users, FileText, UserCheck, Calendar, ShieldCheck, ShieldAlert, ShieldX, Download } from 'lucide-react'
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -21,6 +22,7 @@ const AdminSamajCensus = () => {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [cityFilter, setCityFilter] = useState('all')
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, approved: 0, pending: 0, rejected: 0 })
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedSamaj, setSelectedSamaj] = useState(null)
@@ -168,19 +170,63 @@ const AdminSamajCensus = () => {
     setFormData({ ...formData, leaders: formData.leaders.filter((_, i) => i !== index) })
   }
 
+  const cityOptions = [...new Set(samajList.map(s => s.city).filter(Boolean))].sort()
+
   const filteredList = samajList.filter(s => {
     const matchesSearch = s.samajName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.mobile?.includes(searchTerm)
     const matchesStatus = statusFilter === 'all' || s.verificationStatus === statusFilter
-    return matchesSearch && matchesStatus
+    const matchesCity = cityFilter === 'all' || s.city === cityFilter
+    return matchesSearch && matchesStatus && matchesCity
   })
+
+  const handleExportExcel = () => {
+    if (filteredList.length === 0) { toast.warning('No records to export'); return }
+
+    const rows = filteredList.map((samaj) => {
+      const leadersText = samaj.leaders?.length
+        ? samaj.leaders.map(l => `${l.name || ''} (${l.designation || '-'}${l.mobile ? `, ${l.mobile}` : ''})`).join('; ')
+        : ''
+      return {
+        'Samaj Name': samaj.samajName || '',
+        'Mobile': samaj.mobile || '',
+        'Email': samaj.email || '',
+        'Office Address': samaj.officeAddress || '',
+        'City': samaj.city || '',
+        'District': samaj.district || '',
+        'State': samaj.state || '',
+        'Pincode': samaj.pincode || '',
+        'Leader Count': samaj.leaders?.length || 0,
+        'Leaders': leadersText,
+        'Status': samaj.isActive ? 'Active' : 'Inactive',
+        'Verification': samaj.verificationStatus || '',
+        'Remarks': samaj.remarks || '',
+        'Submitted By': samaj.submittedBy || '',
+        'Submitted By Mobile': samaj.submittedByMobile || '',
+        'Created At': samaj.createdAt ? new Date(samaj.createdAt).toLocaleDateString('en-IN') : '',
+      }
+    })
+
+    const worksheet = XLSX.utils.json_to_sheet(rows)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Samaj Census')
+    XLSX.writeFile(workbook, `Samaj_Census_${new Date().toISOString().slice(0, 10)}.xlsx`)
+  }
 
   return (
     <div className='p-3 md:p-6'>
-      <div className='mb-4 md:mb-6'>
-        <h1 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>Samaj Census</h1>
-        <p className='text-sm md:text-base text-gray-600'>Manage all Samaj records</p>
+      <div className='mb-4 md:mb-6 flex items-start justify-between gap-3'>
+        <div>
+          <h1 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>Samaj Census</h1>
+          <p className='text-sm md:text-base text-gray-600'>Manage all Samaj records</p>
+        </div>
+        <button
+          onClick={handleExportExcel}
+          className='shrink-0 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-md'
+        >
+          <Download size={16} /> Export Excel
+        </button>
       </div>
 
       <div className='grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 mb-4 md:mb-6'>
@@ -218,6 +264,14 @@ const AdminSamajCensus = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className='flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
         />
+        <select
+          value={cityFilter}
+          onChange={(e) => setCityFilter(e.target.value)}
+          className='px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-48'
+        >
+          <option value='all'>All Cities</option>
+          {cityOptions.map(city => <option key={city} value={city}>{city}</option>)}
+        </select>
         <div className='flex items-center gap-1.5 sm:w-auto overflow-x-auto'>
           {[
             { key: 'all', label: 'All' },
