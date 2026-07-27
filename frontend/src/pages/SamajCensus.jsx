@@ -665,7 +665,7 @@ export default function SamajCensus() {
           <div className="flex justify-center pb-4">
             <Link
               to="/census"
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-500 hover:text-[#C67A2D] transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 px-5 py-2.5 rounded-full shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
             >
               <ArrowLeft size={14} /> Back To Census
             </Link>
