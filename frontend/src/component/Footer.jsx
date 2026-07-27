@@ -56,7 +56,7 @@ const Footer = () => {
             </div>
 
             <Link to='/census' className='block mt-4'>
-              <div className='relative bg-gradient-to-r from-emerald-500 to-teal-700 text-white px-5 py-3 text-base rounded-xl font-bold text-center shadow-lg shadow-emerald-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
+              <div className='relative bg-gradient-to-r from-fuchsia-500 to-pink-700 text-white px-5 py-3 text-base rounded-xl font-bold text-center shadow-lg shadow-fuchsia-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
                 <p className='font-extrabold'>Agrawal Samaj Census</p>
               </div>
             </Link>
@@ -143,7 +143,7 @@ const Footer = () => {
               </div>
 
               <Link to='/census' className='block mt-4'>
-                <div className='relative bg-gradient-to-r from-emerald-500 to-teal-700 text-white px-3 py-2 text-xs rounded-xl font-bold text-center shadow-lg shadow-emerald-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                <div className='relative bg-gradient-to-r from-fuchsia-500 to-pink-700 text-white px-3 py-2 text-xs rounded-xl font-bold text-center shadow-lg shadow-fuchsia-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
                   <p className='font-extrabold'>Agrawal Samaj Census</p>
                 </div>
               </Link>
