@@ -490,7 +490,7 @@ export default function SamajCensus() {
                           onKeyDown={(e) => {
                             const currentDisplay = form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''
                             const filtered = filterAndSortCities(cityList, citySearch, currentDisplay)
-                            const visible = filtered.slice(0, 50)
+                            const visible = filtered
                             if (e.key === 'ArrowDown') {
                               e.preventDefault()
                               setHighlightedIndex((prev) => (prev < visible.length - 1 ? prev + 1 : prev))
@@ -532,7 +532,7 @@ export default function SamajCensus() {
                     {cityDropdownOpen && (
                       <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/50 max-h-80 overflow-y-auto">
                         {cityLoading ? (
-                          <div className="px-4 py-6 text-sm text-gray-400 flex flex-col items-center justify-center gap-2">
+                          <div className="px-4 py-6 text-xs sm:text-sm text-gray-400 flex flex-col items-center justify-center gap-2">
                             <div className="w-5 h-5 border-2 border-[#C67A2D]/30 border-t-[#C67A2D] rounded-full animate-spin" />
                             Loading cities...
                           </div>
@@ -542,10 +542,10 @@ export default function SamajCensus() {
                             const filtered = filterAndSortCities(cityList, citySearch, currentDisplay)
                             if (filtered.length === 0) {
                               return (
-                                <div className="px-4 py-6 text-sm text-gray-400 text-center">No cities found</div>
+                                <div className="px-4 py-6 text-xs sm:text-sm text-gray-400 text-center">No cities found</div>
                               )
                             }
-                            return filtered.slice(0, 50).map((c, i) => {
+                            return filtered.map((c, i) => {
                               const isSelected = form.city && titleCase(c.city) === titleCase(form.city) && titleCase(c.district) === titleCase(form.district)
                               const isHighlighted = i === highlightedIndex
                               return (
@@ -558,12 +558,12 @@ export default function SamajCensus() {
                                     setHighlightedIndex(-1)
                                   }}
                                   onMouseEnter={() => setHighlightedIndex(i)}
-                                  className={`px-4 py-2.5 text-sm cursor-pointer transition-colors border-b border-gray-50 last:border-b-0 ${
+                                  className={`px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm cursor-pointer transition-colors border-b border-gray-50 last:border-b-0 ${
                                     isSelected ? 'bg-[#FFF8F0] text-[#C67A2D] font-semibold' : isHighlighted ? 'bg-[#FFF8F0] text-[#C67A2D]' : 'text-gray-700 hover:bg-[#FFF8F0] hover:text-[#C67A2D]'
                                   }`}
                                 >
                                   <div>{titleCase(c.city)}</div>
-                                  <div className="text-xs text-gray-400">{titleCase(c.district)} • {titleCase(c.state)}</div>
+                                  <div className="text-[10px] sm:text-xs text-gray-400">{titleCase(c.district)} • {titleCase(c.state)}</div>
                                 </div>
                               )
                             })
