@@ -269,7 +269,7 @@ const App = () => {
           <Route path='/:state/:district/:city/:slug' element={<VendorDetail />} />
         </Routes>
       </div>
-      {!isAuthPage && <Footer />}
+      {!isAuthPage && <Footer noBottomNav={isCensusPage} />}
       {!isAuthPage && !isCensusPage && <BottomNav />}
 
       {/* Toast Notification Container */}

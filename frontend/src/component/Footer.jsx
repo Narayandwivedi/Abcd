@@ -1,9 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const Footer = () => {
+const Footer = ({ noBottomNav = false }) => {
   return (
-    <footer className='bg-gray-800 text-white mt-auto mb-10 md:mb-24'>
+    <footer className={`bg-gray-800 text-white mt-auto ${noBottomNav ? 'mb-0' : 'mb-10 md:mb-24'}`}>
       <div className='container mx-auto px-4 py-4 md:py-8'>
         {/* Desktop Footer Layout */}
         <div className='hidden md:grid grid-cols-5 gap-8'>
@@ -188,7 +188,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className='border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm'>
+        <div className={`border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 ${noBottomNav ? 'text-[10px] md:text-xs' : 'text-sm'}`}>
           <p>&copy; {new Date().getFullYear()} ABCD. All rights reserved. 
             <a 
               href="https://Softwarebytes.in" 
