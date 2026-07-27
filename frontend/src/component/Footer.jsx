@@ -188,7 +188,7 @@ const Footer = ({ noBottomNav = false }) => {
           </div>
         </div>
 
-        <div className={`border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 ${noBottomNav ? 'text-[10px] md:text-xs' : 'text-sm'}`}>
+        <div className={`border-t border-gray-700 mt-3 pt-3 md:mt-8 md:pt-6 text-center text-gray-400 ${noBottomNav ? 'text-[10px] md:text-xs' : 'text-sm'}`}>
           <p>&copy; {new Date().getFullYear()} ABCD. All rights reserved. 
             <a 
               href="https://Softwarebytes.in" 
