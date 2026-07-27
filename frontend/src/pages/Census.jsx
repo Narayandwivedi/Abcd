@@ -61,11 +61,13 @@ export default function Census() {
                 </p>
 
                 <div className="mt-1 pt-1 border-t border-gray-100 flex items-center gap-3">
-                  <img
-                    src="/image.jpeg"
-                    alt="Lalit Kumar Agrawal"
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover object-[center_25%] shrink-0 ring-2 ring-[#C67A2D]/20"
-                  />
+                  <div className="h-16 md:h-20 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white">
+                    <img
+                      src="/image.jpeg"
+                      alt="Lalit Kumar Agrawal"
+                      className="h-full w-auto object-contain"
+                    />
+                  </div>
                   <div>
                     <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agrawal</p>
                     <p className="text-sm text-gray-500">Chairman, ABCD</p>
