@@ -172,17 +172,26 @@ export default function SamajCensus() {
   }
 
   useEffect(() => {
-    axios.get(`${BACKEND_URL}/api/cities?limit=1000`)
-      .then((res) => {
-        if (res.data.success) {
-          setCityList(res.data.data)
+    const fetchAllCities = async () => {
+      try {
+        let page = 1
+        let all = []
+        let hasMore = true
+        while (hasMore) {
+          const res = await axios.get(`${BACKEND_URL}/api/cities?limit=1000&page=${page}`)
+          if (!res.data.success) break
+          all = all.concat(res.data.data)
+          hasMore = res.data.pagination?.hasMore
+          page += 1
         }
-        setCityLoading(false)
-      })
-      .catch(() => {
+        setCityList(all)
+      } catch (error) {
         toast.error('Failed to load cities')
+      } finally {
         setCityLoading(false)
-      })
+      }
+    }
+    fetchAllCities()
   }, [])
 
   useEffect(() => {
