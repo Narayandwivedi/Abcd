@@ -22,7 +22,7 @@ import Cities from './pages/Cities'
 import Ads from './pages/Ads'
 import Offers from './pages/Offers'
 import WhatsAppSessions from './pages/WhatsAppSessions'
-import AdminSamajCensus from './pages/AdminSamajCensus'
+import AdminLocation from './pages/AdminLocation'
 import AdminFamilyCensus from './pages/AdminFamilyCensus'
 import { useAdminAuth } from './context/AdminAuthContext'
 
@@ -213,11 +213,11 @@ function AppRoutes() {
         }
       />
       <Route
-        path='/samaj-census'
+        path='/location-census'
         element={
           <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
-              <AdminSamajCensus />
+              <AdminLocation />
             </AdminLayout>
           </ProtectedRoute>
         }

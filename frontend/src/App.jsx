@@ -22,10 +22,11 @@ import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Vouchers from './pages/Vouchers'
 import VendorDetail from './pages/VendorDetail'
-import SamajCensus from './pages/SamajCensus'
+import Location from './pages/Location'
 import FamilyCensus from './pages/FamilyCensus'
 import Census from './pages/Census'
 import BackgroundMusic from './component/BackgroundMusic'
+import { AudioProvider } from './context/AudioContext'
 
 // Scroll to top on every route change
 const ScrollToTop = () => {
@@ -39,7 +40,7 @@ const ScrollToTop = () => {
 const App = () => {
   const location = useLocation()
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
-  const isCensusPage = location.pathname === '/census' || location.pathname === '/samaj-census' || location.pathname === '/family-census'
+  const isCensusPage = location.pathname === '/census' || location.pathname === '/location' || location.pathname === '/family-census'
   const isHomePage = location.pathname === '/'
   const getSeoConfig = (pathname) => {
     if (pathname === '/') {
@@ -179,11 +180,11 @@ const App = () => {
       }
     }
 
-    if (pathname === '/samaj-census') {
+    if (pathname === '/location') {
       return {
-        title: 'Samaj Census - ABCD Vyapar',
-        description: 'Register your Samaj in the Agrawal Samaj Census portal. Fill in community details and contact information.',
-        canonicalPath: '/samaj-census',
+        title: 'Location Census - ABCD Vyapar',
+        description: 'Register your location in the Agrawal Samaj Census portal. Fill in village, city, and other location details.',
+        canonicalPath: '/location',
       }
     }
 
@@ -235,6 +236,7 @@ const App = () => {
   }
 
   return (
+    <AudioProvider>
     <div className={isAuthPage ? '' : 'flex flex-col min-h-screen'}>
       <Seo
         title={seo.title}
@@ -263,7 +265,7 @@ const App = () => {
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/category/:categorySlug' element={<CategoryPage />} />
           <Route path='/census' element={<Census />} />
-          <Route path='/samaj-census' element={<SamajCensus />} />
+          <Route path='/location' element={<Location />} />
           <Route path='/family-census' element={<FamilyCensus />} />
           <Route path='/:type/:id' element={<AdDetail />} />
           <Route path='/:state/:district/:city/:slug' element={<VendorDetail />} />
@@ -286,6 +288,7 @@ const App = () => {
         theme="colored"
       />
     </div>
+    </AudioProvider>
   )
 }
 

@@ -1,30 +1,31 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
+import { useAudio } from '../context/AudioContext'
 
-export default function BackgroundMusic({ src = '/music.mp3', volume = 0.6 }) {
+export default function BackgroundMusic({ src = '/music.mp3', volume: _volume }) {
   const audioRef = useRef(null)
+  const { registerAudio } = useAudio()
+
+  const setRef = useCallback((el) => {
+    audioRef.current = el
+    registerAudio(el)
+  }, [registerAudio])
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    audio.volume = volume
 
     const events = ['touchstart', 'touchend', 'pointerdown', 'mousedown', 'click', 'keydown']
     const unlock = () => events.forEach((evt) => document.removeEventListener(evt, startOnInteraction, true))
     const tryPlay = () => audio.play().then(unlock).catch(() => {})
     tryPlay()
 
-    const startOnInteraction = () => {
-      tryPlay()
-    }
-    // capture: true so an ancestor/descendant calling stopPropagation() on its own
-    // click/touch handler (dropdowns, modals, etc.) can't swallow the gesture before
-    // it reaches this listener.
+    const startOnInteraction = () => { tryPlay() }
     events.forEach((evt) => document.addEventListener(evt, startOnInteraction, true))
 
     return () => {
       events.forEach((evt) => document.removeEventListener(evt, startOnInteraction, true))
     }
-  }, [volume])
+  }, [])
 
-  return <audio ref={audioRef} src={src} loop preload="auto" />
+  return <audio ref={setRef} src={src} loop preload="auto" />
 }

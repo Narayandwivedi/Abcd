@@ -2,29 +2,30 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
-import { UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, Search, ChevronDown, ArrowLeft } from 'lucide-react'
+import { Eye, Edit3, X, AlertTriangle, Search, ChevronDown, ArrowLeft } from 'lucide-react'
+import AudioControls from '../component/AudioControls'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
-const emptyContactPerson = () => ({
-  name: '',
-  designation: '',
-  mobile: '',
-  email: '',
-  alternateMobile: '',
-})
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman & Nicobar', 'Chandigarh', 'Dadra & Nagar Haveli',
+  'Daman & Diu', 'Delhi', 'Jammu & Kashmir', 'Ladakh',
+  'Lakshadweep', 'Puducherry',
+]
 
 const emptyForm = {
-  samajName: '',
-  officeAddress: '',
-  mobile: '',
-  email: '',
+  village: '',
+  tehsil: '',
   city: '',
   district: '',
   state: '',
   pincode: '',
-  contactPersons: [{ name: '', designation: '', mobile: '', email: '', alternateMobile: '' }],
-  remarks: '',
   submittedBy: '',
   submittedByMobile: '',
 }
@@ -62,20 +63,6 @@ function Input({ label, required, className, wrapperClassName, ...props }) {
       <input
         {...props}
         className={`w-full px-2.5 py-2 sm:px-3.5 sm:py-2.5 border border-gray-200 rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white ${className || ''}`}
-      />
-    </label>
-  )
-}
-
-function Textarea({ label, required, ...props }) {
-  return (
-    <label className="flex flex-col gap-1.5 font-medium text-sm flex-1 min-w-0">
-      <span className="text-gray-700 text-sm font-semibold">
-        {label} {required && <span className="text-red-500">*</span>}
-      </span>
-      <textarea
-        {...props}
-        className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white resize-y min-h-[80px]"
       />
     </label>
   )
@@ -149,8 +136,8 @@ function PreviewRow({ label, value }) {
   )
 }
 
-export default function SamajCensus() {
-  const [form, setForm] = useState({ ...emptyForm, contactPersons: [emptyContactPerson()] })
+export default function Location() {
+  const [form, setForm] = useState({ ...emptyForm })
   const [submitting, setSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
@@ -160,11 +147,10 @@ export default function SamajCensus() {
   const [cityLoading, setCityLoading] = useState(true)
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
-  const [additionalInfoOpen, setAdditionalInfoOpen] = useState(false)
   const cityRef = useRef(null)
   const cityInputRef = useRef(null)
 
-  const MOBILE_FIELDS = ['mobile', 'submittedByMobile']
+  const MOBILE_FIELDS = ['submittedByMobile']
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -205,79 +191,39 @@ export default function SamajCensus() {
   }, [])
 
   const handleReset = () => {
-    setForm({ ...emptyForm, contactPersons: [emptyContactPerson()] })
+    setForm({ ...emptyForm })
     setShowPreview(false)
     setShowConfirm(false)
     setCitySearch('')
   }
 
-  const handleContactPersonChange = (index, field, value) => {
-    const updated = [...form.contactPersons]
-    updated[index] = { ...updated[index], [field]: (field === 'mobile' || field === 'alternateMobile') ? sanitizeMobile(value) : value }
-    setForm((prev) => ({ ...prev, contactPersons: updated }))
-  }
-
-  const addContactPerson = () => {
-    setForm((prev) => ({
-      ...prev,
-      contactPersons: [...prev.contactPersons, emptyContactPerson()],
-    }))
-  }
-
-  const removeContactPerson = (index) => {
-    setForm((prev) => ({
-      ...prev,
-      contactPersons: prev.contactPersons.filter((_, i) => i !== index),
-    }))
-  }
-
   const validate = () => {
-    if (!form.samajName.trim()) { toast.error('Samaj Name Is Required.'); return false }
-    if (!form.mobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
-    if (!/^\d{10}$/.test(form.mobile.trim())) { toast.error('Please Enter A Valid 10-Digit Mobile Number.'); return false }
+    if (!form.village.trim()) { toast.error('Village Is Required.'); return false }
     if (!form.city.trim()) { toast.error('City Is Required.'); return false }
     if (!form.submittedBy.trim()) { toast.error('Submitted By Name Is Required.'); return false }
     if (!form.submittedByMobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
     if (!/^\d{10}$/.test(form.submittedByMobile.trim())) { toast.error('Please Enter A Valid 10-Digit Mobile Number.'); return false }
-
-    for (let i = 0; i < form.contactPersons.length; i++) {
-      const cp = form.contactPersons[i]
-      if (!cp.name.trim()) { toast.error(`Contact Person ${i + 1}: Name is required.`); return false }
-      if (!cp.designation.trim()) { toast.error(`Contact Person ${i + 1}: Designation is required.`); return false }
-      if (!cp.mobile.trim()) { toast.error(`Contact Person ${i + 1}: Mobile Number is required.`); return false }
-      if (!/^\d{10}$/.test(cp.mobile.trim())) { toast.error(`Contact Person ${i + 1}: Please Enter A Valid 10-Digit Mobile Number.`); return false }
-      if (cp.alternateMobile && !/^\d{10}$/.test(cp.alternateMobile.trim())) { toast.error(`Contact Person ${i + 1}: Please Enter A Valid 10-Digit Alternate Mobile Number.`); return false }
-    }
     return true
   }
 
   const submitToApi = async () => {
     setSubmitting(true)
     try {
-      await axios.post(`${BACKEND_URL}/api/samaj`, {
-        samajName: form.samajName,
-        officeAddress: form.officeAddress,
-        mobile: form.mobile,
-        email: form.email,
-        state: form.state,
-        district: form.district,
+      await axios.post(`${BACKEND_URL}/api/location`, {
+        village: form.village,
+        tehsil: form.tehsil,
         city: form.city,
+        district: form.district,
+        state: form.state,
         pincode: form.pincode,
-        leaders: form.contactPersons.map((cp) => ({
-          name: cp.name,
-          designation: cp.designation,
-          mobile: cp.mobile,
-        })),
-        remarks: form.remarks,
-        isActive: true,
         submittedBy: form.submittedBy,
         submittedByMobile: form.submittedByMobile,
       })
       setShowPreview(false)
       setShowSuccess(true)
-      toast.success('Samaj Registered Successfully!')
+      toast.success('Location Registered Successfully!')
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed To Save Samaj. Please Try Again.')
+      toast.error(err.response?.data?.message || 'Failed To Save Location. Please Try Again.')
     } finally {
       setSubmitting(false)
     }
@@ -305,13 +251,13 @@ export default function SamajCensus() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-[#4A3520] mt-6">Samaj Registered Successfully!</h3>
-          <p className="text-sm text-gray-500 mt-2">The Samaj Information Has Been Saved Successfully.</p>
+          <h3 className="text-xl font-bold text-[#4A3520] mt-6">Location Registered Successfully!</h3>
+          <p className="text-sm text-gray-500 mt-2">The Location Information Has Been Saved Successfully.</p>
           <button
             onClick={() => { setShowSuccess(false); handleReset() }}
             className="mt-8 px-8 py-3 rounded-[14px] text-sm font-semibold text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] hover:shadow-lg hover:shadow-[#C67A2D]/25 transition-all duration-300 cursor-pointer"
           >
-            Register Another Samaj
+            Register Another Location
           </button>
         </div>
       </div>
@@ -328,39 +274,19 @@ export default function SamajCensus() {
               <Eye size={20} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Preview Samaj Details</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Preview Location Details</h1>
               <p className="text-sm text-gray-500">Please review all information before saving</p>
             </div>
           </div>
 
           <div className="flex flex-col gap-5">
-            <SectionCard title="Samaj Information">
-              <PreviewRow label="Samaj Name" value={form.samajName} />
-              <PreviewRow label="Mobile Number" value={form.mobile} />
-              <PreviewRow label="Office Address" value={form.officeAddress} />
-              <PreviewRow label="Email" value={form.email} />
-            </SectionCard>
-
             <SectionCard title="Location Details">
+              <PreviewRow label="Village" value={titleCase(form.village)} />
+              <PreviewRow label="Tehsil" value={titleCase(form.tehsil)} />
               <PreviewRow label="City" value={form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''} />
+              <PreviewRow label="District" value={titleCase(form.district)} />
+              <PreviewRow label="State" value={form.state} />
               <PreviewRow label="Pincode" value={form.pincode} />
-            </SectionCard>
-
-            <SectionCard title="Contact Persons">
-              {form.contactPersons.map((cp, idx) => (
-                <div key={idx} className={idx < form.contactPersons.length - 1 ? 'border-b border-gray-100 pb-4 mb-4' : ''}>
-                  <p className="text-xs font-bold text-[#C67A2D] uppercase tracking-wider mb-3">Contact Person {idx + 1}</p>
-                  <PreviewRow label="Name" value={cp.name} />
-                  <PreviewRow label="Designation" value={cp.designation} />
-                  <PreviewRow label="Mobile" value={cp.mobile} />
-                  <PreviewRow label="Email" value={cp.email} />
-                  <PreviewRow label="Alternate Mobile" value={cp.alternateMobile} />
-                </div>
-              ))}
-            </SectionCard>
-
-            <SectionCard title="Additional Information">
-              <PreviewRow label="Remarks" value={form.remarks} />
             </SectionCard>
 
             <SectionCard title="Submitted By">
@@ -382,7 +308,7 @@ export default function SamajCensus() {
               onClick={() => setShowConfirm(true)}
               className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
             >
-              Save Samaj
+              Save Location
             </button>
           </div>
         </div>
@@ -404,7 +330,7 @@ export default function SamajCensus() {
             </div>
             <h3 className="text-lg font-bold text-[#4A3520] text-center mt-4">Confirm Save</h3>
             <p className="text-sm text-gray-500 text-center mt-2 leading-relaxed">
-              Are you sure you want to save this Samaj data? Please verify all details before confirming.
+              Are you sure you want to save this Location data? Please verify all details before confirming.
             </p>
             <div className="flex gap-3 mt-8">
               <button
@@ -437,9 +363,9 @@ export default function SamajCensus() {
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 py-1.5 sm:py-12 lg:py-16">
       <div className="max-w-[1200px] mx-auto">
         <div className="mb-3 md:mb-8">
-          <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Samaj Census</h1>
+          <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Location Census</h1>
           <p className="text-xs sm:text-base text-gray-500 -mt-1 sm:mt-1 whitespace-nowrap">
-            Fill In The Details Below To Register Your Samaj.
+            Fill In The Details Below To Register Your Location.
           </p>
           <div className="mt-2 flex items-center gap-2.5">
             <div className="h-14 sm:h-16 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white">
@@ -458,6 +384,7 @@ export default function SamajCensus() {
                 7000484146
               </a>
             </div>
+            <AudioControls inline />
           </div>
         </div>
 
@@ -465,12 +392,12 @@ export default function SamajCensus() {
           <div className="flex flex-col gap-3 sm:gap-8 lg:grid lg:grid-cols-2 lg:items-stretch">
           <div className="flex flex-col gap-3 sm:gap-8 lg:h-full">
           <div className="lg:flex-1 lg:flex lg:flex-col">
-            <SectionHeader icon="🏛️" title="Samaj Information" compact accent="bronze" />
+            <SectionHeader icon="📍" title="Location Details" compact accent="bronze" />
             <SectionCard title="Basic Details" noBar bodyClassName="p-4 sm:p-8 pt-3 sm:pt-5" fillHeight>
               <div className="flex flex-col gap-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
-                  <Input label="Samaj Name" required wrapperClassName="col-span-2 sm:col-span-1" value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
-                  <Input label="Samaj Mobile" required type="tel" inputMode="numeric" maxLength={10} value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter 10-Digit Mobile Number" />
+                  <Input label="Village" required wrapperClassName="col-span-2 sm:col-span-1" value={form.village} onChange={handleChange} name="village" placeholder="Enter Village Name" />
+                  <Input label="Tehsil" wrapperClassName="col-span-2 sm:col-span-1" value={form.tehsil} onChange={handleChange} name="tehsil" placeholder="Enter Tehsil" />
                   <div className="relative min-w-0" ref={cityRef}>
                     <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm">
                       <span className="text-gray-700 text-xs sm:text-sm font-semibold">
@@ -483,7 +410,7 @@ export default function SamajCensus() {
                           autoComplete="off"
                           autoCorrect="off"
                           spellCheck="false"
-                          name="samaj-city-search"
+                          name="location-city-search"
                           value={form.city && !cityDropdownOpen ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : citySearch}
                           onChange={(e) => { setCitySearch(e.target.value); setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city) setForm((prev) => ({ ...prev, city: '', district: '', state: '' })) }}
                           onFocus={() => { setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city && !citySearch) setCitySearch(`${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}`) }}
@@ -571,37 +498,15 @@ export default function SamajCensus() {
                         )}
                       </div>
                     )}
-                  </div>
+</div>
                 </div>
-              </div>
-
-              <div className="mt-2 -mx-4 sm:-mx-8 -mb-4 sm:-mb-8 pb-1.5 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
-                  className="w-full flex items-center justify-between px-4 sm:px-8 py-1.5 cursor-pointer transition-colors"
-                >
-                  <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
-                  <ChevronDown
-                    size={20}
-                    className={`text-[#C67A2D] transition-transform duration-300 ${additionalInfoOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                <div
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="px-4 sm:px-8 pb-1 flex flex-col gap-3 sm:gap-5">
-                    <div className="grid grid-cols-1 gap-3 sm:gap-5">
-                      <Input label="Samaj Email" type="email" value={form.email} onChange={handleChange} name="email" placeholder="Enter Email Address" />
-                      <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode (Optional)" />
-                    </div>
-                    <div className="grid grid-cols-1 gap-3 sm:gap-6">
-                      <Textarea label="Samaj Office Address" value={form.officeAddress} onChange={handleChange} name="officeAddress" placeholder="Enter Office Address" />
-                      <Textarea label="Remarks" value={form.remarks} onChange={handleChange} name="remarks" placeholder="Enter Any Additional Remarks Or Notes..." />
-                    </div>
-                  </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
+                  <Input label="District" value={form.district} onChange={handleChange} name="district" placeholder="Enter District" />
+                  <Select label="State" value={form.state} onChange={handleChange} name="state">
+                    <option value="">Select State</option>
+                    {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </Select>
+                  <Input label="Pincode" value={form.pincode} onChange={handleChange} name="pincode" placeholder="Enter Pincode" />
                 </div>
               </div>
             </SectionCard>
@@ -609,57 +514,14 @@ export default function SamajCensus() {
           </div>
 
           <div className="lg:h-full lg:flex lg:flex-col">
-            <SectionHeader icon="👤" title="Samaj Head / Contact Person" compact accent="teal" />
-            <SectionCard title="Contact Person Details" hideHeader bodyClassName="px-3 sm:px-8 pt-1 sm:pt-3 pb-2 sm:pb-5" fillHeight>
-              <div className="flex flex-col gap-2 sm:gap-3 [&_label]:gap-1.5 sm:[&_label]:gap-2">
-                {form.contactPersons.map((cp, idx) => (
-                  <div key={idx} className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-sm animate-fade-in">
-                    {idx > 0 && (
-                      <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-[#FFF8F0] to-white border-b border-gray-100">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-sm">
-                            <span className="text-xs font-bold text-white">{idx + 1}</span>
-                          </div>
-                          <span className="text-sm font-semibold text-gray-700">Contact Person {idx + 1}</span>
-                        </div>
-                        <button type="button" onClick={() => removeContactPerson(idx)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 cursor-pointer">
-                          <Trash2 size={13} /> Remove
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-3">
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-3">
-                        <Input label="Full Name" required value={cp.name} onChange={(e) => handleContactPersonChange(idx, 'name', e.target.value)} placeholder="Enter full name" />
-                        <Input label="Designation" required value={cp.designation} onChange={(e) => handleContactPersonChange(idx, 'designation', e.target.value)} placeholder="Enter designation" />
-                        <Input label="Mobile Number" required type="tel" inputMode="numeric" maxLength={10} value={cp.mobile} onChange={(e) => handleContactPersonChange(idx, 'mobile', e.target.value)} placeholder="Enter 10-digit mobile number" />
-                      </div>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3">
-                        <Input label="Email Address" type="email" value={cp.email} onChange={(e) => handleContactPersonChange(idx, 'email', e.target.value)} placeholder="Enter email address" />
-                        <Input label="Alternate Mobile" type="tel" inputMode="numeric" maxLength={10} value={cp.alternateMobile} onChange={(e) => handleContactPersonChange(idx, 'alternateMobile', e.target.value)} placeholder="Enter alternate mobile (Optional)" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                <div className="flex items-center justify-end">
-                  <button type="button" onClick={addContactPerson} className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20">
-                    <UserPlus size={13} className="sm:w-[15px] sm:h-[15px]" /> Add More Heads
-                  </button>
-                </div>
-              </div>
-            </SectionCard>
-          </div>
-          </div>
-
-          <div>
             <SectionHeader icon="📝" title="Form Submission Details" compact />
-            <SectionCard title="Submitted By" noBar bodyClassName="px-3 sm:px-8 pt-4 sm:pt-5 pb-2 sm:pb-5">
+            <SectionCard title="Submitted By" noBar bodyClassName="px-3 sm:px-8 pt-4 sm:pt-5 pb-2 sm:pb-5" fillHeight>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 [&_label]:gap-1.5 sm:[&_label]:gap-2">
                 <Input label="This Form Is Submitted By" required value={form.submittedBy} onChange={handleChange} name="submittedBy" placeholder="Enter Full Name" />
                 <Input label="Mobile Number" required type="tel" inputMode="numeric" maxLength={10} value={form.submittedByMobile} onChange={handleChange} name="submittedByMobile" placeholder="Enter 10-Digit Mobile Number" />
               </div>
             </SectionCard>
+          </div>
           </div>
 
           <div className="flex flex-row items-center justify-between gap-2 pb-2">
@@ -686,4 +548,3 @@ export default function SamajCensus() {
     </>
   )
 }
-

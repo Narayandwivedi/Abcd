@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Quote, Building2, Users } from 'lucide-react'
+import AudioControls from '../component/AudioControls'
 
 export default function Census() {
   return (
@@ -15,7 +16,7 @@ export default function Census() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-8">
             <Link
-              to="/samaj-census"
+              to="/location"
               className="group block w-full"
             >
               <div className="relative overflow-hidden flex items-center gap-2 md:gap-4 bg-gradient-to-br from-[#FB923C] via-[#F97316] to-[#C2410C] text-white px-3 py-3 md:px-7 md:py-6 rounded-2xl font-semibold text-center shadow-lg shadow-orange-500/25 ring-1 ring-white/10 hover:shadow-xl hover:shadow-orange-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300">
@@ -111,6 +112,7 @@ export default function Census() {
           </div>
         </div>
       </div>
+      <AudioControls />
     </>
   )
 }
