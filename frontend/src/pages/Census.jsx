@@ -47,7 +47,7 @@ export default function Census() {
             </Link>
           </div>
 
-          <div className="mt-2 sm:mt-12 max-w-3xl mx-auto">
+          <div className="mt-2 sm:mt-12 max-w-4xl mx-auto">
             <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-4 sm:p-10">
               <div className="hidden md:block absolute top-0 left-6 md:-top-4 md:left-8">
                 <div className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
@@ -60,26 +60,51 @@ export default function Census() {
                   <span className="hidden md:inline">Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.</span>
                 </p>
 
-                <div className="mt-1 pt-1 border-t border-gray-100 flex items-center gap-3">
-                  <div className="h-16 md:h-20 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white">
-                    <img
-                      src="/image.jpeg"
-                      alt="Lalit Kumar Agrawal"
-                      className="h-full w-auto object-contain"
-                    />
+                <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-4 sm:gap-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+                    <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
+                      <img
+                        src="/ashokji.avif"
+                        alt="Dr Ashok Agrawal"
+                        className="h-full w-auto object-contain"
+                      />
+                    </div>
+                    <div className="text-center md:text-left">
+                      <p className="text-xs md:text-sm font-bold text-[#4A3520]">Dr Ashok Agrawal</p>
+                      <p className="m-0 text-[10px] md:text-xs text-gray-500">President CGPAS</p>
+                      <a
+                        href="tel:9301014000"
+                        className="inline-flex items-center gap-1 text-[10px] md:text-xs text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
+                      >
+                        <svg className="w-3 md:w-3.5 h-3 md:h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        9301014000
+                      </a>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-base font-bold text-[#4A3520]">Lalit Kumar Agrawal</p>
-                    <p className="text-sm text-gray-500">Chairman, ABCD</p>
-                    <a
-                      href="tel:7000484146"
-                      className="inline-flex items-center gap-1.5 mt-1 text-sm text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-                      </svg>
-                      7000484146
-                    </a>
+
+                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+                    <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
+                      <img
+                        src="/image.jpeg"
+                        alt="Lalit Kumar Agrawal"
+                        className="h-full w-auto object-contain"
+                      />
+                    </div>
+                    <div className="text-center md:text-left">
+                      <p className="text-xs md:text-sm font-bold text-[#4A3520]">Lalit Kumar Agrawal</p>
+                      <p className="m-0 text-[10px] md:text-xs text-gray-500">Chairman, ABCD</p>
+                      <a
+                        href="tel:7000484146"
+                        className="inline-flex items-center gap-1 text-[10px] md:text-xs text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
+                      >
+                        <svg className="w-3 md:w-3.5 h-3 md:h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        7000484146
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
