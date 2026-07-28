@@ -48,20 +48,19 @@ export default function Census() {
           </div>
 
           <div className="mt-2 sm:mt-12 max-w-4xl mx-auto">
-            <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-4 sm:p-10">
+            <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-2 sm:p-6">
               <div className="hidden md:block absolute top-0 left-6 md:-top-4 md:left-8">
                 <div className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
                   <Quote size={14} className="text-white" />
                 </div>
               </div>
-              <div className="pl-2">
-                <p className="text-xs md:text-base text-gray-600 leading-relaxed mb-1">
-                  <span className="md:hidden">Participate in the census to preserve our community heritage.</span>
-                  <span className="hidden md:inline">Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.</span>
+              <div>
+                <p className="hidden md:block text-xs md:text-base text-gray-600 leading-relaxed mb-0">
+                  Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.
                 </p>
 
-                <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-4 sm:gap-6">
-                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+                <div className="mt-2 pt-2 border-t border-gray-100 grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
                     <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
                       <img
                         src="/ashokji.avif"
@@ -84,7 +83,7 @@ export default function Census() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+                  <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
                     <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
                       <img
                         src="/image.jpeg"
