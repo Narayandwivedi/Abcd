@@ -126,7 +126,6 @@ const sanitizeMobile = (value) => value.replace(/\D/g, '').slice(0, 10)
 
 export default function FamilyCensus() {
   const [form, setForm] = useState({
-    samaj: '',
     leaderName: '',
     leaderMobile: '',
     address: '',
@@ -140,7 +139,6 @@ export default function FamilyCensus() {
     submittedBy: '',
     submittedByMobile: '',
   })
-  const [samajList, setSamajList] = useState([])
   const [dbStates, setDbStates] = useState([])
   const [dbDistricts, setDbDistricts] = useState([])
   const [loadingDistricts, setLoadingDistricts] = useState(false)
@@ -151,10 +149,6 @@ export default function FamilyCensus() {
   const [additionalInfoOpen, setAdditionalInfoOpen] = useState(false)
 
   useEffect(() => {
-    axios.get(`${BACKEND_URL}/api/samaj?status=approved`)
-      .then((res) => setSamajList(res.data.data || []))
-      .catch(() => toast.error('Failed to load Samaj list'))
-
     axios.get(`${BACKEND_URL}/api/cities/states`)
       .then((res) => {
         if (res.data.success && res.data.states?.length > 0) {
@@ -225,7 +219,6 @@ export default function FamilyCensus() {
     setSubmitting(true)
     try {
       await axios.post(`${BACKEND_URL}/api/families`, {
-        samaj: form.samaj || null,
         leaderName: form.leaderName,
         leaderMobile: form.leaderMobile,
         address: form.address,
@@ -246,7 +239,6 @@ export default function FamilyCensus() {
       setShowPreview(false)
       toast.success('Family Registered Successfully!')
       setForm({
-        samaj: '',
         leaderName: '',
         leaderMobile: '',
         address: '',
@@ -282,7 +274,6 @@ export default function FamilyCensus() {
 
   const handleReset = () => {
     setForm({
-      samaj: '',
       leaderName: '',
       leaderMobile: '',
       address: '',
@@ -319,10 +310,6 @@ export default function FamilyCensus() {
             <SectionCard title="Family Information">
               <PreviewRow label="Family Leader Name" value={form.leaderName} />
               <PreviewRow label="Mobile Number" value={form.leaderMobile} />
-              <PreviewRow label="Samaj" value={(() => {
-                const s = samajList.find((x) => x._id === form.samaj)
-                return s ? (s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName) : ''
-              })()} />
               <PreviewRow label="State" value={form.state} />
               <PreviewRow label="District" value={form.district} />
               <PreviewRow label="Block" value={form.block} />
@@ -474,16 +461,6 @@ export default function FamilyCensus() {
                     onChange={(e) => handleChange('leaderMobile', e.target.value)}
                     placeholder="Enter 10-Digit Mobile Number"
                   />
-                  <Select
-                    label="Samaj"
-                    value={form.samaj}
-                    onChange={(e) => handleChange('samaj', e.target.value)}
-                  >
-                    <option value="">-- Select Samaj --</option>
-                    {samajList.map((s) => (
-                      <option key={s._id} value={s._id}>{s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName}</option>
-                    ))}
-                  </Select>
                 </div>
 
                 <div className="mt-2 -mx-4 sm:-mx-5 -mb-3 sm:-mb-5 pb-1.5 border-t border-gray-100">

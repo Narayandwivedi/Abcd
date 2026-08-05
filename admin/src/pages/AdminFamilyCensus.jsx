@@ -3,7 +3,7 @@ import { toast } from 'react-toastify'
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { Phone, MapPin, Users, FileText, UserCheck, Calendar, Building2, ShieldCheck, ShieldAlert, ShieldX, Download, FileDown } from 'lucide-react'
+import { Phone, MapPin, Users, FileText, UserCheck, Calendar, ShieldCheck, ShieldAlert, ShieldX, Download, FileDown } from 'lucide-react'
 
 const RELATION_OPTIONS = [
   'Self', 'Husband', 'Wife', 'Son', 'Daughter', 'Father', 'Mother',
@@ -31,13 +31,12 @@ const AdminFamilyCensus = () => {
   const [statusFilter, setStatusFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, approved: 0, pending: 0, rejected: 0 })
-  const [samajList, setSamajList] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
   const [stateList, setStateList] = useState([])
   const [districtList, setDistrictList] = useState([])
   const [loadingDistricts, setLoadingDistricts] = useState(false)
   const [formData, setFormData] = useState({
-    samaj: '', leaderName: '', leaderMobile: '', address: '',
+    leaderName: '', leaderMobile: '', address: '',
     state: '', district: '', block: '', villageOrCity: '', pincode: '',
     remarks: '', members: [], submittedBy: '', submittedByMobile: '',
   })
@@ -47,11 +46,6 @@ const AdminFamilyCensus = () => {
   useEffect(() => { fetchFamilies() }, [])
 
   useEffect(() => {
-    fetch(`${BACKEND_URL}/api/samaj`)
-      .then(res => res.json())
-      .then(data => { if (data.success) setSamajList(data.data) })
-      .catch(() => toast.error('Failed to load Samaj list'))
-
     fetch(`${BACKEND_URL}/api/cities/states`)
       .then(res => res.json())
       .then(data => { if (data.success && data.states?.length > 0) setStateList(data.states) })
@@ -172,7 +166,6 @@ const AdminFamilyCensus = () => {
   const openEditModal = (family) => {
     setSelectedFamily(family)
     setFormData({
-      samaj: family.samaj || '',
       leaderName: family.leaderName || '',
       leaderMobile: family.leaderMobile || '',
       address: family.address || '',
@@ -223,15 +216,12 @@ const AdminFamilyCensus = () => {
     if (filteredList.length === 0) { toast.warning('No records to export'); return }
 
     const rows = filteredList.map((family) => {
-      const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
-        || family.samaj?.samajName || ''
       const membersText = family.members?.length
         ? family.members.map(m => `${m.name || ''} (${m.relation || '-'}${m.age ? `, ${m.age}y` : ''}${m.gender ? `, ${m.gender}` : ''}${m.mobile ? `, ${m.mobile}` : ''}${m.occupation ? `, ${m.occupation}` : ''})`).join('; ')
         : ''
       return {
         'Leader Name': family.leaderName || '',
         'Leader Mobile': family.leaderMobile || '',
-        'Samaj': samajName,
         'Address': family.address || '',
         'State': family.state || '',
         'District': family.district || '',
@@ -267,10 +257,8 @@ const AdminFamilyCensus = () => {
     doc.setTextColor(100)
     doc.text(`Generated on ${new Date().toLocaleDateString('en-IN')} | Total Records: ${filteredList.length}`, pageWidth / 2, 46, { align: 'center' })
 
-    const head = [['#', 'Leader Name', 'Mobile', 'Samaj', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
+    const head = [['#', 'Leader Name', 'Mobile', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
     const body = filteredList.map((family, idx) => {
-      const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
-        || family.samaj?.samajName || '-'
       const membersText = family.members?.length
         ? family.members.map(m => `${m.name || ''} (${m.relation || '-'})`).join(', ')
         : '-'
@@ -278,7 +266,6 @@ const AdminFamilyCensus = () => {
         idx + 1,
         family.leaderName || '-',
         family.leaderMobile || '-',
-        samajName,
         family.address || '-',
         family.state || '-',
         family.district || '-',
@@ -416,8 +403,6 @@ const AdminFamilyCensus = () => {
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5'>
           {filteredList.map((family) => {
-            const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
-              || family.samaj?.samajName
             const createdDate = family.createdAt
               ? new Date(family.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
               : null
@@ -427,11 +412,6 @@ const AdminFamilyCensus = () => {
                   <div className='flex items-start justify-between gap-2'>
                     <div className='min-w-0'>
                       <h3 className='font-bold text-lg leading-tight truncate'>{family.leaderName}</h3>
-                      {samajName && (
-                        <p className='text-xs text-blue-100 mt-1 flex items-center gap-1'>
-                          <Building2 size={12} /> {samajName}
-                        </p>
-                      )}
                     </div>
                     <button
                       onClick={() => handleToggleStatus(family._id)}
@@ -581,17 +561,6 @@ const AdminFamilyCensus = () => {
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>Mobile</label>
                   <input type='text' value={formData.leaderMobile} onChange={(e) => setFormData({ ...formData, leaderMobile: e.target.value })}
                     className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
-                </div>
-              </div>
-
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Samaj</label>
-                  <select value={formData.samaj} onChange={(e) => setFormData({ ...formData, samaj: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'>
-                    <option value=''>-- Select Samaj --</option>
-                    {samajList.map(s => <option key={s._id} value={s._id}>{s.samajName}</option>)}
-                  </select>
                 </div>
               </div>
 
