@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { Users, UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, ChevronDown, ArrowLeft } from 'lucide-react'
-import AudioControls from '../component/AudioControls'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -127,6 +126,7 @@ const sanitizeMobile = (value) => value.replace(/\D/g, '').slice(0, 10)
 
 export default function FamilyCensus() {
   const [form, setForm] = useState({
+    samaj: '',
     leaderName: '',
     leaderMobile: '',
     address: '',
@@ -136,11 +136,18 @@ export default function FamilyCensus() {
     submittedBy: '',
     submittedByMobile: '',
   })
+  const [samajList, setSamajList] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
   const [showPreview, setShowPreview] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [additionalInfoOpen, setAdditionalInfoOpen] = useState(false)
+
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/api/samaj?status=approved`)
+      .then((res) => setSamajList(res.data.data || []))
+      .catch(() => toast.error('Failed to load Samaj list'))
+  }, [])
 
   const MOBILE_FIELDS = ['leaderMobile', 'submittedByMobile']
 
@@ -187,6 +194,7 @@ export default function FamilyCensus() {
     setSubmitting(true)
     try {
       await axios.post(`${BACKEND_URL}/api/families`, {
+        samaj: form.samaj || null,
         leaderName: form.leaderName,
         leaderMobile: form.leaderMobile,
         address: form.address,
@@ -203,6 +211,7 @@ export default function FamilyCensus() {
       setShowPreview(false)
       toast.success('Family Registered Successfully!')
       setForm({
+        samaj: '',
         leaderName: '',
         leaderMobile: '',
         address: '',
@@ -267,6 +276,10 @@ export default function FamilyCensus() {
             <SectionCard title="Family Information">
               <PreviewRow label="Family Leader Name" value={form.leaderName} />
               <PreviewRow label="Mobile Number" value={form.leaderMobile} />
+              <PreviewRow label="Samaj" value={(() => {
+                const s = samajList.find((x) => x._id === form.samaj)
+                return s ? (s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName) : ''
+              })()} />
               <PreviewRow label="Complete Address" value={form.address} />
               <PreviewRow label="Pincode" value={form.pincode} />
               <PreviewRow label="Remarks" value={form.remarks} />
@@ -387,7 +400,6 @@ export default function FamilyCensus() {
                 7000484146
               </a>
             </div>
-            <AudioControls inline />
           </div>
         </div>
 
@@ -415,6 +427,16 @@ export default function FamilyCensus() {
                     onChange={(e) => handleChange('leaderMobile', e.target.value)}
                     placeholder="Enter 10-Digit Mobile Number"
                   />
+                  <Select
+                    label="Samaj"
+                    value={form.samaj}
+                    onChange={(e) => handleChange('samaj', e.target.value)}
+                  >
+                    <option value="">-- Select Samaj --</option>
+                    {samajList.map((s) => (
+                      <option key={s._id} value={s._id}>{s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName}</option>
+                    ))}
+                  </Select>
                 </div>
 
                 <div className="mt-2 -mx-4 sm:-mx-5 -mb-3 sm:-mb-5 pb-1.5 border-t border-gray-100">

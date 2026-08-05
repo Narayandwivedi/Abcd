@@ -22,7 +22,7 @@ import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Vouchers from './pages/Vouchers'
 import VendorDetail from './pages/VendorDetail'
-import Location from './pages/Location'
+import SamajCensus from './pages/SamajCensus'
 import FamilyCensus from './pages/FamilyCensus'
 import Census from './pages/Census'
 import BackgroundMusic from './component/BackgroundMusic'
@@ -40,7 +40,7 @@ const ScrollToTop = () => {
 const App = () => {
   const location = useLocation()
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
-  const isCensusPage = location.pathname === '/census' || location.pathname === '/location' || location.pathname === '/family-census'
+  const isCensusPage = location.pathname === '/census' || location.pathname === '/samaj-census' || location.pathname === '/family-census'
   const isHomePage = location.pathname === '/'
   const getSeoConfig = (pathname) => {
     if (pathname === '/') {
@@ -180,11 +180,11 @@ const App = () => {
       }
     }
 
-    if (pathname === '/location') {
+    if (pathname === '/samaj-census') {
       return {
-        title: 'Location Census - ABCD Vyapar',
-        description: 'Register your location in the Agrawal Samaj Census portal. Fill in village, city, and other location details.',
-        canonicalPath: '/location',
+        title: 'Samaj Census - ABCD Vyapar',
+        description: 'Register your Samaj in the Agrawal Samaj Census portal. Fill in Samaj name, office address, and contact details.',
+        canonicalPath: '/samaj-census',
       }
     }
 
@@ -265,7 +265,7 @@ const App = () => {
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/category/:categorySlug' element={<CategoryPage />} />
           <Route path='/census' element={<Census />} />
-          <Route path='/location' element={<Location />} />
+          <Route path='/samaj-census' element={<SamajCensus />} />
           <Route path='/family-census' element={<FamilyCensus />} />
           <Route path='/:type/:id' element={<AdDetail />} />
           <Route path='/:state/:district/:city/:slug' element={<VendorDetail />} />

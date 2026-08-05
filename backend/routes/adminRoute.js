@@ -67,7 +67,7 @@ router.patch("/blogs/:blogId/unpublish", adminAuth, checkPermission('canPublishB
 router.patch("/blogs/:blogId/toggle-featured", adminAuth, checkPermission('canEditBlogs'), toggleFeatured);
 
 // Samaj Census management routes
-const { getAllLocationsAdmin, getLocationByIdAdmin, updateLocationAdmin, deleteLocationAdmin, toggleLocationStatus, setLocationVerificationStatus } = require("../controllers/adminLocationController");
+const { getAllSamajAdmin, getSamajByIdAdmin, updateSamajAdmin, deleteSamajAdmin, toggleSamajStatus, setSamajVerificationStatus } = require("../controllers/adminSamajController");
 
 // Family Census management routes
 const { getAllFamiliesAdmin, getFamilyByIdAdmin, updateFamilyAdmin, deleteFamilyAdmin, toggleFamilyStatus, setFamilyVerificationStatus } = require("../controllers/adminFamilyController");
@@ -81,12 +81,12 @@ router.delete("/offers/:offerId", adminAuth, checkPermission('canManageContent')
 router.patch("/offers/:offerId/toggle-status", adminAuth, checkPermission('canManageContent'), toggleOfferStatus);
 
 // Samaj Census routes
-router.get("/location-census", adminAuth, checkPermission('canManageSamajCensus'), getAllLocationsAdmin);
-router.get("/location-census/:id", adminAuth, checkPermission('canManageSamajCensus'), getLocationByIdAdmin);
-router.put("/location-census/:id", adminAuth, checkPermission('canManageSamajCensus'), updateLocationAdmin);
-router.delete("/location-census/:id", adminAuth, checkPermission('canManageSamajCensus'), deleteLocationAdmin);
-router.patch("/location-census/:id/toggle-status", adminAuth, checkPermission('canManageSamajCensus'), toggleLocationStatus);
-router.patch("/location-census/:id/verification-status", adminAuth, checkPermission('canManageSamajCensus'), setLocationVerificationStatus);
+router.get("/samaj-census", adminAuth, checkPermission('canManageSamajCensus'), getAllSamajAdmin);
+router.get("/samaj-census/:id", adminAuth, checkPermission('canManageSamajCensus'), getSamajByIdAdmin);
+router.put("/samaj-census/:id", adminAuth, checkPermission('canManageSamajCensus'), updateSamajAdmin);
+router.delete("/samaj-census/:id", adminAuth, checkPermission('canManageSamajCensus'), deleteSamajAdmin);
+router.patch("/samaj-census/:id/toggle-status", adminAuth, checkPermission('canManageSamajCensus'), toggleSamajStatus);
+router.patch("/samaj-census/:id/verification-status", adminAuth, checkPermission('canManageSamajCensus'), setSamajVerificationStatus);
 
 // Family Census routes
 router.get("/family-census", adminAuth, checkPermission('canManageFamilyCensus'), getAllFamiliesAdmin);

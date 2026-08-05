@@ -3,12 +3,7 @@ import { toast } from 'react-toastify'
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { Phone, MapPin, Users, FileText, UserCheck, Calendar, Building2, ShieldCheck, ShieldAlert, ShieldX, Download, FileDown } from 'lucide-react'
-
-const RELATION_OPTIONS = [
-  'Self', 'Husband', 'Wife', 'Son', 'Daughter', 'Father', 'Mother',
-  'Brother', 'Sister', 'Grandfather', 'Grandmother', 'Uncle', 'Aunt', 'Other',
-]
+import { Phone, Mail, MapPin, Users, FileText, UserCheck, Calendar, ShieldCheck, ShieldAlert, ShieldX, Download, FileDown } from 'lucide-react'
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -22,48 +17,41 @@ const INDIAN_STATES = [
   'Lakshadweep', 'Puducherry',
 ]
 
-const emptyMember = () => ({ name: '', relation: '', mobile: '', age: '', gender: '', occupation: '' })
+const emptyLeader = () => ({ designation: '', name: '', mobile: '' })
 
-const AdminFamilyCensus = () => {
-  const [familyList, setFamilyList] = useState([])
+const AdminSamajCensus = () => {
+  const [samajList, setSamajList] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, approved: 0, pending: 0, rejected: 0 })
-  const [samajList, setSamajList] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
-  const [selectedFamily, setSelectedFamily] = useState(null)
+  const [selectedSamaj, setSelectedSamaj] = useState(null)
   const [formData, setFormData] = useState({
-    samaj: '', leaderName: '', leaderMobile: '', address: '',
+    samajName: '', officeAddress: '', mobile: '', email: '',
     state: '', district: '', city: '', pincode: '',
-    remarks: '', members: [], submittedBy: '', submittedByMobile: '',
+    leaders: [emptyLeader()], remarks: '',
+    submittedBy: '', submittedByMobile: '',
   })
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
-  useEffect(() => { fetchFamilies() }, [])
+  useEffect(() => { fetchSamaj() }, [])
 
-  useEffect(() => {
-    fetch(`${BACKEND_URL}/api/samaj`)
-      .then(res => res.json())
-      .then(data => { if (data.success) setSamajList(data.data) })
-      .catch(() => toast.error('Failed to load Samaj list'))
-  }, [])
-
-  const fetchFamilies = async () => {
+  const fetchSamaj = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${BACKEND_URL}/api/admin/family-census`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/samaj-census`, {
         method: 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json' },
       })
       const data = await response.json()
       if (data.success) {
-        setFamilyList(data.data)
+        setSamajList(data.data)
         setStats({ total: data.total, active: data.active, inactive: data.inactive, approved: data.approved, pending: data.pending, rejected: data.rejected })
       }
     } catch (error) {
-      toast.error('Failed to fetch family records')
+      toast.error('Failed to fetch samaj records')
     } finally {
       setLoading(false)
     }
@@ -71,56 +59,56 @@ const AdminFamilyCensus = () => {
 
   const handleEdit = async (e) => {
     e.preventDefault()
-    if (!formData.leaderName.trim()) { toast.warning('Leader name is required'); return }
+    if (!formData.samajName.trim()) { toast.warning('Samaj name is required'); return }
     try {
-      const response = await fetch(`${BACKEND_URL}/api/admin/family-census/${selectedFamily._id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/samaj-census/${selectedSamaj._id}`, {
         method: 'PUT', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
       const data = await response.json()
       if (data.success) {
-        toast.success('Family updated successfully!')
+        toast.success('Samaj updated successfully!')
         setShowEditModal(false)
-        setSelectedFamily(null)
-        fetchFamilies()
+        setSelectedSamaj(null)
+        fetchSamaj()
       } else {
-        toast.error(data.message || 'Failed to update family')
+        toast.error(data.message || 'Failed to update samaj')
       }
     } catch (error) {
-      toast.error('Failed to update family')
+      toast.error('Failed to update samaj')
     }
   }
 
   const handleDelete = async (id, name) => {
     if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return
     try {
-      const response = await fetch(`${BACKEND_URL}/api/admin/family-census/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/samaj-census/${id}`, {
         method: 'DELETE', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
       })
       const data = await response.json()
       if (data.success) {
-        toast.success('Family deleted successfully!')
-        fetchFamilies()
+        toast.success('Samaj deleted successfully!')
+        fetchSamaj()
       } else {
-        toast.error(data.message || 'Failed to delete family')
+        toast.error(data.message || 'Failed to delete samaj')
       }
     } catch (error) {
-      toast.error('Failed to delete family')
+      toast.error('Failed to delete samaj')
     }
   }
 
   const handleToggleStatus = async (id) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/admin/family-census/${id}/toggle-status`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/samaj-census/${id}/toggle-status`, {
         method: 'PATCH', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
       })
       const data = await response.json()
       if (data.success) {
-        toast.success(`Family ${data.data.isActive ? 'activated' : 'deactivated'} successfully!`)
-        fetchFamilies()
+        toast.success(`Samaj ${data.data.isActive ? 'activated' : 'deactivated'} successfully!`)
+        fetchSamaj()
       } else {
         toast.error(data.message || 'Failed to toggle status')
       }
@@ -131,16 +119,16 @@ const AdminFamilyCensus = () => {
 
   const handleSetVerificationStatus = async (id, status) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/admin/family-census/${id}/verification-status`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/samaj-census/${id}/verification-status`, {
         method: 'PATCH', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
       const data = await response.json()
       if (data.success) {
-        const messages = { approved: 'Family approved!', rejected: 'Family rejected', pending: 'Family marked as pending' }
+        const messages = { approved: 'Samaj approved!', rejected: 'Samaj rejected', pending: 'Samaj marked as pending' }
         toast.success(messages[status])
-        fetchFamilies()
+        fetchSamaj()
       } else {
         toast.error(data.message || 'Failed to update verification status')
       }
@@ -149,88 +137,83 @@ const AdminFamilyCensus = () => {
     }
   }
 
-  const openEditModal = (family) => {
-    setSelectedFamily(family)
+  const openEditModal = (samaj) => {
+    setSelectedSamaj(samaj)
     setFormData({
-      samaj: family.samaj || '',
-      leaderName: family.leaderName || '',
-      leaderMobile: family.leaderMobile || '',
-      address: family.address || '',
-      state: family.state || '',
-      district: family.district || '',
-      city: family.city || '',
-      pincode: family.pincode || '',
-      remarks: family.remarks || '',
-      members: family.members && family.members.length > 0
-        ? family.members.map(m => ({
-            name: m.name || '', relation: m.relation || '', mobile: m.mobile || '',
-            age: m.age || '', gender: m.gender || '', occupation: m.occupation || '',
-          }))
-        : [],
-      submittedBy: family.submittedBy || '',
-      submittedByMobile: family.submittedByMobile || '',
+      samajName: samaj.samajName || '',
+      officeAddress: samaj.officeAddress || '',
+      mobile: samaj.mobile || '',
+      email: samaj.email || '',
+      state: samaj.state || '',
+      district: samaj.district || '',
+      city: samaj.city || '',
+      pincode: samaj.pincode || '',
+      leaders: samaj.leaders && samaj.leaders.length > 0
+        ? samaj.leaders.map(l => ({ designation: l.designation || '', name: l.name || '', mobile: l.mobile || '' }))
+        : [emptyLeader()],
+      remarks: samaj.remarks || '',
+      submittedBy: samaj.submittedBy || '',
+      submittedByMobile: samaj.submittedByMobile || '',
     })
     setShowEditModal(true)
   }
 
-  const handleMemberChange = (index, field, value) => {
-    const updated = [...formData.members]
+  const handleLeaderChange = (index, field, value) => {
+    const updated = [...formData.leaders]
     updated[index] = { ...updated[index], [field]: value }
-    setFormData({ ...formData, members: updated })
+    setFormData({ ...formData, leaders: updated })
   }
 
-  const addMember = () => {
-    setFormData({ ...formData, members: [...formData.members, emptyMember()] })
+  const addLeader = () => {
+    setFormData({ ...formData, leaders: [...formData.leaders, emptyLeader()] })
   }
 
-  const removeMember = (index) => {
-    setFormData({ ...formData, members: formData.members.filter((_, i) => i !== index) })
+  const removeLeader = (index) => {
+    setFormData({ ...formData, leaders: formData.leaders.filter((_, i) => i !== index) })
   }
 
-  const cityOptions = [...new Set(familyList.map(f => f.city).filter(Boolean))].sort()
+  const cityOptions = [...new Set(samajList.map(s => s.city).filter(Boolean))].sort()
 
-  const filteredList = familyList.filter(f => {
-    const matchesSearch = f.leaderName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      f.leaderMobile?.includes(searchTerm) ||
-      f.city?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || f.verificationStatus === statusFilter
-    const matchesCity = cityFilter === 'all' || f.city === cityFilter
+  const filteredList = samajList.filter(s => {
+    const matchesSearch = s.samajName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.mobile?.includes(searchTerm)
+    const matchesStatus = statusFilter === 'all' || s.verificationStatus === statusFilter
+    const matchesCity = cityFilter === 'all' || s.city === cityFilter
     return matchesSearch && matchesStatus && matchesCity
   })
 
   const handleExportExcel = () => {
     if (filteredList.length === 0) { toast.warning('No records to export'); return }
 
-    const rows = filteredList.map((family) => {
-      const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
-        || family.samaj?.samajName || ''
-      const membersText = family.members?.length
-        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'}${m.age ? `, ${m.age}y` : ''}${m.gender ? `, ${m.gender}` : ''}${m.mobile ? `, ${m.mobile}` : ''}${m.occupation ? `, ${m.occupation}` : ''})`).join('; ')
+    const rows = filteredList.map((samaj) => {
+      const leadersText = samaj.leaders?.length
+        ? samaj.leaders.map(l => `${l.name || ''} (${l.designation || '-'}${l.mobile ? `, ${l.mobile}` : ''})`).join('; ')
         : ''
       return {
-        'Leader Name': family.leaderName || '',
-        'Leader Mobile': family.leaderMobile || '',
-        'Samaj': samajName,
-        'Address': family.address || '',
-        'City': family.city || '',
-        'District': family.district || '',
-        'State': family.state || '',
-        'Pincode': family.pincode || '',
-        'Member Count': family.members?.length || 0,
-        'Members': membersText,
-        'Status': family.isActive ? 'Active' : 'Inactive',
-        'Verification': family.verificationStatus || '',
-        'Remarks': family.remarks || '',
-        'Submitted By': family.submittedBy || '',
-        'Submitted By Mobile': family.submittedByMobile || '',
-        'Created At': family.createdAt ? new Date(family.createdAt).toLocaleDateString('en-IN') : '',
+        'Samaj Name': samaj.samajName || '',
+        'Mobile': samaj.mobile || '',
+        'Email': samaj.email || '',
+        'Office Address': samaj.officeAddress || '',
+        'City': samaj.city || '',
+        'District': samaj.district || '',
+        'State': samaj.state || '',
+        'Pincode': samaj.pincode || '',
+        'Leader Count': samaj.leaders?.length || 0,
+        'Leaders': leadersText,
+        'Status': samaj.isActive ? 'Active' : 'Inactive',
+        'Verification': samaj.verificationStatus || '',
+        'Remarks': samaj.remarks || '',
+        'Submitted By': samaj.submittedBy || '',
+        'Submitted By Mobile': samaj.submittedByMobile || '',
+        'Created At': samaj.createdAt ? new Date(samaj.createdAt).toLocaleDateString('en-IN') : '',
       }
     })
 
     const worksheet = XLSX.utils.json_to_sheet(rows)
     const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Family Census')
-    XLSX.writeFile(workbook, `Family_Census_${new Date().toISOString().slice(0, 10)}.xlsx`)
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Samaj Census')
+    XLSX.writeFile(workbook, `Samaj_Census_${new Date().toISOString().slice(0, 10)}.xlsx`)
   }
 
   const handleExportPDF = () => {
@@ -240,31 +223,29 @@ const AdminFamilyCensus = () => {
     const pageWidth = doc.internal.pageSize.getWidth()
 
     doc.setFontSize(16)
-    doc.text('Family Census Report', pageWidth / 2, 30, { align: 'center' })
+    doc.text('Samaj Census Report', pageWidth / 2, 30, { align: 'center' })
     doc.setFontSize(9)
     doc.setTextColor(100)
     doc.text(`Generated on ${new Date().toLocaleDateString('en-IN')} | Total Records: ${filteredList.length}`, pageWidth / 2, 46, { align: 'center' })
 
-    const head = [['#', 'Leader Name', 'Mobile', 'Samaj', 'Address', 'City', 'District', 'State', 'Pincode', 'Members', 'Status', 'Verification']]
-    const body = filteredList.map((family, idx) => {
-      const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
-        || family.samaj?.samajName || '-'
-      const membersText = family.members?.length
-        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'})`).join(', ')
+    const head = [['#', 'Samaj Name', 'Mobile', 'Email', 'Address', 'City', 'District', 'State', 'Pincode', 'Leaders', 'Status', 'Verification']]
+    const body = filteredList.map((samaj, idx) => {
+      const leadersText = samaj.leaders?.length
+        ? samaj.leaders.map(l => `${l.name || ''} (${l.designation || '-'})`).join(', ')
         : '-'
       return [
         idx + 1,
-        family.leaderName || '-',
-        family.leaderMobile || '-',
-        samajName,
-        family.address || '-',
-        family.city || '-',
-        family.district || '-',
-        family.state || '-',
-        family.pincode || '-',
-        membersText,
-        family.isActive ? 'Active' : 'Inactive',
-        family.verificationStatus || '-',
+        samaj.samajName || '-',
+        samaj.mobile || '-',
+        samaj.email || '-',
+        samaj.officeAddress || '-',
+        samaj.city || '-',
+        samaj.district || '-',
+        samaj.state || '-',
+        samaj.pincode || '-',
+        leadersText,
+        samaj.isActive ? 'Active' : 'Inactive',
+        samaj.verificationStatus || '-',
       ]
     })
 
@@ -273,10 +254,11 @@ const AdminFamilyCensus = () => {
       startY: 58,
       margin: { top: 40, left: 20, right: 20, bottom: 20 },
       styles: { fontSize: 7, cellPadding: 4, overflow: 'linebreak', valign: 'middle' },
-      headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
-      alternateRowStyles: { fillColor: [239, 246, 255] },
+      headStyles: { fillColor: [234, 88, 12], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [255, 247, 237] },
       columnStyles: {
         0: { cellWidth: 20 },
+        3: { cellWidth: 90 },
         4: { cellWidth: 90 },
         9: { cellWidth: 110 },
       },
@@ -290,15 +272,15 @@ const AdminFamilyCensus = () => {
       doc.text(`Page ${i} of ${pageCount}`, pageWidth - 20, doc.internal.pageSize.getHeight() - 10, { align: 'right' })
     }
 
-    doc.save(`Family_Census_${new Date().toISOString().slice(0, 10)}.pdf`)
+    doc.save(`Samaj_Census_${new Date().toISOString().slice(0, 10)}.pdf`)
   }
 
   return (
     <div className='p-3 md:p-6'>
       <div className='mb-4 md:mb-6 flex items-start justify-between gap-3'>
         <div>
-          <h1 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>Family Census</h1>
-          <p className='text-sm md:text-base text-gray-600'>Manage all Family records</p>
+          <h1 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>Samaj Census</h1>
+          <p className='text-sm md:text-base text-gray-600'>Manage all Samaj records</p>
         </div>
         <div className='shrink-0 flex items-center gap-2'>
           <button
@@ -346,7 +328,7 @@ const AdminFamilyCensus = () => {
       <div className='bg-white rounded-xl shadow-md p-4 mb-4 flex flex-col sm:flex-row gap-3'>
         <input
           type='text'
-          placeholder='Search by leader name, mobile or city...'
+          placeholder='Search by name, city or mobile...'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className='flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -371,7 +353,7 @@ const AdminFamilyCensus = () => {
               onClick={() => setStatusFilter(opt.key)}
               className={`shrink-0 px-3.5 py-2 rounded-lg text-sm font-semibold transition ${
                 statusFilter === opt.key
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-orange-500 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -388,74 +370,72 @@ const AdminFamilyCensus = () => {
         </div>
       ) : filteredList.length === 0 ? (
         <div className='bg-white rounded-xl shadow-md py-12 text-center text-gray-500'>
-          {searchTerm ? 'No records found matching your search' : 'No family records available'}
+          {searchTerm ? 'No records found matching your search' : 'No samaj records available'}
         </div>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5'>
-          {filteredList.map((family) => {
-            const samajName = samajList.find(s => s._id === (family.samaj?._id || family.samaj))?.samajName
-              || family.samaj?.samajName
-            const createdDate = family.createdAt
-              ? new Date(family.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+          {filteredList.map((samaj) => {
+            const createdDate = samaj.createdAt
+              ? new Date(samaj.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
               : null
             return (
-              <div key={family._id} className='bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300'>
-                <div className='relative px-5 py-4 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 text-white'>
+              <div key={samaj._id} className='bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300'>
+                <div className='relative px-5 py-4 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 text-white'>
                   <div className='flex items-start justify-between gap-2'>
                     <div className='min-w-0'>
-                      <h3 className='font-bold text-lg leading-tight truncate'>{family.leaderName}</h3>
-                      {samajName && (
-                        <p className='text-xs text-blue-100 mt-1 flex items-center gap-1'>
-                          <Building2 size={12} /> {samajName}
+                      <h3 className='font-bold text-lg leading-tight truncate'>{samaj.samajName}</h3>
+                      {samaj.email && (
+                        <p className='text-xs text-orange-100 mt-1 flex items-center gap-1 truncate'>
+                          <Mail size={12} /> {samaj.email}
                         </p>
                       )}
                     </div>
                     <button
-                      onClick={() => handleToggleStatus(family._id)}
+                      onClick={() => handleToggleStatus(samaj._id)}
                       className={`shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition ${
-                        family.isActive ? 'bg-green-400/90 text-green-900 hover:bg-green-300' : 'bg-white/20 text-white hover:bg-white/30'
+                        samaj.isActive ? 'bg-green-400/90 text-green-900 hover:bg-green-300' : 'bg-white/20 text-white hover:bg-white/30'
                       }`}
                     >
-                      {family.isActive ? 'Active' : 'Inactive'}
+                      {samaj.isActive ? 'Active' : 'Inactive'}
                     </button>
                   </div>
-                  <div className='flex items-center gap-3 mt-3 text-xs text-blue-50'>
-                    <span className='flex items-center gap-1'><Users size={12} /> {family.members?.length || 0} member{family.members?.length !== 1 ? 's' : ''}</span>
+                  <div className='flex items-center gap-3 mt-3 text-xs text-orange-50'>
+                    <span className='flex items-center gap-1'><Users size={12} /> {samaj.leaders?.length || 0} leader{samaj.leaders?.length !== 1 ? 's' : ''}</span>
                     {createdDate && <span className='flex items-center gap-1'><Calendar size={12} /> {createdDate}</span>}
                   </div>
                 </div>
 
                 <div className={`px-5 py-2.5 flex flex-col gap-2 border-b ${
-                  family.verificationStatus === 'approved' ? 'bg-emerald-50 border-emerald-100'
-                    : family.verificationStatus === 'rejected' ? 'bg-red-50 border-red-100'
+                  samaj.verificationStatus === 'approved' ? 'bg-emerald-50 border-emerald-100'
+                    : samaj.verificationStatus === 'rejected' ? 'bg-red-50 border-red-100'
                     : 'bg-amber-50 border-amber-100'
                 }`}>
                   <span className={`flex items-center gap-1.5 text-xs font-semibold ${
-                    family.verificationStatus === 'approved' ? 'text-emerald-700'
-                      : family.verificationStatus === 'rejected' ? 'text-red-700'
+                    samaj.verificationStatus === 'approved' ? 'text-emerald-700'
+                      : samaj.verificationStatus === 'rejected' ? 'text-red-700'
                       : 'text-amber-700'
                   }`}>
-                    {family.verificationStatus === 'approved' ? <ShieldCheck size={14} />
-                      : family.verificationStatus === 'rejected' ? <ShieldX size={14} />
+                    {samaj.verificationStatus === 'approved' ? <ShieldCheck size={14} />
+                      : samaj.verificationStatus === 'rejected' ? <ShieldX size={14} />
                       : <ShieldAlert size={14} />}
-                    {family.verificationStatus === 'approved' ? 'Verified & Approved'
-                      : family.verificationStatus === 'rejected' ? 'Rejected'
+                    {samaj.verificationStatus === 'approved' ? 'Verified & Approved'
+                      : samaj.verificationStatus === 'rejected' ? 'Rejected'
                       : 'Pending Verification'}
                   </span>
                   <div className='flex items-center gap-1.5'>
                     <button
-                      onClick={() => handleSetVerificationStatus(family._id, 'approved')}
-                      disabled={family.verificationStatus === 'approved'}
+                      onClick={() => handleSetVerificationStatus(samaj._id, 'approved')}
+                      disabled={samaj.verificationStatus === 'approved'}
                       className='flex-1 px-2 py-1 rounded-lg text-xs font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition disabled:opacity-40 disabled:cursor-not-allowed'
                     >Approve</button>
                     <button
-                      onClick={() => handleSetVerificationStatus(family._id, 'pending')}
-                      disabled={family.verificationStatus === 'pending'}
+                      onClick={() => handleSetVerificationStatus(samaj._id, 'pending')}
+                      disabled={samaj.verificationStatus === 'pending'}
                       className='flex-1 px-2 py-1 rounded-lg text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition disabled:opacity-40 disabled:cursor-not-allowed'
                     >Pending</button>
                     <button
-                      onClick={() => handleSetVerificationStatus(family._id, 'rejected')}
-                      disabled={family.verificationStatus === 'rejected'}
+                      onClick={() => handleSetVerificationStatus(samaj._id, 'rejected')}
+                      disabled={samaj.verificationStatus === 'rejected'}
                       className='flex-1 px-2 py-1 rounded-lg text-xs font-semibold bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-40 disabled:cursor-not-allowed'
                     >Reject</button>
                   </div>
@@ -463,58 +443,53 @@ const AdminFamilyCensus = () => {
 
                 <div className='p-5 flex-1 flex flex-col gap-3.5 text-sm'>
                   <div className='flex flex-wrap gap-x-5 gap-y-1.5 text-gray-600'>
-                    <span className='flex items-center gap-1.5'><Phone size={13} className='text-blue-500' /> {family.leaderMobile || '—'}</span>
-                    {family.pincode && <span className='text-gray-500'>Pin: {family.pincode}</span>}
+                    <span className='flex items-center gap-1.5'><Phone size={13} className='text-orange-500' /> {samaj.mobile || '—'}</span>
+                    {samaj.pincode && <span className='text-gray-500'>Pin: {samaj.pincode}</span>}
                   </div>
 
                   <div className='flex items-start gap-1.5 text-gray-600'>
-                    <MapPin size={14} className='text-blue-500 mt-0.5 shrink-0' />
+                    <MapPin size={14} className='text-orange-500 mt-0.5 shrink-0' />
                     <div>
-                      {family.address && <div>{family.address}</div>}
-                      <div className='text-gray-500'>{[family.city, family.district, family.state].filter(Boolean).join(', ') || '—'}</div>
+                      {samaj.officeAddress && <div>{samaj.officeAddress}</div>}
+                      <div className='text-gray-500'>{[samaj.city, samaj.district, samaj.state].filter(Boolean).join(', ') || '—'}</div>
                     </div>
                   </div>
 
-                  {family.remarks && (
+                  {samaj.remarks && (
                     <div className='flex items-start gap-1.5 text-gray-600'>
-                      <FileText size={14} className='text-blue-500 mt-0.5 shrink-0' />
-                      <span>{family.remarks}</span>
+                      <FileText size={14} className='text-orange-500 mt-0.5 shrink-0' />
+                      <span>{samaj.remarks}</span>
                     </div>
                   )}
 
                   <div>
                     <p className='font-semibold text-gray-500 mb-1.5 flex items-center gap-1.5'>
-                      <Users size={13} /> Members ({family.members?.length || 0})
+                      <Users size={13} /> Leaders ({samaj.leaders?.length || 0})
                     </p>
-                    {family.members?.length > 0 ? (
+                    {samaj.leaders?.length > 0 ? (
                       <div className='flex flex-col gap-1.5'>
-                        {family.members.map((m, idx) => (
+                        {samaj.leaders.map((l, idx) => (
                           <div key={idx} className='bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
                             <div className='flex items-center justify-between'>
-                              <span className='font-semibold text-gray-800'>{m.name || '—'}</span>
-                              <span className='text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full'>{m.relation || '—'}</span>
+                              <span className='font-semibold text-gray-800'>{l.name || '—'}</span>
+                              <span className='text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full'>{l.designation || '—'}</span>
                             </div>
-                            <div className='text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-0.5'>
-                              {m.mobile && <span className='flex items-center gap-1'><Phone size={10} /> {m.mobile}</span>}
-                              {m.age ? <span>Age: {m.age}</span> : null}
-                              {m.gender && <span>{m.gender}</span>}
-                              {m.occupation && <span>{m.occupation}</span>}
-                            </div>
+                            {l.mobile && <div className='text-xs text-gray-500 mt-1 flex items-center gap-1'><Phone size={10} /> {l.mobile}</div>}
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className='text-xs text-gray-400 italic'>No members added</p>
+                      <p className='text-xs text-gray-400 italic'>No leaders added</p>
                     )}
                   </div>
 
-                  {(family.submittedBy || family.submittedByMobile) && (
+                  {(samaj.submittedBy || samaj.submittedByMobile) && (
                     <div className='mt-auto pt-3 border-t border-dashed border-gray-200 flex items-center gap-2 text-xs text-gray-500'>
                       <UserCheck size={14} className='text-emerald-500 shrink-0' />
                       <span>
                         <span className='font-semibold text-gray-600'>Submitted by:</span>{' '}
-                        {family.submittedBy || '—'}
-                        {family.submittedByMobile && <span className='text-gray-400'> · {family.submittedByMobile}</span>}
+                        {samaj.submittedBy || '—'}
+                        {samaj.submittedByMobile && <span className='text-gray-400'> · {samaj.submittedByMobile}</span>}
                       </span>
                     </div>
                   )}
@@ -522,11 +497,11 @@ const AdminFamilyCensus = () => {
 
                 <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-2'>
                   <button
-                    onClick={() => openEditModal(family)}
+                    onClick={() => openEditModal(samaj)}
                     className='flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
                   >Edit</button>
                   <button
-                    onClick={() => handleDelete(family._id, family.leaderName)}
+                    onClick={() => handleDelete(samaj._id, samaj.samajName)}
                     className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
                   >Delete</button>
                 </div>
@@ -540,8 +515,8 @@ const AdminFamilyCensus = () => {
         <div className='fixed inset-0 bg-black/60 flex items-start justify-center z-50 p-4 pt-8 overflow-y-auto'>
           <div className='bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 my-8'>
             <div className='flex items-center justify-between mb-4 sticky top-0 bg-white'>
-              <h2 className='text-xl font-bold text-gray-800'>Edit Family</h2>
-              <button onClick={() => { setShowEditModal(false); setSelectedFamily(null) }} className='text-gray-400 hover:text-gray-600 transition'>
+              <h2 className='text-xl font-bold text-gray-800'>Edit Samaj</h2>
+              <button onClick={() => setShowEditModal(false)} className='text-gray-400 hover:text-gray-600 transition'>
                 <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
                 </svg>
@@ -550,35 +525,34 @@ const AdminFamilyCensus = () => {
             <form onSubmit={handleEdit} className='space-y-4'>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Leader Name *</label>
-                  <input type='text' value={formData.leaderName} onChange={(e) => setFormData({ ...formData, leaderName: e.target.value })}
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Samaj Name *</label>
+                  <input type='text' value={formData.samajName} onChange={(e) => setFormData({ ...formData, samajName: e.target.value })}
                     className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' required />
                 </div>
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>Mobile</label>
-                  <input type='text' value={formData.leaderMobile} onChange={(e) => setFormData({ ...formData, leaderMobile: e.target.value })}
+                  <input type='text' value={formData.mobile} onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                </div>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Email</label>
+                  <input type='email' value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                </div>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Pincode</label>
+                  <input type='text' value={formData.pincode} onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                     className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
                 </div>
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Samaj</label>
-                  <select value={formData.samaj} onChange={(e) => setFormData({ ...formData, samaj: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'>
-                    <option value=''>-- Select Samaj --</option>
-                    {samajList.map(s => <option key={s._id} value={s._id}>{s.samajName}</option>)}
-                  </select>
-                </div>
-              </div>
-
               <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-1'>Address</label>
-                <textarea value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                <label className='block text-sm font-semibold text-gray-700 mb-1'>Office Address</label>
+                <textarea value={formData.officeAddress} onChange={(e) => setFormData({ ...formData, officeAddress: e.target.value })}
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y' rows='2' />
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>State</label>
                   <select value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })}
@@ -597,54 +571,28 @@ const AdminFamilyCensus = () => {
                   <input type='text' value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
                 </div>
-                <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Pincode</label>
-                  <input type='text' value={formData.pincode} onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
-                </div>
               </div>
 
               <div>
                 <div className='flex items-center justify-between mb-2'>
-                  <label className='block text-sm font-semibold text-gray-700'>Family Members</label>
-                  <button type='button' onClick={addMember} className='text-blue-600 hover:text-blue-800 text-sm font-semibold'>+ Add Member</button>
+                  <label className='block text-sm font-semibold text-gray-700'>Samaj Leaders</label>
+                  <button type='button' onClick={addLeader} className='text-blue-600 hover:text-blue-800 text-sm font-semibold'>+ Add Leader</button>
                 </div>
-                {formData.members.length === 0 && (
-                  <p className='text-sm text-gray-400 italic'>No members added</p>
-                )}
-                {formData.members.map((member, idx) => (
-                  <div key={idx} className='border border-gray-200 rounded-lg p-3 mb-2 bg-gray-50'>
-                    <div className='flex items-center justify-between mb-2'>
-                      <span className='text-sm font-semibold text-gray-700'>Member {idx + 1}</span>
-                      {formData.members.length > 1 && (
-                        <button type='button' onClick={() => removeMember(idx)} className='text-red-500 hover:text-red-700 text-sm'>✕ Remove</button>
+                {formData.leaders.map((leader, idx) => (
+                  <div key={idx} className='grid grid-cols-1 md:grid-cols-3 gap-3 mb-2 p-3 bg-gray-50 rounded-lg'>
+                    <input type='text' placeholder='Designation' value={leader.designation}
+                      onChange={(e) => handleLeaderChange(idx, 'designation', e.target.value)}
+                      className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
+                    <input type='text' placeholder='Name' value={leader.name}
+                      onChange={(e) => handleLeaderChange(idx, 'name', e.target.value)}
+                      className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
+                    <div className='flex gap-2'>
+                      <input type='text' placeholder='Mobile' value={leader.mobile}
+                        onChange={(e) => handleLeaderChange(idx, 'mobile', e.target.value)}
+                        className='flex-1 px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
+                      {formData.leaders.length > 1 && (
+                        <button type='button' onClick={() => removeLeader(idx)} className='text-red-500 hover:text-red-700 px-2 text-sm'>✕</button>
                       )}
-                    </div>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
-                      <input type='text' placeholder='Name' value={member.name}
-                        onChange={(e) => handleMemberChange(idx, 'name', e.target.value)}
-                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
-                      <select value={member.relation} onChange={(e) => handleMemberChange(idx, 'relation', e.target.value)}
-                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'>
-                        <option value=''>Relation</option>
-                        {RELATION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                      </select>
-                      <input type='text' placeholder='Mobile' value={member.mobile}
-                        onChange={(e) => handleMemberChange(idx, 'mobile', e.target.value)}
-                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
-                      <input type='number' placeholder='Age' value={member.age}
-                        onChange={(e) => handleMemberChange(idx, 'age', e.target.value)}
-                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
-                      <select value={member.gender} onChange={(e) => handleMemberChange(idx, 'gender', e.target.value)}
-                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'>
-                        <option value=''>Gender</option>
-                        <option value='Male'>Male</option>
-                        <option value='Female'>Female</option>
-                        <option value='Other'>Other</option>
-                      </select>
-                      <input type='text' placeholder='Occupation' value={member.occupation}
-                        onChange={(e) => handleMemberChange(idx, 'occupation', e.target.value)}
-                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
                     </div>
                   </div>
                 ))}
@@ -670,10 +618,10 @@ const AdminFamilyCensus = () => {
               </div>
 
               <div className='flex gap-3 pt-2'>
-                <button type='button' onClick={() => { setShowEditModal(false); setSelectedFamily(null) }}
+                <button type='button' onClick={() => setShowEditModal(false)}
                   className='flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition'>Cancel</button>
                 <button type='submit'
-                  className='flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition shadow-md'>Update Family</button>
+                  className='flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition shadow-md'>Update Samaj</button>
               </div>
             </form>
           </div>
@@ -683,4 +631,4 @@ const AdminFamilyCensus = () => {
   )
 }
 
-export default AdminFamilyCensus
+export default AdminSamajCensus

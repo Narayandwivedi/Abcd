@@ -95,10 +95,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     //   description: 'Payment Management'
     // },
     {
-      name: 'Location Census',
-      icon: '📍',
-      path: '/location-census',
-      description: 'Manage Location Records',
+      name: 'Samaj Census',
+      icon: '🏛️',
+      path: '/samaj-census',
+      description: 'Manage Samaj Records',
       requiredPermission: 'canManageSamajCensus'
     },
     {
