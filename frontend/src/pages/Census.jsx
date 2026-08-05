@@ -72,7 +72,7 @@ export default function Census() {
             </Link>
           </div>
 
-          <div className="mt-2 sm:mt-12 max-w-4xl mx-auto">
+          <div className="mt-2 sm:mt-4 max-w-4xl mx-auto">
             <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-2 sm:p-6">
               <div>
                 <div className="mt-2 pt-2 border-t border-gray-100 grid grid-cols-2 gap-3 sm:gap-4">
