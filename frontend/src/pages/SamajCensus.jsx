@@ -20,9 +20,10 @@ const emptyForm = {
   officeAddress: '',
   mobile: '',
   email: '',
-  city: '',
-  district: '',
   state: '',
+  district: '',
+  block: '',
+  villageOrCity: '',
   pincode: '',
   contactPersons: [{ name: '', designation: '', mobile: '', email: '', alternateMobile: '' }],
   remarks: '',
@@ -156,14 +157,10 @@ export default function SamajCensus() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [cityList, setCityList] = useState([])
-  const [citySearch, setCitySearch] = useState('')
-  const [cityLoading, setCityLoading] = useState(true)
-  const [cityDropdownOpen, setCityDropdownOpen] = useState(false)
-  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const [dbStates, setDbStates] = useState([])
+  const [dbDistricts, setDbDistricts] = useState([])
+  const [loadingDistricts, setLoadingDistricts] = useState(false)
   const [additionalInfoOpen, setAdditionalInfoOpen] = useState(false)
-  const cityRef = useRef(null)
-  const cityInputRef = useRef(null)
 
   const MOBILE_FIELDS = ['mobile', 'submittedByMobile']
 
@@ -173,43 +170,35 @@ export default function SamajCensus() {
   }
 
   useEffect(() => {
-    const fetchAllCities = async () => {
-      try {
-        let page = 1
-        let all = []
-        let hasMore = true
-        while (hasMore) {
-          const res = await axios.get(`${BACKEND_URL}/api/cities?limit=1000&page=${page}`)
-          if (!res.data.success) break
-          all = all.concat(res.data.data)
-          hasMore = res.data.pagination?.hasMore
-          page += 1
+    axios.get(`${BACKEND_URL}/api/cities/states`)
+      .then((res) => {
+        if (res.data.success && res.data.states?.length > 0) {
+          setDbStates(res.data.states)
         }
-        setCityList(all)
-      } catch (error) {
-        toast.error('Failed to load cities')
-      } finally {
-        setCityLoading(false)
-      }
-    }
-    fetchAllCities()
+      })
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (cityRef.current && !cityRef.current.contains(e.target)) {
-        setCityDropdownOpen(false)
-      }
+    if (!form.state) {
+      setDbDistricts([])
+      return
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    setLoadingDistricts(true)
+    axios.get(`${BACKEND_URL}/api/cities/districts/${encodeURIComponent(form.state)}`)
+      .then((res) => {
+        if (res.data.success) {
+          setDbDistricts(res.data.districts || [])
+        }
+      })
+      .catch(() => setDbDistricts([]))
+      .finally(() => setLoadingDistricts(false))
+  }, [form.state])
 
   const handleReset = () => {
     setForm({ ...emptyForm, contactPersons: [emptyContactPerson()] })
     setShowPreview(false)
     setShowConfirm(false)
-    setCitySearch('')
   }
 
   const handleContactPersonChange = (index, field, value) => {
@@ -236,7 +225,6 @@ export default function SamajCensus() {
     if (!form.samajName.trim()) { toast.error('Samaj Name Is Required.'); return false }
     if (!form.mobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
     if (!/^\d{10}$/.test(form.mobile.trim())) { toast.error('Please Enter A Valid 10-Digit Mobile Number.'); return false }
-    if (!form.city.trim()) { toast.error('City Is Required.'); return false }
     if (!form.submittedBy.trim()) { toast.error('Submitted By Name Is Required.'); return false }
     if (!form.submittedByMobile.trim()) { toast.error('Mobile Number Is Required.'); return false }
     if (!/^\d{10}$/.test(form.submittedByMobile.trim())) { toast.error('Please Enter A Valid 10-Digit Mobile Number.'); return false }
@@ -262,7 +250,9 @@ export default function SamajCensus() {
         email: form.email,
         state: form.state,
         district: form.district,
-        city: form.city,
+        block: form.block,
+        villageOrCity: form.villageOrCity,
+        city: form.villageOrCity || form.city,
         pincode: form.pincode,
         leaders: form.contactPersons.map((cp) => ({
           name: cp.name,
@@ -343,7 +333,10 @@ export default function SamajCensus() {
             </SectionCard>
 
             <SectionCard title="Location Details">
-              <PreviewRow label="City" value={form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''} />
+              <PreviewRow label="State" value={form.state} />
+              <PreviewRow label="District" value={form.district} />
+              <PreviewRow label="Block" value={form.block} />
+              <PreviewRow label="Village / Town / City" value={form.villageOrCity} />
               <PreviewRow label="Pincode" value={form.pincode} />
             </SectionCard>
 
@@ -470,110 +463,41 @@ export default function SamajCensus() {
             <SectionHeader icon="🏛️" title="Samaj Information" compact accent="bronze" />
             <SectionCard title="Basic Details" noBar bodyClassName="p-4 sm:p-8 pt-3 sm:pt-5" fillHeight>
               <div className="flex flex-col gap-5">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-5">
-                  <Input label="Samaj Name" required wrapperClassName="col-span-2 sm:col-span-1" value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Name" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
+                  <Input label="Samaj Name" required wrapperClassName="sm:col-span-2" value={form.samajName} onChange={handleChange} name="samajName" placeholder="Enter Samaj Name" />
                   <Input label="Samaj Mobile" required type="tel" inputMode="numeric" maxLength={10} value={form.mobile} onChange={handleChange} name="mobile" placeholder="Enter 10-Digit Mobile Number" />
-                  <div className="relative min-w-0" ref={cityRef}>
-                    <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm">
-                      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
-                        City <span className="text-red-500">*</span>
-                      </span>
-                      <div className="relative">
-                        <Search size={14} className="absolute left-2 sm:left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                        <input
-                          ref={cityInputRef}
-                          autoComplete="off"
-                          autoCorrect="off"
-                          spellCheck="false"
-                          name="samaj-city-search"
-                          value={form.city && !cityDropdownOpen ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : citySearch}
-                          onChange={(e) => { setCitySearch(e.target.value); setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city) setForm((prev) => ({ ...prev, city: '', district: '', state: '' })) }}
-                          onFocus={() => { setCityDropdownOpen(true); setHighlightedIndex(-1); if (form.city && !citySearch) setCitySearch(`${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}`) }}
-                          onKeyDown={(e) => {
-                            const currentDisplay = form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''
-                            const filtered = filterAndSortCities(cityList, citySearch, currentDisplay)
-                            const visible = filtered
-                            if (e.key === 'ArrowDown') {
-                              e.preventDefault()
-                              setHighlightedIndex((prev) => (prev < visible.length - 1 ? prev + 1 : prev))
-                            } else if (e.key === 'ArrowUp') {
-                              e.preventDefault()
-                              setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1))
-                            } else if (e.key === 'Enter' && highlightedIndex >= 0 && visible[highlightedIndex]) {
-                              e.preventDefault()
-                              const c = visible[highlightedIndex]
-                              setForm((prev) => ({ ...prev, city: titleCase(c.city), district: titleCase(c.district), state: titleCase(c.state) }))
-                              setCitySearch('')
-                              setCityDropdownOpen(false)
-                              setHighlightedIndex(-1)
-                            } else if (e.key === 'Escape') {
-                              setCityDropdownOpen(false)
-                              setHighlightedIndex(-1)
-                            }
-                          }}
-                          placeholder="Select City"
-                          className="w-full pl-7 sm:pl-9 pr-8 sm:pr-10 px-2.5 py-2 sm:px-3.5 sm:py-2.5 border border-gray-200 rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:border-[#C67A2D] focus:ring-2 focus:ring-[#C67A2D]/15 bg-white"
-                        />
-                        <ChevronDown
-                          size={16}
-                          className={`absolute right-2 sm:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer transition-transform duration-200 ${cityDropdownOpen ? 'rotate-180' : ''}`}
-                          onClick={() => {
-                            if (!cityDropdownOpen) {
-                              const formatted = form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''
-                              setCitySearch(formatted)
-                              setHighlightedIndex(-1)
-                              setCityDropdownOpen(true)
-                              cityInputRef.current?.focus()
-                            } else {
-                              setCityDropdownOpen(false)
-                            }
-                          }}
-                        />
-                      </div>
-                    </label>
-                    {cityDropdownOpen && (
-                      <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/50 max-h-80 overflow-y-auto">
-                        {cityLoading ? (
-                          <div className="px-4 py-6 text-xs sm:text-sm text-gray-400 flex flex-col items-center justify-center gap-2">
-                            <div className="w-5 h-5 border-2 border-[#C67A2D]/30 border-t-[#C67A2D] rounded-full animate-spin" />
-                            Loading cities...
-                          </div>
-                        ) : (
-                          (() => {
-                            const currentDisplay = form.city ? `${titleCase(form.city)} • ${titleCase(form.district)} • ${titleCase(form.state)}` : ''
-                            const filtered = filterAndSortCities(cityList, citySearch, currentDisplay)
-                            if (filtered.length === 0) {
-                              return (
-                                <div className="px-4 py-6 text-xs sm:text-sm text-gray-400 text-center">No cities found</div>
-                              )
-                            }
-                            return filtered.map((c, i) => {
-                              const isSelected = form.city && titleCase(c.city) === titleCase(form.city) && titleCase(c.district) === titleCase(form.district)
-                              const isHighlighted = i === highlightedIndex
-                              return (
-                                <div
-                                  key={`${c.city}-${c.district}-${c.state}`}
-                                  onClick={() => {
-                                    setForm((prev) => ({ ...prev, city: titleCase(c.city), district: titleCase(c.district), state: titleCase(c.state) }))
-                                    setCitySearch('')
-                                    setCityDropdownOpen(false)
-                                    setHighlightedIndex(-1)
-                                  }}
-                                  onMouseEnter={() => setHighlightedIndex(i)}
-                                  className={`px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm cursor-pointer transition-colors border-b border-gray-50 last:border-b-0 ${
-                                    isSelected ? 'bg-[#FFF8F0] text-[#C67A2D] font-semibold' : isHighlighted ? 'bg-[#FFF8F0] text-[#C67A2D]' : 'text-gray-700 hover:bg-[#FFF8F0] hover:text-[#C67A2D]'
-                                  }`}
-                                >
-                                  <div>{titleCase(c.city)}</div>
-                                  <div className="text-[10px] sm:text-xs text-gray-400">{titleCase(c.district)} • {titleCase(c.state)}</div>
-                                </div>
-                              )
-                            })
-                          })()
-                        )}
-                      </div>
-                    )}
-                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
+                  <Select
+                    label="State"
+                    value={form.state}
+                    onChange={(e) => setForm((prev) => ({ ...prev, state: e.target.value, district: '' }))}
+                  >
+                    <option value="">-- Select State --</option>
+                    {dbStates.map((s) => (
+                      <option key={s} value={titleCase(s)}>
+                        {titleCase(s)}
+                      </option>
+                    ))}
+                  </Select>
+                  <Select
+                    label="District"
+                    value={form.district}
+                    onChange={handleChange}
+                    name="district"
+                    disabled={!form.state || loadingDistricts}
+                  >
+                    <option value="">
+                      {!form.state ? '-- Select State First --' : loadingDistricts ? 'Loading Districts...' : '-- Select District --'}
+                    </option>
+                    {dbDistricts.map((d) => (
+                      <option key={d} value={titleCase(d)}>
+                        {titleCase(d)}
+                      </option>
+                    ))}
+                  </Select>
+                  <Input label="Block" value={form.block} onChange={handleChange} name="block" placeholder="Enter Block" />
+                  <Input label="Village / Town / City" value={form.villageOrCity} onChange={handleChange} name="villageOrCity" placeholder="Enter Village / Town / City" />
                 </div>
               </div>
 

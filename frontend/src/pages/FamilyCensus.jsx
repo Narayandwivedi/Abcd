@@ -130,6 +130,10 @@ export default function FamilyCensus() {
     leaderName: '',
     leaderMobile: '',
     address: '',
+    state: '',
+    district: '',
+    block: '',
+    villageOrCity: '',
     pincode: '',
     remarks: '',
     members: [],
@@ -137,6 +141,9 @@ export default function FamilyCensus() {
     submittedByMobile: '',
   })
   const [samajList, setSamajList] = useState([])
+  const [dbStates, setDbStates] = useState([])
+  const [dbDistricts, setDbDistricts] = useState([])
+  const [loadingDistricts, setLoadingDistricts] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
   const [showPreview, setShowPreview] = useState(false)
@@ -147,7 +154,31 @@ export default function FamilyCensus() {
     axios.get(`${BACKEND_URL}/api/samaj?status=approved`)
       .then((res) => setSamajList(res.data.data || []))
       .catch(() => toast.error('Failed to load Samaj list'))
+
+    axios.get(`${BACKEND_URL}/api/cities/states`)
+      .then((res) => {
+        if (res.data.success && res.data.states?.length > 0) {
+          setDbStates(res.data.states)
+        }
+      })
+      .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (!form.state) {
+      setDbDistricts([])
+      return
+    }
+    setLoadingDistricts(true)
+    axios.get(`${BACKEND_URL}/api/cities/districts/${encodeURIComponent(form.state)}`)
+      .then((res) => {
+        if (res.data.success) {
+          setDbDistricts(res.data.districts || [])
+        }
+      })
+      .catch(() => setDbDistricts([]))
+      .finally(() => setLoadingDistricts(false))
+  }, [form.state])
 
   const MOBILE_FIELDS = ['leaderMobile', 'submittedByMobile']
 
@@ -198,6 +229,10 @@ export default function FamilyCensus() {
         leaderName: form.leaderName,
         leaderMobile: form.leaderMobile,
         address: form.address,
+        state: form.state,
+        district: form.district,
+        block: form.block,
+        villageOrCity: form.villageOrCity,
         pincode: form.pincode,
         remarks: form.remarks,
         isActive: true,
@@ -215,6 +250,10 @@ export default function FamilyCensus() {
         leaderName: '',
         leaderMobile: '',
         address: '',
+        state: '',
+        district: '',
+        block: '',
+        villageOrCity: '',
         pincode: '',
         remarks: '',
         members: [],
@@ -247,6 +286,10 @@ export default function FamilyCensus() {
       leaderName: '',
       leaderMobile: '',
       address: '',
+      state: '',
+      district: '',
+      block: '',
+      villageOrCity: '',
       pincode: '',
       remarks: '',
       members: [],
@@ -280,6 +323,10 @@ export default function FamilyCensus() {
                 const s = samajList.find((x) => x._id === form.samaj)
                 return s ? (s.city ? `${titleCase(s.city)} - ${s.samajName}` : s.samajName) : ''
               })()} />
+              <PreviewRow label="State" value={form.state} />
+              <PreviewRow label="District" value={form.district} />
+              <PreviewRow label="Block" value={form.block} />
+              <PreviewRow label="Village / Town / City" value={form.villageOrCity} />
               <PreviewRow label="Complete Address" value={form.address} />
               <PreviewRow label="Pincode" value={form.pincode} />
               <PreviewRow label="Remarks" value={form.remarks} />
@@ -457,6 +504,47 @@ export default function FamilyCensus() {
                     }`}
                   >
                     <div className="px-4 sm:px-5 pb-1 flex flex-col gap-2 sm:gap-3 [&_label]:gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
+                        <Select
+                          label="State"
+                          value={form.state}
+                          onChange={(e) => setForm((prev) => ({ ...prev, state: e.target.value, district: '' }))}
+                        >
+                          <option value="">-- Select State --</option>
+                          {dbStates.map((s) => (
+                            <option key={s} value={titleCase(s)}>
+                              {titleCase(s)}
+                            </option>
+                          ))}
+                        </Select>
+                        <Select
+                          label="District"
+                          value={form.district}
+                          onChange={(e) => handleChange('district', e.target.value)}
+                          disabled={!form.state || loadingDistricts}
+                        >
+                          <option value="">
+                            {!form.state ? '-- Select State First --' : loadingDistricts ? 'Loading Districts...' : '-- Select District --'}
+                          </option>
+                          {dbDistricts.map((d) => (
+                            <option key={d} value={titleCase(d)}>
+                              {titleCase(d)}
+                            </option>
+                          ))}
+                        </Select>
+                        <Input
+                          label="Block"
+                          value={form.block}
+                          onChange={(e) => handleChange('block', e.target.value)}
+                          placeholder="Enter Block"
+                        />
+                        <Input
+                          label="Village / Town / City"
+                          value={form.villageOrCity}
+                          onChange={(e) => handleChange('villageOrCity', e.target.value)}
+                          placeholder="Enter Village / Town / City"
+                        />
+                      </div>
                       <div className="grid grid-cols-1 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
                         <Textarea
                           label="Complete Address"

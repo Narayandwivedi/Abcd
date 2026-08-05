@@ -27,10 +27,12 @@ const AdminSamajCensus = () => {
   const [cityFilter, setCityFilter] = useState('all')
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, approved: 0, pending: 0, rejected: 0 })
   const [showEditModal, setShowEditModal] = useState(false)
-  const [selectedSamaj, setSelectedSamaj] = useState(null)
+  const [stateList, setStateList] = useState([])
+  const [districtList, setDistrictList] = useState([])
+  const [loadingDistricts, setLoadingDistricts] = useState(false)
   const [formData, setFormData] = useState({
     samajName: '', officeAddress: '', mobile: '', email: '',
-    state: '', district: '', city: '', pincode: '',
+    state: '', district: '', block: '', villageOrCity: '', city: '', pincode: '',
     leaders: [emptyLeader()], remarks: '',
     submittedBy: '', submittedByMobile: '',
   })
@@ -38,6 +40,26 @@ const AdminSamajCensus = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
   useEffect(() => { fetchSamaj() }, [])
+
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/api/cities/states`)
+      .then(res => res.json())
+      .then(data => { if (data.success && data.states?.length > 0) setStateList(data.states) })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (!formData.state) {
+      setDistrictList([])
+      return
+    }
+    setLoadingDistricts(true)
+    fetch(`${BACKEND_URL}/api/cities/districts/${encodeURIComponent(formData.state)}`)
+      .then(res => res.json())
+      .then(data => { if (data.success) setDistrictList(data.districts || []) })
+      .catch(() => setDistrictList([]))
+      .finally(() => setLoadingDistricts(false))
+  }, [formData.state])
 
   const fetchSamaj = async () => {
     try {
@@ -146,7 +168,9 @@ const AdminSamajCensus = () => {
       email: samaj.email || '',
       state: samaj.state || '',
       district: samaj.district || '',
-      city: samaj.city || '',
+      block: samaj.block || '',
+      villageOrCity: samaj.villageOrCity || samaj.city || '',
+      city: samaj.villageOrCity || samaj.city || '',
       pincode: samaj.pincode || '',
       leaders: samaj.leaders && samaj.leaders.length > 0
         ? samaj.leaders.map(l => ({ designation: l.designation || '', name: l.name || '', mobile: l.mobile || '' }))
@@ -195,9 +219,10 @@ const AdminSamajCensus = () => {
         'Mobile': samaj.mobile || '',
         'Email': samaj.email || '',
         'Office Address': samaj.officeAddress || '',
-        'City': samaj.city || '',
-        'District': samaj.district || '',
         'State': samaj.state || '',
+        'District': samaj.district || '',
+        'Block': samaj.block || '',
+        'Village / Town / City': samaj.villageOrCity || samaj.city || '',
         'Pincode': samaj.pincode || '',
         'Leader Count': samaj.leaders?.length || 0,
         'Leaders': leadersText,
@@ -228,7 +253,7 @@ const AdminSamajCensus = () => {
     doc.setTextColor(100)
     doc.text(`Generated on ${new Date().toLocaleDateString('en-IN')} | Total Records: ${filteredList.length}`, pageWidth / 2, 46, { align: 'center' })
 
-    const head = [['#', 'Samaj Name', 'Mobile', 'Email', 'Address', 'City', 'District', 'State', 'Pincode', 'Leaders', 'Status', 'Verification']]
+    const head = [['#', 'Samaj Name', 'Mobile', 'Email', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Leaders', 'Status', 'Verification']]
     const body = filteredList.map((samaj, idx) => {
       const leadersText = samaj.leaders?.length
         ? samaj.leaders.map(l => `${l.name || ''} (${l.designation || '-'})`).join(', ')
@@ -239,9 +264,10 @@ const AdminSamajCensus = () => {
         samaj.mobile || '-',
         samaj.email || '-',
         samaj.officeAddress || '-',
-        samaj.city || '-',
-        samaj.district || '-',
         samaj.state || '-',
+        samaj.district || '-',
+        samaj.block || '-',
+        samaj.villageOrCity || samaj.city || '-',
         samaj.pincode || '-',
         leadersText,
         samaj.isActive ? 'Active' : 'Inactive',
@@ -552,24 +578,33 @@ const AdminSamajCensus = () => {
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y' rows='2' />
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>State</label>
-                  <select value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  <select value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value, district: '' })}
                     className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'>
-                    <option value=''>Select State</option>
-                    {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                    <option value=''>-- Select State --</option>
+                    {stateList.map(s => <option key={s} value={s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}>{s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>District</label>
-                  <input type='text' value={formData.district} onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                  <select value={formData.district} onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                    disabled={!formData.state || loadingDistricts}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100'>
+                    <option value=''>{!formData.state ? '-- Select State First --' : loadingDistricts ? 'Loading...' : '-- Select District --'}</option>
+                    {districtList.map(d => <option key={d} value={d.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}>{d.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</option>)}
+                  </select>
                 </div>
                 <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-1'>City</label>
-                  <input type='text' value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Block</label>
+                  <input type='text' value={formData.block} onChange={(e) => setFormData({ ...formData, block: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder='Enter Block' />
+                </div>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Village / Town / City</label>
+                  <input type='text' value={formData.villageOrCity} onChange={(e) => setFormData({ ...formData, villageOrCity: e.target.value, city: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder='Enter Village / Town / City' />
                 </div>
               </div>
 

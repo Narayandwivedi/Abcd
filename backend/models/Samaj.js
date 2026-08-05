@@ -19,6 +19,8 @@ const samajSchema = new mongoose.Schema(
     city: { type: String, trim: true },
     district: { type: String, trim: true },
     state: { type: String, trim: true },
+    block: { type: String, trim: true },
+    villageOrCity: { type: String, trim: true },
     pincode: { type: String, trim: true },
     remarks: { type: String, trim: true },
     isActive: { type: Boolean, default: true },
