@@ -11,7 +11,7 @@ export default function Census() {
         <img
           src="/agrasen maharaj.avif"
           alt="Maharaja Agrasen Ji"
-          className="absolute top-6 right-24 sm:right-28 lg:right-32 w-auto max-w-full h-[80%] object-contain object-right"
+          className="absolute top-6 right-24 sm:right-28 lg:right-32 w-auto max-w-full h-[calc(100%-1.5rem)] object-contain object-right"
         />
         <div className="relative z-10 max-w-[1200px] mx-auto h-full flex items-center">
           <div className="max-w-lg">
@@ -31,7 +31,7 @@ export default function Census() {
         </div>
       </section>
 
-      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 pt-2 pb-8 sm:pt-2 sm:pb-16 lg:pt-3 lg:pb-20">
+      <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 pt-2 pb-8 sm:pt-1 sm:pb-16 lg:pt-1 lg:pb-20">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-3 md:mb-4">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Choose an Option</h2>
