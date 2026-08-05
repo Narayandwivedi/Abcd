@@ -5,7 +5,31 @@ import AudioControls from '../component/AudioControls'
 export default function Census() {
   return (
     <>
-      <img src="/census.avif" alt="" className="w-full h-auto min-h-[21vh] md:min-h-0 object-cover md:object-contain" />
+      <img src="/census.avif" alt="" className="md:hidden w-full h-auto min-h-[21vh] object-cover" />
+
+      <section className="hidden md:block relative w-full md:h-[340px] bg-[#FCEBD8] overflow-hidden px-4 sm:px-6 lg:px-8">
+        <img
+          src="/agrasen maharaj.avif"
+          alt="Maharaja Agrasen Ji"
+          className="absolute top-6 right-24 sm:right-28 lg:right-32 w-auto max-w-full h-[80%] object-contain object-right"
+        />
+        <div className="relative z-10 max-w-[1200px] mx-auto h-full flex items-center">
+          <div className="max-w-lg">
+            <p className="inline-flex items-center gap-2 text-sm font-bold tracking-[0.2em] uppercase text-[#C67A2D]">
+              <span className="h-0.5 w-10 rounded-full bg-gradient-to-r from-[#C67A2D] to-[#A8651E]" />
+              Agrawal Samaj Census
+            </p>
+            <h1 className="mt-3 text-4xl font-extrabold leading-tight text-[#4A3520]">
+              अग्रवाल समाज
+              <span className="block text-[#C67A2D]">जय महाराजा अग्रसेन जी</span>
+            </h1>
+            <p className="mt-4 text-base text-gray-600 leading-relaxed">
+              Welcome to the Agrawal Samaj Census Portal — register your branch and family to
+              strengthen our community and preserve our heritage.
+            </p>
+          </div>
+        </div>
+      </section>
 
       <div className="bg-[#FFF8F0] px-4 sm:px-6 lg:px-8 pt-2 pb-8 sm:py-16 lg:py-20">
         <div className="max-w-[1200px] mx-auto">
