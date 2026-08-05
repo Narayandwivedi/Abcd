@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Quote, Building2, Users } from 'lucide-react'
+import { Building2, Users } from 'lucide-react'
 import AudioControls from '../component/AudioControls'
 
 export default function Census() {
@@ -43,13 +43,13 @@ export default function Census() {
               to="/location"
               className="group block w-full"
             >
-              <div className="relative overflow-hidden flex items-center gap-2 md:gap-4 bg-gradient-to-br from-[#FB923C] via-[#F97316] to-[#C2410C] text-white px-3 py-3 md:px-7 md:py-6 rounded-2xl font-semibold text-center shadow-lg shadow-orange-500/25 ring-1 ring-white/10 hover:shadow-xl hover:shadow-orange-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300">
+              <div className="relative overflow-hidden flex items-center gap-2 md:gap-4 bg-gradient-to-br from-[#FB923C] via-[#F97316] to-[#C2410C] text-white px-3 py-2.5 md:px-7 md:py-3 rounded-2xl font-semibold text-center shadow-lg shadow-orange-500/25 ring-1 ring-white/10 hover:shadow-xl hover:shadow-orange-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300">
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
-                <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/25">
-                  <Building2 size={20} className="text-white" />
+                <div className="shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/25">
+                  <Building2 size={18} className="text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="leading-tight text-sm md:text-lg">Submit New Agrawal Samaj Branch</p>
+                  <p className="leading-tight text-sm md:text-base">Submit New Agrawal Samaj Branch</p>
                   <p className="text-xs font-medium mt-1 text-orange-50/90">नया अग्रवाल समाज शाखा पंजीकृत करें</p>
                 </div>
               </div>
@@ -59,13 +59,13 @@ export default function Census() {
               to="/family-census"
               className="group block w-full"
             >
-              <div className="relative overflow-hidden flex items-center gap-2 md:gap-4 bg-gradient-to-br from-[#60A5FA] via-[#2563EB] to-[#1E3A8A] text-white px-3 py-3 md:px-7 md:py-6 rounded-2xl font-semibold text-center shadow-lg shadow-blue-500/25 ring-1 ring-white/10 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300">
+              <div className="relative overflow-hidden flex items-center gap-2 md:gap-4 bg-gradient-to-br from-[#60A5FA] via-[#2563EB] to-[#1E3A8A] text-white px-3 py-2.5 md:px-7 md:py-3 rounded-2xl font-semibold text-center shadow-lg shadow-blue-500/25 ring-1 ring-white/10 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300">
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
-                <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/25">
-                  <Users size={20} className="text-white" />
+                <div className="shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/25">
+                  <Users size={18} className="text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="leading-tight text-sm md:text-lg">Submit New Family Member Data</p>
+                  <p className="leading-tight text-sm md:text-base">Submit New Family Member Data</p>
                   <p className="text-xs font-medium mt-1 text-blue-50/90">नया परिवार सदस्य डेटा पंजीकृत करें</p>
                 </div>
               </div>
@@ -74,16 +74,7 @@ export default function Census() {
 
           <div className="mt-2 sm:mt-12 max-w-4xl mx-auto">
             <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-2 sm:p-6">
-              <div className="hidden md:block absolute top-0 left-6 md:-top-4 md:left-8">
-                <div className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
-                  <Quote size={14} className="text-white" />
-                </div>
-              </div>
               <div>
-                <p className="hidden md:block text-xs md:text-base text-gray-600 leading-relaxed mb-0">
-                  Your participation in this census helps preserve our community heritage and strengthens the bonds between Samaj and families across regions.
-                </p>
-
                 <div className="mt-2 pt-2 border-t border-gray-100 grid grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
                     <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
