@@ -10,6 +10,12 @@ const RELATION_OPTIONS = [
   'Brother', 'Sister', 'Grandfather', 'Grandmother', 'Uncle', 'Aunt', 'Other',
 ]
 
+const GOTRA_OPTIONS = [
+  'Bansal', 'Kuchhal', 'Kansal', 'Bindal', 'Singhal', 'Jindal', 'Mittal',
+  'Garg', 'Nangal', 'Mangal', 'Tayal', 'Tingal', 'Madhukul', 'Goyal',
+  'Airan', 'Goyan', 'Dharan', 'Bhandal',
+]
+
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
   'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
@@ -58,7 +64,7 @@ const AdminFamilyCensus = () => {
   const [districtList, setDistrictList] = useState([])
   const [loadingDistricts, setLoadingDistricts] = useState(false)
   const [formData, setFormData] = useState({
-    leaderName: '', leaderMobile: '', address: '',
+    leaderName: '', leaderMobile: '', gotra: '', address: '',
     state: '', district: '', block: '', villageOrCity: '', pincode: '',
     remarks: '', members: [], submittedBy: '', submittedByMobile: '',
   })
@@ -190,6 +196,7 @@ const AdminFamilyCensus = () => {
     setFormData({
       leaderName: family.leaderName || '',
       leaderMobile: family.leaderMobile || '',
+      gotra: family.gotra || '',
       address: family.address || '',
       state: family.state || '',
       district: family.district || '',
@@ -247,6 +254,7 @@ const AdminFamilyCensus = () => {
       return {
         'Leader Name': family.leaderName || '',
         'Leader Mobile': family.leaderMobile || '',
+        'Gotra': family.gotra || '',
         'Address': family.address || '',
         'State': family.state || '',
         'District': family.district || '',
@@ -282,7 +290,7 @@ const AdminFamilyCensus = () => {
     doc.setTextColor(100)
     doc.text(`Generated on ${new Date().toLocaleDateString('en-IN')} | Total Records: ${filteredList.length}`, pageWidth / 2, 46, { align: 'center' })
 
-    const head = [['#', 'Leader Name', 'Mobile', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
+    const head = [['#', 'Leader Name', 'Mobile', 'Gotra', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
     const body = filteredList.map((family, idx) => {
       const membersText = family.members?.length
         ? family.members.map(m => `${m.name || ''} (${m.relation || '-'}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''})`).join(', ')
@@ -291,6 +299,7 @@ const AdminFamilyCensus = () => {
         idx + 1,
         family.leaderName || '-',
         family.leaderMobile || '-',
+        family.gotra || '-',
         family.address || '-',
         family.state || '-',
         family.district || '-',
@@ -312,8 +321,10 @@ const AdminFamilyCensus = () => {
       alternateRowStyles: { fillColor: [239, 246, 255] },
       columnStyles: {
         0: { cellWidth: 20 },
-        4: { cellWidth: 90 },
-        9: { cellWidth: 110 },
+        3: { cellWidth: 55 },
+        4: { cellWidth: 70 },
+        5: { cellWidth: 60 },
+        10: { cellWidth: 110 },
       },
     })
 
@@ -492,6 +503,7 @@ const AdminFamilyCensus = () => {
                 <div className='p-5 flex-1 flex flex-col gap-3.5 text-sm'>
                   <div className='flex flex-wrap gap-x-5 gap-y-1.5 text-gray-600'>
                     <span className='flex items-center gap-1.5'><Phone size={13} className='text-blue-500' /> {family.leaderMobile || '—'}</span>
+                    {family.gotra && <span className='text-gray-500'>Gotra: {family.gotra}</span>}
                     {family.pincode && <span className='text-gray-500'>Pin: {family.pincode}</span>}
                   </div>
 
@@ -587,6 +599,14 @@ const AdminFamilyCensus = () => {
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>Mobile</label>
                   <input type='text' value={formData.leaderMobile} onChange={(e) => setFormData({ ...formData, leaderMobile: e.target.value })}
                     className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' />
+                </div>
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Gotra</label>
+                  <select value={formData.gotra} onChange={(e) => setFormData({ ...formData, gotra: e.target.value })}
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'>
+                    <option value=''>-- Select Gotra --</option>
+                    {GOTRA_OPTIONS.map(g => <option key={g} value={g}>{g}</option>)}
+                  </select>
                 </div>
               </div>
 
