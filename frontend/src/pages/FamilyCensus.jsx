@@ -11,13 +11,21 @@ const RELATION_OPTIONS = [
   'Brother', 'Sister', 'Grandfather', 'Grandmother', 'Uncle', 'Aunt', 'Other',
 ]
 
+const OCCUPATION_OPTIONS = [
+  'Self Employed', 'Government Job', 'Private Job', 'Teacher', 'Student',
+  'Doctor', 'Engineer', 'Farmer / Agriculture', 'Housewife / Homemaker',
+  'Labourer / Worker', 'Retired',
+]
+
 const emptyMember = () => ({
   name: '',
   relation: '',
   mobile: '',
+  dob: '',
   age: '',
   gender: '',
   occupation: '',
+  occupationOther: '',
 })
 
 
@@ -124,6 +132,19 @@ const titleCase = (str) => {
 
 const sanitizeMobile = (value) => value.replace(/\D/g, '').slice(0, 10)
 
+const calcAge = (dob) => {
+  if (!dob) return ''
+  const birth = new Date(dob)
+  if (isNaN(birth.getTime())) return ''
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const m = today.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age -= 1
+  return age >= 0 ? age : ''
+}
+
+const todayStr = () => new Date().toISOString().split('T')[0]
+
 export default function FamilyCensus() {
   const [form, setForm] = useState({
     leaderName: '',
@@ -190,6 +211,9 @@ export default function FamilyCensus() {
   const handleMemberChange = (index, field, value) => {
     const updated = [...form.members]
     updated[index] = { ...updated[index], [field]: field === 'mobile' ? sanitizeMobile(value) : value }
+    if (field === 'dob' && value) {
+      updated[index].age = calcAge(value)
+    }
     setForm((prev) => ({ ...prev, members: updated }))
   }
 
@@ -231,7 +255,8 @@ export default function FamilyCensus() {
         isActive: true,
         members: form.members.map((m) => ({
           ...m,
-          age: m.age ? Number(m.age) : 0,
+          occupation: m.occupation === 'Other' ? (m.occupationOther || 'Other') : m.occupation,
+          age: m.age !== '' && m.age != null ? Number(m.age) : Number(calcAge(m.dob)),
         })),
         submittedBy: form.submittedBy,
         submittedByMobile: form.submittedByMobile,
@@ -330,9 +355,10 @@ export default function FamilyCensus() {
                       <PreviewRow label="Name" value={member.name} />
                       <PreviewRow label="Relation With Family Leader" value={member.relation} />
                       <PreviewRow label="Mobile" value={member.mobile} />
+                      <PreviewRow label="Date Of Birth" value={member.dob} />
                       <PreviewRow label="Age" value={member.age} />
                       <PreviewRow label="Gender" value={member.gender} />
-                      <PreviewRow label="Occupation" value={member.occupation} />
+                      <PreviewRow label="Occupation" value={member.occupation === 'Other' ? member.occupationOther : member.occupation} />
                     </div>
                   </div>
                 ))
@@ -624,6 +650,15 @@ export default function FamilyCensus() {
                         placeholder="Enter 10-digit mobile number"
                       />
                       <Input
+                        label="Date Of Birth (Optional)"
+                        wrapperClassName="sm:col-span-1"
+                        type="date"
+                        max={todayStr()}
+                        value={member.dob}
+                        onChange={(e) => handleMemberChange(idx, 'dob', e.target.value)}
+                        placeholder="Select date of birth"
+                      />
+                      <Input
                         label="Age"
                         type="number"
                         min="0"
@@ -641,13 +676,28 @@ export default function FamilyCensus() {
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                       </Select>
+                      <Select
+                        label="Occupation"
+                        wrapperClassName="sm:col-span-2"
+                        value={member.occupation}
+                        onChange={(e) => handleMemberChange(idx, 'occupation', e.target.value)}
+                      >
+                        <option value="">-- Select Occupation --</option>
+                        {OCCUPATION_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                        <option value="Other">Other</option>
+                      </Select>
+                      {member.occupation === 'Other' && (
+                        <Input
+                          label="Specify Occupation"
+                          wrapperClassName="sm:col-span-2"
+                          value={member.occupationOther}
+                          onChange={(e) => handleMemberChange(idx, 'occupationOther', e.target.value)}
+                          placeholder="Enter occupation"
+                        />
+                      )}
                     </div>
-                    <Input
-                      label="Occupation"
-                      value={member.occupation}
-                      onChange={(e) => handleMemberChange(idx, 'occupation', e.target.value)}
-                      placeholder="Enter occupation"
-                    />
                   </div>
                 </div>
               ))}

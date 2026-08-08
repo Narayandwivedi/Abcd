@@ -22,7 +22,29 @@ const INDIAN_STATES = [
   'Lakshadweep', 'Puducherry',
 ]
 
-const emptyMember = () => ({ name: '', relation: '', mobile: '', age: '', gender: '', occupation: '' })
+const emptyMember = () => ({ name: '', relation: '', mobile: '', dob: '', age: '', gender: '', occupation: '' })
+
+const calcAge = (dob) => {
+  if (!dob) return ''
+  const birth = new Date(dob)
+  if (isNaN(birth.getTime())) return ''
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const m = today.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age -= 1
+  return age >= 0 ? age : ''
+}
+
+const todayStr = () => new Date().toISOString().split('T')[0]
+
+const toInputDate = (d) => {
+  if (!d) return ''
+  const dt = new Date(d)
+  if (isNaN(dt.getTime())) return ''
+  const mm = String(dt.getMonth() + 1).padStart(2, '0')
+  const dd = String(dt.getDate()).padStart(2, '0')
+  return `${dt.getFullYear()}-${mm}-${dd}`
+}
 
 const AdminFamilyCensus = () => {
   const [familyList, setFamilyList] = useState([])
@@ -178,7 +200,7 @@ const AdminFamilyCensus = () => {
       members: family.members && family.members.length > 0
         ? family.members.map(m => ({
             name: m.name || '', relation: m.relation || '', mobile: m.mobile || '',
-            age: m.age || '', gender: m.gender || '', occupation: m.occupation || '',
+            dob: toInputDate(m.dob), age: m.age || '', gender: m.gender || '', occupation: m.occupation || '',
           }))
         : [],
       submittedBy: family.submittedBy || '',
@@ -190,6 +212,9 @@ const AdminFamilyCensus = () => {
   const handleMemberChange = (index, field, value) => {
     const updated = [...formData.members]
     updated[index] = { ...updated[index], [field]: value }
+    if (field === 'dob' && value) {
+      updated[index].age = calcAge(value)
+    }
     setFormData({ ...formData, members: updated })
   }
 
@@ -217,7 +242,7 @@ const AdminFamilyCensus = () => {
 
     const rows = filteredList.map((family) => {
       const membersText = family.members?.length
-        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'}${m.age ? `, ${m.age}y` : ''}${m.gender ? `, ${m.gender}` : ''}${m.mobile ? `, ${m.mobile}` : ''}${m.occupation ? `, ${m.occupation}` : ''})`).join('; ')
+        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''}${m.gender ? `, ${m.gender}` : ''}${m.mobile ? `, ${m.mobile}` : ''}${m.occupation ? `, ${m.occupation}` : ''})`).join('; ')
         : ''
       return {
         'Leader Name': family.leaderName || '',
@@ -260,7 +285,7 @@ const AdminFamilyCensus = () => {
     const head = [['#', 'Leader Name', 'Mobile', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
     const body = filteredList.map((family, idx) => {
       const membersText = family.members?.length
-        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'})`).join(', ')
+        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''})`).join(', ')
         : '-'
       return [
         idx + 1,
@@ -500,6 +525,7 @@ const AdminFamilyCensus = () => {
                             <div className='text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-0.5'>
                               {m.mobile && <span className='flex items-center gap-1'><Phone size={10} /> {m.mobile}</span>}
                               {m.age ? <span>Age: {m.age}</span> : null}
+                              {m.dob ? <span>DOB: {new Date(m.dob).toLocaleDateString('en-IN')}</span> : null}
                               {m.gender && <span>{m.gender}</span>}
                               {m.occupation && <span>{m.occupation}</span>}
                             </div>
@@ -632,6 +658,9 @@ const AdminFamilyCensus = () => {
                       </select>
                       <input type='text' placeholder='Mobile' value={member.mobile}
                         onChange={(e) => handleMemberChange(idx, 'mobile', e.target.value)}
+                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
+                      <input type='date' placeholder='Date of Birth' max={todayStr()} value={member.dob}
+                        onChange={(e) => handleMemberChange(idx, 'dob', e.target.value)}
                         className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
                       <input type='number' placeholder='Age' value={member.age}
                         onChange={(e) => handleMemberChange(idx, 'age', e.target.value)}

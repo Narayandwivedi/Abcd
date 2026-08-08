@@ -5,6 +5,7 @@ const familyMemberSchema = new mongoose.Schema(
     name: { type: String, required: [true, 'Family member name is required'], trim: true },
     relation: { type: String, required: [true, 'Relation with family leader is required'], trim: true },
     mobile: { type: String, trim: true },
+    dob: { type: Date },
     age: { type: Number, min: [0, 'Age cannot be negative'], default: 0 },
     gender: { type: String, enum: ['Male', 'Female', 'Other'], required: [true, 'Gender is required'], trim: true },
     occupation: { type: String, trim: true, default: '' },

@@ -4,6 +4,7 @@ const AudioContext = createContext(null)
 
 export function AudioProvider({ children }) {
   const audioRef = useRef(null)
+  const [audioVersion, setAudioVersion] = useState(0)
   const [volume, setVolumeState] = useState(0.6)
   const [isPlaying, setIsPlaying] = useState(false)
   const playbackRef = useRef(false)
@@ -48,13 +49,14 @@ export function AudioProvider({ children }) {
     if (audioEl) {
       audioEl.volume = volume
     }
+    setAudioVersion(v => v + 1)
   }, [volume])
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
     const onPlay = () => { setIsPlaying(true); playbackRef.current = true }
-    const onPause = () => { setIsPlaying(false) }
+    const onPause = () => { setIsPlaying(false); playbackRef.current = false }
     const onEnded = () => { setIsPlaying(false); playbackRef.current = false }
     audio.addEventListener('play', onPlay)
     audio.addEventListener('pause', onPause)
@@ -64,7 +66,7 @@ export function AudioProvider({ children }) {
       audio.removeEventListener('pause', onPause)
       audio.removeEventListener('ended', onEnded)
     }
-  }, [])
+  }, [audioVersion])
 
   return (
     <AudioContext.Provider value={{ volume, isPlaying, play, stop, togglePlay, volumeUp, volumeDown, setVolume, registerAudio }}>
