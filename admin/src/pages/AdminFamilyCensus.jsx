@@ -28,7 +28,7 @@ const INDIAN_STATES = [
   'Lakshadweep', 'Puducherry',
 ]
 
-const emptyMember = () => ({ name: '', relation: '', mobile: '', dob: '', age: '', gender: '', occupation: '' })
+const emptyMember = () => ({ name: '', relation: '', relationWith: 'Family Leader', mobile: '', dob: '', age: '', gender: '', occupation: '' })
 
 const calcAge = (dob) => {
   if (!dob) return ''
@@ -51,6 +51,11 @@ const toInputDate = (d) => {
   const dd = String(dt.getDate()).padStart(2, '0')
   return `${dt.getFullYear()}-${mm}-${dd}`
 }
+
+const relationLabel = (m) =>
+  m.relation === 'Self' || !m.relationWith || m.relationWith === 'Family Leader'
+    ? m.relation || '-'
+    : `${m.relation} of ${m.relationWith}`
 
 const AdminFamilyCensus = () => {
   const [familyList, setFamilyList] = useState([])
@@ -206,7 +211,7 @@ const AdminFamilyCensus = () => {
       remarks: family.remarks || '',
       members: family.members && family.members.length > 0
         ? family.members.map(m => ({
-            name: m.name || '', relation: m.relation || '', mobile: m.mobile || '',
+            name: m.name || '', relation: m.relation || '', relationWith: m.relationWith || 'Family Leader', mobile: m.mobile || '',
             dob: toInputDate(m.dob), age: m.age || '', gender: m.gender || '', occupation: m.occupation || '',
           }))
         : [],
@@ -249,7 +254,7 @@ const AdminFamilyCensus = () => {
 
     const rows = filteredList.map((family) => {
       const membersText = family.members?.length
-        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''}${m.gender ? `, ${m.gender}` : ''}${m.mobile ? `, ${m.mobile}` : ''}${m.occupation ? `, ${m.occupation}` : ''})`).join('; ')
+        ? family.members.map(m => `${m.name || ''} (${relationLabel(m)}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''}${m.gender ? `, ${m.gender}` : ''}${m.mobile ? `, ${m.mobile}` : ''}${m.occupation ? `, ${m.occupation}` : ''})`).join('; ')
         : ''
       return {
         'Leader Name': family.leaderName || '',
@@ -293,7 +298,7 @@ const AdminFamilyCensus = () => {
     const head = [['#', 'Leader Name', 'Mobile', 'Gotra', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
     const body = filteredList.map((family, idx) => {
       const membersText = family.members?.length
-        ? family.members.map(m => `${m.name || ''} (${m.relation || '-'}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''})`).join(', ')
+        ? family.members.map(m => `${m.name || ''} (${relationLabel(m)}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''})`).join(', ')
         : '-'
       return [
         idx + 1,
@@ -671,6 +676,13 @@ const AdminFamilyCensus = () => {
                       <input type='text' placeholder='Name' value={member.name}
                         onChange={(e) => handleMemberChange(idx, 'name', e.target.value)}
                         className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
+                      <select value={member.relationWith} onChange={(e) => handleMemberChange(idx, 'relationWith', e.target.value)}
+                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'>
+                        <option value='Family Leader'>Relation With: Family Leader</option>
+                        {formData.members.map((m, i) => (
+                          i !== idx && <option key={i} value={m.name || `Member ${i + 1}`}>{m.name || `Member ${i + 1}`}</option>
+                        ))}
+                      </select>
                       <select value={member.relation} onChange={(e) => handleMemberChange(idx, 'relation', e.target.value)}
                         className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'>
                         <option value=''>Relation</option>

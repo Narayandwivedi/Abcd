@@ -27,6 +27,7 @@ const GOTRA_OPTIONS = [
 const emptyMember = () => ({
   name: '',
   relation: '',
+  relationWith: 'Family Leader',
   mobile: '',
   dob: '',
   age: '',
@@ -365,7 +366,7 @@ export default function FamilyCensus() {
                     <p className="text-xs font-bold text-[#C67A2D] uppercase tracking-wider mb-3">Member {idx + 1}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                       <PreviewRow label="Name" value={member.name} />
-                      <PreviewRow label="Relation With Family Leader" value={member.relation} />
+                      <PreviewRow label="Relation" value={member.relation === 'Self' || !member.relationWith ? member.relation : `${member.relation} of ${member.relationWith}`} />
                       <PreviewRow label="Mobile" value={member.mobile} />
                       <PreviewRow label="Date Of Birth" value={member.dob} />
                       <PreviewRow label="Age" value={member.age} />
@@ -653,16 +654,26 @@ export default function FamilyCensus() {
                         placeholder="Enter member name"
                       />
                       <Select
-                        label="Relation With Family Leader"
-                        value={member.relation}
-                        onChange={(e) => handleMemberChange(idx, 'relation', e.target.value)}
+                        label="Relation With"
+                        value={member.relationWith}
+                        onChange={(e) => handleMemberChange(idx, 'relationWith', e.target.value)}
                       >
-                        <option value="">-- Select Relation --</option>
-                        {RELATION_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
+                        <option value="Family Leader">Family Leader</option>
+                        {form.members.slice(0, idx).map((m, i) => (
+                          <option key={i} value={m.name || `Member ${i + 1}`}>{m.name || `Member ${i + 1}`}</option>
                         ))}
                       </Select>
                     </div>
+                    <Select
+                      label="Relation"
+                      value={member.relation}
+                      onChange={(e) => handleMemberChange(idx, 'relation', e.target.value)}
+                    >
+                      <option value="">-- Select Relation --</option>
+                      {RELATION_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </Select>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
                       <Input
                         label="Mobile Number"
