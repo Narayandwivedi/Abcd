@@ -17,6 +17,7 @@ const familySchema = new mongoose.Schema(
   {
     leaderName: { type: String, required: [true, 'Family leader name is required'], trim: true },
     leaderMobile: { type: String, trim: true },
+    gotra: { type: String, trim: true, default: '' },
     address: { type: String, trim: true },
     state: { type: String, trim: true },
     district: { type: String, trim: true },

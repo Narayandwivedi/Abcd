@@ -18,6 +18,12 @@ const OCCUPATION_OPTIONS = [
   'Labourer / Worker', 'Retired',
 ]
 
+const GOTRA_OPTIONS = [
+  'Bansal', 'Kuchhal', 'Kansal', 'Bindal', 'Singhal', 'Jindal', 'Mittal',
+  'Garg', 'Nangal', 'Mangal', 'Tayal', 'Tingal', 'Madhukul', 'Goyal',
+  'Airan', 'Goyan', 'Dharan', 'Bhandal',
+]
+
 const emptyMember = () => ({
   name: '',
   relation: '',
@@ -150,6 +156,7 @@ export default function FamilyCensus() {
   const [form, setForm] = useState({
     leaderName: '',
     leaderMobile: '',
+    gotra: '',
     address: '',
     state: '',
     district: '',
@@ -246,6 +253,7 @@ export default function FamilyCensus() {
       await axios.post(`${BACKEND_URL}/api/families`, {
         leaderName: form.leaderName,
         leaderMobile: form.leaderMobile,
+        gotra: form.gotra,
         address: form.address,
         state: form.state,
         district: form.district,
@@ -267,6 +275,7 @@ export default function FamilyCensus() {
       setForm({
         leaderName: '',
         leaderMobile: '',
+        gotra: '',
         address: '',
         state: '',
         district: '',
@@ -302,6 +311,7 @@ export default function FamilyCensus() {
     setForm({
       leaderName: '',
       leaderMobile: '',
+      gotra: '',
       address: '',
       state: '',
       district: '',
@@ -336,6 +346,7 @@ export default function FamilyCensus() {
             <SectionCard title="Family Information">
               <PreviewRow label="Family Leader Name" value={form.leaderName} />
               <PreviewRow label="Mobile Number" value={form.leaderMobile} />
+              <PreviewRow label="Gotra" value={form.gotra} />
               <PreviewRow label="State" value={form.state} />
               <PreviewRow label="District" value={form.district} />
               <PreviewRow label="Block" value={form.block} />
@@ -490,6 +501,18 @@ export default function FamilyCensus() {
                     placeholder="Enter 10-Digit Mobile Number"
                   />
                 </div>
+
+                <Select
+                  label="Gotra"
+                  className="mt-2"
+                  value={form.gotra}
+                  onChange={(e) => handleChange('gotra', e.target.value)}
+                >
+                  <option value="">-- Select Gotra --</option>
+                  {GOTRA_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </Select>
 
                 <div className="mt-2 -mx-4 sm:-mx-5 -mb-3 sm:-mb-5 pb-1.5 border-t border-gray-100">
                   <button
