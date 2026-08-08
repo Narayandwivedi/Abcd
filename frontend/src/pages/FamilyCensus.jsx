@@ -67,9 +67,9 @@ function Textarea({ label, required, error, ...props }) {
   )
 }
 
-function Select({ label, required, error, children, ...props }) {
+function Select({ label, required, error, wrapperClassName, children, ...props }) {
   return (
-    <label className="flex flex-col gap-1 sm:gap-1.5! -mt-1 sm:mt-0 font-medium text-xs sm:text-sm flex-1 min-w-0">
+    <label className={`flex flex-col gap-1 sm:gap-1.5! -mt-1 sm:mt-0 font-medium text-xs sm:text-sm flex-1 min-w-0 ${wrapperClassName || ''}`}>
       <span className="text-gray-700 text-xs sm:text-sm font-semibold">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
@@ -481,9 +481,10 @@ export default function FamilyCensus() {
           <div className="flex flex-col gap-3 sm:gap-6 lg:grid lg:grid-cols-2 lg:items-start">
             <div className="flex flex-col gap-3 sm:gap-6">
               <SectionCard title="Family Information" compactHeader accent="bronze">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
                   <Input
                     label="Family Leader Name"
+                    wrapperClassName="col-span-2 md:col-span-1"
                     required
                     error={errors.leaderName}
                     value={form.leaderName}
@@ -492,6 +493,7 @@ export default function FamilyCensus() {
                   />
                   <Input
                     label="Mobile Number"
+                    wrapperClassName="col-span-1"
                     required
                     error={errors.leaderMobile}
                     type="tel"
@@ -501,19 +503,18 @@ export default function FamilyCensus() {
                     onChange={(e) => handleChange('leaderMobile', e.target.value)}
                     placeholder="Enter 10-Digit Mobile Number"
                   />
+                  <Select
+                    label="Gotra"
+                    wrapperClassName="col-span-1"
+                    value={form.gotra}
+                    onChange={(e) => handleChange('gotra', e.target.value)}
+                  >
+                    <option value="">-- Select Gotra --</option>
+                    {GOTRA_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </Select>
                 </div>
-
-                <Select
-                  label="Gotra"
-                  className="mt-2"
-                  value={form.gotra}
-                  onChange={(e) => handleChange('gotra', e.target.value)}
-                >
-                  <option value="">-- Select Gotra --</option>
-                  {GOTRA_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </Select>
 
                 <div className="mt-2 -mx-4 sm:-mx-5 -mb-3 sm:-mb-5 pb-1.5 border-t border-gray-100">
                   <button

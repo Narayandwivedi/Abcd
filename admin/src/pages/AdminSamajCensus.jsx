@@ -3,7 +3,7 @@ import { toast } from 'react-toastify'
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { Phone, Mail, MapPin, Users, FileText, UserCheck, Calendar, ShieldCheck, ShieldAlert, ShieldX, Download, FileDown } from 'lucide-react'
+import { Phone, Mail, MapPin, Users, FileText, UserCheck, Calendar, ShieldCheck, ShieldAlert, ShieldX, Download, FileDown, LayoutGrid, Table, Eye } from 'lucide-react'
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -25,8 +25,10 @@ const AdminSamajCensus = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [cityFilter, setCityFilter] = useState('all')
+  const [viewMode, setViewMode] = useState('table')
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, approved: 0, pending: 0, rejected: 0 })
   const [showEditModal, setShowEditModal] = useState(false)
+  const [viewSamaj, setViewSamaj] = useState(null)
   const [stateList, setStateList] = useState([])
   const [districtList, setDistrictList] = useState([])
   const [loadingDistricts, setLoadingDistricts] = useState(false)
@@ -387,6 +389,20 @@ const AdminSamajCensus = () => {
             </button>
           ))}
         </div>
+        <div className='flex items-center gap-1 bg-gray-100 rounded-xl p-1 shrink-0'>
+          <button
+            onClick={() => setViewMode('card')}
+            className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold transition ${viewMode === 'card' ? 'bg-white text-orange-600 shadow' : 'text-gray-600 hover:text-gray-800'}`}
+          >
+            <LayoutGrid size={15} /> Cards
+          </button>
+          <button
+            onClick={() => setViewMode('table')}
+            className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold transition ${viewMode === 'table' ? 'bg-white text-orange-600 shadow' : 'text-gray-600 hover:text-gray-800'}`}
+          >
+            <Table size={15} /> Table
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -397,6 +413,87 @@ const AdminSamajCensus = () => {
       ) : filteredList.length === 0 ? (
         <div className='bg-white rounded-xl shadow-md py-12 text-center text-gray-500'>
           {searchTerm ? 'No records found matching your search' : 'No samaj records available'}
+        </div>
+      ) : viewMode === 'table' ? (
+        <div className='bg-white rounded-xl shadow-md overflow-hidden'>
+          <div className='overflow-x-auto'>
+            <table className='min-w-full text-sm text-left'>
+              <thead className='bg-gray-50 text-xs uppercase tracking-wider text-gray-500'>
+                <tr>
+                  <th className='px-4 py-3 font-semibold'>#</th>
+                  <th className='px-4 py-3 font-semibold'>Samaj</th>
+                  <th className='px-4 py-3 font-semibold'>Address</th>
+                  <th className='px-4 py-3 font-semibold'>Leaders</th>
+                  <th className='px-4 py-3 font-semibold'>Remarks</th>
+                  <th className='px-4 py-3 font-semibold'>Verification</th>
+                  <th className='px-4 py-3 font-semibold'>Status</th>
+                  <th className='px-4 py-3 font-semibold'>Actions</th>
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-gray-100'>
+                {filteredList.map((samaj, idx) => (
+                  <tr key={samaj._id} className='hover:bg-gray-50 align-top'>
+                    <td className='px-4 py-3 text-gray-500'>{idx + 1}</td>
+                    <td className='px-4 py-3'>
+                      <div className='font-bold text-gray-800'>{samaj.samajName || '—'}</div>
+                      <div className='text-xs text-gray-500 flex items-center gap-1 mt-0.5'><Phone size={11} /> {samaj.mobile || '—'}</div>
+                      {samaj.email && <div className='text-xs text-gray-500 flex items-center gap-1 mt-0.5'><Mail size={11} /> {samaj.email}</div>}
+                      {(samaj.submittedBy || samaj.submittedByMobile) && (
+                        <div className='text-[11px] text-gray-400 mt-1'>By: {samaj.submittedBy || '—'}{samaj.submittedByMobile ? ` · ${samaj.submittedByMobile}` : ''}</div>
+                      )}
+                    </td>
+                    <td className='px-4 py-3 text-xs text-gray-600 max-w-[240px]'>
+                      {samaj.officeAddress && <div className='font-medium text-gray-700'>{samaj.officeAddress}</div>}
+                      <div className='text-gray-500'>
+                        {[samaj.villageOrCity, samaj.block, samaj.district, samaj.state, samaj.pincode ? `Pin: ${samaj.pincode}` : ''].filter(Boolean).join(', ') || '—'}
+                      </div>
+                    </td>
+                    <td className='px-4 py-3'>
+                      <div className='text-xs font-semibold text-orange-600 mb-1 flex items-center gap-1'><Users size={12} /> {samaj.leaders?.length || 0} leader{samaj.leaders?.length !== 1 ? 's' : ''}</div>
+                      {samaj.leaders?.length > 0 ? (
+                        <div className='flex flex-col gap-1.5 min-w-[220px]'>
+                          {samaj.leaders.map((l, i) => (
+                            <div key={i} className='bg-gray-50 border border-gray-100 rounded-lg px-3 py-2'>
+                              <div className='flex items-center justify-between gap-2'>
+                                <span className='font-semibold text-gray-800 text-xs'>{l.name || '—'}</span>
+                                <span className='shrink-0 text-[10px] text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full'>{l.designation || '—'}</span>
+                              </div>
+                              {l.mobile && <div className='text-[11px] text-gray-500 mt-1 flex items-center gap-1'><Phone size={10} /> {l.mobile}</div>}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className='text-xs text-gray-400 italic'>No leaders added</p>
+                      )}
+                    </td>
+                    <td className='px-4 py-3 text-xs text-gray-500 max-w-[160px]'>{samaj.remarks || '—'}</td>
+                    <td className='px-4 py-3'>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold ${
+                        samaj.verificationStatus === 'approved' ? 'bg-emerald-50 text-emerald-700'
+                          : samaj.verificationStatus === 'rejected' ? 'bg-red-50 text-red-700'
+                          : 'bg-amber-50 text-amber-700'
+                      }`}>
+                        {samaj.verificationStatus === 'approved' ? <ShieldCheck size={12} />
+                          : samaj.verificationStatus === 'rejected' ? <ShieldX size={12} />
+                          : <ShieldAlert size={12} />}
+                        {samaj.verificationStatus === 'approved' ? 'Approved' : samaj.verificationStatus === 'rejected' ? 'Rejected' : 'Pending'}
+                      </span>
+                    </td>
+                    <td className='px-4 py-3'>
+                      <button onClick={() => handleToggleStatus(samaj._id)} className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${
+                        samaj.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}>{samaj.isActive ? 'Active' : 'Inactive'}</button>
+                    </td>
+                    <td className='px-4 py-3 whitespace-nowrap'>
+                      <button onClick={() => setViewSamaj(samaj)} title='View Details' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold transition'><Eye size={12} /> View</button>
+                      <button onClick={() => openEditModal(samaj)} className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition ml-1'>Edit</button>
+                      <button onClick={() => handleDelete(samaj._id, samaj.samajName)} className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition ml-1'>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5'>
@@ -522,6 +619,10 @@ const AdminSamajCensus = () => {
                 </div>
 
                 <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-2'>
+                  <button
+                    onClick={() => setViewSamaj(samaj)}
+                    className='flex-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  >View</button>
                   <button
                     onClick={() => openEditModal(samaj)}
                     className='flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
@@ -659,6 +760,84 @@ const AdminSamajCensus = () => {
                   className='flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition shadow-md'>Update Samaj</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {viewSamaj && (
+        <div className='fixed inset-0 bg-black/60 flex items-start justify-center z-50 p-4 pt-8 overflow-y-auto'>
+          <div className='bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8'>
+            <div className='flex items-center justify-between gap-3 px-6 py-4 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 text-white rounded-t-2xl sticky top-0'>
+              <div className='min-w-0'>
+                <h2 className='text-xl font-bold truncate'>{viewSamaj.samajName || 'Samaj Details'}</h2>
+                <div className='flex items-center gap-2 mt-1 text-xs text-orange-100'>
+                  <span className={`px-2 py-0.5 rounded-full font-semibold ${viewSamaj.isActive ? 'bg-green-400/90 text-green-900' : 'bg-white/20'}`}>{viewSamaj.isActive ? 'Active' : 'Inactive'}</span>
+                  <span className='capitalize'>{viewSamaj.verificationStatus || 'pending'}</span>
+                  <span className='flex items-center gap-1'><Users size={11} /> {viewSamaj.leaders?.length || 0} leader{viewSamaj.leaders?.length !== 1 ? 's' : ''}</span>
+                </div>
+              </div>
+              <button onClick={() => setViewSamaj(null)} className='shrink-0 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition'>
+                <svg className='w-5 h-5 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                </svg>
+              </button>
+            </div>
+
+            <div className='p-6 space-y-5'>
+              <div>
+                <h3 className='text-sm font-bold text-gray-700 uppercase tracking-wider mb-2 flex items-center gap-1.5'><Phone size={14} className='text-orange-500' /> Contact</h3>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 bg-gray-50 border border-gray-100 rounded-xl p-4'>
+                  <div className='flex justify-between gap-2'><span className='text-gray-500 text-sm'>Mobile</span><span className='font-semibold text-gray-800 text-sm text-right'>{viewSamaj.mobile || '—'}</span></div>
+                  <div className='flex justify-between gap-2'><span className='text-gray-500 text-sm'>Email</span><span className='font-semibold text-gray-800 text-sm text-right'>{viewSamaj.email || '—'}</span></div>
+                  <div className='flex justify-between gap-2'><span className='text-gray-500 text-sm'>Pincode</span><span className='font-semibold text-gray-800 text-sm text-right'>{viewSamaj.pincode || '—'}</span></div>
+                  <div className='flex justify-between gap-2'><span className='text-gray-500 text-sm'>Registered</span><span className='font-semibold text-gray-800 text-sm text-right'>{viewSamaj.createdAt ? new Date(viewSamaj.createdAt).toLocaleDateString('en-IN') : '—'}</span></div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className='text-sm font-bold text-gray-700 uppercase tracking-wider mb-2 flex items-center gap-1.5'><MapPin size={14} className='text-orange-500' /> Address</h3>
+                <div className='bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-700'>
+                  {viewSamaj.officeAddress && <div className='font-medium'>{viewSamaj.officeAddress}</div>}
+                  <div className='text-gray-500 mt-0.5'>
+                    {[viewSamaj.villageOrCity, viewSamaj.block, viewSamaj.district, viewSamaj.state].filter(Boolean).join(', ') || '—'}
+                  </div>
+                  {viewSamaj.remarks && <div className='mt-2 pt-2 border-t border-gray-200 flex items-start gap-1.5 text-gray-600'><FileText size={14} className='text-orange-500 mt-0.5 shrink-0' /> <span>{viewSamaj.remarks}</span></div>}
+                </div>
+              </div>
+
+              <div>
+                <h3 className='text-sm font-bold text-gray-700 uppercase tracking-wider mb-2 flex items-center gap-1.5'><Users size={14} className='text-orange-500' /> Samaj Leaders ({viewSamaj.leaders?.length || 0})</h3>
+                {viewSamaj.leaders?.length > 0 ? (
+                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                    {viewSamaj.leaders.map((l, idx) => (
+                      <div key={idx} className='border border-gray-100 rounded-xl p-4 bg-gray-50'>
+                        <div className='flex items-start justify-between gap-2'>
+                          <span className='font-bold text-gray-800'>{l.name || '—'}</span>
+                          <span className='shrink-0 text-[11px] text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full'>{l.designation || '—'}</span>
+                        </div>
+                        {l.mobile && <div className='mt-2 flex items-center gap-1 text-xs text-gray-600'><Phone size={11} className='text-gray-400' /> {l.mobile}</div>}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className='text-sm text-gray-400 italic bg-gray-50 rounded-xl p-4'>No leaders added</p>
+                )}
+              </div>
+
+              {(viewSamaj.submittedBy || viewSamaj.submittedByMobile) && (
+                <div className='flex items-center gap-2 text-sm text-gray-600 pt-3 border-t border-gray-100'>
+                  <UserCheck size={16} className='text-emerald-500 shrink-0' />
+                  <span>
+                    <span className='font-semibold text-gray-700'>Submitted by:</span> {viewSamaj.submittedBy || '—'}
+                    {viewSamaj.submittedByMobile && <span className='text-gray-400'> · {viewSamaj.submittedByMobile}</span>}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className='px-6 py-4 border-t border-gray-100 flex justify-end'>
+              <button onClick={() => setViewSamaj(null)} className='px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition'>Close</button>
+            </div>
           </div>
         </div>
       )}
