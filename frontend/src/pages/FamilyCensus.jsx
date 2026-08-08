@@ -350,7 +350,7 @@ export default function FamilyCensus() {
               <PreviewRow label="Gotra" value={form.gotra} />
               <PreviewRow label="State" value={form.state} />
               <PreviewRow label="District" value={form.district} />
-              <PreviewRow label="Block" value={form.block} />
+              <PreviewRow label="Block/Tehsil" value={form.block} />
               <PreviewRow label="Village / Town / City" value={form.villageOrCity} />
               <PreviewRow label="Complete Address" value={form.address} />
               <PreviewRow label="Pincode" value={form.pincode} />
@@ -456,24 +456,52 @@ export default function FamilyCensus() {
           <p className="text-xs sm:text-base text-gray-500 -mt-1 sm:mt-1 whitespace-nowrap">
             Fill In The Details Below To Register Your Family.
           </p>
-          <div className="mt-2 flex items-center gap-2.5">
-            <div className="h-14 sm:h-16 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white">
-              <img src="/image.jpeg" alt="Lalit Kumar Agrawal" className="h-full w-auto object-contain" />
+          <div className="mt-2 sm:mt-4 max-w-4xl mx-auto">
+            <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-2">
+              <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
+                <AudioControls inline compact />
+              </div>
+              <div>
+                <div className="mt-2 pt-2 border-t border-gray-100 grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
+                    <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
+                      <img src="/ashokji.avif" alt="Dr Ashok Agrawal" className="h-full w-auto object-contain" />
+                    </div>
+                    <div className="text-center md:text-left">
+                      <p className="text-xs md:text-sm font-bold text-[#4A3520]">Dr Ashok Agrawal</p>
+                      <p className="m-0 text-[10px] md:text-xs text-gray-500">President CGPAS</p>
+                      <a
+                        href="tel:9301014000"
+                        className="inline-flex items-center gap-1 text-[10px] md:text-xs text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        9301014000
+                      </a>
+                    </div>
+                  </div>
+                  <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
+                    <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
+                      <img src="/image.jpeg" alt="Lalit Kumar Agrawal" className="h-full w-auto object-contain" />
+                    </div>
+                    <div className="text-center md:text-left">
+                      <p className="text-xs md:text-sm font-bold text-[#4A3520]">Lalit Kumar Agrawal</p>
+                      <p className="m-0 text-[10px] md:text-xs text-gray-500">Chairman, ABCD</p>
+                      <a
+                        href="tel:7000484146"
+                        className="inline-flex items-center gap-1 text-[10px] md:text-xs text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        7000484146
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="font-semibold text-[#4A3520] text-sm leading-tight">Lalit Kumar Agrawal</span>
-              <span className="text-xs text-gray-500 leading-tight">Chairman, ABCD</span>
-              <a
-                href="tel:7000484146"
-                className="inline-flex items-center gap-1 mt-0.5 text-xs text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-                </svg>
-                 7000484146
-              </a>
-            </div>
-            <AudioControls inline />
           </div>
         </div>
 
@@ -563,10 +591,10 @@ export default function FamilyCensus() {
                           ))}
                         </Select>
                         <Input
-                          label="Block"
+                          label="Block/Tehsil"
                           value={form.block}
                           onChange={(e) => handleChange('block', e.target.value)}
-                          placeholder="Enter Block"
+                          placeholder="Enter Block/Tehsil"
                         />
                         <Input
                           label="Village / Town / City"

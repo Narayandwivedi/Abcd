@@ -265,7 +265,7 @@ const AdminFamilyCensus = () => {
         'Address': family.address || '',
         'State': family.state || '',
         'District': family.district || '',
-        'Block': family.block || '',
+        'Block/Tehsil': family.block || '',
         'Village / Town / City': family.villageOrCity || family.village || '',
         'Pincode': family.pincode || '',
         'Member Count': family.members?.length || 0,
@@ -297,7 +297,7 @@ const AdminFamilyCensus = () => {
     doc.setTextColor(100)
     doc.text(`Generated on ${new Date().toLocaleDateString('en-IN')} | Total Records: ${filteredList.length}`, pageWidth / 2, 46, { align: 'center' })
 
-    const head = [['#', 'Leader Name', 'Mobile', 'Gotra', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
+    const head = [['#', 'Leader Name', 'Mobile', 'Gotra', 'Address', 'State', 'District', 'Block/Tehsil', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
     const body = filteredList.map((family, idx) => {
       const membersText = family.members?.length
         ? family.members.map(m => `${m.name || ''} (${relationLabel(m)}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''})`).join(', ')
@@ -747,9 +747,9 @@ const AdminFamilyCensus = () => {
                   </select>
                 </div>
                 <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Block</label>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Block/Tehsil</label>
                   <input type='text' value={formData.block} onChange={(e) => setFormData({ ...formData, block: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder='Enter Block' />
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder='Enter Block/Tehsil' />
                 </div>
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>Village / Town / City</label>

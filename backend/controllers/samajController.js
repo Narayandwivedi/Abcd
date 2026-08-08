@@ -1,8 +1,17 @@
 const Samaj = require('../models/Samaj');
 
+const lower = (v) => (typeof v === 'string' ? v.trim().toLowerCase() : v);
+
+const normalizeAddress = (data = {}) => ({
+  ...data,
+  block: lower(data.block),
+  villageOrCity: lower(data.villageOrCity),
+  city: lower(data.city),
+});
+
 exports.createSamaj = async (req, res) => {
   try {
-    const samaj = await Samaj.create(req.body);
+    const samaj = await Samaj.create(normalizeAddress(req.body));
     res.status(201).json({ success: true, data: samaj });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -34,7 +43,7 @@ exports.getSamajById = async (req, res) => {
 
 exports.updateSamaj = async (req, res) => {
   try {
-    const samaj = await Samaj.findByIdAndUpdate(req.params.id, req.body, {
+    const samaj = await Samaj.findByIdAndUpdate(req.params.id, normalizeAddress(req.body), {
       new: true,
       runValidators: true,
     });

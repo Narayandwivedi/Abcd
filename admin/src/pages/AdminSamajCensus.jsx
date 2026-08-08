@@ -223,7 +223,7 @@ const AdminSamajCensus = () => {
         'Office Address': samaj.officeAddress || '',
         'State': samaj.state || '',
         'District': samaj.district || '',
-        'Block': samaj.block || '',
+        'Block/Tehsil': samaj.block || '',
         'Village / Town / City': samaj.villageOrCity || samaj.city || '',
         'Pincode': samaj.pincode || '',
         'Leader Count': samaj.leaders?.length || 0,
@@ -255,7 +255,7 @@ const AdminSamajCensus = () => {
     doc.setTextColor(100)
     doc.text(`Generated on ${new Date().toLocaleDateString('en-IN')} | Total Records: ${filteredList.length}`, pageWidth / 2, 46, { align: 'center' })
 
-    const head = [['#', 'Samaj Name', 'Mobile', 'Email', 'Address', 'State', 'District', 'Block', 'Village/City', 'Pincode', 'Leaders', 'Status', 'Verification']]
+    const head = [['#', 'Samaj Name', 'Mobile', 'Email', 'Address', 'State', 'District', 'Block/Tehsil', 'Village/City', 'Pincode', 'Leaders', 'Status', 'Verification']]
     const body = filteredList.map((samaj, idx) => {
       const leadersText = samaj.leaders?.length
         ? samaj.leaders.map(l => `${l.name || ''} (${l.designation || '-'})`).join(', ')
@@ -698,9 +698,9 @@ const AdminSamajCensus = () => {
                   </select>
                 </div>
                 <div>
-                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Block</label>
+                  <label className='block text-sm font-semibold text-gray-700 mb-1'>Block/Tehsil</label>
                   <input type='text' value={formData.block} onChange={(e) => setFormData({ ...formData, block: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder='Enter Block' />
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder='Enter Block/Tehsil' />
                 </div>
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-1'>Village / Town / City</label>

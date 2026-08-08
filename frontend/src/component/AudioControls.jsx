@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useAudio } from '../context/AudioContext'
 import { Music, Play, Pause, X } from 'lucide-react'
 
-export default function AudioControls({ inline = false }) {
+export default function AudioControls({ inline = false, compact = false }) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef(null)
   const { volume, isPlaying, togglePlay, setVolume } = useAudio()
@@ -50,10 +50,10 @@ export default function AudioControls({ inline = false }) {
   const button = (
     <button
       onClick={() => setOpen((o) => !o)}
-      className="w-8 h-8 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/30 hover:shadow-xl hover:shadow-[#C67A2D]/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer shrink-0"
+      className={`${compact ? 'w-6 h-6' : 'w-8 h-8'} rounded-full flex items-center justify-center text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/30 hover:shadow-xl hover:shadow-[#C67A2D]/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer shrink-0`}
       title="Music Controls"
     >
-      <Music size={14} />
+      <Music size={compact ? 11 : 14} />
     </button>
   )
 
@@ -62,7 +62,7 @@ export default function AudioControls({ inline = false }) {
       <div ref={containerRef} className="relative inline-flex items-center">
         {button}
         {open && (
-          <div className="absolute left-full ml-1.5 top-1/2 -translate-y-1/2 z-50 whitespace-nowrap">
+          <div className="absolute top-full right-0 mt-1.5 z-50 whitespace-nowrap sm:top-1/2 sm:right-auto sm:left-full sm:ml-1.5 sm:mt-0 sm:-translate-y-1/2">
             {panel}
           </div>
         )}

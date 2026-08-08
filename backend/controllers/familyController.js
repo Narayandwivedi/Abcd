@@ -17,9 +17,17 @@ const normalizeMembers = (members = []) =>
     age: m.age != null && m.age !== '' ? Number(m.age) : calcAge(m.dob),
   }))
 
+const lower = (v) => (typeof v === 'string' ? v.trim().toLowerCase() : v)
+
+const normalizeAddress = (data = {}) => ({
+  ...data,
+  block: lower(data.block),
+  villageOrCity: lower(data.villageOrCity),
+})
+
 exports.createFamily = async (req, res) => {
   try {
-    const family = await Family.create({ ...req.body, members: normalizeMembers(req.body.members) });
+    const family = await Family.create({ ...normalizeAddress(req.body), members: normalizeMembers(req.body.members) });
     res.status(201).json({ success: true, data: family });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -49,7 +57,7 @@ exports.getFamilyById = async (req, res) => {
 
 exports.updateFamily = async (req, res) => {
   try {
-    const family = await Family.findByIdAndUpdate(req.params.id, { ...req.body, members: normalizeMembers(req.body.members) }, {
+    const family = await Family.findByIdAndUpdate(req.params.id, { ...normalizeAddress(req.body), members: normalizeMembers(req.body.members) }, {
       new: true,
       runValidators: true,
     });

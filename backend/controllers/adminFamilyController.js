@@ -1,5 +1,13 @@
 const Family = require('../models/Family');
 
+const lower = (v) => (typeof v === 'string' ? v.trim().toLowerCase() : v);
+
+const normalizeAddress = (data = {}) => ({
+  ...data,
+  block: lower(data.block),
+  villageOrCity: lower(data.villageOrCity),
+});
+
 exports.getAllFamiliesAdmin = async (req, res) => {
   try {
     const families = await Family.find().sort({ createdAt: -1 });
@@ -27,7 +35,7 @@ exports.getFamilyByIdAdmin = async (req, res) => {
 
 exports.updateFamilyAdmin = async (req, res) => {
   try {
-    const family = await Family.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const family = await Family.findByIdAndUpdate(req.params.id, normalizeAddress(req.body), { new: true, runValidators: true });
     if (!family) return res.status(404).json({ success: false, message: 'Family not found' });
     res.status(200).json({ success: true, data: family });
   } catch (err) {
