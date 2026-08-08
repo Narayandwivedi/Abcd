@@ -74,6 +74,9 @@ export default function Census() {
 
           <div className="mt-2 sm:mt-4 max-w-4xl mx-auto">
             <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-2 sm:p-6">
+              <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
+                <AudioControls inline />
+              </div>
               <div>
                 <div className="mt-2 pt-2 border-t border-gray-100 grid grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
@@ -127,7 +130,6 @@ export default function Census() {
           </div>
         </div>
       </div>
-      <AudioControls />
     </>
   )
 }
