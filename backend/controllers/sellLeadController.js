@@ -8,6 +8,7 @@ const createSellLead = async (req, res) => {
     const {
       vendorName,
       vendorLocation,
+      category,
       productServiceOffered,
       brand,
       modelDetail,
@@ -19,7 +20,7 @@ const createSellLead = async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!vendorName || !vendorLocation || !productServiceOffered ||
+    if (!vendorName || !vendorLocation || !category || !productServiceOffered ||
         !brand || !mrpListPrice || !specialOfferPrice ||
         !stockQtyAvailable || !validity || !mobileNo) {
       return res.status(400).json({
@@ -36,6 +37,7 @@ const createSellLead = async (req, res) => {
       userId,
       vendorName,
       vendorLocation,
+      category,
       productServiceOffered,
       brand,
       modelDetail,

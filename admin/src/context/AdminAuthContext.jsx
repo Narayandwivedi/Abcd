@@ -57,13 +57,20 @@ export const AdminAuthProvider = ({ children }) => {
     }
   }
 
+  const hasPermission = (permissionKey) => {
+    if (!admin) return false
+    if (admin.role === 'superadmin') return true
+    return admin.permissions?.[permissionKey] === true
+  }
+
   const value = {
     admin,
     loading,
     isAuthenticated,
     login,
     logout,
-    checkAuth
+    checkAuth,
+    hasPermission
   }
 
   return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>

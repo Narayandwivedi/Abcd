@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
 import MultiCategorySelector from '../components/MultiCategorySelector'
+import { useAdminAuth } from '../context/AdminAuthContext'
+import { toast } from 'react-toastify'
 
 const Vendors = () => {
+  const { hasPermission } = useAdminAuth()
+  const createEmptyOwner = () => ({ name: '', photo: null, previewUrl: '' })
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -17,32 +21,55 @@ const Vendors = () => {
     approved: 0,
     rejected: 0
   })
+  const [activeTab, setActiveTab] = useState('approved') // approved, applications
+  const [applications, setApplications] = useState([])
+  const [loadingApplications, setLoadingApplications] = useState(false)
+  const [applicationFilterStatus, setApplicationFilterStatus] = useState('pending') // pending, rejected, approved
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForm, setCreateForm] = useState({
-    ownerName: '',
+    owners: [createEmptyOwner()],
     businessName: '',
     mobile: '',
     email: '',
+    gstPan: '',
+    address: '',
     state: '',
     district: '',
     city: '',
+    websiteUrl: '',
+    referralId: '',
+    membershipType: '',
     businessCategories: [],
     membershipFees: '',
-    password: ''
+    utrNumber: '',
+    paymentScreenshot: null,
+    password: '',
+    applicationNumber: ''
   })
+  const [previewPaymentScreenshot, setPreviewPaymentScreenshot] = useState(null)
   const [creating, setCreating] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editForm, setEditForm] = useState({
-    ownerName: '',
+    owners: [createEmptyOwner()],
     businessName: '',
     mobile: '',
     email: '',
+    gstPan: '',
+    address: '',
     state: '',
     district: '',
     city: '',
+    websiteUrl: '',
+    referralId: '',
+    membershipType: '',
     businessCategories: [],
-    membershipFees: ''
+    membershipFees: '',
+    utrNumber: '',
+    paymentScreenshot: null,
+    password: '',
+    applicationNumber: ''
   })
+  const [previewEditPaymentScreenshot, setPreviewEditPaymentScreenshot] = useState(null)
   const [editing, setEditing] = useState(false)
   const [createStates, setCreateStates] = useState([])
   const [createDistricts, setCreateDistricts] = useState([])
@@ -92,6 +119,187 @@ const Vendors = () => {
     return `${vendor.ownerNames[0]} +${vendor.ownerNames.length - 1}`
   }
 
+  const addCreateOwner = () => {
+    setCreateForm((prev) => {
+      if (prev.owners.length >= 10) {
+        toast.warn('Maximum 10 owners allowed')
+        return prev
+      }
+      return { ...prev, owners: [...prev.owners, createEmptyOwner()] }
+    })
+  }
+
+  const removeCreateOwner = (index) => {
+    setCreateForm((prev) => {
+      if (prev.owners.length <= 1) return prev
+      const removedOwner = prev.owners[index]
+      if (removedOwner?.previewUrl) URL.revokeObjectURL(removedOwner.previewUrl)
+      return { ...prev, owners: prev.owners.filter((_, i) => i !== index) }
+    })
+  }
+
+  const handleCreateOwnerNameChange = (index, value) => {
+    setCreateForm((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => (i === index ? { ...owner, name: value } : owner))
+    }))
+  }
+
+  const handleCreateOwnerPhotoChange = (index, e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      toast.warn('Please upload a valid image (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.warn('Photo size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    const previewUrl = URL.createObjectURL(file)
+    setCreateForm((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => {
+        if (i !== index) return owner
+        if (owner.previewUrl) URL.revokeObjectURL(owner.previewUrl)
+        return { ...owner, photo: file, previewUrl }
+      })
+    }))
+  }
+
+  const handleCreatePaymentScreenshotChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      toast.warn('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.warn('Payment screenshot size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    setCreateForm((prev) => ({ ...prev, paymentScreenshot: file }))
+    const reader = new FileReader()
+    reader.onloadend = () => setPreviewPaymentScreenshot(reader.result)
+    reader.readAsDataURL(file)
+  }
+
+  const addEditOwner = () => {
+    setEditForm((prev) => {
+      if (prev.owners.length >= 10) {
+        toast.warn('Maximum 10 owners allowed')
+        return prev
+      }
+      return { ...prev, owners: [...prev.owners, createEmptyOwner()] }
+    })
+  }
+
+  const removeEditOwner = (index) => {
+    setEditForm((prev) => {
+      if (prev.owners.length <= 1) return prev
+      const removedOwner = prev.owners[index]
+      if (removedOwner?.previewUrl && removedOwner.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(removedOwner.previewUrl)
+      }
+      return { ...prev, owners: prev.owners.filter((_, i) => i !== index) }
+    })
+  }
+
+  const handleEditOwnerNameChange = (index, value) => {
+    setEditForm((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => (i === index ? { ...owner, name: value } : owner))
+    }))
+  }
+
+  const handleEditOwnerPhotoChange = (index, e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      toast.warn('Please upload a valid image (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.warn('Photo size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    const previewUrl = URL.createObjectURL(file)
+    setEditForm((prev) => ({
+      ...prev,
+      owners: prev.owners.map((owner, i) => {
+        if (i !== index) return owner
+        if (owner.previewUrl && owner.previewUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(owner.previewUrl)
+        }
+        return { ...owner, photo: file, previewUrl }
+      })
+    }))
+  }
+
+  const handleEditPaymentScreenshotChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      toast.warn('Please upload a valid payment screenshot (JPG, PNG, or WebP)')
+      e.target.value = ''
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.warn('File size should be less than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    setEditForm((prev) => ({ ...prev, paymentScreenshot: file }))
+    const reader = new FileReader()
+    reader.onloadend = () => setPreviewEditPaymentScreenshot(reader.result)
+    reader.readAsDataURL(file)
+  }
+
+  const resetCreateForm = () => {
+    setCreateForm({
+      owners: [createEmptyOwner()],
+      businessName: '',
+      mobile: '',
+      email: '',
+      gstPan: '',
+      address: '',
+      state: '',
+      district: '',
+      city: '',
+      websiteUrl: '',
+      referralId: '',
+      membershipType: '',
+      businessCategories: [],
+      membershipFees: '',
+      utrNumber: '',
+      paymentScreenshot: null,
+      password: ''
+    })
+    setPreviewPaymentScreenshot(null)
+  }
+
   // Debug logging for createForm
   useEffect(() => {
     console.log('Vendors - createForm changed:', createForm)
@@ -100,9 +308,27 @@ const Vendors = () => {
   // Fetch all vendors
   useEffect(() => {
     fetchVendors()
+    fetchApplications()
     fetchCreateStates()
     fetchEditStates()
   }, [])
+
+  const fetchApplications = async () => {
+    try {
+      setLoadingApplications(true)
+      const response = await fetch(`${BACKEND_URL}/api/vendor-application/all`, {
+        credentials: 'include'
+      })
+      const data = await response.json()
+      if (data.success) {
+        setApplications(data.applications)
+      }
+    } catch (error) {
+      console.error('Error fetching applications:', error)
+    } finally {
+      setLoadingApplications(false)
+    }
+  }
 
   useEffect(() => {
     if (!createForm.state) {
@@ -217,7 +443,7 @@ const Vendors = () => {
       }
     } catch (error) {
       console.error('Error fetching vendors:', error)
-      alert('Failed to fetch vendors')
+      toast.error('Failed to fetch vendors')
     } finally {
       setLoading(false)
     }
@@ -247,14 +473,14 @@ const Vendors = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor approved successfully!')
+        toast.success('Vendor approved successfully!')
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to approve vendor')
+        toast.error(data.message || 'Failed to approve vendor')
       }
     } catch (error) {
       console.error('Error approving vendor:', error)
-      alert('Failed to approve vendor')
+      toast.error('Failed to fetch vendors')
     }
   }
 
@@ -267,7 +493,7 @@ const Vendors = () => {
 
   const handleSetPassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-      alert('Password must be at least 6 characters')
+      toast.warn('Password must be at least 6 characters')
       return
     }
 
@@ -283,16 +509,16 @@ const Vendors = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Password set successfully!')
+        toast.success('Password set successfully!')
         setShowPasswordModal(false)
         setNewPassword('')
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to set password')
+        toast.error(data.message || 'Failed to set password')
       }
     } catch (error) {
       console.error('Error setting password:', error)
-      alert('Failed to set password')
+      toast.error('Failed to set password')
     }
   }
 
@@ -305,7 +531,7 @@ const Vendors = () => {
   // Send WhatsApp message
   const sendWhatsAppMessage = (vendor) => {
     if (!vendor.activeCertificate?.certificateNumber || !vendor.activeCertificate?.downloadLink) {
-      alert('Certificate not generated yet. Please approve the vendor first.')
+      toast.info('Certificate not generated yet. Please approve the vendor first.')
       return
     }
 
@@ -334,50 +560,80 @@ ABCD Team`
 
   // Create vendor handler
   const handleCreateVendor = async () => {
-    if (!createForm.ownerName || !createForm.businessName || !createForm.mobile || !createForm.state || !createForm.district || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipFees) {
-      alert('Please fill all required fields including state, district, city, and at least one category and subcategory')
+    if (!createForm.businessName || !createForm.mobile || !createForm.state || !createForm.district || !createForm.city || createForm.businessCategories.length === 0 || !createForm.membershipFees) {
+      toast.warn('Please fill all required fields including state, district, city, and at least one category and subcategory')
       return
     }
 
     if (createForm.mobile.length !== 10) {
-      alert('Mobile number must be exactly 10 digits')
+      toast.warn('Mobile number must be exactly 10 digits')
+      return
+    }
+
+    const hasInvalidOwners = createForm.owners.some((owner) => !owner.name?.trim())
+    if (hasInvalidOwners) {
+      toast.warn('Please add owner name for all owners')
+      return
+    }
+
+    const hasEmptyCategory = createForm.businessCategories.some(item => !item.category?.trim() || !item.subCategories || item.subCategories.length === 0)
+    if (hasEmptyCategory) {
+      toast.warn('Please fill in both category and select at least one subcategory for all entries')
+      return
+    }
+
+    if (createForm.utrNumber && !/^\d{12}$/.test((createForm.utrNumber || '').trim())) {
+      toast.warn('Please enter a valid 12-digit UTR number')
       return
     }
 
     try {
       setCreating(true)
+      const formData = new FormData()
+      const ownersPayload = createForm.owners.map((owner) => ({ name: owner.name.trim() }))
+
+      formData.append('ownerName', ownersPayload[0]?.name || '')
+      formData.append('owners', JSON.stringify(ownersPayload))
+      formData.append('businessName', createForm.businessName)
+      formData.append('mobile', createForm.mobile)
+      formData.append('state', createForm.state)
+      formData.append('district', createForm.district)
+      formData.append('city', createForm.city)
+      formData.append('businessCategories', JSON.stringify(createForm.businessCategories))
+      formData.append('membershipFees', createForm.membershipFees)
+      formData.append('email', createForm.email || '')
+      formData.append('websiteUrl', createForm.websiteUrl || '')
+      formData.append('gstPan', createForm.gstPan || '')
+      formData.append('address', createForm.address || '')
+      formData.append('referralId', createForm.referralId || '')
+      formData.append('membershipType', createForm.membershipType || '')
+      formData.append('utrNumber', (createForm.utrNumber || '').trim())
+      formData.append('password', createForm.password || '')
+      formData.append('applicationNumber', createForm.applicationNumber || '')
+      if (createForm.paymentScreenshot) formData.append('paymentScreenshot', createForm.paymentScreenshot)
+      createForm.owners.forEach((owner) => {
+        if (owner.photo) formData.append('ownerPhotos', owner.photo)
+      })
+
       const response = await fetch(`${BACKEND_URL}/api/admin/vendors`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(createForm),
+        body: formData,
       })
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor created successfully!')
+        toast.success('Vendor created successfully!')
         setShowCreateModal(false)
-        setCreateForm({
-          ownerName: '',
-          businessName: '',
-          mobile: '',
-          email: '',
-          state: '',
-          district: '',
-          city: '',
-          businessCategories: [],
-          membershipFees: '',
-          password: ''
-        })
+        resetCreateForm()
         fetchVendors()
+        fetchApplications()
       } else {
-        alert(data.message || 'Failed to create vendor')
+        toast.error(data.message || 'Failed to create vendor')
       }
     } catch (error) {
       console.error('Error creating vendor:', error)
-      alert('Failed to create vendor')
+      toast.error('Failed to create vendor')
     } finally {
       setCreating(false)
     }
@@ -386,66 +642,124 @@ ABCD Team`
   // Open edit modal with vendor data
   const openEditModal = (vendor) => {
     setSelectedVendor(vendor)
+    
+    // Normalize owners for edit form
+    const normalizedOwners = (vendor.owners && vendor.owners.length > 0) 
+      ? vendor.owners.map(o => ({ 
+          name: o.name, 
+          photo: null, 
+          previewUrl: o.photo ? toAbsoluteFileUrl(o.photo) : '' 
+        }))
+      : [{ name: vendor.ownerName || '', photo: null, previewUrl: '' }]
+
     setEditForm({
-      ownerName: vendor.ownerName || '',
+      owners: normalizedOwners,
       businessName: vendor.businessName || '',
       mobile: vendor.mobile || '',
       email: vendor.email || '',
+      gstPan: vendor.gstPan || '',
+      address: vendor.address || '',
       state: vendor.state || '',
       district: vendor.district || '',
       city: vendor.city || '',
+      websiteUrl: vendor.websiteUrl?.replace(/^https?:\/\//i, '') || '',
+      referralId: vendor.referralId || '',
+      membershipType: vendor.membershipType || '',
       businessCategories: vendor.businessCategories || [],
-      membershipFees: vendor.membershipFees || ''
+      membershipFees: vendor.membershipFees || '',
+      utrNumber: vendor.utrNumber || '',
+      paymentScreenshot: null,
+      password: ''
     })
+    
+    // Set preview for payment screenshot if exists
+    if (vendor.paymentScreenshot) {
+      setPreviewEditPaymentScreenshot(toAbsoluteFileUrl(vendor.paymentScreenshot))
+    } else {
+      setPreviewEditPaymentScreenshot(null)
+    }
+    
     setShowEditModal(true)
   }
 
   // Handle edit vendor
   const handleEditVendor = async () => {
-    if (!editForm.ownerName || !editForm.businessName || !editForm.mobile || !editForm.state || !editForm.district || !editForm.city || editForm.businessCategories.length === 0 || !editForm.membershipFees) {
-      alert('Please fill all required fields including state, district, city, and at least one category and subcategory')
+    const hasEmptyCategory = editForm.businessCategories.some(item => !item.category?.trim() || !item.subCategories || item.subCategories.length === 0)
+    if (hasEmptyCategory || editForm.businessCategories.length === 0) {
+      toast.warn('Please fill all required fields including state, district, city, and at least one category and subcategory')
       return
     }
 
     if (editForm.mobile.toString().length !== 10) {
-      alert('Mobile number must be exactly 10 digits')
+      toast.warn('Mobile number must be exactly 10 digits')
       return
     }
 
     try {
       setEditing(true)
+      const formData = new FormData()
+      const ownersPayload = editForm.owners.map((owner) => ({ name: owner.name.trim() }))
+
+      formData.append('owners', JSON.stringify(ownersPayload))
+      formData.append('ownerName', ownersPayload[0]?.name || '')
+      formData.append('businessName', editForm.businessName)
+      formData.append('mobile', editForm.mobile)
+      formData.append('state', editForm.state)
+      formData.append('district', editForm.district)
+      formData.append('city', editForm.city)
+      formData.append('businessCategories', JSON.stringify(editForm.businessCategories))
+      formData.append('membershipFees', editForm.membershipFees)
+      formData.append('email', editForm.email || '')
+      formData.append('gstPan', editForm.gstPan || '')
+      formData.append('address', editForm.address || '')
+      formData.append('websiteUrl', editForm.websiteUrl || '')
+      formData.append('referralId', editForm.referralId || '')
+      formData.append('membershipType', editForm.membershipType || '')
+      formData.append('utrNumber', editForm.utrNumber || '')
+      formData.append('password', editForm.password || '')
+      if (editForm.paymentScreenshot) formData.append('paymentScreenshot', editForm.paymentScreenshot)
+      
+      editForm.owners.forEach((owner) => {
+        if (owner.photo) formData.append('ownerPhotos', owner.photo)
+      })
+
       const response = await fetch(`${BACKEND_URL}/api/admin/vendors/${selectedVendor._id}`, {
         method: 'PUT',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editForm),
+        body: formData,
       })
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor updated successfully!')
+        toast.success('Vendor updated successfully!')
         setShowEditModal(false)
         setSelectedVendor(null)
         setEditForm({
-          ownerName: '',
+          owners: [createEmptyOwner()],
           businessName: '',
           mobile: '',
           email: '',
+          gstPan: '',
+          address: '',
           state: '',
           district: '',
           city: '',
+          websiteUrl: '',
+          referralId: '',
+          membershipType: '',
           businessCategories: [],
-          membershipFees: ''
+          membershipFees: '',
+          utrNumber: '',
+          paymentScreenshot: null,
+          password: ''
         })
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to update vendor')
+        toast.error(data.message || 'Failed to update vendor')
       }
     } catch (error) {
       console.error('Error updating vendor:', error)
-      alert('Failed to update vendor')
+      toast.error('Failed to update vendor')
     } finally {
       setEditing(false)
     }
@@ -467,14 +781,14 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert(data.message)
+        toast.success(data.message)
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to toggle vendor status')
+        toast.error(data.message || 'Failed to toggle vendor status')
       }
     } catch (error) {
       console.error('Error toggling vendor status:', error)
-      alert('Failed to toggle vendor status')
+      toast.error('Failed to toggle vendor status')
     }
   }
 
@@ -493,14 +807,14 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor deleted successfully!')
+        toast.success('Vendor deleted successfully!')
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to delete vendor')
+        toast.error(data.message || 'Failed to delete vendor')
       }
     } catch (error) {
       console.error('Error deleting vendor:', error)
-      alert('Failed to delete vendor')
+      toast.error('Failed to delete vendor')
     }
   }
 
@@ -521,14 +835,42 @@ ABCD Team`
       const data = await response.json()
 
       if (data.success) {
-        alert('Vendor application rejected successfully!')
+        toast.success('Vendor application rejected successfully!')
+        setShowRejectModal(false)
         fetchVendors()
       } else {
-        alert(data.message || 'Failed to reject vendor')
+        toast.error(data.message || 'Failed to reject vendor')
       }
     } catch (error) {
       console.error('Error rejecting vendor:', error)
-      alert('Failed to reject vendor')
+      toast.error('Failed to reject vendor')
+    }
+  }
+
+  // Reject application (temporary registration)
+  const handleRejectApplication = async (applicationId, businessName) => {
+    if (!window.confirm(`Are you sure you want to reject the application from "${businessName}"?`)) return
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/vendor-application/${applicationId}/reject`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Application rejected successfully!')
+        setShowPublicRejectModal(false)
+        fetchVendors()
+      } else {
+        toast.error(data.message || 'Failed to reject application')
+      }
+    } catch (error) {
+      console.error('Error rejecting application:', error)
+      toast.error('Failed to reject application')
     }
   }
 
@@ -541,17 +883,22 @@ ABCD Team`
       vendor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vendor.mobile?.toString().includes(searchTerm)
 
-    // Status filter
-    let matchesStatus = true
-    if (filterStatus === 'pending') {
-      matchesStatus = !vendor.paymentVerified && !vendor.isRejected
-    } else if (filterStatus === 'approved') {
-      matchesStatus = vendor.paymentVerified
-    } else if (filterStatus === 'rejected') {
-      matchesStatus = vendor.isRejected
+    if (activeTab === 'approved') {
+      return matchesSearch && vendor.paymentVerified
     }
 
-    return matchesSearch && matchesStatus
+    return matchesSearch
+  })
+
+  const filteredApplications = applications.filter(app => {
+    const matchesSearch = app.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.whatsappNumber?.toString().includes(searchTerm) ||
+      app.city?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesStatus = (app.status || 'pending') === applicationFilterStatus;
+    
+    return matchesSearch && matchesStatus;
   })
 
   return (
@@ -572,87 +919,72 @@ ABCD Team`
         </button>
       </div>
 
-      {/* Stats */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-8'>
-        <div className='bg-white rounded-xl p-3 md:p-6 shadow-lg border border-gray-200'>
-          <div className='text-gray-600 text-xs md:text-sm font-medium mb-1 md:mb-2'>Total Applications</div>
-          <div className='text-xl md:text-3xl font-black text-blue-600'>{stats.total}</div>
-        </div>
-        <div className='bg-white rounded-xl p-3 md:p-6 shadow-lg border border-yellow-200'>
-          <div className='text-gray-600 text-xs md:text-sm font-medium mb-1 md:mb-2'>Pending Approval</div>
-          <div className='text-xl md:text-3xl font-black text-yellow-600'>{stats.pending}</div>
-        </div>
-        <div className='bg-white rounded-xl p-3 md:p-6 shadow-lg border border-green-200'>
-          <div className='text-gray-600 text-xs md:text-sm font-medium mb-1 md:mb-2'>Approved</div>
-          <div className='text-xl md:text-3xl font-black text-green-600'>{stats.approved}</div>
-        </div>
-        <div className='bg-white rounded-xl p-3 md:p-6 shadow-lg border border-red-200'>
-          <div className='text-gray-600 text-xs md:text-sm font-medium mb-1 md:mb-2'>Rejected</div>
-          <div className='text-xl md:text-3xl font-black text-red-600'>{stats.rejected}</div>
-        </div>
-      </div>
-
-      {/* Vendors Table */}
+      {/* Tab Navigation */}
+      <div className='flex gap-4 mb-6 border-b border-gray-200'>
+        <button
+          onClick={() => setActiveTab('approved')}
+          className={`pb-3 px-2 font-bold text-lg transition-all ${
+            activeTab === 'approved'
+              ? 'text-blue-600 border-b-4 border-blue-600'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          All Vendors
+        </button>
+        <button
+          onClick={() => setActiveTab('applications')}
+          className={`pb-3 px-2 font-bold text-lg transition-all ${
+            activeTab === 'applications'
+              ? 'text-blue-600 border-b-4 border-blue-600'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          Vendor Applications
+        </button>
+      </div>      {/* Vendors Table Container */}
       <div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden'>
-        <div className='p-6 border-b border-gray-200 space-y-4'>
-          {/* Filter Buttons */}
-          <div className='flex flex-wrap gap-2'>
-            <button
-              onClick={() => setFilterStatus('all')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                filterStatus === 'all'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              All ({stats.total})
-            </button>
-            <button
-              onClick={() => setFilterStatus('pending')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                filterStatus === 'pending'
-                  ? 'bg-yellow-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Pending ({stats.pending})
-            </button>
-            <button
-              onClick={() => setFilterStatus('approved')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                filterStatus === 'approved'
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Approved ({stats.approved})
-            </button>
-            <button
-              onClick={() => setFilterStatus('rejected')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                filterStatus === 'rejected'
-                  ? 'bg-red-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Rejected ({stats.rejected})
-            </button>
+          {/* Search Bar & Filters */}
+          <div className='flex flex-col md:flex-row gap-4 items-center'>
+            <div className='relative flex-1 w-full'>
+              <input
+                type='text'
+                placeholder={`Search ${activeTab === 'approved' ? 'vendors' : 'applications'}...`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className='w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+              />
+              <svg className='w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+              </svg>
+            </div>
+            {activeTab === 'applications' && (
+              <div className='flex bg-gray-100 p-1 rounded-xl w-full md:w-auto'>
+                <button
+                  onClick={() => setApplicationFilterStatus('pending')}
+                  className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${applicationFilterStatus === 'pending' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Pending
+                </button>
+                <button
+                  onClick={() => setApplicationFilterStatus('rejected')}
+                  className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${applicationFilterStatus === 'rejected' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Rejected
+                </button>
+                <button
+                  onClick={() => setApplicationFilterStatus('approved')}
+                  className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${applicationFilterStatus === 'approved' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Approved
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Search Bar */}
-          <input
-            type='text'
-            placeholder='Search vendors by business name, owner, email, or mobile...'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-        </div>
-
-        {loading ? (
-          <div className='p-12 text-center text-gray-500'>Loading vendors...</div>
-        ) : filteredVendors.length === 0 ? (
-          <div className='p-12 text-center text-gray-500'>No vendors found</div>
+        {loading || loadingApplications ? (
+          <div className='p-12 text-center text-gray-500'>Loading...</div>
+        ) : (activeTab === 'approved' ? filteredVendors : filteredApplications).length === 0 ? (
+          <div className='p-12 text-center text-gray-500'>No {activeTab === 'approved' ? 'vendors' : 'applications'} found</div>
         ) : (
           <>
             {/* Desktop Table View */}
@@ -660,19 +992,24 @@ ABCD Team`
               <table className='w-full'>
                 <thead className='bg-gray-50 border-b border-gray-200'>
                   <tr>
-                    <th className='px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>Vendor Details</th>
+                    <th className='px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                      {activeTab === 'approved' ? 'Vendor Details' : 'Applicant Details'}
+                    </th>
                     <th className='px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>Contact</th>
-                    <th className='px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>Category</th>
+                    <th className='px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>
+                      {activeTab === 'approved' ? 'Category' : 'Membership'}
+                    </th>
                     <th className='px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>Payment</th>
                     <th className='px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>Status</th>
                     <th className='px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider'>Actions</th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-gray-200'>
-                  {filteredVendors.map((vendor) => (
-                    <tr key={vendor._id} className='hover:bg-gray-50 transition'>
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center gap-3'>
+                  {activeTab === 'approved' ? (
+                    filteredVendors.map((vendor) => (
+                      <tr key={vendor._id} className='hover:bg-gray-50 transition'>
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center gap-3'>
                             {getVendorPrimaryPhoto(vendor) ? (
                               <img
                                 src={toAbsoluteFileUrl(getVendorPrimaryPhoto(vendor))}
@@ -681,525 +1018,246 @@ ABCD Team`
                                 className='w-12 h-12 rounded-full object-cover border-2 border-gray-200 cursor-pointer hover:opacity-80 transition'
                               />
                             ) : (
-                            <div className='w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold'>
-                              {vendor.businessName?.[0]?.toUpperCase()}
-                            </div>
-                          )}
+                              <div className='w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold'>
+                                {vendor.businessName?.[0]?.toUpperCase()}
+                              </div>
+                            )}
                             <div>
                               <div className='font-semibold text-gray-800'>{vendor.businessName}</div>
-                              <div className='text-xs text-gray-500'>Owners: {getOwnerSummary(vendor)}</div>
-                              {vendor.ownerNames?.length > 1 && (
-                                <div className='flex flex-wrap gap-1 mt-1'>
-                                  {vendor.ownerNames.slice(0, 3).map((ownerName, idx) => (
-                                    <span key={idx} className='px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded text-[10px] font-medium'>
-                                      {ownerName}
+                              {vendor.activeCertificate?.certificateNumber && (
+                                <div className='text-[10px] text-amber-700 font-bold uppercase'>{vendor.activeCertificate.certificateNumber}</div>
+                              )}
+                              <div className='text-xs text-gray-500'>Owner: {vendor.ownerName}</div>
+                              <div className='text-xs text-gray-500'>{vendor.city}, {vendor.state}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <a href={`tel:${vendor.mobile}`} className='text-blue-600 hover:text-blue-800 font-medium text-sm'>
+                            {vendor.mobile}
+                          </a>
+                          <div className='text-xs text-gray-500'>{vendor.email}</div>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='flex flex-col gap-1'>
+                            {vendor.businessCategories?.slice(0, 2).map((bc, idx) => (
+                              <div key={idx} className='flex flex-col'>
+                                <span className='text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded w-fit mb-0.5'>
+                                  {bc.category}
+                                </span>
+                                <div className='flex flex-wrap gap-1'>
+                                  {bc.subCategories?.map((sc, sidx) => (
+                                    <span key={sidx} className='text-[9px] text-gray-500 bg-gray-50 px-1 rounded'>
+                                      {sc.name}
                                     </span>
                                   ))}
-                                  {vendor.ownerNames.length > 3 && (
-                                    <span className='px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-medium'>
-                                      +{vendor.ownerNames.length - 3} more
-                                    </span>
-                                  )}
                                 </div>
-                              )}
-                              <div className='text-xs text-gray-500'>
-                                {[vendor.city, vendor.district, vendor.state].filter(Boolean).join(', ') || 'N/A'}
                               </div>
-                            {vendor.gstPan && (
-                              <div className='text-xs text-gray-500'>PAN/GST: {vendor.gstPan}</div>
+                            ))}
+                            {vendor.businessCategories?.length > 2 && <span className='text-[10px] text-gray-400'>+{vendor.businessCategories.length - 2} more categories</span>}
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='text-xs'>
+                            <div className='font-bold'>₹{vendor.membershipFees}</div>
+                            <div className='text-gray-500'>UTR: {vendor.utrNumber || 'N/A'}</div>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <span className='px-2 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-bold uppercase'>
+                            Approved
+                          </span>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='flex gap-2'>
+                            {vendor.activeCertificate?.downloadLink && (
+                              <a
+                                href={toAbsoluteFileUrl(vendor.activeCertificate.downloadLink)}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='p-2 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition'
+                                title='View Certificate'
+                              >
+                                <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
+                                </svg>
+                              </a>
                             )}
-                            {vendor.membershipType && (
-                              <div className='text-xs text-gray-500'>Membership Type: {vendor.membershipType}</div>
-                            )}
-                            {vendor.referralCode && (
-                              <div className='text-xs text-purple-600 font-semibold'>Referral: {vendor.referralCode}</div>
-                            )}
-                            {vendor.activeCertificate?.certificateNumber && (
-                              <div className='text-xs text-blue-600 font-semibold mt-1'>
-                                Cert: {vendor.activeCertificate?.certificateNumber}
-                              </div>
+                            <button onClick={() => openEditModal(vendor)} className='p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition'>
+                              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'/></svg>
+                            </button>
+                            {hasPermission('canDeleteVendors') && (
+                              <button onClick={() => handleDeleteVendor(vendor._id, vendor.businessName)} className='p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition'>
+                                <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/></svg>
+                              </button>
                             )}
                           </div>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>
-                        <div className='space-y-1'>
-                          <div className='flex items-center gap-2'>
-                            <a
-                              href={`tel:${vendor.mobile}`}
-                              className='text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1'
-                            >
-                              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
-                              </svg>
-                              {vendor.mobile}
-                            </a>
-                          </div>
-                          {vendor.email && (
-                            <div className='text-xs text-gray-600'>{vendor.email}</div>
-                          )}
-                          {vendor.websiteUrl && (
-                            <div className='text-xs text-gray-600 truncate'>Web: {vendor.websiteUrl}</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>
-                        <div className='space-y-1'>
-                          {vendor.businessCategories && vendor.businessCategories.length > 0 ? (
-                            <div className='flex flex-wrap gap-1'>
-                              {vendor.businessCategories.map((bc, idx) => (
-                                <div key={idx} className='text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md'>
-                                  <span className='font-semibold'>{bc.category}</span>
-                                  <span className='mx-1'>→</span>
-                                  <span>{bc.subCategory}</span>
-                                </div>
-                              ))}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    filteredApplications.map((app) => (
+                      <tr key={app._id} className='hover:bg-gray-50 transition'>
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center gap-3'>
+                            <div className='w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold'>
+                              {app.businessName?.[0]?.toUpperCase()}
                             </div>
-                          ) : (
-                            <div className='text-sm text-gray-500'>No categories</div>
-                          )}
-                          {vendor.membershipFees && (
-                            <span className='inline-block px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold mt-1'>
-                              ₹{vendor.membershipFees}
-                            </span>
-                          )}
-                          {vendor.referralId && (
-                            <div className='text-xs text-gray-500 mt-1'>Referral ID: {vendor.referralId}</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>
-                        <div className='text-sm'>
-                          {vendor.utrNumber && (
-                            <div className='text-gray-600'>UTR: {vendor.utrNumber}</div>
-                          )}
-                          {vendor.amountPaid && (
-                            <div className='text-gray-600 text-xs'>Amount Paid: ₹{vendor.amountPaid}</div>
-                          )}
-                          {vendor.paymentScreenshot && (
-                            <a
-                              href={`${BACKEND_URL}/${vendor.paymentScreenshot}`}
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              className='text-blue-600 hover:underline text-xs'
-                            >
-                              View Screenshot
-                            </a>
-                          )}
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>
-                        {vendor.paymentVerified ? (
-                          <span className='px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold'>
-                            ✓ Approved
-                          </span>
-                        ) : vendor.isRejected ? (
-                          <span className='px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold'>
-                            ✗ Rejected
-                          </span>
-                        ) : (
-                          <span className='px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold'>
-                            ⏳ Pending
-                          </span>
-                        )}
-                      </td>
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center gap-3 flex-wrap'>
-                          {/* Edit Button */}
-                          <button
-                            onClick={() => openEditModal(vendor)}
-                            className='p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition'
-                            title='Edit Vendor'
-                          >
-                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' />
-                            </svg>
-                          </button>
-
-                          {/* Call Button */}
-                          <a
-                            href={`tel:${vendor.mobile}`}
-                            className='p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition'
-                            title='Call Vendor'
-                          >
-                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
-                            </svg>
+                            <div>
+                              <div className='font-semibold text-gray-800'>{app.businessName}</div>
+                              <div className='text-[10px] text-indigo-600 font-bold uppercase'>{app.applicationNumber}</div>
+                              <div className='text-xs text-gray-500'>Owner: {app.ownerName}</div>
+                              <div className='text-xs text-gray-500'>City: {app.city}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <a href={`tel:${app.whatsappNumber}`} className='text-blue-600 hover:text-blue-800 font-medium text-sm'>
+                            {app.whatsappNumber}
                           </a>
-
-                          {/* WhatsApp Button */}
-                          {vendor.paymentVerified && vendor.activeCertificate?.downloadLink && (
-                            <button
-                              onClick={() => sendWhatsAppMessage(vendor)}
-                              className='p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition'
-                              title='Send WhatsApp'
-                            >
-                              <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 24 24'>
-                                <path d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z' />
-                              </svg>
-                            </button>
-                          )}
-
-                          {/* View Certificate PDF Button */}
-                          {vendor.paymentVerified && vendor.activeCertificate && vendor.activeCertificate.downloadLink && (
-                            <a
-                              href={`${BACKEND_URL}${vendor.activeCertificate.downloadLink}`}
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              className='p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition'
-                              title={`View Certificate (${vendor.activeCertificate.certificateNumber})`}
-                            >
-                              <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z' />
-                              </svg>
-                            </a>
-                          )}
-
-                          {/* Set Password Button */}
-                          <button
-                            onClick={() => openPasswordModal(vendor)}
-                            className='p-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition'
-                            title='Set Password'
-                          >
-                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' />
-                            </svg>
-                          </button>
-
-                          {/* Approve Button - Show for pending OR rejected vendors */}
-                          {!vendor.paymentVerified && (
-                            <button
-                              onClick={() => handleApprove(vendor._id)}
-                              className='px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-200 transition'
-                            >
-                              {vendor.isRejected ? 'Re-Approve' : 'Approve'}
-                            </button>
-                          )}
-
-                          {/* Reject Button - Only show for pending (not rejected) */}
-                          {!vendor.paymentVerified && !vendor.isRejected && (
-                            <button
-                              onClick={() => handleReject(vendor._id, vendor.businessName)}
-                              className='px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-semibold hover:bg-red-200 transition'
-                            >
-                              Reject
-                            </button>
-                          )}
-
-                          {/* Toggle Active/Inactive Button - Only show for approved vendors (not rejected) */}
-                          {!vendor.isRejected && (
-                            <button
-                              onClick={() => handleToggleStatus(vendor._id, vendor.isActive)}
-                              className={`p-2 rounded-lg transition ${
-                                vendor.isActive
-                                  ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
-                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                              }`}
-                              title={vendor.isActive ? 'Deactivate Vendor' : 'Activate Vendor'}
-                            >
-                              {vendor.isActive ? (
-                                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' />
-                                </svg>
-                              ) : (
-                                <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
-                                </svg>
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='text-xs font-bold text-indigo-600'>
+                            {app.membershipType}
+                            <div className='text-gray-500 font-normal'>₹{app.membershipAmount}</div>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='text-xs'>
+                            {app.utrNumber ? <div>UTR: {app.utrNumber}</div> : <div className='text-blue-600 italic'>Screenshot Attached</div>}
+                            {app.paymentScreenshot && (
+                              <a href={`${BACKEND_URL}/${app.paymentScreenshot}`} target='_blank' className='text-blue-600 hover:underline'>View Receipt</a>
+                            )}
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${app.status === 'rejected' ? 'bg-red-100 text-red-700' : (app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700')}`}>
+                            {app.status === 'rejected' ? 'Rejected' : (app.status === 'approved' ? 'Approved' : 'Pending Approval')}
+                          </span>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='flex gap-2'>
+                            {(!app.status || app.status === 'pending') && (
+                              <button
+                                onClick={() => {
+                                  // Auto-fill form fields for creation
+                                  setCreateForm(prev => ({
+                                    ...prev,
+                                    applicationNumber: app.applicationNumber,
+                                    businessName: app.businessName,
+                                    mobile: app.whatsappNumber,
+                                    city: app.city,
+                                    membershipType: app.membershipType,
+                                    membershipFees: app.membershipAmount,
+                                    utrNumber: app.utrNumber,
+                                    referralId: app.referralCode,
+                                    owners: [{ name: app.ownerName, photo: null, previewUrl: '' }]
+                                  }));
+                                  setShowCreateModal(true);
+                                }}
+                                className='px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition shadow-md'
+                              >
+                                Process
+                              </button>
+                            )}
+                            {(!app.status || app.status === 'pending') && (
+                              <button
+                                onClick={() => handleRejectApplication(app._id, app.businessName)}
+                                className='px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition'
+                              >
+                                Reject
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile Card View */}
             <div className='md:hidden space-y-4 p-4'>
-              {filteredVendors.map((vendor) => (
-                <div key={vendor._id} className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300'>
-                  {/* Card Header with Gradient Background */}
-                  <div className='bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 p-4'>
-                    <div className='flex items-start gap-3'>
-                      {/* Profile Photo with Ring */}
-                      <div className='relative flex-shrink-0'>
-                        {getVendorPrimaryPhoto(vendor) ? (
-                          <img
-                            src={toAbsoluteFileUrl(getVendorPrimaryPhoto(vendor))}
-                            alt={vendor.businessName}
-                            onClick={() => handlePhotoClick(toAbsoluteFileUrl(getVendorPrimaryPhoto(vendor)))}
-                            className='w-16 h-16 rounded-full object-cover border-4 border-white shadow-md cursor-pointer hover:scale-105 transition-transform duration-200'
-                          />
-                        ) : (
-                          <div className='w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md border-4 border-white'>
-                            {vendor.businessName?.[0]?.toUpperCase()}
-                          </div>
-                        )}
-                        {/* Status Indicator Dot */}
-                        {vendor.paymentVerified && (
-                          <div className='absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-3 border-white shadow-md flex items-center justify-center'>
-                            <svg className='w-3 h-3 text-white' fill='currentColor' viewBox='0 0 20 20'>
-                              <path fillRule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clipRule='evenodd' />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-
-                        {/* Vendor Info */}
-                        <div className='flex-1 min-w-0'>
-                          <h3 className='font-bold text-gray-900 text-sm leading-tight mb-0.5'>{vendor.businessName}</h3>
-                          <p className='text-xs text-gray-600 mb-0.5'>Owners: {getOwnerSummary(vendor)}</p>
-                          {vendor.ownerNames?.length > 1 && (
-                            <div className='flex flex-wrap gap-1 mb-1'>
-                              {vendor.ownerNames.slice(0, 3).map((ownerName, idx) => (
-                                <span key={idx} className='px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded-md text-[10px] font-semibold'>
-                                  {ownerName}
-                                </span>
-                              ))}
-                              {vendor.ownerNames.length > 3 && (
-                                <span className='px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded-md text-[10px] font-semibold'>
-                                  +{vendor.ownerNames.length - 3} more
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          {vendor.activeCertificate?.certificateNumber && (
-                            <div className='inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold mb-0.5'>
-                            <svg className='w-3 h-3 flex-shrink-0' fill='currentColor' viewBox='0 0 20 20'>
-                              <path fillRule='evenodd' d='M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z' clipRule='evenodd' />
-                            </svg>
-                            <span>{vendor.activeCertificate?.certificateNumber}</span>
-                          </div>
-                        )}
-                        <div className='flex items-start gap-1 text-xs text-gray-500'>
-                          <svg className='w-3 h-3 flex-shrink-0 mt-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
-                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
-                          </svg>
-                          <span className='text-left break-words'>
-                            {[vendor.city, vendor.district, vendor.state].filter(Boolean).join(', ') || 'N/A'}
-                          </span>
-                        </div>
-                        {vendor.gstPan && (
-                          <p className='text-[11px] text-gray-600 mt-1'>PAN/GST: {vendor.gstPan}</p>
-                        )}
-                        {vendor.referralCode && (
-                          <p className='text-[11px] text-purple-600 font-semibold mt-0.5'>Referral: {vendor.referralCode}</p>
-                        )}
-                      </div>
+              {(activeTab === 'approved' ? filteredVendors : filteredApplications).map((item) => (
+                <div key={item._id} className='bg-white rounded-2xl shadow-lg border border-gray-100 p-4'>
+                  <div className='flex items-center gap-3 mb-3'>
+                    <div className='w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold'>
+                      {item.businessName?.[0]?.toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className='font-bold text-gray-900'>{item.businessName}</h3>
+                      {item.activeCertificate?.certificateNumber && (
+                        <p className='text-[10px] text-amber-700 font-bold uppercase'>{item.activeCertificate.certificateNumber}</p>
+                      )}
+                      <p className='text-xs text-gray-500'>{item.ownerName}</p>
                     </div>
                   </div>
-
-                  {/* Card Body */}
-                  <div className='p-4 space-y-3'>
-                    {/* Contact Info */}
-                    <div className='flex items-center justify-between gap-2 bg-gray-50 rounded-xl p-3'>
-                      <a href={`tel:${vendor.mobile}`} className='flex items-center gap-1.5 text-blue-600 hover:text-blue-700 font-medium text-xs group'>
-                        <div className='p-1.5 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition'>
-                          <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
-                          </svg>
-                        </div>
-                        <span className='whitespace-nowrap'>{vendor.mobile}</span>
-                      </a>
-                      {vendor.email && (
-                        <a href={`mailto:${vendor.email}`} className='text-gray-600 hover:text-gray-800 text-xs truncate'>
-                          {vendor.email}
+                  <div className='grid grid-cols-2 gap-4 text-xs mb-4'>
+                    <div>
+                      <p className='text-gray-500'>Mobile</p>
+                      <p className='font-semibold'>{item.mobile || item.whatsappNumber}</p>
+                    </div>
+                    <div>
+                      <p className='text-gray-500'>City</p>
+                      <p className='font-semibold'>{item.city}</p>
+                    </div>
+                  </div>
+                  <div className='flex justify-between items-center pt-3 border-t border-gray-100'>
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${activeTab === 'approved' ? 'bg-green-100 text-green-700' : (item.status === 'rejected' ? 'bg-red-100 text-red-700' : (item.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'))}`}>
+                      {activeTab === 'approved' ? 'Approved' : (item.status === 'rejected' ? 'Rejected' : (item.status === 'approved' ? 'Approved' : 'Pending'))}
+                    </span>
+                    <div className='flex gap-4 items-center'>
+                      {activeTab === 'approved' && item.activeCertificate?.downloadLink && (
+                        <a
+                          href={toAbsoluteFileUrl(item.activeCertificate.downloadLink)}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='text-amber-700 text-xs font-bold'
+                        >
+                          View Certificate
                         </a>
                       )}
-                    </div>
-
-                    {/* Categories Row */}
-                    {vendor.businessCategories && vendor.businessCategories.length > 0 && (
-                      <div className='flex flex-wrap gap-1.5'>
-                        {vendor.businessCategories.slice(0, 2).map((bc, idx) => (
-                          <div key={idx} className='flex items-center gap-1 bg-purple-50 px-2.5 py-1.5 rounded-lg'>
-                            <svg className='w-3 h-3 text-purple-600' fill='currentColor' viewBox='0 0 20 20'>
-                              <path d='M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z' />
-                            </svg>
-                            <span className='text-xs font-semibold text-purple-700'>{bc.category}</span>
-                            <span className='text-xs text-purple-500'>→</span>
-                            <span className='text-xs text-purple-600'>{bc.subCategory}</span>
-                          </div>
-                        ))}
-                        {vendor.businessCategories.length > 2 && (
-                          <div className='flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium'>
-                            +{vendor.businessCategories.length - 2} more
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Status Row */}
-                    <div className='flex items-center justify-between gap-2 mt-2'>
-
-                      {/* Status Badge */}
-                      {vendor.paymentVerified ? (
-                        <div className='flex items-center gap-1.5 px-2.5 py-2 bg-green-50 text-green-700 rounded-xl text-xs font-semibold'>
-                          <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                          Approved
-                        </div>
-                      ) : vendor.isRejected ? (
-                        <div className='flex items-center gap-1.5 px-2.5 py-2 bg-red-50 text-red-700 rounded-xl text-xs font-semibold'>
-                          <div className='w-2 h-2 bg-red-500 rounded-full'></div>
-                          Rejected
-                        </div>
+                      {activeTab === 'approved' ? (
+                        <button
+                          onClick={() => openEditModal(item)}
+                          className='text-blue-600 text-xs font-bold'
+                        >
+                          Edit Details
+                        </button>
                       ) : (
-                        <div className='flex items-center gap-1.5 px-2.5 py-2 bg-yellow-50 text-yellow-700 rounded-xl text-xs font-semibold'>
-                          <div className='w-2 h-2 bg-yellow-500 rounded-full animate-pulse'></div>
-                          Pending
-                        </div>
+                        (!item.status || item.status === 'pending') && (
+                          <div className='flex gap-3'>
+                            <button
+                              onClick={() => {
+                                setCreateForm(prev => ({
+                                  ...prev,
+                                  applicationNumber: item.applicationNumber,
+                                  businessName: item.businessName,
+                                  mobile: item.whatsappNumber,
+                                  city: item.city,
+                                  membershipType: item.membershipType,
+                                  membershipFees: item.membershipAmount,
+                                  utrNumber: item.utrNumber,
+                                  referralId: item.referralCode,
+                                  owners: [{ name: item.ownerName, photo: null, previewUrl: '' }]
+                                }));
+                                setShowCreateModal(true);
+                              }}
+                              className='text-blue-600 text-xs font-bold'
+                            >
+                              Process
+                            </button>
+                            <button
+                              onClick={() => handleRejectApplication(item._id, item.businessName)}
+                              className='text-red-600 text-xs font-bold'
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )
                       )}
                     </div>
-
-                    {/* Membership & Sub-Category */}
-                    {vendor.membershipFees && (
-                      <div className='flex items-center gap-2 bg-indigo-50 px-3 py-2 rounded-xl'>
-                        <svg className='w-3.5 h-3.5 text-indigo-600' fill='currentColor' viewBox='0 0 20 20'>
-                          <path d='M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z' />
-                        </svg>
-                        <span className='text-xs font-medium text-indigo-700'>Membership: ₹{vendor.membershipFees}</span>
-                      </div>
-                    )}
-
-                    {/* UTR Number */}
-                    {vendor.utrNumber && (
-                      <div className='flex items-center gap-2 bg-orange-50 px-3 py-2 rounded-xl'>
-                        <svg className='w-3.5 h-3.5 text-orange-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
-                        </svg>
-                        <span className='text-xs font-semibold text-orange-700'>UTR: {vendor.utrNumber}</span>
-                      </div>
-                    )}
-
-                    {/* Created Date */}
-                    {vendor.createdAt && (
-                      <div className='flex items-center gap-2 text-xs text-gray-500'>
-                        <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
-                        </svg>
-                        <span>
-                          Created: {new Date(vendor.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className='flex items-center gap-2 p-4 bg-gray-50 border-t border-gray-100 flex-wrap'>
-                    {/* Edit */}
-                    <button
-                      onClick={() => openEditModal(vendor)}
-                      className='flex items-center gap-1.5 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
-                    >
-                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' />
-                      </svg>
-                      Edit
-                    </button>
-
-                    {/* Call */}
-                    <a
-                      href={`tel:${vendor.mobile}`}
-                      className='flex items-center gap-1.5 px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
-                    >
-                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
-                      </svg>
-                      Call
-                    </a>
-
-                    {/* WhatsApp */}
-                    {vendor.paymentVerified && vendor.activeCertificate?.downloadLink && (
-                      <button
-                        onClick={() => sendWhatsAppMessage(vendor)}
-                        className='p-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm hover:shadow-md'
-                      >
-                        <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 24 24'>
-                          <path d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z' />
-                        </svg>
-                      </button>
-                    )}
-
-                    {/* Certificate */}
-                    {vendor.paymentVerified && vendor.activeCertificate?.downloadLink && (
-                      <a
-                        href={`${BACKEND_URL}${vendor.activeCertificate?.downloadLink}`}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='flex items-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
-                      >
-                        <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
-                        </svg>
-                        Cert
-                      </a>
-                    )}
-
-                    {/* Password */}
-                    <button
-                      onClick={() => openPasswordModal(vendor)}
-                      className='flex items-center gap-1.5 px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all shadow-sm hover:shadow-md text-xs font-semibold'
-                    >
-                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' />
-                      </svg>
-                      Pass
-                    </button>
-
-                    {/* Approve - Show for pending OR rejected vendors */}
-                    {!vendor.paymentVerified && (
-                      <button
-                        onClick={() => handleApprove(vendor._id)}
-                        className='flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-xs font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
-                      >
-                        {vendor.isRejected ? 'Re-Approve' : 'Approve Now'}
-                      </button>
-                    )}
-
-                    {/* Reject - Only show for pending (not rejected) */}
-                    {!vendor.paymentVerified && !vendor.isRejected && (
-                      <button
-                        onClick={() => handleReject(vendor._id, vendor.businessName)}
-                        className='flex-1 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-xs font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap'
-                      >
-                        Reject
-                      </button>
-                    )}
-
-                    {/* Toggle Status - Only show for approved vendors (not rejected) */}
-                    {!vendor.isRejected && (
-                      <button
-                        onClick={() => handleToggleStatus(vendor._id, vendor.isActive)}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all shadow-sm hover:shadow-md text-xs font-semibold ${
-                          vendor.isActive
-                            ? 'bg-orange-500 text-white hover:bg-orange-600'
-                            : 'bg-gray-500 text-white hover:bg-gray-600'
-                        }`}
-                      >
-                        {vendor.isActive ? (
-                          <>
-                            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 715.636 5.636m12.728 12.728L5.636 5.636' />
-                            </svg>
-                            Inactive
-                          </>
-                        ) : (
-                          <>
-                            <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
-                            </svg>
-                            Active
-                          </>
-                        )}
-                      </button>
-                    )}
                   </div>
                 </div>
               ))}
@@ -1276,39 +1334,39 @@ ABCD Team`
             </div>
 
             <div className='p-4 md:p-6 space-y-4 md:space-y-5'>
-              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-4'>
                 <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Basic Details</h3>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div>
-                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Name <span className='text-red-500'>*</span></label>
-                    <input
-                      type='text'
-                      value={createForm.ownerName}
-                      onChange={(e) => setCreateForm({...createForm, ownerName: e.target.value})}
-                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                    />
-                  </div>
-
                   <div>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Business Name <span className='text-red-500'>*</span></label>
                     <input
                       type='text'
                       value={createForm.businessName}
-                      onChange={(e) => setCreateForm({...createForm, businessName: e.target.value})}
+                      onChange={(e) => setCreateForm({ ...createForm, businessName: e.target.value })}
                       className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
 
                   <div>
-                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Mobile (10 digits) <span className='text-red-500'>*</span></label>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>WhatsApp No. <span className='text-red-500'>*</span></label>
                     <input
                       type='tel'
                       maxLength={10}
                       value={createForm.mobile}
                       onChange={(e) => {
                         const val = e.target.value.replace(/\D/g, '').slice(0, 10)
-                        setCreateForm({...createForm, mobile: val})
+                        setCreateForm({ ...createForm, mobile: val })
                       }}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>GSTN Details / PAN No.</label>
+                    <input
+                      type='text'
+                      value={createForm.gstPan}
+                      onChange={(e) => setCreateForm({ ...createForm, gstPan: e.target.value })}
                       className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
@@ -1318,15 +1376,84 @@ ABCD Team`
                     <input
                       type='email'
                       value={createForm.email}
-                      onChange={(e) => setCreateForm({...createForm, email: e.target.value})}
+                      onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
                       className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
                 </div>
+
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700'>Owners <span className='text-red-500'>*</span></label>
+                    <button
+                      type='button'
+                      onClick={addCreateOwner}
+                      className='px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition'
+                    >
+                      + Add Owner
+                    </button>
+                  </div>
+
+                  {createForm.owners.map((owner, index) => (
+                    <div key={`create-owner-${index}`} className='border border-gray-200 rounded-xl p-3 bg-white space-y-3'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                        <div>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Name {index + 1} <span className='text-red-500'>*</span></label>
+                          <input
+                            type='text'
+                            value={owner.name}
+                            onChange={(e) => handleCreateOwnerNameChange(index, e.target.value)}
+                            className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Photo {index + 1}</label>
+                          <input
+                            type='file'
+                            accept='image/jpeg,image/jpg,image/png,image/webp'
+                            onChange={(e) => handleCreateOwnerPhotoChange(index, e)}
+                            className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+                          />
+                        </div>
+                      </div>
+
+                      <div className='flex items-start justify-between'>
+                        {owner.previewUrl ? (
+                          <img src={owner.previewUrl} alt={`Owner ${index + 1}`} className='w-20 h-20 object-cover rounded-lg border border-gray-300' />
+                        ) : <div />}
+                        {createForm.owners.length > 1 && (
+                          <button
+                            type='button'
+                            onClick={() => removeCreateOwner(index)}
+                            className='px-3 py-1 text-xs font-semibold text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition'
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
-                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Location</h3>
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Business Setup</h3>
+                <MultiCategorySelector
+                  value={createForm.businessCategories}
+                  onChange={(businessCategories) => setCreateForm({ ...createForm, businessCategories })}
+                  required
+                />
+
+                <div>
+                  <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Address</label>
+                  <textarea
+                    rows='2'
+                    value={createForm.address}
+                    onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })}
+                    className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  />
+                </div>
+
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
                   <div>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>State <span className='text-red-500'>*</span></label>
@@ -1372,17 +1499,56 @@ ABCD Team`
                     </select>
                   </div>
                 </div>
-              </div>
-
-              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-3 md:space-y-4'>
-                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Business Setup</h3>
-                <MultiCategorySelector
-                  value={createForm.businessCategories}
-                  onChange={(businessCategories) => setCreateForm({...createForm, businessCategories})}
-                  required
-                />
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Website If Any</label>
+                    <div className='flex items-center rounded-xl border-2 border-gray-200 bg-white overflow-hidden'>
+                      <span className='px-3 text-xs text-gray-500'>https://</span>
+                      <input
+                        type='text'
+                        value={createForm.websiteUrl}
+                        onChange={(e) => setCreateForm({ ...createForm, websiteUrl: e.target.value.replace(/^https?:\/\//i, '') })}
+                        className='w-full px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        placeholder='yourbusiness.com'
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Referral ID</label>
+                    <input
+                      type='text'
+                      value={createForm.referralId}
+                      onChange={(e) => setCreateForm({ ...createForm, referralId: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-2'>Membership Type</label>
+                    <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
+                      {['Gold', 'Diamond', 'Platinum', 'Charted'].map((type) => (
+                        <label key={type} className='flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white cursor-pointer'>
+                          <input
+                            type='checkbox'
+                            checked={createForm.membershipType === type}
+                            onChange={() => {
+                              const membershipFeeMap = { Gold: '5000', Diamond: '10000', Platinum: '25000', Charted: '0' }
+                              const selectedValue = createForm.membershipType === type ? '' : type
+                              setCreateForm({
+                                ...createForm,
+                                membershipType: selectedValue,
+                                membershipFees: selectedValue ? membershipFeeMap[selectedValue] : ''
+                              })
+                            }}
+                          />
+                          <span className='text-xs md:text-sm font-semibold'>{type}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) <span className='text-red-500'>*</span></label>
                     <input
@@ -1396,6 +1562,17 @@ ABCD Team`
                   </div>
 
                   <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>UTR Number</label>
+                    <input
+                      type='text'
+                      maxLength={12}
+                      value={createForm.utrNumber}
+                      onChange={(e) => setCreateForm({ ...createForm, utrNumber: e.target.value.replace(/\D/g, '').slice(0, 12) })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
                     <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Password (min 6 chars)</label>
                     <input
                       type='text'
@@ -1404,7 +1581,33 @@ ABCD Team`
                       className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Payment Screenshot</label>
+                    <input
+                      type='file'
+                      accept='image/jpeg,image/jpg,image/png,image/webp'
+                      onChange={handleCreatePaymentScreenshotChange}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+                    />
+                  </div>
                 </div>
+
+                {previewPaymentScreenshot && (
+                  <div className='mt-2 relative'>
+                    <img src={previewPaymentScreenshot} alt='Payment screenshot preview' className='w-full h-32 object-cover rounded-xl border border-gray-300' />
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setCreateForm({ ...createForm, paymentScreenshot: null })
+                        setPreviewPaymentScreenshot(null)
+                      }}
+                      className='absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs'
+                    >
+                      x
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1430,124 +1633,296 @@ ABCD Team`
       {/* Edit Vendor Modal */}
       {showEditModal && selectedVendor && (
         <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
-          <div className='bg-white rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto'>
-            <h2 className='text-2xl font-bold text-gray-800 mb-4'>Edit Vendor</h2>
+          <div className='bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200'>
+            <div className='px-4 md:px-6 py-4 md:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50'>
+              <h2 className='text-xl md:text-2xl font-black text-gray-800'>Edit Vendor</h2>
+              <p className='text-xs md:text-sm text-gray-600 mt-1'>Modify details for {selectedVendor.businessName}</p>
+            </div>
 
-            <div className='space-y-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Owner Name *</label>
-                <input
-                  type='text'
-                  value={editForm.ownerName}
-                  onChange={(e) => setEditForm({...editForm, ownerName: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+            <div className='p-4 md:p-6 space-y-4 md:space-y-5'>
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Basic Details</h3>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Business Name <span className='text-red-500'>*</span></label>
+                    <input
+                      type='text'
+                      value={editForm.businessName}
+                      onChange={(e) => setEditForm({ ...editForm, businessName: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Business Name *</label>
-                <input
-                  type='text'
-                  value={editForm.businessName}
-                  onChange={(e) => setEditForm({...editForm, businessName: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>WhatsApp No. <span className='text-red-500'>*</span></label>
+                    <input
+                      type='tel'
+                      maxLength={10}
+                      value={editForm.mobile}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 10)
+                        setEditForm({ ...editForm, mobile: val })
+                      }}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Mobile * (10 digits)</label>
-                <input
-                  type='tel'
-                  maxLength={10}
-                  value={editForm.mobile}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, '').slice(0, 10)
-                    setEditForm({...editForm, mobile: val})
-                  }}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>GSTN Details / PAN No.</label>
+                    <input
+                      type='text'
+                      value={editForm.gstPan}
+                      onChange={(e) => setEditForm({ ...editForm, gstPan: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
 
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Email</label>
-                <input
-                  type='email'
-                  value={editForm.email}
-                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-              </div>
-
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>State *</label>
-                  <select
-                    value={editForm.state}
-                    onChange={(e) => setEditForm({ ...editForm, state: e.target.value, district: '', city: '' })}
-                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white'
-                  >
-                    <option value=''>Select State</option>
-                    {editStates.map(state => (
-                      <option key={state} value={state}>{state.toUpperCase()}</option>
-                    ))}
-                  </select>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Email</label>
+                    <input
+                      type='email'
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>District *</label>
-                  <select
-                    value={editForm.district}
-                    onChange={(e) => setEditForm({ ...editForm, district: e.target.value, city: '' })}
-                    disabled={!editForm.state || editDistricts.length === 0}
-                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
-                  >
-                    <option value=''>Select District</option>
-                    {editDistricts.map(district => (
-                      <option key={district} value={district}>{district.toUpperCase()}</option>
-                    ))}
-                  </select>
-                </div>
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700'>Owners <span className='text-red-500'>*</span></label>
+                    <button
+                      type='button'
+                      onClick={addEditOwner}
+                      className='px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition'
+                    >
+                      + Add Owner
+                    </button>
+                  </div>
 
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>City *</label>
-                  <select
-                    value={editForm.city}
-                    onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
-                    disabled={!editForm.district || editCities.length === 0}
-                    className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white disabled:opacity-50'
-                  >
-                    <option value=''>Select City</option>
-                    {editCities.map(city => (
-                      <option key={city} value={city}>{city.toUpperCase()}</option>
-                    ))}
-                  </select>
+                  {editForm.owners.map((owner, index) => (
+                    <div key={`edit-owner-${index}`} className='border border-gray-200 rounded-xl p-3 bg-white space-y-3'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                        <div>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Name {index + 1} <span className='text-red-500'>*</span></label>
+                          <input
+                            type='text'
+                            value={owner.name}
+                            onChange={(e) => handleEditOwnerNameChange(index, e.target.value)}
+                            className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Owner Photo {index + 1}</label>
+                          <input
+                            type='file'
+                            accept='image/jpeg,image/jpg,image/png,image/webp'
+                            onChange={(e) => handleEditOwnerPhotoChange(index, e)}
+                            className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+                          />
+                        </div>
+                      </div>
+
+                      <div className='flex items-start justify-between'>
+                        {owner.previewUrl ? (
+                          <img src={owner.previewUrl} alt={`Owner ${index + 1}`} className='w-20 h-20 object-cover rounded-lg border border-gray-300' />
+                        ) : <div />}
+                        {editForm.owners.length > 1 && (
+                          <button
+                            type='button'
+                            onClick={() => removeEditOwner(index)}
+                            className='px-3 py-1 text-xs font-semibold text-red-700 border border-red-300 rounded-lg hover:bg-red-50 transition'
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <MultiCategorySelector
-                value={editForm.businessCategories}
-                onChange={(businessCategories) => setEditForm({...editForm, businessCategories})}
-                required
-              />
-
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) *</label>
-                <input
-                  type='number'
-                  value={editForm.membershipFees}
-                  onChange={(e) => setEditForm({...editForm, membershipFees: e.target.value})}
-                  min='1'
-                  placeholder='Enter amount e.g. 1000'
-                  className='w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+              <div className='bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-4 space-y-4'>
+                <h3 className='text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide'>Business Setup</h3>
+                <MultiCategorySelector
+                  value={editForm.businessCategories}
+                  onChange={(businessCategories) => setEditForm({ ...editForm, businessCategories })}
+                  required
                 />
+
+                <div>
+                  <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Address</label>
+                  <textarea
+                    rows='2'
+                    value={editForm.address}
+                    onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                    className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  />
+                </div>
+
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>State <span className='text-red-500'>*</span></label>
+                    <select
+                      value={editForm.state}
+                      onChange={(e) => setEditForm({ ...editForm, state: e.target.value, district: '', city: '' })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white'
+                    >
+                      <option value=''>Select State</option>
+                      {editStates.map(state => (
+                        <option key={state} value={state}>{state.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>District <span className='text-red-500'>*</span></label>
+                    <select
+                      value={editForm.district}
+                      onChange={(e) => setEditForm({ ...editForm, district: e.target.value, city: '' })}
+                      disabled={!editForm.state || editDistricts.length === 0}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white disabled:opacity-50'
+                    >
+                      <option value=''>Select District</option>
+                      {editDistricts.map(district => (
+                        <option key={district} value={district}>{district.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>City <span className='text-red-500'>*</span></label>
+                    <select
+                      value={editForm.city}
+                      onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                      disabled={!editForm.district || editCities.length === 0}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm bg-white disabled:opacity-50'
+                    >
+                      <option value=''>Select City</option>
+                      {editCities.map(city => (
+                        <option key={city} value={city}>{city.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Website If Any</label>
+                    <div className='flex items-center rounded-xl border-2 border-gray-200 bg-white overflow-hidden'>
+                      <span className='px-3 text-xs text-gray-500'>https://</span>
+                      <input
+                        type='text'
+                        value={editForm.websiteUrl}
+                        onChange={(e) => setEditForm({ ...editForm, websiteUrl: e.target.value.replace(/^https?:\/\//i, '') })}
+                        className='w-full px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        placeholder='yourbusiness.com'
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Referral ID</label>
+                    <input
+                      type='text'
+                      value={editForm.referralId}
+                      onChange={(e) => setEditForm({ ...editForm, referralId: e.target.value })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div className='md:col-span-2'>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-2'>Membership Type</label>
+                    <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
+                      {['Gold', 'Diamond', 'Platinum', 'Charted'].map((type) => (
+                        <label key={type} className='flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white cursor-pointer'>
+                          <input
+                            type='checkbox'
+                            checked={editForm.membershipType === type}
+                            onChange={() => {
+                              const membershipFeeMap = { Gold: '5000', Diamond: '10000', Platinum: '25000', Charted: '0' }
+                              const selectedValue = editForm.membershipType === type ? '' : type
+                              setEditForm({
+                                ...editForm,
+                                membershipType: selectedValue,
+                                membershipFees: selectedValue ? (editForm.membershipType === type ? editForm.membershipFees : membershipFeeMap[selectedValue]) : ''
+                              })
+                            }}
+                          />
+                          <span className='text-xs md:text-sm font-semibold'>{type}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Membership Fees (Rs.) <span className='text-red-500'>*</span></label>
+                    <input
+                      type='number'
+                      value={editForm.membershipFees}
+                      onChange={(e) => setEditForm({...editForm, membershipFees: e.target.value})}
+                      min='1'
+                      placeholder='Enter amount'
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>UTR Number</label>
+                    <input
+                      type='text'
+                      maxLength={12}
+                      value={editForm.utrNumber}
+                      onChange={(e) => setEditForm({ ...editForm, utrNumber: e.target.value.replace(/\D/g, '').slice(0, 12) })}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Password (min 6 chars)</label>
+                    <input
+                      type='text'
+                      value={editForm.password}
+                      onChange={(e) => setEditForm({...editForm, password: e.target.value})}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      placeholder='Leave blank to keep current'
+                    />
+                  </div>
+
+                  <div>
+                    <label className='block text-xs md:text-sm font-medium text-gray-700 mb-1'>Payment Screenshot</label>
+                    <input
+                      type='file'
+                      accept='image/jpeg,image/jpg,image/png,image/webp'
+                      onChange={handleEditPaymentScreenshotChange}
+                      className='w-full px-3 md:px-4 py-2 md:py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+                    />
+                  </div>
+                </div>
+
+                {previewEditPaymentScreenshot && (
+                  <div className='mt-2 relative'>
+                    <img src={previewEditPaymentScreenshot} alt='Payment screenshot preview' className='w-full h-32 object-cover rounded-xl border border-gray-300' />
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setEditForm({ ...editForm, paymentScreenshot: null })
+                        setPreviewEditPaymentScreenshot(null)
+                      }}
+                      className='absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs'
+                    >
+                      x
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className='flex gap-3 mt-6'>
+            <div className='flex gap-2 md:gap-3 p-4 md:p-6 pt-3 md:pt-4 border-t border-gray-200 bg-white'>
               <button
                 onClick={handleEditVendor}
                 disabled={editing}
-                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50'
+                className='flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 md:py-3 text-sm md:text-base rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50 shadow-md'
               >
                 {editing ? 'Updating...' : 'Update Vendor'}
               </button>
@@ -1556,7 +1931,7 @@ ABCD Team`
                   setShowEditModal(false)
                   setSelectedVendor(null)
                 }}
-                className='flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition'
+                className='flex-1 bg-gray-100 border border-gray-300 text-gray-700 py-2.5 md:py-3 text-sm md:text-base rounded-xl font-bold hover:bg-gray-200 transition'
               >
                 Cancel
               </button>

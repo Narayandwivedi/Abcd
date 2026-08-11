@@ -10,7 +10,11 @@ const vendorSchema = new mongoose.Schema({
   mobile: {
     type: Number,
     required:true,
+  },
+  applicationNumber: {
+    type: String,
     unique: true,
+    sparse: true,
   },
   ownerName: {
     type: String,
@@ -24,14 +28,18 @@ const vendorSchema = new mongoose.Schema({
     },
     photo: {
       type: String,
-      required: true,
+      required: false,
     },
   }],
   businessName: {
     type: String,
     required: true,
   },
-
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
   password: {
     type: String,
   },
@@ -52,7 +60,7 @@ const vendorSchema = new mongoose.Schema({
     required: true,
   },
 
-  // Business Categories - Plain text (max 5)
+  // Business Categories - Grouped (max 5 subcategories total)
   businessCategories: [{
     category: {
       type: String,
@@ -62,13 +70,15 @@ const vendorSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
     },
-    subCategory: {
-      type: String,
-      required: true,
-    },
-    subcategoryId: {
-      type: mongoose.Schema.Types.ObjectId,
-    },
+    subCategories: [{
+      name: {
+        type: String,
+        required: true,
+      },
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+      }
+    }],
   }],
   gstPan: {
     type: String,
@@ -95,7 +105,7 @@ const vendorSchema = new mongoose.Schema({
   },
   membershipType: {
     type: String,
-    enum: ['Silver', 'Gold', 'Diamond', 'Platinum'],
+    enum: ['Silver', 'Gold', 'Diamond', 'Platinum', 'Charted'],
   },
   amountPaid: {
     type: Number,

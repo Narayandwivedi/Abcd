@@ -1,0 +1,839 @@
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import axios from 'axios'
+import { Users, UserPlus, Trash2, Eye, Edit3, X, AlertTriangle, ChevronDown, ArrowLeft } from 'lucide-react'
+import AudioControls from '../component/AudioControls'
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+
+const RELATION_OPTIONS = [
+  'Self', 'Husband', 'Wife', 'Son', 'Daughter', 'Father', 'Mother',
+  'Brother', 'Sister', 'Grandfather', 'Grandmother', 'Uncle', 'Aunt', 'Other',
+]
+
+const OCCUPATION_OPTIONS = [
+  'Self Employed', 'Government Job', 'Private Job', 'Teacher', 'Student',
+  'Doctor', 'Engineer', 'Farmer / Agriculture', 'Housewife / Homemaker',
+  'Labourer / Worker', 'Retired',
+]
+
+const GOTRA_OPTIONS = [
+  'Bansal', 'Kuchhal', 'Kansal', 'Bindal', 'Singhal', 'Jindal', 'Mittal',
+  'Garg', 'Nangal', 'Mangal', 'Tayal', 'Tingal', 'Madhukul', 'Goyal',
+  'Airan', 'Goyan', 'Dharan', 'Bhandal',
+]
+
+const emptyMember = () => ({
+  name: '',
+  relation: '',
+  relationWith: 'Family Leader',
+  mobile: '',
+  dob: '',
+  age: '',
+  gender: '',
+  occupation: '',
+  occupationOther: '',
+})
+
+
+function Input({ label, required, error, className, wrapperClassName, ...props }) {
+  return (
+    <label className={`flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0 ${wrapperClassName || ''}`}>
+      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
+        {label} {required && <span className="text-red-500">*</span>}
+      </span>
+      <input
+        {...props}
+        className={`w-full px-2.5 py-2 sm:px-3.5 sm:py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:ring-2 bg-white ${className || ''}`}
+      />
+      {error && <span className="text-xs text-red-500 mt-0.5">{error}</span>}
+    </label>
+  )
+}
+
+function Textarea({ label, required, error, ...props }) {
+  return (
+    <label className="flex flex-col gap-1 font-medium text-xs sm:text-sm flex-1 min-w-0">
+      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
+        {label} {required && <span className="text-red-500">*</span>}
+      </span>
+      <textarea
+        {...props}
+        className={`w-full px-2.5 py-2 sm:px-3.5 sm:py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:ring-2 bg-white resize-y min-h-[80px]`}
+      />
+      {error && <span className="text-xs text-red-500 mt-0.5">{error}</span>}
+    </label>
+  )
+}
+
+function Select({ label, required, error, wrapperClassName, children, ...props }) {
+  return (
+    <label className={`flex flex-col gap-1 sm:gap-1.5! -mt-1 sm:mt-0 font-medium text-xs sm:text-sm flex-1 min-w-0 ${wrapperClassName || ''}`}>
+      <span className="text-gray-700 text-xs sm:text-sm font-semibold">
+        {label} {required && <span className="text-red-500">*</span>}
+      </span>
+      <select
+        {...props}
+        className={`w-full px-2.5 py-2 sm:px-3.5 sm:py-2.5 border ${error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-[#C67A2D] focus:ring-[#C67A2D]/15'} rounded-xl text-xs sm:text-sm outline-none transition-all duration-200 focus:ring-2 bg-white`}
+      >
+        {children}
+      </select>
+      {error && <span className="text-xs text-red-500 mt-0.5">{error}</span>}
+    </label>
+  )
+}
+
+const CARD_ACCENTS = {
+  bronze: 'bg-gradient-to-r from-[#4A3520] to-[#C67A2D] shadow-md shadow-[#4A3520]/20',
+  plum: 'bg-gradient-to-r from-[#9D174D] to-[#831843] shadow-md shadow-[#9D174D]/20',
+  navy: 'bg-gradient-to-r from-[#1E3A8A] to-[#1E293B] shadow-md shadow-[#1E3A8A]/20',
+}
+
+function SectionCard({ title, children, compactHeader, accent }) {
+  return (
+    <div className="bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden">
+      <div
+        className={`px-6 sm:px-8 ${compactHeader ? 'py-2.5' : 'py-4'} ${
+          accent ? CARD_ACCENTS[accent] : 'border-b border-gray-100 bg-gradient-to-r from-[#FFF8F0] to-white'
+        }`}
+      >
+        <h3 className={`text-base font-bold tracking-wide ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{title}</h3>
+      </div>
+      <div className="p-3 sm:p-5">{children}</div>
+    </div>
+  )
+}
+
+function SectionHeader({ icon, title, subtitle, accent }) {
+  const textClass = `text-lg font-bold ${accent ? 'text-white' : 'text-[#4A3520]'}`
+  return (
+    <div
+      className={`flex items-center gap-3 w-fit mb-3 ${
+        accent ? 'rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-[#0F766E] to-[#134E4A] shadow-md shadow-[#0F766E]/20' : ''
+      }`}
+    >
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${accent ? 'bg-white/20' : 'bg-[#C67A2D]/10'}`}>
+        <span className={`text-base ${accent ? 'text-white' : 'text-[#C67A2D]'}`}>{icon}</span>
+      </div>
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0">
+        <h2 className={textClass}>{title}</h2>
+        {subtitle && <span className={textClass}>{subtitle}</span>}
+      </div>
+    </div>
+  )
+}
+
+function PreviewRow({ label, value }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center py-2.5 border-b border-gray-50 last:border-b-0">
+      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider min-w-[160px]">{label}</span>
+      <span className="text-sm text-gray-800 font-medium mt-0.5 sm:mt-0">{value || '—'}</span>
+    </div>
+  )
+}
+
+const titleCase = (str) => {
+  if (!str) return ''
+  return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
+
+const sanitizeMobile = (value) => value.replace(/\D/g, '').slice(0, 10)
+
+const calcAge = (dob) => {
+  if (!dob) return ''
+  const birth = new Date(dob)
+  if (isNaN(birth.getTime())) return ''
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const m = today.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age -= 1
+  return age >= 0 ? age : ''
+}
+
+const todayStr = () => new Date().toISOString().split('T')[0]
+
+export default function FamilyCensus() {
+  const [form, setForm] = useState({
+    leaderName: '',
+    leaderMobile: '',
+    gotra: '',
+    address: '',
+    state: '',
+    district: '',
+    block: '',
+    villageOrCity: '',
+    pincode: '',
+    remarks: '',
+    members: [],
+    submittedBy: '',
+    submittedByMobile: '',
+  })
+  const [dbStates, setDbStates] = useState([])
+  const [dbDistricts, setDbDistricts] = useState([])
+  const [loadingDistricts, setLoadingDistricts] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [showPreview, setShowPreview] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [additionalInfoOpen, setAdditionalInfoOpen] = useState(false)
+
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/api/cities/states`)
+      .then((res) => {
+        if (res.data.success && res.data.states?.length > 0) {
+          setDbStates(res.data.states)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (!form.state) {
+      setDbDistricts([])
+      return
+    }
+    setLoadingDistricts(true)
+    axios.get(`${BACKEND_URL}/api/cities/districts/${encodeURIComponent(form.state)}`)
+      .then((res) => {
+        if (res.data.success) {
+          setDbDistricts(res.data.districts || [])
+        }
+      })
+      .catch(() => setDbDistricts([]))
+      .finally(() => setLoadingDistricts(false))
+  }, [form.state])
+
+  const MOBILE_FIELDS = ['leaderMobile', 'submittedByMobile']
+
+  const handleChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: MOBILE_FIELDS.includes(field) ? sanitizeMobile(value) : value }))
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev }
+        delete next[field]
+        return next
+      })
+    }
+  }
+
+  const handleMemberChange = (index, field, value) => {
+    const updated = [...form.members]
+    updated[index] = { ...updated[index], [field]: field === 'mobile' ? sanitizeMobile(value) : value }
+    if (field === 'dob' && value) {
+      updated[index].age = calcAge(value)
+    }
+    setForm((prev) => ({ ...prev, members: updated }))
+  }
+
+  const addMember = () => {
+    setForm((prev) => ({ ...prev, members: [...prev.members, emptyMember()] }))
+  }
+
+  const removeMember = (index) => {
+    setForm((prev) => ({
+      ...prev,
+      members: prev.members.filter((_, i) => i !== index),
+    }))
+  }
+
+  const validate = () => {
+    const errs = {}
+    if (!form.leaderName.trim()) errs.leaderName = 'Family Leader Name Is Required'
+    if (!form.leaderMobile.trim()) errs.leaderMobile = 'Mobile Number Is Required'
+    else if (!/^\d{10}$/.test(form.leaderMobile.trim())) errs.leaderMobile = 'Please Enter A Valid 10-Digit Mobile Number'
+    if (!form.submittedBy.trim()) errs.submittedBy = 'Submitted By Name Is Required'
+    if (!form.submittedByMobile.trim()) errs.submittedByMobile = 'Mobile Number Is Required'
+    else if (!/^\d{10}$/.test(form.submittedByMobile.trim())) errs.submittedByMobile = 'Please Enter A Valid 10-Digit Mobile Number'
+    return errs
+  }
+
+  const submitToApi = async () => {
+    setSubmitting(true)
+    try {
+      await axios.post(`${BACKEND_URL}/api/families`, {
+        leaderName: form.leaderName,
+        leaderMobile: form.leaderMobile,
+        gotra: form.gotra,
+        address: form.address,
+        state: form.state,
+        district: form.district,
+        block: form.block,
+        villageOrCity: form.villageOrCity,
+        pincode: form.pincode,
+        remarks: form.remarks,
+        isActive: true,
+        members: form.members.map((m) => ({
+          ...m,
+          occupation: m.occupation === 'Other' ? (m.occupationOther || 'Other') : m.occupation,
+          age: m.age !== '' && m.age != null ? Number(m.age) : Number(calcAge(m.dob)),
+        })),
+        submittedBy: form.submittedBy,
+        submittedByMobile: form.submittedByMobile,
+      })
+      setShowPreview(false)
+      toast.success('Family Registered Successfully!')
+      setForm({
+        leaderName: '',
+        leaderMobile: '',
+        gotra: '',
+        address: '',
+        state: '',
+        district: '',
+        block: '',
+        villageOrCity: '',
+        pincode: '',
+        remarks: '',
+        members: [],
+        submittedBy: '',
+        submittedByMobile: '',
+      })
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed To Save Family. Please Try Again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const errs = validate()
+    setErrors(errs)
+    if (Object.keys(errs).length > 0) return
+    setShowPreview(true)
+  }
+
+  const handleConfirmSave = async () => {
+    setShowConfirm(false)
+    await submitToApi()
+  }
+
+  const handleReset = () => {
+    setForm({
+      leaderName: '',
+      leaderMobile: '',
+      gotra: '',
+      address: '',
+      state: '',
+      district: '',
+      block: '',
+      villageOrCity: '',
+      pincode: '',
+      remarks: '',
+      members: [],
+      submittedBy: '',
+      submittedByMobile: '',
+    })
+    setErrors({})
+    setShowPreview(false)
+    setShowConfirm(false)
+  }
+
+  const previewModal = showPreview && (
+    <div className="fixed inset-0 z-50 bg-[#FFF8F0] overflow-y-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+        <div className="max-w-[900px] mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C67A2D] to-[#A8651E] flex items-center justify-center shadow-lg shadow-[#C67A2D]/30">
+              <Eye size={20} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#4A3520]">Preview Family Details</h1>
+              <p className="text-sm text-gray-500">Please review all information before saving</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-5">
+            <SectionCard title="Family Information">
+              <PreviewRow label="Family Leader Name" value={form.leaderName} />
+              <PreviewRow label="Mobile Number" value={form.leaderMobile} />
+              <PreviewRow label="Gotra" value={form.gotra} />
+              <PreviewRow label="State" value={form.state} />
+              <PreviewRow label="District" value={form.district} />
+              <PreviewRow label="Block/Tehsil" value={form.block} />
+              <PreviewRow label="Village / Town / City" value={form.villageOrCity} />
+              <PreviewRow label="Complete Address" value={form.address} />
+              <PreviewRow label="Pincode" value={form.pincode} />
+              <PreviewRow label="Remarks" value={form.remarks} />
+            </SectionCard>
+
+            <SectionCard title="Family Members">
+              {form.members.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-4">No members added</p>
+              ) : (
+                form.members.map((member, idx) => (
+                  <div key={idx} className={idx < form.members.length - 1 ? 'border-b border-gray-100 pb-4 mb-4' : ''}>
+                    <p className="text-xs font-bold text-[#C67A2D] uppercase tracking-wider mb-3">Member {idx + 1}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                      <PreviewRow label="Name" value={member.name} />
+                      <PreviewRow label="Relation" value={member.relation === 'Self' || !member.relationWith ? member.relation : `${member.relation} of ${member.relationWith}`} />
+                      <PreviewRow label="Mobile" value={member.mobile} />
+                      <PreviewRow label="Date Of Birth" value={member.dob} />
+                      <PreviewRow label="Age" value={member.age} />
+                      <PreviewRow label="Gender" value={member.gender} />
+                      <PreviewRow label="Occupation" value={member.occupation === 'Other' ? member.occupationOther : member.occupation} />
+                    </div>
+                  </div>
+                ))
+              )}
+            </SectionCard>
+
+            <SectionCard title="Submitted By">
+              <PreviewRow label="Name" value={form.submittedBy} />
+              <PreviewRow label="Mobile Number" value={form.submittedByMobile} />
+            </SectionCard>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pb-8">
+            <button
+              type="button"
+              onClick={() => setShowPreview(false)}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-[14px] text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Edit3 size={16} /> Edit Details
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowConfirm(true)}
+              className="w-full sm:w-auto px-10 py-3.5 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
+            >
+              Save Family
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {showConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
+          <div className="relative bg-white rounded-[20px] shadow-2xl p-8 max-w-md w-full animate-fade-in">
+            <button
+              type="button"
+              onClick={() => setShowConfirm(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <X size={16} className="text-gray-500" />
+            </button>
+            <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto">
+              <AlertTriangle size={28} className="text-amber-500" />
+            </div>
+            <h3 className="text-lg font-bold text-[#4A3520] text-center mt-4">Confirm Save</h3>
+            <p className="text-sm text-gray-500 text-center mt-2 leading-relaxed">
+              Are you sure you want to save this Family data? Please verify all details before confirming.
+            </p>
+            <div className="flex gap-3 mt-8">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-all duration-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSave}
+                disabled={submitting}
+                className="flex-1 px-5 py-3 rounded-[14px] text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] transition-all duration-200 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {submitting ? (
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
+                ) : 'Yes, Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  return (
+    <>
+      <img src="/samaj hero.avif" alt="" className="w-full h-auto object-contain md:max-w-4xl md:mx-auto" />
+      <div className="bg-[#FFF8F0] min-h-screen px-4 sm:px-6 lg:px-8 py-1.5 sm:py-12 lg:py-16">
+      <div className="max-w-[1200px] mx-auto">
+        <div className="mb-3 md:mb-8">
+          <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-[#4A3520]">Family Census</h1>
+          <p className="text-xs sm:text-base text-gray-500 -mt-1 sm:mt-1 whitespace-nowrap">
+            Fill In The Details Below To Register Your Family.
+          </p>
+          <div className="mt-2 sm:mt-4 max-w-4xl mx-auto">
+            <div className="relative bg-white rounded-[20px] border border-gray-100 shadow-lg shadow-gray-200/50 p-2">
+              <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
+                <AudioControls inline compact />
+              </div>
+              <div>
+                <div className="mt-2 pt-2 border-t border-gray-100 grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
+                    <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
+                      <img src="/ashokji.avif" alt="Dr Ashok Agrawal" className="h-full w-auto object-contain" />
+                    </div>
+                    <div className="text-center md:text-left">
+                      <p className="text-xs md:text-sm font-bold text-[#4A3520]">Dr Ashok Agrawal</p>
+                      <p className="m-0 text-[10px] md:text-xs text-gray-500">President CGPAS</p>
+                      <a
+                        href="tel:9301014000"
+                        className="inline-flex items-center gap-1 text-[10px] md:text-xs text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        9301014000
+                      </a>
+                    </div>
+                  </div>
+                  <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
+                    <div className="h-[4.5rem] md:h-24 rounded-lg overflow-hidden shrink-0 ring-2 ring-[#C67A2D]/20 bg-white mx-auto md:mx-0">
+                      <img src="/image.jpeg" alt="Lalit Kumar Agrawal" className="h-full w-auto object-contain" />
+                    </div>
+                    <div className="text-center md:text-left">
+                      <p className="text-xs md:text-sm font-bold text-[#4A3520]">Lalit Kumar Agrawal</p>
+                      <p className="m-0 text-[10px] md:text-xs text-gray-500">Chairman, ABCD</p>
+                      <a
+                        href="tel:7000484146"
+                        className="inline-flex items-center gap-1 text-[10px] md:text-xs text-[#C67A2D] hover:text-[#A8651E] font-semibold transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        7000484146
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-6">
+          <div className="flex flex-col gap-3 sm:gap-6 lg:grid lg:grid-cols-2 lg:items-start">
+            <div className="flex flex-col gap-3 sm:gap-6">
+              <SectionCard title="Family Information" compactHeader accent="bronze">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
+                  <Input
+                    label="Family Leader Name"
+                    wrapperClassName="col-span-2 md:col-span-1"
+                    required
+                    error={errors.leaderName}
+                    value={form.leaderName}
+                    onChange={(e) => handleChange('leaderName', e.target.value)}
+                    placeholder="Enter Family Leader Name"
+                  />
+                  <Input
+                    label="Mobile Number"
+                    wrapperClassName="col-span-1"
+                    required
+                    error={errors.leaderMobile}
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={form.leaderMobile}
+                    onChange={(e) => handleChange('leaderMobile', e.target.value)}
+                    placeholder="Enter 10-Digit Mobile Number"
+                  />
+                  <Select
+                    label="Gotra"
+                    wrapperClassName="col-span-1"
+                    value={form.gotra}
+                    onChange={(e) => handleChange('gotra', e.target.value)}
+                  >
+                    <option value="">-- Select Gotra --</option>
+                    {GOTRA_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div className="mt-2 -mx-4 sm:-mx-5 -mb-3 sm:-mb-5 pb-1.5 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setAdditionalInfoOpen(!additionalInfoOpen)}
+                    className="w-full flex items-center justify-between px-4 sm:px-5 py-1.5 bg-white cursor-pointer transition-colors"
+                  >
+                    <h3 className="text-sm sm:text-base font-bold text-[#C67A2D] tracking-wide">Additional Details</h3>
+                    <ChevronDown
+                      size={20}
+                      className={`text-[#C67A2D] transition-transform duration-300 ${additionalInfoOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <div
+                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                      additionalInfoOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}
+                  >
+                    <div className="px-4 sm:px-5 pb-1 flex flex-col gap-2 sm:gap-3 [&_label]:gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
+                        <Select
+                          label="State"
+                          value={form.state}
+                          onChange={(e) => setForm((prev) => ({ ...prev, state: e.target.value, district: '' }))}
+                        >
+                          <option value="">-- Select State --</option>
+                          {dbStates.map((s) => (
+                            <option key={s} value={titleCase(s)}>
+                              {titleCase(s)}
+                            </option>
+                          ))}
+                        </Select>
+                        <Select
+                          label="District"
+                          value={form.district}
+                          onChange={(e) => handleChange('district', e.target.value)}
+                          disabled={!form.state || loadingDistricts}
+                        >
+                          <option value="">
+                            {!form.state ? '-- Select State First --' : loadingDistricts ? 'Loading Districts...' : '-- Select District --'}
+                          </option>
+                          {dbDistricts.map((d) => (
+                            <option key={d} value={titleCase(d)}>
+                              {titleCase(d)}
+                            </option>
+                          ))}
+                        </Select>
+                        <Input
+                          label="Block/Tehsil"
+                          value={form.block}
+                          onChange={(e) => handleChange('block', e.target.value)}
+                          placeholder="Enter Block/Tehsil"
+                        />
+                        <Input
+                          label="Village / Town / City"
+                          value={form.villageOrCity}
+                          onChange={(e) => handleChange('villageOrCity', e.target.value)}
+                          placeholder="Enter Village / Town / City"
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
+                        <Textarea
+                          label="Complete Address"
+                          value={form.address}
+                          onChange={(e) => handleChange('address', e.target.value)}
+                          placeholder="Enter Complete Address"
+                        />
+                        <Input
+                          label="Pincode"
+                          value={form.pincode}
+                          onChange={(e) => handleChange('pincode', e.target.value)}
+                          placeholder="Enter Pincode"
+                        />
+                      </div>
+                      <Input
+                        label="Remarks"
+                        value={form.remarks}
+                        onChange={(e) => handleChange('remarks', e.target.value)}
+                        placeholder="Any Remarks (Optional)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </SectionCard>
+            </div>
+
+          <SectionCard title="Family Members" compactHeader accent="navy">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-400">
+                  {form.members.length} member{form.members.length !== 1 ? 's' : ''} added
+                </span>
+              </div>
+
+              {form.members.length === 0 && (
+                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
+                  <Users size={32} className="mx-auto text-gray-300" />
+                  <p className="text-sm text-gray-400 mt-2">No members added yet</p>
+                  <button
+                    type="button"
+                    onClick={addMember}
+                    className="mt-2 text-xs text-[#C67A2D] hover:text-[#A8651E] font-semibold cursor-pointer"
+                  >
+                    + Add a member
+                  </button>
+                </div>
+              )}
+
+              {form.members.map((member, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-sm animate-fade-in"
+                >
+                  <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-[#4338CA] to-[#312E81] shadow-md shadow-[#4338CA]/20">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center shadow-sm">
+                        <span className="text-xs font-bold text-white">{idx + 1}</span>
+                      </div>
+                      <span className="text-sm font-semibold text-white">Member {idx + 1}</span>
+                    </div>
+                    {form.members.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeMember(idx)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 cursor-pointer"
+                      >
+                        <Trash2 size={13} /> Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-3 [&_label]:gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
+                      <Input
+                        label="Member Name"
+                        value={member.name}
+                        onChange={(e) => handleMemberChange(idx, 'name', e.target.value)}
+                        placeholder="Enter member name"
+                      />
+                      <Select
+                        label="Relation With"
+                        value={member.relationWith}
+                        onChange={(e) => handleMemberChange(idx, 'relationWith', e.target.value)}
+                      >
+                        <option value="Family Leader">Family Leader</option>
+                        {form.members.slice(0, idx).map((m, i) => (
+                          <option key={i} value={m.name || `Member ${i + 1}`}>{m.name || `Member ${i + 1}`}</option>
+                        ))}
+                      </Select>
+                    </div>
+                    <Select
+                      label="Relation"
+                      value={member.relation}
+                      onChange={(e) => handleMemberChange(idx, 'relation', e.target.value)}
+                    >
+                      <option value="">-- Select Relation --</option>
+                      {RELATION_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </Select>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3">
+                      <Input
+                        label="Mobile Number"
+                        wrapperClassName="col-span-2 sm:col-span-1"
+                        type="tel"
+                        inputMode="numeric"
+                        maxLength={10}
+                        value={member.mobile}
+                        onChange={(e) => handleMemberChange(idx, 'mobile', e.target.value)}
+                        placeholder="Enter 10-digit mobile number"
+                      />
+                      <Input
+                        label="Date Of Birth (Optional)"
+                        wrapperClassName="sm:col-span-1"
+                        type="date"
+                        max={todayStr()}
+                        value={member.dob}
+                        onChange={(e) => handleMemberChange(idx, 'dob', e.target.value)}
+                        placeholder="Select date of birth"
+                      />
+                      <Input
+                        label="Age"
+                        type="number"
+                        min="0"
+                        value={member.age}
+                        onChange={(e) => handleMemberChange(idx, 'age', e.target.value)}
+                        placeholder="Enter age"
+                      />
+                      <Select
+                        label="Gender"
+                        value={member.gender}
+                        onChange={(e) => handleMemberChange(idx, 'gender', e.target.value)}
+                      >
+                        <option value="">-- Select Gender --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </Select>
+                      <Select
+                        label="Occupation"
+                        wrapperClassName="sm:col-span-2"
+                        value={member.occupation}
+                        onChange={(e) => handleMemberChange(idx, 'occupation', e.target.value)}
+                      >
+                        <option value="">-- Select Occupation --</option>
+                        {OCCUPATION_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                        <option value="Other">Other</option>
+                      </Select>
+                      {member.occupation === 'Other' && (
+                        <Input
+                          label="Specify Occupation"
+                          wrapperClassName="sm:col-span-2"
+                          value={member.occupationOther}
+                          onChange={(e) => handleMemberChange(idx, 'occupationOther', e.target.value)}
+                          placeholder="Enter occupation"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {form.members.length > 0 && (
+                <div className="flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={addMember}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#C67A2D] to-[#A8651E] text-white hover:opacity-90 transition-all duration-200 cursor-pointer shadow-sm shadow-[#C67A2D]/20"
+                  >
+                    <UserPlus size={14} /> Add More Member
+                  </button>
+                </div>
+              )}
+            </div>
+          </SectionCard>
+          </div>
+
+          <SectionCard title="Submitted By" compactHeader accent="plum">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 sm:gap-y-3 [&>label]:gap-2">
+              <Input
+                label="This Form Is Submitted By"
+                required
+                error={errors.submittedBy}
+                value={form.submittedBy}
+                onChange={(e) => handleChange('submittedBy', e.target.value)}
+                placeholder="Enter Full Name"
+              />
+              <Input
+                label="Mobile Number"
+                required
+                error={errors.submittedByMobile}
+                type="tel"
+                inputMode="numeric"
+                maxLength={10}
+                value={form.submittedByMobile}
+                onChange={(e) => handleChange('submittedByMobile', e.target.value)}
+                placeholder="Enter 10-Digit Mobile Number"
+              />
+            </div>
+          </SectionCard>
+
+          <div className="flex flex-row items-center justify-between gap-3 sm:gap-4 pt-2 pb-6">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="flex-1 sm:flex-none sm:w-auto px-4 sm:px-8 py-3 sm:py-3.5 rounded-[14px] text-xs sm:text-sm font-semibold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:text-gray-700 hover:border-gray-300 transition-all duration-200 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 sm:flex-none sm:w-auto px-4 sm:px-10 py-3 sm:py-3.5 rounded-[14px] text-xs sm:text-sm font-semibold text-white bg-[#C67A2D] shadow-sm hover:bg-[#A8651E] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Eye size={18} /> Preview & Save
+            </button>
+          </div>
+
+          <div className="flex justify-center pb-4">
+            <Link
+              to="/census"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 px-5 py-2.5 rounded-full shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+            >
+              <ArrowLeft size={14} /> Back To Census
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+    {previewModal}
+    </>
+  )
+}

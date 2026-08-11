@@ -32,6 +32,10 @@ const subAdminSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    canCreateUsers: {
+      type: Boolean,
+      default: false,
+    },
     canEditUsers: {
       type: Boolean,
       default: false,
@@ -50,6 +54,10 @@ const subAdminSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    canCreateVendors: {
+      type: Boolean,
+      default: false,
+    },
     canEditVendors: {
       type: Boolean,
       default: false,
@@ -65,6 +73,22 @@ const subAdminSchema = new mongoose.Schema({
 
     // Content Management
     canManageContent: {
+      type: Boolean,
+      default: false,
+    },
+    canViewCategories: {
+      type: Boolean,
+      default: false,
+    },
+    canCreateCategories: {
+      type: Boolean,
+      default: false,
+    },
+    canEditCategories: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteCategories: {
       type: Boolean,
       default: false,
     },
@@ -123,12 +147,38 @@ const subAdminSchema = new mongoose.Schema({
       default: false,
     },
 
-    // Settings
-    canViewSettings: {
+    // Lead Management
+    canViewBuyLeads: {
       type: Boolean,
       default: false,
     },
-    canEditSettings: {
+    canApproveBuyLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteBuyLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canViewSellLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canApproveSellLeads: {
+      type: Boolean,
+      default: false,
+    },
+    canDeleteSellLeads: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Census Management
+    canManageSamajCensus: {
+      type: Boolean,
+      default: false,
+    },
+    canManageFamilyCensus: {
       type: Boolean,
       default: false,
     },

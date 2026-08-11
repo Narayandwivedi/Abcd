@@ -168,8 +168,17 @@ const getVendorsByCategory = async (req, res) => {
 
     // 3. Find vendors
     const vendors = await Vendor.find(vendorQuery)
-      .select('businessName ownerName mobile email city state businessCategories passportPhoto owners')
+      .select('businessName ownerName mobile email city state district address slug businessCategories passportPhoto owners')
       .sort({ businessName: 1 });
+
+    // 4. Find active offers for these vendors and this category
+    const vendorIds = vendors.map(v => v._id);
+    const Offer = require("../models/Offer");
+    const offers = await Offer.find({
+      vendorId: { $in: vendorIds },
+      categoryId: category._id,
+      isActive: true
+    }).select('vendorId title description discountPercentage isActive');
 
     return res.status(200).json({
       success: true,
@@ -181,7 +190,8 @@ const getVendorsByCategory = async (req, res) => {
         icon: category.icon
       },
       count: vendors.length,
-      vendors
+      vendors,
+      offers
     });
   } catch (error) {
     console.error('Get vendors by category error:', error);

@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useAdminAuth } from '../context/AdminAuthContext'
+import { toast } from 'react-toastify'
 
 const SubAdmin = () => {
+  const { hasPermission } = useAdminAuth()
   const [showModal, setShowModal] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [selectedSubAdmin, setSelectedSubAdmin] = useState(null)
@@ -20,10 +23,12 @@ const SubAdmin = () => {
     isActive: true,
     permissions: {
       canViewUsers: false,
+      canCreateUsers: false,
       canEditUsers: false,
       canDeleteUsers: false,
       canApproveUsers: false,
       canViewVendors: false,
+      canCreateVendors: false,
       canEditVendors: false,
       canDeleteVendors: false,
       canApproveVendors: false,
@@ -41,7 +46,19 @@ const SubAdmin = () => {
       canViewChats: false,
       canReplyChats: false,
       canViewSettings: false,
-      canEditSettings: false
+      canEditSettings: false,
+      canViewCategories: false,
+      canCreateCategories: false,
+      canEditCategories: false,
+      canDeleteCategories: false,
+      canViewBuyLeads: false,
+      canApproveBuyLeads: false,
+      canDeleteBuyLeads: false,
+      canViewSellLeads: false,
+      canApproveSellLeads: false,
+      canDeleteSellLeads: false,
+      canManageSamajCensus: false,
+      canManageFamilyCensus: false
     }
   })
 
@@ -72,11 +89,11 @@ const SubAdmin = () => {
       if (data.success) {
         setSubAdmins(data.subAdmins)
       } else {
-        alert(data.message || 'Failed to fetch sub-admins')
+        toast.error(data.message || 'Failed to fetch sub-admins')
       }
     } catch (error) {
       console.error('Error fetching sub-admins:', error)
-      alert('Failed to fetch sub-admins')
+      toast.error('Failed to fetch sub-admins')
     } finally {
       setLoading(false)
     }
@@ -94,10 +111,12 @@ const SubAdmin = () => {
       isActive: true,
       permissions: {
         canViewUsers: false,
+        canCreateUsers: false,
         canEditUsers: false,
         canDeleteUsers: false,
         canApproveUsers: false,
         canViewVendors: false,
+        canCreateVendors: false,
         canEditVendors: false,
         canDeleteVendors: false,
         canApproveVendors: false,
@@ -115,7 +134,19 @@ const SubAdmin = () => {
         canViewChats: false,
         canReplyChats: false,
         canViewSettings: false,
-        canEditSettings: false
+        canEditSettings: false,
+        canViewCategories: false,
+        canCreateCategories: false,
+        canEditCategories: false,
+        canDeleteCategories: false,
+        canViewBuyLeads: false,
+        canApproveBuyLeads: false,
+        canDeleteBuyLeads: false,
+        canViewSellLeads: false,
+        canApproveSellLeads: false,
+        canDeleteSellLeads: false,
+        canManageSamajCensus: false,
+        canManageFamilyCensus: false
       }
     })
     setShowModal(true)
@@ -174,12 +205,17 @@ const SubAdmin = () => {
     e.preventDefault()
 
     if (!formData.fullName || !formData.email || !formData.mobile) {
-      alert('Please fill all required fields')
+      toast.warn('Please fill all required fields')
       return
     }
 
     if (!isEdit && (!formData.password || formData.password.length < 6)) {
-      alert('Password must be at least 6 characters')
+      toast.warn('Password must be at least 6 characters')
+      return
+    }
+
+    if (isEdit && formData.password && formData.password.length < 6) {
+      toast.warn('New password must be at least 6 characters')
       return
     }
 
@@ -190,12 +226,13 @@ const SubAdmin = () => {
 
       const body = isEdit
         ? {
-            fullName: formData.fullName,
-            email: formData.email,
-            mobile: formData.mobile,
-            permissions: formData.permissions,
-            isActive: formData.isActive
-          }
+          fullName: formData.fullName,
+          email: formData.email,
+          mobile: formData.mobile,
+          password: formData.password || undefined,
+          permissions: formData.permissions,
+          isActive: formData.isActive
+        }
         : formData
 
       const response = await fetch(url, {
@@ -210,15 +247,15 @@ const SubAdmin = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert(isEdit ? 'Sub-admin updated successfully!' : 'Sub-admin created successfully!')
+        toast.success(isEdit ? 'Sub-admin updated successfully!' : 'Sub-admin created successfully!')
         setShowModal(false)
         fetchSubAdmins()
       } else {
-        alert(data.message || 'Failed to save sub-admin')
+        toast.error(data.message || 'Failed to save sub-admin')
       }
     } catch (error) {
       console.error('Error saving sub-admin:', error)
-      alert('Failed to save sub-admin')
+      toast.error('Failed to save sub-admin')
     }
   }
 
@@ -238,14 +275,14 @@ const SubAdmin = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Sub-admin deleted successfully!')
+        toast.success('Sub-admin deleted successfully!')
         fetchSubAdmins()
       } else {
-        alert(data.message || 'Failed to delete sub-admin')
+        toast.error(data.message || 'Failed to delete sub-admin')
       }
     } catch (error) {
       console.error('Error deleting sub-admin:', error)
-      alert('Failed to delete sub-admin')
+      toast.error('Failed to delete sub-admin')
     }
   }
 
@@ -263,14 +300,14 @@ const SubAdmin = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert(data.message)
+        toast.success(data.message)
         fetchSubAdmins()
       } else {
-        alert(data.message || 'Failed to toggle status')
+        toast.error(data.message || 'Failed to toggle status')
       }
     } catch (error) {
       console.error('Error toggling status:', error)
-      alert('Failed to toggle status')
+      toast.error('Failed to toggle status')
     }
   }
 
@@ -284,7 +321,7 @@ const SubAdmin = () => {
   // Change password
   const handleChangePassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-      alert('Password must be at least 6 characters')
+      toast.warn('Password must be at least 6 characters')
       return
     }
 
@@ -301,15 +338,15 @@ const SubAdmin = () => {
       const data = await response.json()
 
       if (data.success) {
-        alert('Password changed successfully!')
+        toast.success('Password changed successfully!')
         setShowPasswordModal(false)
         setNewPassword('')
       } else {
-        alert(data.message || 'Failed to change password')
+        toast.error(data.message || 'Failed to change password')
       }
     } catch (error) {
       console.error('Error changing password:', error)
-      alert('Failed to change password')
+      toast.error('Failed to change password')
     }
   }
 
@@ -334,12 +371,14 @@ const SubAdmin = () => {
   const permissionGroups = {
     'User Management': [
       { key: 'canViewUsers', label: 'View Users' },
+      { key: 'canCreateUsers', label: 'Create Users' },
       { key: 'canEditUsers', label: 'Edit Users' },
       { key: 'canDeleteUsers', label: 'Delete Users' },
       { key: 'canApproveUsers', label: 'Approve Users' }
     ],
     'Vendor Management': [
       { key: 'canViewVendors', label: 'View Vendors' },
+      { key: 'canCreateVendors', label: 'Create Vendors' },
       { key: 'canEditVendors', label: 'Edit Vendors' },
       { key: 'canDeleteVendors', label: 'Delete Vendors' },
       { key: 'canApproveVendors', label: 'Approve Vendors' }
@@ -365,8 +404,27 @@ const SubAdmin = () => {
     'Content & Settings': [
       { key: 'canManageContent', label: 'Manage Content' },
       { key: 'canViewSettings', label: 'View Settings' },
-      { key: 'canEditSettings', label: 'Edit Settings' }
-    ]
+      { key: 'canEditSettings', label: 'Edit Settings' },
+      { key: 'canViewCategories', label: 'View Categories' },
+      { key: 'canCreateCategories', label: 'Create Categories' },
+      { key: 'canEditCategories', label: 'Edit Categories' },
+      { key: 'canDeleteCategories', label: 'Delete Categories' }
+    ],
+    'Buy Lead Management': [
+      { key: 'canViewBuyLeads', label: 'View Buy Leads' },
+      { key: 'canApproveBuyLeads', label: 'Approve Buy Leads' },
+      { key: 'canDeleteBuyLeads', label: 'Delete Buy Leads' }
+    ],
+    'Sell Lead Management': [
+      { key: 'canViewSellLeads', label: 'View Sell Leads' },
+      { key: 'canApproveSellLeads', label: 'Approve Sell Leads' },
+      { key: 'canDeleteSellLeads', label: 'Delete Sell Leads' }
+    ],
+    'Census Management': [
+      { key: 'canManageSamajCensus', label: 'Manage Samaj Census' },
+      { key: 'canManageFamilyCensus', label: 'Manage Family Census' }
+    ],
+
   }
 
   return (
@@ -466,11 +524,10 @@ const SubAdmin = () => {
                       <td className='px-6 py-4'>
                         <button
                           onClick={() => toggleStatus(subAdmin._id)}
-                          className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                            subAdmin.isActive
+                          className={`px-3 py-1 rounded-full text-xs font-semibold transition ${subAdmin.isActive
                               ? 'bg-green-100 text-green-700 hover:bg-green-200'
                               : 'bg-red-100 text-red-700 hover:bg-red-200'
-                          }`}
+                            }`}
                         >
                           {subAdmin.isActive ? '✓ Active' : '✗ Inactive'}
                         </button>
@@ -500,15 +557,17 @@ const SubAdmin = () => {
                               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' />
                             </svg>
                           </button>
-                          <button
-                            onClick={() => handleDelete(subAdmin._id)}
-                            className='p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition'
-                            title='Delete Sub Admin'
-                          >
-                            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
-                            </svg>
-                          </button>
+                          {hasPermission('canDeleteSubAdmins') && (
+                            <button
+                              onClick={() => handleDelete(subAdmin._id)}
+                              className='p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition'
+                              title='Delete Sub Admin'
+                            >
+                              <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                              </svg>
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -528,11 +587,10 @@ const SubAdmin = () => {
                     <div className='flex-1'>
                       <div className='text-sm font-bold text-gray-800'>{subAdmin.fullName}</div>
                       <div className='text-[10px] text-gray-500'>ID: {subAdmin._id.slice(-6)}</div>
-                      <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        subAdmin.isActive
+                      <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${subAdmin.isActive
                           ? 'bg-green-100 text-green-700'
                           : 'bg-red-100 text-red-700'
-                      }`}>
+                        }`}>
                         {subAdmin.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -570,15 +628,17 @@ const SubAdmin = () => {
                       </svg>
                       Pass
                     </button>
-                    <button
-                      onClick={() => handleDelete(subAdmin._id)}
-                      className='flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition text-[11px] font-semibold'
-                    >
-                      <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
-                      </svg>
-                      Del
-                    </button>
+                    {hasPermission('canDeleteSubAdmins') && (
+                      <button
+                        onClick={() => handleDelete(subAdmin._id)}
+                        className='flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition text-[11px] font-semibold'
+                      >
+                        <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                        </svg>
+                        Del
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -637,20 +697,20 @@ const SubAdmin = () => {
                   />
                 </div>
 
-                {!isEdit && (
-                  <div>
-                    <label className='block text-sm font-semibold text-gray-700 mb-2'>Password *</label>
-                    <input
-                      type='password'
-                      name='password'
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      placeholder='Enter password (min 6 characters)'
-                      className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
-                      required
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className='block text-sm font-semibold text-gray-700 mb-2'>
+                    Password {isEdit ? <span className="text-gray-400 font-normal">(Leave blank to keep current)</span> : '*'}
+                  </label>
+                  <input
+                    type='password'
+                    name='password'
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    placeholder={isEdit ? 'Enter new password' : 'Enter password (min 6 characters)'}
+                    className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    required={!isEdit}
+                  />
+                </div>
 
                 <div>
                   <label className='block text-sm font-semibold text-gray-700 mb-2'>Status</label>

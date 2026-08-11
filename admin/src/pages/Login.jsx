@@ -8,6 +8,7 @@ const Login = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [loginType, setLoginType] = useState('admin')
 
   const { login } = useAdminAuth()
   const navigate = useNavigate()
@@ -42,7 +43,33 @@ const Login = () => {
 
         {/* Login Card */}
         <div className='bg-white rounded-2xl shadow-2xl p-8'>
-          <h2 className='text-2xl font-bold text-gray-800 mb-6 text-center'>Admin Login</h2>
+          
+          {/* Login Tabs */}
+          <div className='flex p-1 bg-gray-100 rounded-xl mb-6'>
+            <button
+              onClick={() => setLoginType('admin')}
+              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
+                loginType === 'admin'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Admin Login
+            </button>
+            <button
+              onClick={() => setLoginType('subadmin')}
+              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
+                loginType === 'subadmin'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Subadmin Login
+            </button>
+          </div>
+          <h2 className='text-2xl font-bold text-gray-800 mb-6 text-center'>
+            {loginType === 'admin' ? 'Admin Login' : 'Subadmin Login'}
+          </h2>
 
           {error && (
             <div className='mb-4 p-4 bg-red-50 border border-red-200 rounded-lg'>

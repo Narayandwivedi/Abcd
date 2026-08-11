@@ -73,20 +73,25 @@ const handleVendorSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "Maximum 10 owners are allowed" });
     }
 
-    // Validate max 5 categories and each must have category + subCategory strings
-    if (businessCategories.length > 5) {
-      return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
-    }
+    // Count total subcategories across all categories
+    let totalSubCategories = 0;
     for (const item of businessCategories) {
-      if (!item.category || !item.subCategory || typeof item.category !== 'string' || typeof item.subCategory !== 'string') {
-        return res.status(400).json({ success: false, message: "Each category must have a category and subCategory text" });
+      if (!item.category || !Array.isArray(item.subCategories) || item.subCategories.length === 0) {
+        return res.status(400).json({ success: false, message: "Each category must have a name and at least one subcategory" });
       }
-      item.category = item.category.trim();
-      item.subCategory = item.subCategory.trim();
+      totalSubCategories += item.subCategories.length;
       
-      // Handle IDs if provided by frontend
+      item.category = item.category.trim();
       if (item.categoryId) item.categoryId = item.categoryId.trim();
-      if (item.subcategoryId) item.subcategoryId = item.subcategoryId.trim();
+      
+      item.subCategories = item.subCategories.map(sub => ({
+        name: sub.name?.trim(),
+        id: sub.id?.trim()
+      })).filter(sub => sub.name);
+    }
+
+    if (totalSubCategories > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 subcategories allowed across all categories" });
     }
 
     // Convert mobile to number for consistent comparison
@@ -100,14 +105,6 @@ const handleVendorSignup = async (req, res) => {
       });
     }
 
-    // Check if vendor already exists by mobile
-    const existingByMobile = await vendorModel.findOne({ mobile });
-    if (existingByMobile) {
-      return res.status(400).json({
-        success: false,
-        message: "Mobile number already exists",
-      });
-    }
 
     // Check if vendor already exists by email
     if (email) {
@@ -188,13 +185,6 @@ const handleVendorSignup = async (req, res) => {
 
     const hasPaymentScreenshot = !!(req.files && req.files.paymentScreenshot && req.files.paymentScreenshot[0]);
 
-    if (!hasPaymentScreenshot) {
-      return res.status(400).json({
-        success: false,
-        message: "Payment screenshot is required"
-      });
-    }
-
     if (!/^\d{12}$/.test(utrNumber || "")) {
       return res.status(400).json({
         success: false,
@@ -202,15 +192,20 @@ const handleVendorSignup = async (req, res) => {
       });
     }
 
-    try {
-      newVendorData.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
-    } catch (error) {
-      console.error("Payment screenshot upload error:", error);
-      return res.status(500).json({
-        success: false,
-        message: error.message || "Failed to upload payment screenshot"
-      });
+    if (hasPaymentScreenshot) {
+      try {
+        newVendorData.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
+      } catch (error) {
+        console.error("Payment screenshot upload error:", error);
+        return res.status(500).json({
+          success: false,
+          message: error.message || "Failed to upload payment screenshot"
+        });
+      }
     }
+
+    const { generateUniqueVendorSlug } = require('../utils/slugify');
+    newVendorData.slug = await generateUniqueVendorSlug(businessName);
 
     // Create new vendor WITHOUT logging them in (similar to user signup)
     const newVendor = await vendorModel.create(newVendorData);
@@ -226,6 +221,15 @@ const handleVendorSignup = async (req, res) => {
       console.error("Telegram Vendor Alert Error:", err.message);
     }
 
+    // Send WhatsApp Welcome Message
+    try {
+      const { sendWhatsAppMessage } = require("../utils/whatsapp");
+      const welcomeMsg = `Hello ${vendorObj.ownerName},\n\nThank you for registering with Abcd Vyapar as a vendor. Your application for "${vendorObj.businessName}" is currently under review. We will contact you shortly.\n\nBest Regards,\nTeam Abcd Vyapar`;
+      await sendWhatsAppMessage(vendorObj.mobile, welcomeMsg);
+    } catch (waErr) {
+      console.error("WhatsApp Welcome Message Error:", waErr.message);
+    }
+
     // DO NOT generate JWT token or set cookies - admin will verify first
     return res.status(201).json({
       success: true,
@@ -236,12 +240,6 @@ const handleVendorSignup = async (req, res) => {
     console.error("❌ Vendor Signup Error:", err);
     // Handle duplicate key error
     if (err.code === 11000) {
-      if (err.keyPattern && err.keyPattern.mobile) {
-        return res.status(400).json({
-          success: false,
-          message: "Mobile number already exists",
-        });
-      }
       if (err.keyPattern && err.keyPattern.email) {
         return res.status(400).json({
           success: false,

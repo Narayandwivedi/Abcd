@@ -3,32 +3,17 @@ const fs = require("fs");
 const path = require("path");
 const vendorModel = require("../models/Vendor.js");
 const VendorCertificate = require("../models/VendorCertificate.js");
+const VendorApplication = require("../models/VendorApplication.js");
+const Category = require("../models/Category.js");
 const { generateVendorCertificatePDF } = require("../utils/generateVendorCertificate.js");
+const { handleVendorPhotoUpload, handlePaymentScreenshotUpload } = require("./uploadController");
 
-const getStatePrefixForVendorReferral = (state = "") => {
-  const normalizedState = String(state).trim().toLowerCase();
-
-  if (normalizedState.includes("chhattisgarh") || normalizedState.includes("chhatisgarh")) return "CG";
-  if (normalizedState.includes("bihar")) return "BR";
-  if (normalizedState.includes("jharkhand")) return "JH";
-  if (normalizedState.includes("odisha") || normalizedState.includes("orissa") || normalizedState.includes("orrisa")) return "OD";
-
-  const compact = normalizedState.replace(/[^a-z]/g, "");
-  return compact.slice(0, 2).toUpperCase() || "NA";
-};
-
-const getLastFiveDigitsFromCertificate = (certificateNumber = "") => {
-  const match = String(certificateNumber).match(/(\d{5})$/);
-  if (match) return match[1];
-
-  const digitsOnly = String(certificateNumber).replace(/\D/g, "");
-  return digitsOnly.slice(-5).padStart(5, "0");
-};
-
-const buildVendorReferralCode = ({ state, certificateNumber }) => {
-  const statePrefix = getStatePrefixForVendorReferral(state);
-  const suffix = getLastFiveDigitsFromCertificate(certificateNumber);
-  return `${statePrefix}VM${suffix}`;
+const normalizeWebsiteUrl = (value) => {
+  if (!value || typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
 };
 
 // Get all vendors (for admin)
@@ -88,13 +73,24 @@ const approveVendor = async (req, res) => {
     vendor.isRejected = false; // Clear rejection status if re-approving
     vendor.rejectionReason = undefined; // Clear rejection reason
     vendor.activeCertificate = certificate._id;
-    vendor.referralCode = certificateData.referralCode || buildVendorReferralCode({
-      state: vendor.state,
-      certificateNumber: certificate.certificateNumber
-    });
+    vendor.referralCode = certificateData.referralCode || certificate.certificateNumber;
     await vendor.save();
 
     console.log(`[ADMIN] Vendor approved and certificate generated: ${vendor.businessName} - ${certificate.certificateNumber}`);
+
+    // Send WhatsApp Message with Certificate
+    try {
+      const { sendWhatsAppMessage } = require("../utils/whatsapp");
+      const downloadUrl = `${process.env.BACKEND_URL}${certificate.downloadLink}`;
+      const msg = `Congratulations ${vendor.ownerName}!\n\nYour vendor profile for "${vendor.businessName}" has been approved. Your Referral Code is ${vendor.referralCode}.\n\nBest Regards,\nTeam Abcd Vyapar`;
+      
+      await sendWhatsAppMessage(vendor.mobile, msg, {
+        url: downloadUrl,
+        filename: `ABCDVEDOR_${vendor.referralCode}.pdf`
+      });
+    } catch (waErr) {
+      console.error("WhatsApp Approval Message Error:", waErr.message);
+    }
 
     return res.status(200).json({
       success: true,
@@ -170,28 +166,112 @@ const setVendorPassword = async (req, res) => {
 // Create vendor (admin)
 const createVendor = async (req, res) => {
   try {
-    const { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees, password } = req.body;
+    let {
+      ownerName,
+      owners,
+      businessName,
+      mobile,
+      email,
+      state,
+      district,
+      city,
+      businessCategories,
+      membershipFees,
+      password,
+      websiteUrl,
+      socialUrl,
+      gstPan,
+      address,
+      referredByName,
+      referralId,
+      membershipType,
+      amountPaid,
+      utrNumber,
+      applicationNumber
+    } = req.body;
 
-    // Validate required fields
-    if (!ownerName || !businessName || !mobile || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
+    if (typeof businessCategories === 'string') {
+      try {
+        businessCategories = JSON.parse(businessCategories);
+      } catch (e) {
+        return res.status(400).json({ success: false, message: "Invalid business categories format" });
+      }
+    }
+
+    if (typeof owners === 'string') {
+      try {
+        owners = JSON.parse(owners);
+      } catch (e) {
+        return res.status(400).json({ success: false, message: "Invalid owners format" });
+      }
+    }
+
+    email = email?.trim();
+    ownerName = ownerName?.trim();
+    businessName = businessName?.trim();
+    state = state?.trim();
+    district = district?.trim();
+    city = city?.trim();
+    membershipFees = Number(membershipFees);
+    websiteUrl = normalizeWebsiteUrl(websiteUrl);
+    socialUrl = socialUrl?.trim();
+    gstPan = gstPan?.trim();
+    address = address?.trim();
+    referredByName = referredByName?.trim();
+    referralId = referralId?.trim();
+    utrNumber = utrNumber?.trim();
+    membershipType = membershipType?.trim();
+    amountPaid = amountPaid ? Number(amountPaid) : undefined;
+
+    if (!Array.isArray(owners) || owners.length === 0) {
+      owners = ownerName ? [{ name: ownerName }] : [];
+    }
+
+    owners = owners.map((item) => ({
+      name: (item?.name || item?.ownerName || '').trim()
+    })).filter((item) => item.name);
+
+    if (!mobile || owners.length === 0 || !businessName || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees || isNaN(membershipFees) || membershipFees <= 0) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided including state, district, city, at least one category and subcategory"
+        message: "Mobile, at least one owner, business name, state, district, city, at least one category-subcategory pair, and membership fees are required"
       });
     }
 
-    if (businessCategories.length > 5) {
-      return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
+    if (owners.length > 10) {
+      return res.status(400).json({ success: false, message: "Maximum 10 owners are allowed" });
     }
 
-    // Check if mobile already exists
-    const existingVendor = await vendorModel.findOne({ mobile });
-    if (existingVendor) {
+    // Count total subcategories across all categories
+    let totalSubCategories = 0;
+    for (const item of businessCategories) {
+      if (!item.category || !Array.isArray(item.subCategories) || item.subCategories.length === 0) {
+        return res.status(400).json({ success: false, message: "Each category must have a name and at least one subcategory" });
+      }
+      totalSubCategories += item.subCategories.length;
+      
+      item.category = item.category.trim();
+      if (item.categoryId) item.categoryId = item.categoryId.trim();
+      
+      item.subCategories = item.subCategories.map(sub => ({
+        name: sub.name?.trim(),
+        id: sub.id?.trim()
+      })).filter(sub => sub.name);
+    }
+
+    if (totalSubCategories > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 subcategories allowed across all categories" });
+    }
+
+    mobile = Number(mobile);
+
+    if (!mobile || mobile < 6000000000 || mobile > 9999999999) {
       return res.status(400).json({
         success: false,
-        message: "Vendor with this mobile number already exists"
+        message: "Please enter a valid Indian mobile number",
       });
     }
+
 
     // Check if email is provided and already exists
     if (email && email.trim()) {
@@ -206,7 +286,7 @@ const createVendor = async (req, res) => {
 
     // Create vendor data
     const vendorData = {
-      ownerName,
+      ownerName: owners[0].name,
       businessName,
       mobile,
       state,
@@ -216,7 +296,8 @@ const createVendor = async (req, res) => {
       membershipFees,
       paymentVerified: true,
       isVerified: true,
-      isMobileVerified: true
+      isMobileVerified: true,
+      isBusinessApplicationSubmitted: true,
     };
 
     // Only add email if it's provided and not empty
@@ -224,11 +305,77 @@ const createVendor = async (req, res) => {
       vendorData.email = email.trim();
     }
 
+    if (websiteUrl) vendorData.websiteUrl = websiteUrl;
+    if (socialUrl) vendorData.socialUrl = socialUrl;
+    if (gstPan) vendorData.gstPan = gstPan;
+    if (address) vendorData.address = address;
+    if (referredByName) vendorData.referredByName = referredByName;
+    if (referralId) vendorData.referralId = referralId;
+    if (utrNumber) vendorData.utrNumber = utrNumber;
+    if (membershipType) vendorData.membershipType = membershipType;
+    if (amountPaid) vendorData.amountPaid = amountPaid;
+    if (applicationNumber) vendorData.applicationNumber = applicationNumber;
+
     // Hash password if provided
     if (password && password.length >= 6) {
       const salt = await bcrypt.genSalt(10);
       vendorData.password = await bcrypt.hash(password, salt);
     }
+
+    const ownerPhotoFiles = (req.files && req.files.ownerPhotos) ? req.files.ownerPhotos : [];
+    const legacyVendorPhotoFiles = (req.files && req.files.vendorPhoto) ? req.files.vendorPhoto : [];
+    const normalizedOwnerPhotoFiles = ownerPhotoFiles.length > 0 ? ownerPhotoFiles : legacyVendorPhotoFiles;
+
+    try {
+      const ownersWithPhotos = [];
+      let photoIndex = 0;
+      for (let i = 0; i < owners.length; i++) {
+        let photoPath = null;
+        // If frontend appends photos, we'll try to match them. Since we removed the requirement
+        // we just map available photos sequentially, or null if none available.
+        if (normalizedOwnerPhotoFiles && photoIndex < normalizedOwnerPhotoFiles.length) {
+          photoPath = await handleVendorPhotoUpload(normalizedOwnerPhotoFiles[photoIndex]);
+          photoIndex++;
+        }
+        ownersWithPhotos.push({
+          name: owners[i].name,
+          photo: photoPath
+        });
+      }
+      vendorData.owners = ownersWithPhotos;
+      if (ownersWithPhotos.length > 0 && ownersWithPhotos[0].photo) {
+        vendorData.passportPhoto = ownersWithPhotos[0].photo;
+      }
+    } catch (error) {
+      console.error("Owner photo upload error:", error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || "Failed to upload owner photos"
+      });
+    }
+
+    if (utrNumber && !/^\d{12}$/.test(utrNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: "UTR number must be exactly 12 digits"
+      });
+    }
+
+    const hasPaymentScreenshot = !!(req.files && req.files.paymentScreenshot && req.files.paymentScreenshot[0]);
+    if (hasPaymentScreenshot) {
+      try {
+        vendorData.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
+      } catch (error) {
+        console.error("Payment screenshot upload error:", error);
+        return res.status(500).json({
+          success: false,
+          message: error.message || "Failed to upload payment screenshot"
+        });
+      }
+    }
+
+    const { generateUniqueVendorSlug } = require('../utils/slugify');
+    vendorData.slug = await generateUniqueVendorSlug(businessName);
 
     const vendor = await vendorModel.create(vendorData);
 
@@ -250,13 +397,32 @@ const createVendor = async (req, res) => {
 
     // Update vendor with certificate reference
     vendor.activeCertificate = certificate._id;
-    vendor.referralCode = certificateData.referralCode || buildVendorReferralCode({
-      state: vendor.state,
-      certificateNumber: certificate.certificateNumber
-    });
+    vendor.referralCode = certificateData.referralCode || certificate.certificateNumber;
     await vendor.save();
 
+    // If applicationNumber is provided, mark the application as approved
+    if (applicationNumber) {
+      await VendorApplication.findOneAndUpdate(
+        { applicationNumber: applicationNumber },
+        { status: 'approved' }
+      );
+    }
+
     console.log(`[ADMIN] Vendor created with certificate: ${vendor.businessName} - ${certificate.certificateNumber}`);
+
+    // Send WhatsApp Message with Certificate
+    try {
+      const { sendWhatsAppMessage } = require("../utils/whatsapp");
+      const downloadUrl = `${process.env.BACKEND_URL}${certificate.downloadLink}`;
+      const msg = `Welcome ${vendor.ownerName}!\n\nYou have been registered as a vendor on Abcd Vyapar. Your Referral Code is ${vendor.referralCode}.\n\nBest Regards,\nTeam Abcd Vyapar`;
+      
+      await sendWhatsAppMessage(vendor.mobile, msg, {
+        url: downloadUrl,
+        filename: `ABCDVEDOR_${vendor.referralCode}.pdf`
+      });
+    } catch (waErr) {
+      console.error("WhatsApp Creation Message Error:", waErr.message);
+    }
 
     return res.status(201).json({
       success: true,
@@ -288,7 +454,23 @@ const createVendor = async (req, res) => {
 const updateVendor = async (req, res) => {
   try {
     const { vendorId } = req.params;
-    const { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees } = req.body;
+    let { ownerName, businessName, mobile, email, state, district, city, businessCategories, membershipFees, owners, utrNumber, password, membershipType, address, gstPan, websiteUrl, referralId } = req.body;
+
+    // Handle stringified JSON from FormData
+    if (typeof businessCategories === 'string') {
+      try {
+        businessCategories = JSON.parse(businessCategories);
+      } catch (e) {
+        console.error("Error parsing businessCategories:", e);
+      }
+    }
+    if (typeof owners === 'string') {
+      try {
+        owners = JSON.parse(owners);
+      } catch (e) {
+        console.error("Error parsing owners:", e);
+      }
+    }
 
     // Validate required fields
     if (!ownerName || !businessName || !mobile || !state || !district || !city || !businessCategories || !Array.isArray(businessCategories) || businessCategories.length === 0 || !membershipFees) {
@@ -298,8 +480,17 @@ const updateVendor = async (req, res) => {
       });
     }
 
-    if (businessCategories.length > 5) {
-      return res.status(400).json({ success: false, message: "Maximum 5 business categories allowed" });
+    // Count total subcategories across all categories
+    let totalSubCategories = 0;
+    for (const item of businessCategories) {
+      if (!item.category || !Array.isArray(item.subCategories) || item.subCategories.length === 0) {
+        return res.status(400).json({ success: false, message: "Each category must have a name and at least one subcategory" });
+      }
+      totalSubCategories += item.subCategories.length;
+    }
+
+    if (totalSubCategories > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 subcategories allowed across all categories" });
     }
 
     const vendor = await vendorModel.findById(vendorId).populate('activeCertificate');
@@ -311,16 +502,6 @@ const updateVendor = async (req, res) => {
       });
     }
 
-    // Check if mobile is being changed and if it already exists
-    if (mobile !== vendor.mobile) {
-      const existingMobile = await vendorModel.findOne({ mobile, _id: { $ne: vendorId } });
-      if (existingMobile) {
-        return res.status(400).json({
-          success: false,
-          message: "Mobile number already exists"
-        });
-      }
-    }
 
     // Check if email is provided and already exists (excluding current vendor)
     if (email && email.trim()) {
@@ -340,14 +521,92 @@ const updateVendor = async (req, res) => {
     vendor.state = state;
     vendor.district = district;
     vendor.city = city;
-    vendor.businessCategories = businessCategories;
+    // Auto-resolve missing categoryIds by looking up Category collection
+    const resolvedCategories = await Promise.all(
+      businessCategories.map(async (item) => {
+        if (!item.categoryId || item.categoryId === '') {
+          const cat = await Category.findOne({ name: item.category });
+          if (cat) {
+            return { ...item, categoryId: cat._id };
+          }
+        }
+        return item;
+      })
+    );
+
+    vendor.businessCategories = resolvedCategories;
     vendor.membershipFees = membershipFees;
+
+    if (utrNumber) vendor.utrNumber = utrNumber;
+    if (membershipType) vendor.membershipType = membershipType;
+    if (address !== undefined) vendor.address = address?.trim();
+    if (gstPan !== undefined) vendor.gstPan = gstPan?.trim();
+    if (websiteUrl !== undefined) vendor.websiteUrl = normalizeWebsiteUrl(websiteUrl);
+    if (referralId !== undefined) vendor.referralId = referralId?.trim();
+
+    // Hash password if provided
+    if (password && password.length >= 6) {
+      const salt = await bcrypt.genSalt(10);
+      vendor.password = await bcrypt.hash(password, salt);
+    }
+
+    // Handle Owners and Photos
+    if (owners && Array.isArray(owners)) {
+      const ownerPhotoFiles = (req.files && req.files.ownerPhotos) ? req.files.ownerPhotos : [];
+      const legacyVendorPhotoFiles = (req.files && req.files.vendorPhoto) ? req.files.vendorPhoto : [];
+      const normalizedOwnerPhotoFiles = ownerPhotoFiles.length > 0 ? ownerPhotoFiles : legacyVendorPhotoFiles;
+
+      const updatedOwners = [];
+      let photoIndex = 0;
+      
+      for (let i = 0; i < owners.length; i++) {
+        let photoPath = vendor.owners[i]?.photo || null; // Keep existing photo by default
+        
+        // If a new photo is provided for this owner, upload it
+        // Note: The frontend sends new photos in normalizedOwnerPhotoFiles.
+        // We match them by index of owners that have a new photo.
+        // But for simplicity, if any photo is sent, we take the next one.
+        if (normalizedOwnerPhotoFiles && photoIndex < normalizedOwnerPhotoFiles.length) {
+          try {
+            photoPath = await handleVendorPhotoUpload(normalizedOwnerPhotoFiles[photoIndex]);
+            photoIndex++;
+          } catch (error) {
+            console.error("Error uploading owner photo:", error);
+          }
+        }
+        
+        updatedOwners.push({
+          name: owners[i].name,
+          photo: photoPath
+        });
+      }
+      vendor.owners = updatedOwners;
+      if (updatedOwners.length > 0 && updatedOwners[0].photo) {
+        vendor.passportPhoto = updatedOwners[0].photo;
+      }
+    }
+
+    // Handle Payment Screenshot
+    const hasPaymentScreenshot = !!(req.files && req.files.paymentScreenshot && req.files.paymentScreenshot[0]);
+    if (hasPaymentScreenshot) {
+      try {
+        vendor.paymentScreenshot = await handlePaymentScreenshotUpload(req.files.paymentScreenshot[0]);
+      } catch (error) {
+        console.error("Payment screenshot upload error:", error);
+      }
+    }
 
     // Update email if provided
     if (email && email.trim()) {
       vendor.email = email.trim();
     } else {
       vendor.email = undefined; // Remove email if not provided
+    }
+
+    // Regenerate slug if business name changed
+    if (!vendor.slug || vendor.businessName !== businessName) {
+      const { generateUniqueVendorSlug } = require('../utils/slugify');
+      vendor.slug = await generateUniqueVendorSlug(businessName, vendor._id);
     }
 
     await vendor.save();

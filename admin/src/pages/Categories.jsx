@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { useAdminAuth } from '../context/AdminAuthContext'
 
 const Categories = () => {
+  const { hasPermission } = useAdminAuth()
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -63,8 +65,8 @@ const Categories = () => {
       return
     }
 
-    if (!formData.icon.trim() && !selectedFile) {
-      toast.warning('Either an icon or an image is required')
+    if (!selectedFile) {
+      toast.warning('Category image is required')
       return
     }
 
@@ -513,12 +515,14 @@ const Categories = () => {
                 >
                   Edit
                 </button>
-                <button
-                  onClick={() => handleDeleteCategory(category._id, category.name)}
-                  className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
-                >
-                  Delete
-                </button>
+                {hasPermission('canDeleteCategories') && (
+                  <button
+                    onClick={() => handleDeleteCategory(category._id, category.name)}
+                    className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))
@@ -557,18 +561,7 @@ const Categories = () => {
                 <p className='text-xs text-gray-500 mt-1'>Main category name - slug auto-generated</p>
               </div>
               <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Icon Name (Optional if image provided)</label>
-                <input
-                  type='text'
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder='e.g., Scale, Smartphone, Stethoscope'
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-                <p className='text-xs text-gray-500 mt-1'>Lucide-react icon name</p>
-              </div>
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Category Image (Optional if icon provided)</label>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Category Image *</label>
                 <div className='flex items-center gap-4'>
                   <div className='flex-1'>
                     <input
@@ -718,18 +711,7 @@ const Categories = () => {
                 <p className='text-xs text-gray-500 mt-1'>Main category name - slug auto-generated</p>
               </div>
               <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Icon Name (Optional if image exists)</label>
-                <input
-                  type='text'
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder='e.g., Scale, Smartphone, Stethoscope'
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                />
-                <p className='text-xs text-gray-500 mt-1'>Lucide-react icon name</p>
-              </div>
-              <div>
-                <label className='block text-sm font-semibold text-gray-700 mb-2'>Category Image (Optional if icon exists)</label>
+                <label className='block text-sm font-semibold text-gray-700 mb-2'>Category Image</label>
                 <div className='flex items-center gap-4'>
                   <div className='flex-1'>
                     <input
@@ -745,7 +727,7 @@ const Categories = () => {
                     </div>
                   )}
                 </div>
-                <p className='text-xs text-gray-500 mt-1'>Recommended: 800x400px. Will be converted to AVIF.</p>
+                <p className='text-xs text-gray-500 mt-1'>Recommended: 800x400px. Upload a new image to replace the current one.</p>
               </div>
               <div>
                 <label className='block text-sm font-semibold text-gray-700 mb-2'>Description (Optional)</label>
@@ -987,12 +969,14 @@ const Categories = () => {
                       >
                         Edit
                       </button>
-                      <button
-                        onClick={() => handleDeleteSubcategory(sub._id, sub.name)}
-                        className='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold transition'
-                      >
-                        Delete
-                      </button>
+                      {hasPermission('canDeleteCategories') && (
+                        <button
+                          onClick={() => handleDeleteSubcategory(sub._id, sub.name)}
+                          className='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-semibold transition'
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))

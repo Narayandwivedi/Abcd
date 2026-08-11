@@ -5,50 +5,8 @@ import { useAdminAuth } from '../context/AdminAuthContext'
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { admin, logout } = useAdminAuth()
+  const { admin, logout, hasPermission } = useAdminAuth()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState(null)
-  const [showInstallButton, setShowInstallButton] = useState(false)
-
-  useEffect(() => {
-    // Listen for the beforeinstallprompt event
-    const handleBeforeInstallPrompt = (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault()
-      // Stash the event so it can be triggered later
-      setDeferredPrompt(e)
-      // Show the install button
-      setShowInstallButton(true)
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    }
-  }, [])
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      return
-    }
-
-    // Show the install prompt
-    deferredPrompt.prompt()
-
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice
-
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt')
-      setShowInstallButton(false)
-    } else {
-      console.log('User dismissed the install prompt')
-    }
-
-    // Clear the deferredPrompt for the next time
-    setDeferredPrompt(null)
-  }
 
   const handleLogout = async () => {
     await logout()
@@ -66,43 +24,57 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       name: 'Users',
       icon: '👥',
       path: '/users',
-      description: 'Manage Users'
+      description: 'Manage Users',
+      requiredPermission: 'canViewUsers'
     },
     {
       name: 'Vendors',
       icon: '🏪',
       path: '/vendors',
-      description: 'Manage Vendors'
+      description: 'Manage Vendors',
+      requiredPermission: 'canViewVendors'
     },
     {
       name: 'Buy Leads',
       icon: '🛍️',
       path: '/buy-leads',
-      description: 'Manage Buy Leads'
+      description: 'Manage Buy Leads',
+      requiredPermission: 'canViewBuyLeads'
     },
     {
       name: 'Sell Leads',
       icon: '🏷️',
       path: '/sell-leads',
-      description: 'Manage Sell Leads'
+      description: 'Manage Sell Leads',
+      requiredPermission: 'canViewSellLeads'
     },
     {
       name: 'Cities',
       icon: '🏙️',
       path: '/cities',
-      description: 'Manage Cities'
+      description: 'Manage Cities',
+      requiredPermission: 'canManageContent'
     },
     {
       name: 'Categories',
       icon: '📂',
       path: '/categories',
-      description: 'Manage Categories'
+      description: 'Manage Categories',
+      requiredPermission: 'canManageContent'
     },
     {
       name: 'Ads',
       icon: '📢',
       path: '/ads',
-      description: 'Manage Advertisements'
+      description: 'Manage Advertisements',
+      requiredPermission: 'canViewAds'
+    },
+    {
+      name: 'Offers',
+      icon: '🎁',
+      path: '/offers',
+      description: 'Discounts & Deals',
+      requiredPermission: 'canManageContent'
     },
     // {
     //   name: 'Products',
@@ -123,24 +95,52 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     //   description: 'Payment Management'
     // },
     {
+      name: 'Samaj Census',
+      icon: '🏛️',
+      path: '/samaj-census',
+      description: 'Manage Samaj Records',
+      requiredPermission: 'canManageSamajCensus'
+    },
+    {
+      name: 'Family Census',
+      icon: '👨‍👩‍👧‍👦',
+      path: '/family-census',
+      description: 'Manage Family Records',
+      requiredPermission: 'canManageFamilyCensus'
+    },
+    {
       name: 'Reports',
       icon: '📈',
       path: '/reports',
-      description: 'Sales & Analytics'
+      description: 'Sales & Analytics',
+      requiredPermission: 'canManageContent'
     },
     {
       name: 'Settings',
       icon: '⚙️',
       path: '/settings',
-      description: 'System Settings'
+      description: 'System Settings',
+      requiredPermission: 'SUPERADMIN_ONLY'
     },
     {
       name: 'Sub Admin',
       icon: '👤',
       path: '/subadmin',
-      description: 'Manage Sub Admins'
+      description: 'Manage Sub Admins',
+      requiredPermission: 'SUPERADMIN_ONLY'
+    },
+    {
+      name: 'WhatsApp',
+      icon: '💬',
+      path: '/whatsapp',
+      description: 'Session Management'
     }
   ]
+
+  const visibleMenuItems = menuItems.filter(item => {
+    if (!item.requiredPermission) return true;
+    return hasPermission(item.requiredPermission);
+  });
 
   const isActive = (path) => location.pathname === path
 
@@ -189,8 +189,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         </div>
 
         {/* Menu Items */}
-        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-280px)]">
-          {menuItems.map((item) => (
+        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-210px)]">
+          {visibleMenuItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
@@ -217,34 +217,19 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               )}
             </Link>
           ))}
-
-          {/* PWA Install Button */}
-          {showInstallButton && (
-            <button
-              onClick={handleInstallClick}
-              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 bg-gradient-to-r from-green-600/30 to-emerald-600/30 border border-green-400/40 hover:from-green-600/40 hover:to-emerald-600/40 shadow-lg group"
-            >
-              <span className="text-xl text-green-300">📱</span>
-              <div className="flex-1 text-left">
-                <div className="font-semibold text-green-100">Download App</div>
-                <div className="text-xs text-green-300">Install PWA</div>
-              </div>
-              <svg className="w-5 h-5 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-            </button>
-          )}
         </nav>
 
         {/* User Info & Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-700/30 bg-blue-900/50 space-y-2">
-          <div className="flex items-center space-x-3 px-4 py-3 bg-black/20 rounded-xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+        <div className="absolute bottom-0 left-0 right-0 px-2.5 py-2 border-t border-blue-700/30 bg-blue-900/50 space-y-1">
+          <div className="flex items-center space-x-2 px-2.5 py-1.5 bg-black/20 rounded-md">
+            <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">
               {admin?.fullName?.charAt(0).toUpperCase() || 'A'}
             </div>
             <div className="flex-1">
-              <div className="font-semibold text-blue-100 text-sm truncate">{admin?.fullName || 'Admin'}</div>
-              <div className="text-xs text-blue-300">Super Admin</div>
+              <div className="font-semibold text-blue-100 text-xs truncate">{admin?.fullName || 'Admin'}</div>
+              <div className="text-[10px] text-blue-300">
+                {admin?.role === 'subadmin' ? 'Sub Admin' : 'Super Admin'}
+              </div>
             </div>
           </div>
 
@@ -252,26 +237,26 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           {!showLogoutConfirm ? (
             <button
               onClick={() => setShowLogoutConfirm(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-xl transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
+              className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-md transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              <span className="font-semibold text-sm">Logout</span>
+              <span className="font-semibold text-xs">Logout</span>
             </button>
           ) : (
-            <div className="space-y-2">
-              <p className="text-xs text-blue-200 text-center">Are you sure?</p>
-              <div className="flex gap-2">
+            <div className="space-y-1">
+              <p className="text-[10px] text-blue-200 text-center">Are you sure?</p>
+              <div className="flex gap-1.5">
                 <button
                   onClick={handleLogout}
-                  className="flex-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold transition"
+                  className="flex-1 px-2 py-1 bg-red-50 hover:bg-red-600 text-white rounded-md text-xs font-semibold transition"
                 >
                   Yes
                 </button>
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-semibold transition"
+                  className="flex-1 px-2 py-1 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-xs font-semibold transition"
                 >
                   No
                 </button>

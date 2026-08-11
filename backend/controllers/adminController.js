@@ -4,7 +4,9 @@ const fs = require("fs");
 const path = require("path");
 const userModel = require("../models/User.js");
 const Admin = require("../models/Admin.js");
+const SubAdmin = require("../models/SubAdmin.js");
 const Certificate = require("../models/Certificate.js");
+const UserApplication = require("../models/UserApplication.js");
 const { generateCertificatePDF, regenerateCertificatePDF } = require("../utils/generateCertificate.js");
 
 // Get all users (for admin)
@@ -152,14 +154,27 @@ const adminLogin = async (req, res) => {
     }
 
     // Find admin by email or mobile
-    const admin = await Admin.findOne({
+    let user = await Admin.findOne({
       $or: [
         { email: identifier.toLowerCase() },
         { mobile: identifier }
       ]
     });
+    
+    let role = 'superadmin';
 
-    if (!admin) {
+    // If not found in Admin, try SubAdmin
+    if (!user) {
+      user = await SubAdmin.findOne({
+        $or: [
+          { email: identifier.toLowerCase() },
+          { mobile: identifier }
+        ]
+      });
+      role = 'subadmin';
+    }
+
+    if (!user) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials"
@@ -167,7 +182,7 @@ const adminLogin = async (req, res) => {
     }
 
     // Check if admin is active
-    if (!admin.isActive) {
+    if (!user.isActive) {
       return res.status(403).json({
         success: false,
         message: "Account is deactivated. Contact system administrator."
@@ -175,7 +190,7 @@ const adminLogin = async (req, res) => {
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(password, admin.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -185,14 +200,14 @@ const adminLogin = async (req, res) => {
     }
 
     // Update last login
-    admin.lastLogin = new Date();
-    await admin.save();
+    user.lastLogin = new Date();
+    await user.save();
 
-    console.log(`[ADMIN LOGIN] ✅ Successful login for ${admin.email} from IP: ${clientIp}`);
+    console.log(`[ADMIN LOGIN] ✅ Successful login for ${user.email} (Role: ${role}) from IP: ${clientIp}`);
 
     // Generate JWT token
     const token = jwt.sign(
-      { adminId: admin._id },
+      { adminId: user._id, role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -209,10 +224,12 @@ const adminLogin = async (req, res) => {
       success: true,
       message: "Login successful",
       admin: {
-        _id: admin._id,
-        fullName: admin.fullName,
-        email: admin.email,
-        mobile: admin.mobile
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        mobile: user.mobile,
+        role,
+        permissions: user.permissions || {}
       }
     });
   } catch (error) {
@@ -244,7 +261,13 @@ const adminLogout = async (req, res) => {
 // Get current admin info
 const getCurrentAdmin = async (req, res) => {
   try {
-    const admin = await Admin.findById(req.adminId).select("-password");
+    let admin;
+    
+    if (req.adminRole === 'subadmin') {
+      admin = await SubAdmin.findById(req.adminId).select("-password");
+    } else {
+      admin = await Admin.findById(req.adminId).select("-password");
+    }
 
     if (!admin) {
       return res.status(404).json({
@@ -255,7 +278,10 @@ const getCurrentAdmin = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      admin
+      admin: {
+        ...admin.toObject(),
+        role: req.adminRole || 'superadmin'
+      }
     });
   } catch (error) {
     console.error("Get current admin error:", error);
@@ -593,7 +619,7 @@ const deleteUser = async (req, res) => {
 // Create user (admin) - bypasses payment requirement
 const createUser = async (req, res) => {
   try {
-    const { fullName, mobile, email, gotra, state, district, city, address, relativeName, relationship, referredBy, password } = req.body;
+    const { fullName, mobile, email, gotra, state, district, city, address, relativeName, relationship, referredBy, password, utrNumber, applicationNumber } = req.body;
 
     // Validate required fields
     if (!fullName || !mobile || !gotra || !address || !relativeName) {
@@ -668,6 +694,10 @@ const createUser = async (req, res) => {
       userData.city = city.toUpperCase();
     }
 
+    if (utrNumber) {
+      userData.utrNumber = utrNumber;
+    }
+
     if (referredBy) {
       userData.referredBy = referredBy.trim().toUpperCase();
     }
@@ -700,6 +730,14 @@ const createUser = async (req, res) => {
     user.activeCertificate = certificate._id;
     user.referralCode = certificateData.referralCode;
     await user.save();
+
+    // If applicationNumber provided, mark that user application as approved
+    if (applicationNumber) {
+      await UserApplication.findOneAndUpdate(
+        { applicationNumber },
+        { status: 'approved' }
+      );
+    }
 
     console.log(`[ADMIN] User created: ${user.fullName} (${user.mobile})`);
 

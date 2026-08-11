@@ -125,7 +125,7 @@ const createSubAdmin = async (req, res) => {
 const updateSubAdmin = async (req, res) => {
   try {
     const { subAdminId } = req.params;
-    const { fullName, email, mobile, permissions, isActive } = req.body;
+    const { fullName, email, mobile, password, permissions, isActive } = req.body;
 
     const subAdmin = await SubAdmin.findById(subAdminId);
 
@@ -163,6 +163,11 @@ const updateSubAdmin = async (req, res) => {
     if (fullName) subAdmin.fullName = fullName;
     if (permissions) subAdmin.permissions = { ...subAdmin.permissions, ...permissions };
     if (typeof isActive !== 'undefined') subAdmin.isActive = isActive;
+    
+    if (password && password.length >= 6) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      subAdmin.password = hashedPassword;
+    }
 
     await subAdmin.save();
 

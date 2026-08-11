@@ -44,7 +44,7 @@ adSchema.index({ displayOrder: 1 });
 // Static method to get all approved and visible ads
 adSchema.statics.getActiveAds = function() {
   return this.find({ isApproved: true, isVisible: true })
-    .populate('vendorId', 'businessName ownerName mobile')
+    .populate('vendorId', 'businessName ownerName mobile slug city district state')
     .sort({ displayOrder: 1, createdAt: -1 })
     .lean();
 };

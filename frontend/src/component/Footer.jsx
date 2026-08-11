@@ -1,23 +1,22 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const Footer = () => {
+const Footer = ({ noBottomNav = false }) => {
   return (
-    <footer className='bg-gray-800 text-white mt-auto mb-10 md:mb-0'>
+    <footer className={`bg-gray-800 text-white mt-auto ${noBottomNav ? 'mb-0' : 'mb-10 md:mb-24'}`}>
       <div className='container mx-auto px-4 py-4 md:py-8'>
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8'>
-          {/* Company Info - Hidden on Mobile */}
-          <div className='hidden md:block'>
+        {/* Desktop Footer Layout */}
+        <div className='hidden md:grid grid-cols-5 gap-8'>
+          <div>
             <h3 className='text-xl font-bold mb-4'>ABCD</h3>
             <p className='text-gray-400 text-sm'>
               Your trusted platform for all your needs. Building better solutions for tomorrow.
             </p>
           </div>
 
-          {/* Links Section - Mobile: Combined, Desktop: Quick Links */}
           <div>
-            <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Links</h4>
-            <ul className='space-y-1 md:space-y-2 text-xs md:text-base'>
+            <h4 className='text-lg font-semibold mb-4'>Links</h4>
+            <ul className='space-y-2'>
               <li>
                 <Link to='/' className='text-gray-400 hover:text-white transition'>Home</Link>
               </li>
@@ -28,19 +27,21 @@ const Footer = () => {
                 <Link to='/privacy' className='text-gray-400 hover:text-white transition'>Privacy Policy</Link>
               </li>
               <li>
+<<<<<<< HEAD
                 <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran 2025-26</Link>
               </li>
               <li className='hidden md:block'>
+=======
+>>>>>>> 405b6119bc477a3168b7d5c0b8fe3e4aa51b721e
                 <Link to='/about' className='text-gray-400 hover:text-white transition'>About</Link>
               </li>
-              <li className='hidden md:block'>
+              <li>
                 <Link to='/services' className='text-gray-400 hover:text-white transition'>Services</Link>
               </li>
             </ul>
           </div>
 
-          {/* Legal - Desktop Only */}
-          <div className='hidden md:block'>
+          <div>
             <h4 className='text-lg font-semibold mb-4'>Legal</h4>
             <ul className='space-y-2'>
               <li>
@@ -52,20 +53,45 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Address */}
           <div>
-            <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Address</h4>
-            <div className='space-y-1 md:space-y-2 text-gray-400 text-[10px] md:text-sm'>
+            <h4 className='text-lg font-semibold mb-4'>Address</h4>
+            <div className='space-y-2 text-gray-400 text-sm'>
               <p>Agrawal Business and Community Development (ABCD)</p>
               <p>Hanuman Market, Ramsagar Para,</p>
               <p className='font-bold text-yellow-400'>RAIPUR (CG) 492001</p>
             </div>
+
+            <Link to='/census' className='block mt-4'>
+              <div className='relative bg-gradient-to-r from-fuchsia-500 to-pink-700 text-white px-5 py-3 text-base rounded-xl font-bold text-center shadow-lg shadow-fuchsia-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                <p className='font-extrabold'>Agrawal Samaj Census</p>
+              </div>
+            </Link>
+
+            <div className='flex mt-6 flex-col gap-4 max-w-xs'>
+              <Link to='/signup' className='block'>
+                <div className='relative bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-4 py-3 rounded-xl font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>
+                  <p className='text-sm leading-tight'>Join as Buyer</p>
+                  <p className='text-xl font-extrabold'>@Rs 499/year</p>
+                </div>
+              </Link>
+
+              <a
+                href='https://vendor.abcdvyapar.com/signup'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='block'
+              >
+                <div className='relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 rounded-xl font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>
+                  <p className='text-sm leading-tight'>Join as Vendor</p>
+                  <p className='text-xl font-extrabold'>Register Now</p>
+                </div>
+              </a>
+            </div>
           </div>
 
-          {/* Contact */}
           <div>
-            <h4 className='text-sm md:text-lg font-semibold mb-2 md:mb-4'>Contact</h4>
-            <div className='space-y-1 md:space-y-2 text-gray-400 text-[10px] md:text-sm'>
+            <h4 className='text-lg font-semibold mb-4'>Contact</h4>
+            <div className='space-y-2 text-gray-400 text-sm'>
               <p>
                 Tele: <a href='tel:07713562323' className='hover:text-white transition underline'>0771-3562323</a>
               </p>
@@ -77,30 +103,109 @@ const Footer = () => {
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Join Buttons - Mobile Only (Stacked) */}
-          <div className='md:hidden flex flex-col gap-3'>
-            {/* Join as Buyer */}
+        {/* Mobile Footer Layout */}
+        <div className='grid grid-cols-2 gap-x-4 md:hidden'>
+          <div className='flex flex-col'>
+            <div>
+              <h4 className='text-sm font-semibold mb-2'>Links</h4>
+              <ul className='space-y-1 text-xs'>
+                <li>
+                  <Link to='/' className='text-gray-400 hover:text-white transition'>Home</Link>
+                </li>
+                <li>
+                  <Link to='/terms' className='text-gray-400 hover:text-white transition'>Terms & Conditions</Link>
+                </li>
+                <li>
+                  <Link to='/privacy' className='text-gray-400 hover:text-white transition'>Privacy Policy</Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className='mt-2'>
+              <h4 className='text-sm font-semibold mb-2'>Contact</h4>
+              <div className='space-y-1 text-gray-400 text-[10px]'>
+                <p>
+                  Tele: <a href='tel:07713562323' className='hover:text-white transition underline'>0771-3562323</a>
+                </p>
+                <p>
+                  Mob: <a href='tel:+919993961778' className='hover:text-white transition underline'>+91 9993961778</a>
+                </p>
+                <p>
+                  Email: <a href='mailto:cgpasabcd@gmail.com' className='hover:text-white transition underline'>cgpasabcd@gmail.com</a>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className='flex flex-col'>
+            <div>
+              <h4 className='text-sm font-semibold mb-2'>Address</h4>
+              <div className='space-y-1 text-gray-400 text-[10px]'>
+                <p>Agrawal Business and Community Development (ABCD)</p>
+                <p>Hanuman Market, Ramsagar Para,</p>
+                <p className='font-bold text-yellow-400'>RAIPUR (CG) 492001</p>
+              </div>
+
+              <Link to='/census' className='block mt-4'>
+                <div className='relative bg-gradient-to-r from-fuchsia-500 to-pink-700 text-white px-3 py-2 text-xs rounded-xl font-bold text-center shadow-lg shadow-fuchsia-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                  <p className='font-extrabold'>Agrawal Samaj Census</p>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Buyer/Vendor buttons + Demo Video - Mobile Only */}
+        <div className='grid grid-cols-2 gap-x-4 mt-4 md:hidden'>
+          <div className='flex flex-col gap-2 justify-center'>
             <Link to='/signup' className='block'>
-              <div className='relative bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse'>
+              <div className='relative bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>
                 <p className='text-[11px] leading-tight'>Join as Buyer</p>
-                <p className='text-sm font-extrabold'>@₹499/year</p>
+                <p className='text-sm font-extrabold'>@Rs 499/year</p>
               </div>
             </Link>
 
-            {/* Join as Vendor */}
-            <a href='https://vendor.abcdvyapar.com/signup' className='block'>
-              <div className='relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse'>
+            <a
+              href='https://vendor.abcdvyapar.com/signup'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='block'
+            >
+              <div className='relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-2 rounded-lg font-bold text-center shadow-lg animate-pulse hover:scale-[1.02] transition-transform'>
                 <p className='text-[11px] leading-tight'>Join as Vendor</p>
                 <p className='text-sm font-extrabold'>Register Now</p>
               </div>
             </a>
           </div>
+
+          <div className='overflow-hidden rounded-xl shadow-lg border border-gray-700 bg-gray-900'>
+            <div className='aspect-video w-full'>
+              <iframe
+                className='w-full h-full'
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                title="ABCD Demo Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className='border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm'>
-          <p>&copy; {new Date().getFullYear()} ABCD. All rights reserved.</p>
+        <div className={`border-t border-gray-700 text-center text-gray-400 ${noBottomNav ? 'mt-3 pt-3 md:mt-8 md:pt-6 text-[10px] md:text-xs' : 'mt-8 pt-6 text-sm'}`}>
+          <p>&copy; {new Date().getFullYear()} ABCD. All rights reserved. 
+            <a 
+              href="https://Softwarebytes.in" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="opacity-[0.03] text-[8px] cursor-default ml-2"
+              aria-hidden="true"
+            >
+              Developed by Softwarebytes
+            </a>
+          </p>
         </div>
       </div>
     </footer>

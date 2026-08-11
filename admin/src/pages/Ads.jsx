@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { useAdminAuth } from '../context/AdminAuthContext'
 
 const Ads = () => {
+  const { hasPermission } = useAdminAuth()
   const [ads, setAds] = useState([])
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
@@ -11,6 +13,8 @@ const Ads = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedAd, setSelectedAd] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
+  const [vendorSearchTerm, setVendorSearchTerm] = useState('')
+  const [showVendorDropdown, setShowVendorDropdown] = useState(false)
   const [formData, setFormData] = useState({
     vendorId: '',
     title: '',
@@ -60,7 +64,7 @@ const Ads = () => {
 
   const fetchVendors = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/admin/users`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/vendors`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -70,7 +74,7 @@ const Ads = () => {
       const data = await response.json()
 
       if (data.success) {
-        setVendors(data.users.filter(u => u.paymentVerified))
+        setVendors(data.vendors.filter(v => v.paymentVerified))
       }
     } catch (error) {
       console.error('Error fetching vendors:', error)
@@ -270,7 +274,20 @@ const Ads = () => {
     })
     setImagePreview(null)
     setSelectedAd(null)
+    setVendorSearchTerm('')
+    setShowVendorDropdown(false)
   }
+
+  const getSelectedVendorName = () => {
+    const vendor = vendors.find(v => v._id === formData.vendorId)
+    return vendor ? `${vendor.businessName} (${vendor.ownerName})` : 'Select Vendor'
+  }
+
+  const filteredVendors = vendors.filter(vendor => 
+    vendor.businessName.toLowerCase().includes(vendorSearchTerm.toLowerCase()) ||
+    vendor.ownerName.toLowerCase().includes(vendorSearchTerm.toLowerCase()) ||
+    vendor.mobile.toString().includes(vendorSearchTerm)
+  )
 
   // Filter ads based on tab selection and search term
   const filteredAds = ads
@@ -340,21 +357,19 @@ const Ads = () => {
         <div className='flex gap-2 mb-4'>
           <button
             onClick={() => setFilterTab('all')}
-            className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-              filterTab === 'all'
+            className={`px-6 py-2 rounded-lg font-semibold transition-all ${filterTab === 'all'
                 ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+              }`}
           >
             All Ads ({stats.total})
           </button>
           <button
             onClick={() => setFilterTab('active')}
-            className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-              filterTab === 'active'
+            className={`px-6 py-2 rounded-lg font-semibold transition-all ${filterTab === 'active'
                 ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+              }`}
           >
             Active Ads ({stats.active})
           </button>
@@ -502,36 +517,36 @@ const Ads = () => {
                       </svg>
                       Edit
                     </button>
-                    <button
-                      onClick={() => handleDeleteAd(ad._id)}
-                      className='flex items-center justify-center gap-1 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-xs font-semibold hover:from-red-700 hover:to-red-800 transition-all shadow-md'
-                    >
-                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
-                      </svg>
-                      Delete
-                    </button>
+                    {hasPermission('canDeleteAds') && (
+                      <button
+                        onClick={() => handleDeleteAd(ad._id)}
+                        className='flex items-center justify-center gap-1 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-xs font-semibold hover:from-red-700 hover:to-red-800 transition-all shadow-md'
+                      >
+                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                        </svg>
+                        Delete
+                      </button>
+                    )}
                   </div>
 
                   {/* Toggle Actions */}
                   <div className='grid grid-cols-2 gap-2'>
                     <button
                       onClick={() => handleToggleApproval(ad._id)}
-                      className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                        ad.isApproved
+                      className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${ad.isApproved
                           ? 'bg-red-100 text-red-700 hover:bg-red-200'
                           : 'bg-green-100 text-green-700 hover:bg-green-200'
-                      }`}
+                        }`}
                     >
                       {ad.isApproved ? '✗ Unapprove' : '✓ Approve'}
                     </button>
                     <button
                       onClick={() => handleToggleVisibility(ad._id)}
-                      className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                        ad.isVisible
+                      className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${ad.isVisible
                           ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                      }`}
+                        }`}
                     >
                       {ad.isVisible ? '🙈 Hide' : '👁 Show'}
                     </button>
@@ -566,20 +581,75 @@ const Ads = () => {
                   )}
                 </div>
 
-                <div>
+                <div className='relative'>
                   <label className='block text-sm font-medium text-gray-700 mb-1'>Vendor (Optional)</label>
-                  <select
-                    value={formData.vendorId}
-                    onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  <div 
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg cursor-pointer flex justify-between items-center bg-white shadow-sm hover:border-blue-400 transition-colors'
+                    onClick={() => setShowVendorDropdown(!showVendorDropdown)}
                   >
-                    <option value=''>No Vendor</option>
-                    {vendors.map((vendor) => (
-                      <option key={vendor._id} value={vendor._id}>
-                        {vendor.businessName} - {vendor.ownerName}
-                      </option>
-                    ))}
-                  </select>
+                    <span className={formData.vendorId ? 'text-gray-900 font-medium' : 'text-gray-500'}>
+                      {getSelectedVendorName()}
+                    </span>
+                    <div className='flex items-center gap-2'>
+                      <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+                      </svg>
+                      <svg className={`w-4 h-4 text-gray-400 transition-transform ${showVendorDropdown ? 'rotate-180' : ''}`} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {showVendorDropdown && (
+                    <div className='absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-64 overflow-hidden flex flex-col'>
+                      <div className='p-2 border-b bg-gray-50'>
+                        <div className='relative'>
+                          <input
+                            type='text'
+                            placeholder='Search vendor by name or mobile...'
+                            value={vendorSearchTerm}
+                            onChange={(e) => setVendorSearchTerm(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            className='w-full pl-8 pr-4 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                            autoFocus
+                          />
+                          <svg className='w-4 h-4 text-gray-400 absolute left-2.5 top-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className='overflow-y-auto'>
+                        <div 
+                          className='px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm font-medium text-blue-600 border-b italic'
+                          onClick={() => {
+                            setFormData({ ...formData, vendorId: '' })
+                            setShowVendorDropdown(false)
+                            setVendorSearchTerm('')
+                          }}
+                        >
+                          None (No Vendor)
+                        </div>
+                        {filteredVendors.length === 0 ? (
+                          <div className='px-4 py-3 text-sm text-gray-500 text-center'>No vendors found</div>
+                        ) : (
+                          filteredVendors.map((vendor) => (
+                            <div
+                              key={vendor._id}
+                              className={`px-4 py-2 hover:bg-blue-50 cursor-pointer border-b last:border-0 ${formData.vendorId === vendor._id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''}`}
+                              onClick={() => {
+                                setFormData({ ...formData, vendorId: vendor._id })
+                                setShowVendorDropdown(false)
+                                setVendorSearchTerm('')
+                              }}
+                            >
+                              <div className='text-sm font-bold text-gray-900'>{vendor.businessName}</div>
+                              <div className='text-xs text-gray-600'>{vendor.ownerName} - {vendor.mobile}</div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -669,20 +739,75 @@ const Ads = () => {
                   )}
                 </div>
 
-                <div>
+                <div className='relative'>
                   <label className='block text-sm font-medium text-gray-700 mb-1'>Vendor (Optional)</label>
-                  <select
-                    value={formData.vendorId}
-                    onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
-                    className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  <div 
+                    className='w-full px-4 py-2 border border-gray-300 rounded-lg cursor-pointer flex justify-between items-center bg-white shadow-sm hover:border-blue-400 transition-colors'
+                    onClick={() => setShowVendorDropdown(!showVendorDropdown)}
                   >
-                    <option value=''>No Vendor</option>
-                    {vendors.map((vendor) => (
-                      <option key={vendor._id} value={vendor._id}>
-                        {vendor.businessName} - {vendor.ownerName}
-                      </option>
-                    ))}
-                  </select>
+                    <span className={formData.vendorId ? 'text-gray-900 font-medium' : 'text-gray-500'}>
+                      {getSelectedVendorName()}
+                    </span>
+                    <div className='flex items-center gap-2'>
+                      <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+                      </svg>
+                      <svg className={`w-4 h-4 text-gray-400 transition-transform ${showVendorDropdown ? 'rotate-180' : ''}`} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {showVendorDropdown && (
+                    <div className='absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-64 overflow-hidden flex flex-col'>
+                      <div className='p-2 border-b bg-gray-50'>
+                        <div className='relative'>
+                          <input
+                            type='text'
+                            placeholder='Search vendor by name or mobile...'
+                            value={vendorSearchTerm}
+                            onChange={(e) => setVendorSearchTerm(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            className='w-full pl-8 pr-4 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                            autoFocus
+                          />
+                          <svg className='w-4 h-4 text-gray-400 absolute left-2.5 top-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className='overflow-y-auto'>
+                        <div 
+                          className='px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm font-medium text-blue-600 border-b italic'
+                          onClick={() => {
+                            setFormData({ ...formData, vendorId: '' })
+                            setShowVendorDropdown(false)
+                            setVendorSearchTerm('')
+                          }}
+                        >
+                          None (No Vendor)
+                        </div>
+                        {filteredVendors.length === 0 ? (
+                          <div className='px-4 py-3 text-sm text-gray-500 text-center'>No vendors found</div>
+                        ) : (
+                          filteredVendors.map((vendor) => (
+                            <div
+                              key={vendor._id}
+                              className={`px-4 py-2 hover:bg-blue-50 cursor-pointer border-b last:border-0 ${formData.vendorId === vendor._id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''}`}
+                              onClick={() => {
+                                setFormData({ ...formData, vendorId: vendor._id })
+                                setShowVendorDropdown(false)
+                                setVendorSearchTerm('')
+                              }}
+                            >
+                              <div className='text-sm font-bold text-gray-900'>{vendor.businessName}</div>
+                              <div className='text-xs text-gray-600'>{vendor.ownerName} - {vendor.mobile}</div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>

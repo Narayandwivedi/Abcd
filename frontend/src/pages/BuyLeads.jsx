@@ -11,20 +11,27 @@ const BuyLeads = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
 
-  // Categories list
-  const categories = [
-    'Advocates', 'Automobiles', 'Beauty parlour', 'Books n stationery', 'Catering',
-    'CCTV', 'Chartered accountants', 'Clothing', 'Digital marketing', 'Doctors',
-    'Education n training', 'Electrical', 'Electronics', 'Engineers', 'Fruits n Veg',
-    'Furniture', 'Grocery', 'Hardware', 'Home appliances', 'Home service',
-    'Hospital', 'Hotel', 'Interior decorators', 'Logistics n courier', 'Marble and tiles',
-    'Medicine', 'Pathology', 'Properties', 'Restaurent', 'Sports',
-    'Telecommunication', 'Tour n Travels', 'Tuition and coaching', 'Web solutions'
-  ]
+  const [categories, setCategories] = useState([])
 
   useEffect(() => {
     fetchApprovedBuyLeads()
+    fetchCategories()
   }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+      const response = await fetch(`${BACKEND_URL}/api/categories`)
+      const data = await response.json()
+      if (data.success) {
+        const categoryData = data.categories || data.data || []
+        const categoryList = categoryData.map(cat => cat.name || cat.title || cat.categoryName).filter(Boolean)
+        setCategories(categoryList)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   // Filter leads when filters change
   useEffect(() => {
@@ -173,7 +180,7 @@ View more leads at: ${window.location.origin}/buy-leads`
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
                 </svg>
               </button>
-              <h1 className='text-2xl md:text-3xl font-bold text-indigo-800 flex items-center gap-2'>
+              <h1 className='text-xl md:text-3xl font-bold text-indigo-800 flex items-center gap-2'>
                 <svg className='w-7 h-7' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' />
                 </svg>
@@ -204,7 +211,7 @@ View more leads at: ${window.location.origin}/buy-leads`
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className='w-full px-2 md:px-3 py-2 md:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-xs md:text-sm bg-white'
+                  className={`w-full px-2 md:px-3 py-2 md:py-2.5 border-2 border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-xs md:text-sm bg-white ${!selectedCategory ? 'text-gray-400' : 'text-gray-800'}`}
                 >
                   <option value=''>All Categories</option>
                   {categories.map((category) => (

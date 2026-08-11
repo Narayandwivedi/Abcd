@@ -35,7 +35,14 @@ const adRoute = require('./routes/adRoute')
 const blogRoute = require('./routes/blogRoute')
 const chatRoute = require('./routes/chatRoute')
 const userChatRoute = require('./routes/userChatRoute')
+<<<<<<< HEAD
 const agraAlankaranRoute = require('./routes/agraAlankaranRoute')
+=======
+const vendorApplicationRoute = require('./routes/vendorApplicationRoute')
+const userApplicationRoute = require('./routes/userApplicationRoute')
+const samajRoute = require('./routes/samajRoutes')
+const familyRoute = require('./routes/familyRoutes')
+>>>>>>> 405b6119bc477a3168b7d5c0b8fe3e4aa51b721e
 
 // CORS configuration
 const corsOptions = {
@@ -82,7 +89,14 @@ app.use('/api/ads', adRoute)
 app.use('/api/blogs', blogRoute)
 app.use('/api/chats', chatRoute)
 app.use('/api/user/chat', userChatRoute)
+<<<<<<< HEAD
 app.use('/api/agra-alankaran', agraAlankaranRoute)
+=======
+app.use('/api/vendor-application', vendorApplicationRoute)
+app.use('/api/user-application', userApplicationRoute)
+app.use('/api/samaj', samajRoute)
+app.use('/api/families', familyRoute)
+>>>>>>> 405b6119bc477a3168b7d5c0b8fe3e4aa51b721e
 
 
 // server listen - only after DB connection

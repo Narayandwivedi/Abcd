@@ -39,7 +39,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
             gradient: gradients[index % gradients.length]
           }))
           setCategories(mappedCategories)
-          onCategoriesLoaded(mappedCategories)
+          if (onCategoriesLoaded) onCategoriesLoaded(mappedCategories)
         } else {
           console.error('Failed to load categories')
         }
@@ -84,7 +84,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
       <div className='container mx-auto px-4'>
         <div className='text-center mb-4 md:mb-10'>
           <h2 className='text-xl md:text-3xl font-extrabold text-gray-900 tracking-tight'>
-            Shop by Category
+            Vendor by Category
           </h2>
           <div className='mt-1 md:mt-2 h-1 w-16 md:w-24 bg-blue-600 mx-auto rounded-full'></div>
         </div>
@@ -110,9 +110,9 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
               >
                 {category.image ? (
                   <>
-                    <img 
-                      src={`${BACKEND_URL}${category.image}`} 
-                      alt={category.name} 
+                    <img
+                      src={`${BACKEND_URL}${category.image}`}
+                      alt={category.name}
                       className='absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'
                     />
                     <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-100 transition-opacity duration-500'></div>
@@ -124,7 +124,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
                     <div className='absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700'></div>
                   </>
                 )}
-                
+
                 <div className='relative h-full flex items-center justify-center p-3 text-center'>
                   <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-lg group-hover:scale-110 transition-transform duration-300'>
                     {category.name}
@@ -137,9 +137,9 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
 
         {/* Vendors Joining Soon Section */}
         {!noVendorLoading && noVendorCategories.length > 0 && (
-          <div className='mt-12 md:mt-20 anim-fade-in'>
+          <div className='mt-6 md:mt-8 anim-fade-in'>
             {/* Divider Line */}
-            <div className='relative flex items-center justify-center mb-12 md:mb-16'>
+            <div className='relative flex items-center justify-center mb-6 md:mb-8'>
               <div className='w-full border-t border-gray-300'></div>
               <div className='absolute bg-white px-6 py-1 rounded-full border border-gray-300 shadow-sm'>
                 <span className='text-xs md:text-sm font-semibold text-gray-500 tracking-widest uppercase'>
@@ -148,14 +148,22 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
               </div>
             </div>
 
-            <div className='text-center mb-6 md:mb-12'>
+            <div className='text-center mb-5 md:mb-8'>
               <h2 className='text-xl md:text-3xl font-extrabold text-gray-900 tracking-tight'>
                 Vendors Joining Soon
               </h2>
-              <p className='mt-2 md:mt-3 text-gray-500 text-sm md:text-base max-w-2xl mx-auto px-4'>
-                Stay tuned! New verified vendors are currently being onboarded for these business categories.
-              </p>
               <div className='mt-3 md:mt-4 h-1.5 w-16 md:w-24 bg-blue-600/40 mx-auto rounded-full'></div>
+              
+              <div className='mt-6'>
+                <button 
+                  className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200'
+                >
+                  <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Suggest Category
+                </button>
+              </div>
             </div>
 
             <div className='grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 max-w-7xl mx-auto'>
@@ -167,9 +175,9 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
                 >
                   {category.image ? (
                     <>
-                      <img 
-                        src={`${BACKEND_URL}${category.image}`} 
-                        alt={category.name} 
+                      <img
+                        src={`${BACKEND_URL}${category.image}`}
+                        alt={category.name}
                         className='absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'
                       />
                       <div className='absolute inset-0 bg-black/40 backdrop-blur-[1px] group-hover:backdrop-blur-0 transition-all duration-500'></div>
@@ -184,7 +192,7 @@ const CategorySection = ({ handleCategoryClick, onCategoriesLoaded }) => {
                       <div className='absolute -right-6 -bottom-6 w-20 h-20 bg-white/20 rounded-full group-hover:scale-150 transition-transform duration-700 blur-xl'></div>
                     </>
                   )}
-                  
+
                   <div className='relative h-full flex flex-col items-center justify-center p-3 text-center'>
                     <h3 className='font-bold text-white text-xs md:text-base leading-tight drop-shadow-lg group-hover:scale-105 transition-transform duration-300'>
                       {category.name}

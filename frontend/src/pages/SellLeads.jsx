@@ -11,20 +11,27 @@ const SellLeads = () => {
   const [selectedCity, setSelectedCity] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
 
-  // Categories list
-  const categories = [
-    'Advocates', 'Automobiles', 'Beauty parlour', 'Books n stationery', 'Catering',
-    'CCTV', 'Chartered accountants', 'Clothing', 'Digital marketing', 'Doctors',
-    'Education n training', 'Electrical', 'Electronics', 'Engineers', 'Fruits n Veg',
-    'Furniture', 'Grocery', 'Hardware', 'Home appliances', 'Home service',
-    'Hospital', 'Hotel', 'Interior decorators', 'Logistics n courier', 'Marble and tiles',
-    'Medicine', 'Pathology', 'Properties', 'Restaurent', 'Sports',
-    'Telecommunication', 'Tour n Travels', 'Tuition and coaching', 'Web solutions'
-  ]
+  const [categories, setCategories] = useState([])
 
   useEffect(() => {
     fetchApprovedSellLeads()
+    fetchCategories()
   }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
+      const response = await fetch(`${BACKEND_URL}/api/categories`)
+      const data = await response.json()
+      if (data.success) {
+        const categoryData = data.categories || data.data || []
+        const categoryList = categoryData.map(cat => cat.name || cat.title || cat.categoryName).filter(Boolean)
+        setCategories(categoryList)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   // Filter leads when city or category filter changes
   useEffect(() => {
@@ -187,7 +194,7 @@ View more offers at: ${window.location.origin}/sell-leads`
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
                 </svg>
               </button>
-              <h1 className='text-2xl md:text-3xl font-bold text-orange-800 flex items-center gap-2'>
+              <h1 className='text-xl md:text-3xl font-bold text-orange-800 flex items-center gap-2'>
                 <svg className='w-7 h-7' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
                 </svg>
@@ -218,7 +225,7 @@ View more offers at: ${window.location.origin}/sell-leads`
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className='w-full px-2 md:px-3 py-2 md:py-2.5 border-2 border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-xs md:text-sm bg-white'
+                  className={`w-full px-2 md:px-3 py-2 md:py-2.5 border-2 border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-xs md:text-sm bg-white ${!selectedCategory ? 'text-gray-400' : 'text-gray-800'}`}
                 >
                   <option value=''>All Categories</option>
                   {categories.map((category) => (
@@ -366,13 +373,21 @@ View more offers at: ${window.location.origin}/sell-leads`
                       {/* Divider */}
                       <div className='border-t border-orange-100 my-1'></div>
 
-                      {/* Grid Layout for Product Info - 2 columns on mobile, 3 on desktop */}
-                      <div className='grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-1'>
+                      {/* Grid Layout for Product Info - 2 columns on mobile, 4 on desktop */}
+                      <div className='grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-1'>
                         {/* Product/Service */}
                         <div className='flex items-center gap-1.5 col-span-2'>
                           <span className='text-[10px] font-bold text-gray-500 uppercase'>Product:</span>
                           <span className='text-xs md:text-sm font-bold text-gray-900 truncate'>{lead.productServiceOffered}</span>
                         </div>
+
+                        {/* Category */}
+                        {lead.category && (
+                          <div className='flex items-center gap-1.5'>
+                            <span className='text-[10px] font-bold text-gray-500 uppercase'>Category:</span>
+                            <span className='text-xs md:text-sm font-semibold text-indigo-700 truncate'>{lead.category}</span>
+                          </div>
+                        )}
 
                         {/* Brand */}
                         <div className='flex items-center gap-1.5'>
@@ -382,7 +397,7 @@ View more offers at: ${window.location.origin}/sell-leads`
 
                         {/* Model */}
                         {lead.modelDetail && (
-                          <div className='flex items-center gap-1.5 col-span-2 md:col-span-3'>
+                          <div className='flex items-center gap-1.5 col-span-2 md:col-span-4'>
                             <span className='text-[10px] font-bold text-gray-500 uppercase'>Model:</span>
                             <span className='text-xs md:text-sm font-semibold text-purple-600 truncate'>{lead.modelDetail}</span>
                           </div>

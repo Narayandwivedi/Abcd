@@ -21,11 +21,30 @@ import Download from './pages/Download'
 import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Vouchers from './pages/Vouchers'
+<<<<<<< HEAD
 import AgraAlankaran from './pages/AgraAlankaran'
+=======
+import VendorDetail from './pages/VendorDetail'
+import SamajCensus from './pages/SamajCensus'
+import FamilyCensus from './pages/FamilyCensus'
+import Census from './pages/Census'
+import BackgroundMusic from './component/BackgroundMusic'
+import { AudioProvider } from './context/AudioContext'
+
+// Scroll to top on every route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation()
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [pathname])
+  return null
+}
+>>>>>>> 405b6119bc477a3168b7d5c0b8fe3e4aa51b721e
 
 const App = () => {
   const location = useLocation()
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
+  const isCensusPage = location.pathname === '/census' || location.pathname === '/samaj-census' || location.pathname === '/family-census'
   const isHomePage = location.pathname === '/'
   const getSeoConfig = (pathname) => {
     if (pathname === '/') {
@@ -144,6 +163,17 @@ const App = () => {
       }
     }
 
+    // Vendor detail pages: /:state/:district/:city/:slug
+    const parts = pathname.split('/').filter(Boolean)
+    if (parts.length === 4) {
+      return {
+        title: 'Vendor Profile - ABCD Vyapar',
+        description:
+          'View vendor profile, contact details, and business categories on ABCD Vyapar.',
+        canonicalPath: pathname,
+      }
+    }
+
     if (pathname === '/login') {
       return {
         title: 'Login - ABCD Vyapar',
@@ -159,6 +189,30 @@ const App = () => {
         description: 'Create your ABCD Vyapar account.',
         canonicalPath: '/signup',
         robots: 'noindex, nofollow',
+      }
+    }
+
+    if (pathname === '/samaj-census') {
+      return {
+        title: 'Samaj Census - ABCD Vyapar',
+        description: 'Register your Samaj in the Agrawal Samaj Census portal. Fill in Samaj name, office address, and contact details.',
+        canonicalPath: '/samaj-census',
+      }
+    }
+
+    if (pathname === '/family-census') {
+      return {
+        title: 'Family Census - ABCD Vyapar',
+        description: 'Register your family in the Agrawal Samaj Census portal. Submit family details and member information.',
+        canonicalPath: '/family-census',
+      }
+    }
+
+    if (pathname === '/census') {
+      return {
+        title: 'Agrawal Samaj Census Portal - ABCD Vyapar',
+        description: 'Participate in the Agrawal Samaj Census. Register your Samaj location or family member data to strengthen our community network.',
+        canonicalPath: '/census',
       }
     }
 
@@ -194,6 +248,7 @@ const App = () => {
   }
 
   return (
+    <AudioProvider>
     <div className={isAuthPage ? '' : 'flex flex-col min-h-screen'}>
       <Seo
         title={seo.title}
@@ -203,6 +258,8 @@ const App = () => {
         structuredData={isHomePage ? homeStructuredData : null}
       />
       {!isAuthPage && <Navbar />}
+      <ScrollToTop />
+      {isCensusPage && <BackgroundMusic />}
       <div className='pb-0 md:pb-0'>
         <Routes>
           <Route path='/' element={<Home />} />
@@ -220,11 +277,15 @@ const App = () => {
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/agra-alankaran' element={<AgraAlankaran />} />
           <Route path='/category/:categorySlug' element={<CategoryPage />} />
+          <Route path='/census' element={<Census />} />
+          <Route path='/samaj-census' element={<SamajCensus />} />
+          <Route path='/family-census' element={<FamilyCensus />} />
           <Route path='/:type/:id' element={<AdDetail />} />
+          <Route path='/:state/:district/:city/:slug' element={<VendorDetail />} />
         </Routes>
       </div>
-      {!isAuthPage && <Footer />}
-      {!isAuthPage && <BottomNav />}
+      {!isAuthPage && <Footer noBottomNav={isCensusPage} />}
+      {!isAuthPage && !isCensusPage && <BottomNav />}
 
       {/* Toast Notification Container */}
       <ToastContainer
@@ -240,6 +301,7 @@ const App = () => {
         theme="colored"
       />
     </div>
+    </AudioProvider>
   )
 }
 
