@@ -35,6 +35,7 @@ const adRoute = require('./routes/adRoute')
 const blogRoute = require('./routes/blogRoute')
 const chatRoute = require('./routes/chatRoute')
 const userChatRoute = require('./routes/userChatRoute')
+const agraAlankaranRoute = require('./routes/agraAlankaranRoute')
 
 // CORS configuration
 const corsOptions = {
@@ -81,6 +82,7 @@ app.use('/api/ads', adRoute)
 app.use('/api/blogs', blogRoute)
 app.use('/api/chats', chatRoute)
 app.use('/api/user/chat', userChatRoute)
+app.use('/api/agra-alankaran', agraAlankaranRoute)
 
 
 // server listen - only after DB connection

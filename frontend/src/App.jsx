@@ -21,6 +21,7 @@ import Download from './pages/Download'
 import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Vouchers from './pages/Vouchers'
+import AgraAlankaran from './pages/AgraAlankaran'
 
 const App = () => {
   const location = useLocation()
@@ -117,6 +118,14 @@ const App = () => {
       }
     }
 
+    if (pathname === '/agra-alankaran') {
+      return {
+        title: 'अग्र अलंकरण 2025-26 - छत्तीसगढ़ प्रांतीय अग्रवाल संगठन',
+        description: 'छत्तीसगढ़ स्तरीय दशम् अग्र अलंकरण समारोह 2026 हेतु ऑनलाइन आवेदन-पत्र। अपनी उपलब्धियों का विवरण दर्ज करें।',
+        canonicalPath: '/agra-alankaran',
+      }
+    }
+
     if (pathname.startsWith('/category/')) {
       return {
         title: 'Category Listings - ABCD Vyapar',
@@ -209,6 +218,7 @@ const App = () => {
           <Route path='/signup' element={<Signup />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
+          <Route path='/agra-alankaran' element={<AgraAlankaran />} />
           <Route path='/category/:categorySlug' element={<CategoryPage />} />
           <Route path='/:type/:id' element={<AdDetail />} />
         </Routes>
