@@ -21,9 +21,7 @@ import Download from './pages/Download'
 import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Vouchers from './pages/Vouchers'
-<<<<<<< HEAD
 import AgraAlankaran from './pages/AgraAlankaran'
-=======
 import VendorDetail from './pages/VendorDetail'
 import SamajCensus from './pages/SamajCensus'
 import FamilyCensus from './pages/FamilyCensus'
@@ -39,7 +37,6 @@ const ScrollToTop = () => {
   }, [pathname])
   return null
 }
->>>>>>> 405b6119bc477a3168b7d5c0b8fe3e4aa51b721e
 
 const App = () => {
   const location = useLocation()

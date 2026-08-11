@@ -18,6 +18,15 @@ const OCCUPATION_OPTIONS = [
   'Labourer / Worker', 'Retired',
 ]
 
+const BLOOD_GROUP_OPTIONS = [
+  'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Unknown',
+]
+
+const QUALIFICATION_OPTIONS = [
+  'Below 10th', '10th Pass', '12th Pass', 'ITI / Diploma', 'Graduate',
+  'Post Graduate', 'Professional', 'Doctorate / PhD', 'Other',
+]
+
 const GOTRA_OPTIONS = [
   'Bansal', 'Kuchhal', 'Kansal', 'Bindal', 'Singhal', 'Jindal', 'Mittal',
   'Garg', 'Nangal', 'Mangal', 'Tayal', 'Tingal', 'Madhukul', 'Goyal',
@@ -34,6 +43,8 @@ const emptyMember = () => ({
   gender: '',
   occupation: '',
   occupationOther: '',
+  bloodGroup: '',
+  highestQualification: '',
 })
 
 
@@ -126,7 +137,7 @@ function SectionHeader({ icon, title, subtitle, accent }) {
 
 function PreviewRow({ label, value }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center py-2.5 border-b border-gray-50 last:border-b-0">
+    <div className="flex flex-col sm:flex-row sm:items-center py-1.5">
       <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider min-w-[160px]">{label}</span>
       <span className="text-sm text-gray-800 font-medium mt-0.5 sm:mt-0">{value || '—'}</span>
     </div>
@@ -345,16 +356,18 @@ export default function FamilyCensus() {
 
           <div className="flex flex-col gap-5">
             <SectionCard title="Family Information">
-              <PreviewRow label="Family Leader Name" value={form.leaderName} />
-              <PreviewRow label="Mobile Number" value={form.leaderMobile} />
-              <PreviewRow label="Gotra" value={form.gotra} />
-              <PreviewRow label="State" value={form.state} />
-              <PreviewRow label="District" value={form.district} />
-              <PreviewRow label="Block/Tehsil" value={form.block} />
-              <PreviewRow label="Village / Town / City" value={form.villageOrCity} />
-              <PreviewRow label="Complete Address" value={form.address} />
-              <PreviewRow label="Pincode" value={form.pincode} />
-              <PreviewRow label="Remarks" value={form.remarks} />
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-3 sm:gap-x-6">
+                <PreviewRow label="Family Leader Name" value={form.leaderName} />
+                <PreviewRow label="Mobile Number" value={form.leaderMobile} />
+                <PreviewRow label="Gotra" value={form.gotra} />
+                <PreviewRow label="State" value={form.state} />
+                <PreviewRow label="District" value={form.district} />
+                <PreviewRow label="Block/Tehsil" value={form.block} />
+                <PreviewRow label="Village / Town / City" value={form.villageOrCity} />
+                <PreviewRow label="Complete Address" value={form.address} />
+                <PreviewRow label="Pincode" value={form.pincode} />
+                <PreviewRow label="Remarks" value={form.remarks} />
+              </div>
             </SectionCard>
 
             <SectionCard title="Family Members">
@@ -364,7 +377,7 @@ export default function FamilyCensus() {
                 form.members.map((member, idx) => (
                   <div key={idx} className={idx < form.members.length - 1 ? 'border-b border-gray-100 pb-4 mb-4' : ''}>
                     <p className="text-xs font-bold text-[#C67A2D] uppercase tracking-wider mb-3">Member {idx + 1}</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-3 sm:gap-x-6">
                       <PreviewRow label="Name" value={member.name} />
                       <PreviewRow label="Relation" value={member.relation === 'Self' || !member.relationWith ? member.relation : `${member.relation} of ${member.relationWith}`} />
                       <PreviewRow label="Mobile" value={member.mobile} />
@@ -372,6 +385,8 @@ export default function FamilyCensus() {
                       <PreviewRow label="Age" value={member.age} />
                       <PreviewRow label="Gender" value={member.gender} />
                       <PreviewRow label="Occupation" value={member.occupation === 'Other' ? member.occupationOther : member.occupation} />
+                      <PreviewRow label="Blood Group" value={member.bloodGroup} />
+                      <PreviewRow label="Qualification" value={member.highestQualification} />
                     </div>
                   </div>
                 ))
@@ -379,8 +394,10 @@ export default function FamilyCensus() {
             </SectionCard>
 
             <SectionCard title="Submitted By">
-              <PreviewRow label="Name" value={form.submittedBy} />
-              <PreviewRow label="Mobile Number" value={form.submittedByMobile} />
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-x-3 sm:gap-x-6">
+                <PreviewRow label="Name" value={form.submittedBy} />
+                <PreviewRow label="Mobile Number" value={form.submittedByMobile} />
+              </div>
             </SectionCard>
           </div>
 
@@ -742,6 +759,16 @@ export default function FamilyCensus() {
                         <option value="Other">Other</option>
                       </Select>
                       <Select
+                        label="Blood Group (Optional)"
+                        value={member.bloodGroup}
+                        onChange={(e) => handleMemberChange(idx, 'bloodGroup', e.target.value)}
+                      >
+                        <option value="">-- Select Blood Group --</option>
+                        {BLOOD_GROUP_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </Select>
+                      <Select
                         label="Occupation"
                         wrapperClassName="sm:col-span-2"
                         value={member.occupation}
@@ -762,6 +789,17 @@ export default function FamilyCensus() {
                           placeholder="Enter occupation"
                         />
                       )}
+                      <Select
+                        label="Highest Qualification (Optional)"
+                        wrapperClassName="sm:col-span-2"
+                        value={member.highestQualification}
+                        onChange={(e) => handleMemberChange(idx, 'highestQualification', e.target.value)}
+                      >
+                        <option value="">-- Select Highest Qualification --</option>
+                        {QUALIFICATION_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </Select>
                     </div>
                   </div>
                 </div>

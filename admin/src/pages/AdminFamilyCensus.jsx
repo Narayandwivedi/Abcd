@@ -10,6 +10,15 @@ const RELATION_OPTIONS = [
   'Brother', 'Sister', 'Grandfather', 'Grandmother', 'Uncle', 'Aunt', 'Other',
 ]
 
+const BLOOD_GROUP_OPTIONS = [
+  'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Unknown',
+]
+
+const QUALIFICATION_OPTIONS = [
+  'Below 10th', '10th Pass', '12th Pass', 'ITI / Diploma', 'Graduate',
+  'Post Graduate', 'Professional', 'Doctorate / PhD', 'Other',
+]
+
 const GOTRA_OPTIONS = [
   'Bansal', 'Kuchhal', 'Kansal', 'Bindal', 'Singhal', 'Jindal', 'Mittal',
   'Garg', 'Nangal', 'Mangal', 'Tayal', 'Tingal', 'Madhukul', 'Goyal',
@@ -28,7 +37,7 @@ const INDIAN_STATES = [
   'Lakshadweep', 'Puducherry',
 ]
 
-const emptyMember = () => ({ name: '', relation: '', relationWith: 'Family Leader', mobile: '', dob: '', age: '', gender: '', occupation: '' })
+const emptyMember = () => ({ name: '', relation: '', relationWith: 'Family Leader', mobile: '', dob: '', age: '', gender: '', occupation: '', bloodGroup: '', highestQualification: '' })
 
 const calcAge = (dob) => {
   if (!dob) return ''
@@ -214,7 +223,7 @@ const AdminFamilyCensus = () => {
       members: family.members && family.members.length > 0
         ? family.members.map(m => ({
             name: m.name || '', relation: m.relation || '', relationWith: m.relationWith || 'Family Leader', mobile: m.mobile || '',
-            dob: toInputDate(m.dob), age: m.age || '', gender: m.gender || '', occupation: m.occupation || '',
+            dob: toInputDate(m.dob), age: m.age || '', gender: m.gender || '', occupation: m.occupation || '', bloodGroup: m.bloodGroup || '', highestQualification: m.highestQualification || '',
           }))
         : [],
       submittedBy: family.submittedBy || '',
@@ -256,7 +265,7 @@ const AdminFamilyCensus = () => {
 
     const rows = filteredList.map((family) => {
       const membersText = family.members?.length
-        ? family.members.map(m => `${m.name || ''} (${relationLabel(m)}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''}${m.gender ? `, ${m.gender}` : ''}${m.mobile ? `, ${m.mobile}` : ''}${m.occupation ? `, ${m.occupation}` : ''})`).join('; ')
+        ? family.members.map(m => `${m.name || ''} (${relationLabel(m)}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''}${m.gender ? `, ${m.gender}` : ''}${m.mobile ? `, ${m.mobile}` : ''}${m.occupation ? `, ${m.occupation}` : ''}${m.bloodGroup ? `, Blood: ${m.bloodGroup}` : ''}${m.highestQualification ? `, Qualification: ${m.highestQualification}` : ''})`).join('; ')
         : ''
       return {
         'Leader Name': family.leaderName || '',
@@ -300,7 +309,7 @@ const AdminFamilyCensus = () => {
     const head = [['#', 'Leader Name', 'Mobile', 'Gotra', 'Address', 'State', 'District', 'Block/Tehsil', 'Village/City', 'Pincode', 'Members', 'Status', 'Verification']]
     const body = filteredList.map((family, idx) => {
       const membersText = family.members?.length
-        ? family.members.map(m => `${m.name || ''} (${relationLabel(m)}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''})`).join(', ')
+        ? family.members.map(m => `${m.name || ''} (${relationLabel(m)}${m.age ? `, ${m.age}y` : ''}${m.dob ? `, DOB: ${new Date(m.dob).toLocaleDateString('en-IN')}` : ''}${m.bloodGroup ? `, Blood: ${m.bloodGroup}` : ''}${m.highestQualification ? `, Qualification: ${m.highestQualification}` : ''})`).join(', ')
         : '-'
       return [
         idx + 1,
@@ -507,6 +516,8 @@ const AdminFamilyCensus = () => {
                                 {m.age ? <span>Age: {m.age}</span> : null}
                                 {m.gender && <span>{m.gender}</span>}
                                 {m.occupation && <span>{m.occupation}</span>}
+                                {m.bloodGroup && <span>Blood: {m.bloodGroup}</span>}
+                                {m.highestQualification && <span>Qualification: {m.highestQualification}</span>}
                               </div>
                             </div>
                           ))}
@@ -648,6 +659,8 @@ const AdminFamilyCensus = () => {
                               {m.dob ? <span>DOB: {new Date(m.dob).toLocaleDateString('en-IN')}</span> : null}
                               {m.gender && <span>{m.gender}</span>}
                               {m.occupation && <span>{m.occupation}</span>}
+                              {m.bloodGroup && <span>Blood: {m.bloodGroup}</span>}
+                              {m.highestQualification && <span>Qualification: {m.highestQualification}</span>}
                             </div>
                           </div>
                         ))}
@@ -811,9 +824,19 @@ const AdminFamilyCensus = () => {
                         <option value='Female'>Female</option>
                         <option value='Other'>Other</option>
                       </select>
+                      <select value={member.bloodGroup} onChange={(e) => handleMemberChange(idx, 'bloodGroup', e.target.value)}
+                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'>
+                        <option value=''>Blood Group</option>
+                        {BLOOD_GROUP_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
                       <input type='text' placeholder='Occupation' value={member.occupation}
                         onChange={(e) => handleMemberChange(idx, 'occupation', e.target.value)}
                         className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm' />
+                      <select value={member.highestQualification} onChange={(e) => handleMemberChange(idx, 'highestQualification', e.target.value)}
+                        className='px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'>
+                        <option value=''>Highest Qualification</option>
+                        {QUALIFICATION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
                     </div>
                   </div>
                 ))}
@@ -908,6 +931,8 @@ const AdminFamilyCensus = () => {
                             {m.dob ? <span className='text-gray-500'>DOB: <span className='text-gray-700 font-medium'>{new Date(m.dob).toLocaleDateString('en-IN')}</span></span> : null}
                           </div>
                           {m.occupation && <span className='text-gray-500'>Occupation: <span className='text-gray-700 font-medium'>{m.occupation}</span></span>}
+                          {m.bloodGroup && <span className='text-gray-500'>Blood: <span className='text-gray-700 font-medium'>{m.bloodGroup}</span></span>}
+                          {m.highestQualification && <span className='text-gray-500'>Qualification: <span className='text-gray-700 font-medium'>{m.highestQualification}</span></span>}
                         </div>
                       </div>
                     ))}

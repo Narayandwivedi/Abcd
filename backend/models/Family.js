@@ -10,6 +10,8 @@ const familyMemberSchema = new mongoose.Schema(
     age: { type: Number, min: [0, 'Age cannot be negative'], default: 0 },
     gender: { type: String, enum: ['Male', 'Female', 'Other'], required: [true, 'Gender is required'], trim: true },
     occupation: { type: String, trim: true, default: '' },
+    bloodGroup: { type: String, trim: true, default: '' },
+    highestQualification: { type: String, trim: true, default: '' },
   },
   { _id: false }
 );

@@ -27,12 +27,9 @@ const Footer = ({ noBottomNav = false }) => {
                 <Link to='/privacy' className='text-gray-400 hover:text-white transition'>Privacy Policy</Link>
               </li>
               <li>
-<<<<<<< HEAD
                 <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran 2025-26</Link>
               </li>
               <li className='hidden md:block'>
-=======
->>>>>>> 405b6119bc477a3168b7d5c0b8fe3e4aa51b721e
                 <Link to='/about' className='text-gray-400 hover:text-white transition'>About</Link>
               </li>
               <li>
