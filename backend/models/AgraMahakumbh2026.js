@@ -59,6 +59,22 @@ const agraMahakumbh2026Schema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  travelMode: {
+    type: String,
+    trim: true,
+  },
+  travelDetail: {
+    type: String,
+    trim: true,
+  },
+  arrivalDate: {
+    type: String,
+    trim: true,
+  },
+  arrivalTime: {
+    type: String,
+    trim: true,
+  },
   status: {
     type: String,
     enum: ["pending", "approved", "rejected"],

@@ -67,7 +67,11 @@ exports.submitRegistration = async (req, res) => {
       address,
       registrationType,
       registrationFee,
-      utrNumber
+      utrNumber,
+      travelMode,
+      travelDetail,
+      arrivalDate,
+      arrivalTime
     } = req.body;
 
     // Validate required fields
@@ -133,6 +137,10 @@ exports.submitRegistration = async (req, res) => {
       photo: photoPath,
       paymentScreenshot: paymentPath,
       utrNumber: utrNumber || "",
+      travelMode: travelMode || "",
+      travelDetail: travelDetail || "",
+      arrivalDate: arrivalDate || "",
+      arrivalTime: arrivalTime || "",
       status: "pending"
     });
 

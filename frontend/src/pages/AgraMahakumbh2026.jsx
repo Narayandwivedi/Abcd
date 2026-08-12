@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { Loader2, CheckCircle, User, Phone, MapPin, Upload, Hash, Camera, Users, CalendarDays } from 'lucide-react'
+import { Loader2, CheckCircle, User, Phone, MapPin, Upload, Hash, Camera, Users, CalendarDays, Train, Car, Bus, MoreHorizontal, Clock } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AppContext } from '../context/AppContext'
 
@@ -40,6 +40,13 @@ const REGISTRATION_TYPES = [
 
 const GENDERS = ['Male', 'Female', 'Other']
 
+const TRAVEL_MODES = [
+  { value: 'Train', Icon: Train },
+  { value: 'Car', Icon: Car },
+  { value: 'Bus', Icon: Bus },
+  { value: 'Other', Icon: MoreHorizontal },
+]
+
 const AgraMahakumbh2026 = () => {
   const { BACKEND_URL } = useContext(AppContext)
   const [loading, setLoading] = useState(false)
@@ -55,6 +62,10 @@ const AgraMahakumbh2026 = () => {
     address: '',
     registrationType: '',
     utrNumber: '',
+    travelMode: '',
+    travelDetail: '',
+    arrivalDate: '',
+    arrivalTime: '',
   })
   const [photoFile, setPhotoFile] = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
@@ -210,6 +221,10 @@ const AgraMahakumbh2026 = () => {
       submitData.append('address', formData.address.trim())
       submitData.append('registrationType', formData.registrationType)
       submitData.append('registrationFee', selectedType ? selectedType.fee : '')
+      submitData.append('travelMode', formData.travelMode)
+      submitData.append('travelDetail', formData.travelDetail.trim())
+      submitData.append('arrivalDate', formData.arrivalDate)
+      submitData.append('arrivalTime', formData.arrivalTime)
       if (formData.utrNumber.trim()) submitData.append('utrNumber', formData.utrNumber.trim())
       if (photoFile) submitData.append('photo', photoFile)
       if (paymentFile) submitData.append('paymentScreenshot', paymentFile)
@@ -245,6 +260,10 @@ const AgraMahakumbh2026 = () => {
       address: '',
       registrationType: '',
       utrNumber: '',
+      travelMode: '',
+      travelDetail: '',
+      arrivalDate: '',
+      arrivalTime: '',
     })
     setPhotoFile(null)
     setPhotoPreview(null)
@@ -445,6 +464,70 @@ const AgraMahakumbh2026 = () => {
                 ))}
               </div>
               {errors.registrationType && <p className='text-xs text-red-500 mt-1'>{errors.registrationType}</p>}
+            </div>
+
+            {/* Travel Details */}
+            <div className='space-y-3'>
+              <div>
+                <label className={labelClass}>Travel Mode</label>
+                <div className='grid grid-cols-4 gap-2'>
+                  {TRAVEL_MODES.map((mode) => (
+                    <label
+                      key={mode.value}
+                      className={`flex items-center justify-center gap-1.5 px-2 py-2.5 border-2 rounded-xl cursor-pointer transition-all font-bold text-[11px] sm:text-xs ${
+                        formData.travelMode === mode.value
+                          ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
+                          : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-indigo-300'
+                      }`}
+                    >
+                      <input type='radio' name='travelMode' value={mode.value} checked={formData.travelMode === mode.value} onChange={handleChange} className='hidden' />
+                      <mode.Icon className='w-3.5 h-3.5' />
+                      {mode.value}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Travel Detail</label>
+                <textarea
+                  name='travelDetail'
+                  value={formData.travelDetail}
+                  onChange={handleChange}
+                  rows='3'
+                  placeholder='Write your travel details here…'
+                  className='w-full px-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium resize-y'
+                />
+              </div>
+
+              <div className='grid grid-cols-2 gap-2'>
+                <div>
+                  <label className={labelClass}>Arrival Date</label>
+                  <div className='relative'>
+                    <CalendarDays className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                    <input
+                      type='date'
+                      name='arrivalDate'
+                      value={formData.arrivalDate}
+                      onChange={handleChange}
+                      className='w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium'
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className={labelClass}>Arrival Time</label>
+                  <div className='relative'>
+                    <Clock className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                    <input
+                      type='time'
+                      name='arrivalTime'
+                      value={formData.arrivalTime}
+                      onChange={handleChange}
+                      className='w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium'
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Photo Upload */}
