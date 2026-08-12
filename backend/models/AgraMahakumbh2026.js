@@ -47,6 +47,10 @@ const agraMahakumbh2026Schema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  utrNumber: {
+    type: String,
+    trim: true,
+  },
   status: {
     type: String,
     enum: ["pending", "approved", "rejected"],

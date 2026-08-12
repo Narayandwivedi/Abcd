@@ -64,7 +64,8 @@ exports.submitRegistration = async (req, res) => {
       fatherName,
       address,
       registrationType,
-      registrationFee
+      registrationFee,
+      utrNumber
     } = req.body;
 
     // Validate required fields
@@ -127,6 +128,7 @@ exports.submitRegistration = async (req, res) => {
       registrationFee,
       photo: photoPath,
       paymentScreenshot: paymentPath,
+      utrNumber: utrNumber || "",
       status: "pending"
     });
 
