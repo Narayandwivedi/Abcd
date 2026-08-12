@@ -167,8 +167,8 @@ const AgraMahakumbh2026 = () => {
   const handlePhotoChange = (e) => {
     const file = e.target.files[0]
     if (!file) return
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Photo size should be less than 5MB')
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Photo size should be less than 10MB')
       return
     }
     setPhotoFile(file)
@@ -539,7 +539,7 @@ const AgraMahakumbh2026 = () => {
                 className='flex items-center justify-center gap-2 w-full py-2.5 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl text-xs sm:text-sm text-gray-600 cursor-pointer hover:bg-gray-100 hover:border-indigo-400 transition-all'
               >
                 <Camera className='w-4 h-4' />
-                {photoFile ? photoFile.name : 'Upload Passport Size Photo (Max 5MB)'}
+                {photoFile ? photoFile.name : 'Upload Passport Size Photo (Max 10MB)'}
               </label>
               {photoPreview && (
                 <div className='mt-2 relative'>
