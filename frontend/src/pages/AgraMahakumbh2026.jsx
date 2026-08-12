@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { Loader2, CheckCircle, User, Phone, MapPin, Upload, Hash, FileText, Camera, Users } from 'lucide-react'
+import { Loader2, CheckCircle, User, Phone, MapPin, Upload, Hash, Camera, Users } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AppContext } from '../context/AppContext'
 
@@ -233,18 +233,10 @@ const AgraMahakumbh2026 = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-start sm:items-center justify-center px-2 py-4 sm:p-4'>
-      <div className='w-full max-w-lg'>
+    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50'>
+      <img src='/agra alankaran.avif' alt='Agra Mahakumbh 2026' className='w-full h-auto object-cover' />
 
-        {/* Header */}
-        <div className='text-center mb-5 sm:mb-4 px-2 pt-6 sm:pt-0'>
-          <div className='flex items-center justify-center gap-2 mb-1'>
-            <FileText className='w-5 h-5 text-indigo-600' />
-            <h1 className='text-xl sm:text-2xl lg:text-xl font-black text-gray-900'>Agra Mahakumbh 2026 Registration</h1>
-          </div>
-          <p className='text-sm sm:text-base lg:text-sm xl:text-sm text-gray-600'>Submit your registration — our team will verify your payment!</p>
-          <p className='text-xs text-indigo-600 font-bold mt-1'>Date: 19–20 September 2026 · Venue: Ambikapur (C.G.)</p>
-        </div>
+      <div className='w-full max-w-lg mx-auto px-2 py-6 sm:py-8'>
 
         {/* Card */}
         <div className='bg-white sm:rounded-3xl sm:shadow-xl p-4 sm:p-8'>
