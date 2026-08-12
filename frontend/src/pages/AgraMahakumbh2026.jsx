@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { Loader2, CheckCircle, User, Phone, MapPin, Upload, Hash, Camera, Users } from 'lucide-react'
+import { Loader2, CheckCircle, User, Phone, MapPin, Upload, Hash, Camera, Users, CalendarDays } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AppContext } from '../context/AppContext'
 
@@ -16,11 +16,11 @@ const BANK_DETAILS = {
 
 const REGISTRATION_TYPES = [
   {
-    value: 'without-room',
-    label: 'Without Room',
-    fee: '300',
-    feeLabel: '₹300',
-    desc: 'Registration Fee ₹300',
+    value: 'with-room-1-night',
+    label: 'With Room – 1 Night',
+    fee: '500',
+    feeLabel: '₹500',
+    desc: 'Twin / Triple Sharing – ₹500',
   },
   {
     value: 'with-room-2-nights',
@@ -30,11 +30,11 @@ const REGISTRATION_TYPES = [
     desc: 'Twin / Triple Sharing – ₹1500',
   },
   {
-    value: 'with-room-1-night',
-    label: 'With Room – 1 Night',
-    fee: '500',
-    feeLabel: '₹500',
-    desc: 'Twin / Triple Sharing – ₹500',
+    value: 'without-room',
+    label: 'Without Room',
+    fee: '300',
+    feeLabel: '₹300',
+    desc: 'Registration Fee ₹300',
   },
 ]
 
@@ -49,6 +49,8 @@ const AgraMahakumbh2026 = () => {
     fullName: '',
     gender: '',
     mobileNo: '',
+    dob: '',
+    age: '',
     fatherName: '',
     address: '',
     registrationType: '',
@@ -76,6 +78,19 @@ const AgraMahakumbh2026 = () => {
     } else if (name === 'utrNumber') {
       const digitsOnly = value.replace(/\D/g, '').slice(0, 12)
       setFormData((prev) => ({ ...prev, [name]: digitsOnly }))
+    } else if (name === 'dob') {
+      if (value) {
+        const birthDate = new Date(value)
+        const today = new Date()
+        let calculatedAge = today.getFullYear() - birthDate.getFullYear()
+        const monthDifference = today.getMonth() - birthDate.getMonth()
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+          calculatedAge--
+        }
+        setFormData((prev) => ({ ...prev, dob: value, age: calculatedAge > 0 ? String(calculatedAge) : '0' }))
+      } else {
+        setFormData((prev) => ({ ...prev, dob: '', age: '' }))
+      }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }))
     }
@@ -116,6 +131,8 @@ const AgraMahakumbh2026 = () => {
       newErrors.mobileNo = 'Enter a valid 10-digit number'
     }
     if (!formData.registrationType) newErrors.registrationType = 'Please select a registration type'
+    if (!formData.fatherName.trim()) newErrors.fatherName = "Father's name is required"
+    if (!formData.address.trim()) newErrors.address = 'Address is required'
     if (!photoFile) newErrors.photo = 'Please upload your photo'
     if (!paymentFile) newErrors.payment = 'Please upload the payment screenshot'
     setErrors(newErrors)
@@ -131,6 +148,8 @@ const AgraMahakumbh2026 = () => {
       submitData.append('fullName', formData.fullName.trim())
       submitData.append('gender', formData.gender)
       submitData.append('mobileNo', formData.mobileNo.trim())
+      submitData.append('dob', formData.dob)
+      submitData.append('age', formData.age)
       submitData.append('fatherName', formData.fatherName.trim())
       submitData.append('address', formData.address.trim())
       submitData.append('registrationType', formData.registrationType)
@@ -164,6 +183,8 @@ const AgraMahakumbh2026 = () => {
       fullName: '',
       gender: '',
       mobileNo: '',
+      dob: '',
+      age: '',
       fatherName: '',
       address: '',
       registrationType: '',
@@ -287,17 +308,44 @@ const AgraMahakumbh2026 = () => {
             {/* Row 2: Father's Name + Address */}
             <div className='grid grid-cols-2 gap-2'>
               <div>
-                <label className={labelClass}>Father&apos;s Name</label>
+                <label className={labelClass}>Father&apos;s Name <span className='text-red-500'>*</span></label>
                 <div className='relative'>
                   <User className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
                   <input type='text' name='fatherName' value={formData.fatherName} onChange={handleChange} placeholder="Father's full name" className={inputClass('fatherName')} />
                 </div>
+                {errors.fatherName && <p className='text-xs text-red-500 mt-1'>{errors.fatherName}</p>}
               </div>
               <div>
-                <label className={labelClass}>Address</label>
+                <label className={labelClass}>Address <span className='text-red-500'>*</span></label>
                 <div className='relative'>
                   <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
                   <input type='text' name='address' value={formData.address} onChange={handleChange} placeholder='Your address' className={inputClass('address')} />
+                </div>
+                {errors.address && <p className='text-xs text-red-500 mt-1'>{errors.address}</p>}
+              </div>
+            </div>
+
+            {/* Row: DOB + Age */}
+            <div className='grid grid-cols-2 gap-2'>
+              <div>
+                <label className={labelClass}>Date of Birth</label>
+                <div className='relative'>
+                  <CalendarDays className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                  <input
+                    type='date'
+                    name='dob'
+                    value={formData.dob}
+                    onChange={handleChange}
+                    max={new Date().toISOString().split('T')[0]}
+                    className='w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium'
+                  />
+                </div>
+              </div>
+              <div>
+                <label className={labelClass}>Age <span className='text-gray-400 font-medium'>(auto)</span></label>
+                <div className='relative'>
+                  <Hash className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                  <input type='number' name='age' value={formData.age} onChange={handleChange} placeholder='Years' className='w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium' />
                 </div>
               </div>
             </div>

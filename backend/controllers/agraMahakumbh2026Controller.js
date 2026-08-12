@@ -61,6 +61,8 @@ exports.submitRegistration = async (req, res) => {
       fullName,
       gender,
       mobileNo,
+      dob,
+      age,
       fatherName,
       address,
       registrationType,
@@ -69,7 +71,7 @@ exports.submitRegistration = async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!fullName || !gender || !mobileNo || !registrationType || !registrationFee) {
+    if (!fullName || !gender || !mobileNo || !fatherName || !address || !registrationType || !registrationFee) {
       return res.status(400).json({
         success: false,
         message: "नाम, लिंग, मोबाइल नंबर, पंजीकरण प्रकार और शुल्क भरना अनिवार्य है"
@@ -122,6 +124,8 @@ exports.submitRegistration = async (req, res) => {
       fullName,
       gender,
       mobileNo,
+      dob: dob || "",
+      age: age || "",
       fatherName: fatherName || "",
       address: address || "",
       registrationType,

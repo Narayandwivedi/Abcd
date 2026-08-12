@@ -21,6 +21,14 @@ const agraMahakumbh2026Schema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  dob: {
+    type: String,
+    trim: true,
+  },
+  age: {
+    type: String,
+    trim: true,
+  },
   fatherName: {
     type: String,
     trim: true,
