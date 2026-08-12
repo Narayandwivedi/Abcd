@@ -61,6 +61,75 @@ const AgraMahakumbh2026 = () => {
   const [paymentFile, setPaymentFile] = useState(null)
   const [paymentPreview, setPaymentPreview] = useState(null)
   const [errors, setErrors] = useState({})
+  const [dobParts, setDobParts] = useState({ year: '', month: '', day: '' })
+  const [showDobPopup, setShowDobPopup] = useState(false)
+  const [dobStep, setDobStep] = useState('year')
+  const [tempDob, setTempDob] = useState({ year: '', month: '', day: '' })
+
+  const MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ]
+
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 101 }, (_, i) => currentYear - i)
+
+  const daysInMonth = (year, month) => {
+    if (!year || !month) return []
+    const lastDay = new Date(year, month, 0).getDate()
+    const today = new Date()
+    const maxDay = year === today.getFullYear() && month === today.getMonth() + 1 ? today.getDate() : lastDay
+    return Array.from({ length: maxDay }, (_, i) => i + 1)
+  }
+
+  const applyDob = (year, month, day) => {
+    if (year && month && day) {
+      const dd = String(day).padStart(2, '0')
+      const mm = String(month).padStart(2, '0')
+      const dobValue = `${year}-${mm}-${dd}`
+      const birthDate = new Date(dobValue)
+      const today = new Date()
+      let calculatedAge = today.getFullYear() - birthDate.getFullYear()
+      const monthDifference = today.getMonth() - birthDate.getMonth()
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        calculatedAge--
+      }
+      setFormData((prev) => ({ ...prev, dob: dobValue, age: calculatedAge > 0 ? String(calculatedAge) : '0' }))
+    } else {
+      setFormData((prev) => ({ ...prev, dob: '', age: '' }))
+    }
+  }
+
+  const openDobPopup = () => {
+    setTempDob({ ...dobParts })
+    setDobStep(dobParts.year ? (dobParts.month ? 'day' : 'month') : 'year')
+    setShowDobPopup(true)
+  }
+
+  const selectDobPart = (part, value) => {
+    const next = { ...tempDob, [part]: value }
+    if (part === 'year') {
+      next.month = ''
+      next.day = ''
+      setDobStep('month')
+    } else if (part === 'month') {
+      next.day = ''
+      setDobStep('day')
+    }
+    setTempDob(next)
+  }
+
+  const confirmDob = () => {
+    const { year, month, day } = tempDob
+    if (!year || !month || !day) return
+    setDobParts({ year, month, day })
+    applyDob(year, month, day)
+    setShowDobPopup(false)
+  }
+
+  const dobDisplay = dobParts.year && dobParts.month && dobParts.day
+    ? `${String(dobParts.day).padStart(2, '0')}-${String(dobParts.month).padStart(2, '0')}-${dobParts.year}`
+    : ''
 
   const selectedType = REGISTRATION_TYPES.find((t) => t.value === formData.registrationType)
 
@@ -78,19 +147,6 @@ const AgraMahakumbh2026 = () => {
     } else if (name === 'utrNumber') {
       const digitsOnly = value.replace(/\D/g, '').slice(0, 12)
       setFormData((prev) => ({ ...prev, [name]: digitsOnly }))
-    } else if (name === 'dob') {
-      if (value) {
-        const birthDate = new Date(value)
-        const today = new Date()
-        let calculatedAge = today.getFullYear() - birthDate.getFullYear()
-        const monthDifference = today.getMonth() - birthDate.getMonth()
-        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-          calculatedAge--
-        }
-        setFormData((prev) => ({ ...prev, dob: value, age: calculatedAge > 0 ? String(calculatedAge) : '0' }))
-      } else {
-        setFormData((prev) => ({ ...prev, dob: '', age: '' }))
-      }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }))
     }
@@ -194,6 +250,7 @@ const AgraMahakumbh2026 = () => {
     setPhotoPreview(null)
     setPaymentFile(null)
     setPaymentPreview(null)
+    setDobParts({ year: '', month: '', day: '' })
     setErrors({})
   }
 
@@ -330,15 +387,28 @@ const AgraMahakumbh2026 = () => {
               <div>
                 <label className={labelClass}>Date of Birth</label>
                 <div className='relative'>
-                  <CalendarDays className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                  <input
-                    type='date'
-                    name='dob'
-                    value={formData.dob}
-                    onChange={handleChange}
-                    max={new Date().toISOString().split('T')[0]}
-                    className='w-full pl-10 pr-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium'
-                  />
+                  <button
+                    type='button'
+                    onClick={openDobPopup}
+                    className='w-full flex items-center gap-2 pl-3 pr-9 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs sm:text-sm text-left transition-all font-medium hover:border-indigo-300 focus:outline-none focus:border-indigo-500 focus:bg-white'
+                  >
+                    <CalendarDays className='w-4 h-4 text-gray-400 shrink-0' />
+                    <span className={`flex-1 truncate ${dobDisplay ? 'text-gray-900 font-semibold' : 'text-gray-400'}`}>
+                      {dobDisplay || 'Select Date of Birth'}
+                    </span>
+                  </button>
+                  {dobDisplay && (
+                    <button
+                      type='button'
+                      onClick={() => { setDobParts({ year: '', month: '', day: '' }); applyDob('', '', '') }}
+                      className='absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-gray-300 hover:text-red-500 transition-colors'
+                      aria-label='Clear Date of Birth'
+                    >
+                      <svg className='w-4 h-4' fill='none' stroke='currentColor' strokeWidth={2} viewBox='0 0 24 24'>
+                        <path strokeLinecap='round' strokeLinejoin='round' d='M6 18L18 6M6 6l12 12' />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
               <div>
@@ -510,6 +580,146 @@ const AgraMahakumbh2026 = () => {
           </form>
         </div>
       </div>
+
+      {showDobPopup && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
+          <div className='absolute inset-0 bg-black/60 backdrop-blur-sm' onClick={() => setShowDobPopup(false)} />
+          <div className='relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-5 sm:p-6 overflow-hidden animate-fade-in'>
+            <div className='flex items-center justify-between mb-4'>
+              <h3 className='text-base font-black text-gray-900'>Select Date of Birth</h3>
+              <button
+                type='button'
+                onClick={() => setShowDobPopup(false)}
+                className='w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors'
+                aria-label='Close'
+              >
+                <svg className='w-4 h-4 text-gray-500' fill='none' stroke='currentColor' strokeWidth={2} viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M6 18L18 6M6 6l12 12' />
+                </svg>
+              </button>
+            </div>
+
+            {/* Stepper indicator */}
+            <div className='flex gap-1.5 mb-4'>
+              {['Year', 'Month', 'Date'].map((label, i) => {
+                const stepName = ['year', 'month', 'day'][i]
+                const active = dobStep === stepName
+                const done = i === 0 ? !!tempDob.year : i === 1 ? !!tempDob.month : !!tempDob.day
+                return (
+                  <div
+                    key={label}
+                    className={`flex-1 rounded-lg py-2 text-center text-[11px] font-black ${
+                      active ? 'bg-indigo-600 text-white' : done ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    {label}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Step: Year */}
+            {dobStep === 'year' && (
+              <div className='max-h-64 overflow-y-auto grid grid-cols-4 gap-1.5 pr-1'>
+                {years.map((y) => (
+                  <button
+                    key={y}
+                    type='button'
+                    onClick={() => selectDobPart('year', String(y))}
+                    className={`py-2 rounded-lg text-xs font-bold border-2 transition-all ${
+                      tempDob.year === String(y)
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                        : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-indigo-300'
+                    }`}
+                  >
+                    {y}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Step: Month */}
+            {dobStep === 'month' && (
+              <div className='max-h-64 overflow-y-auto grid grid-cols-3 gap-1.5 pr-1'>
+                {MONTHS.map((m, i) => (
+                  <button
+                    key={m}
+                    type='button'
+                    onClick={() => selectDobPart('month', String(i + 1))}
+                    className={`px-1 py-2 rounded-lg text-[11px] font-bold border-2 transition-all ${
+                      tempDob.month === String(i + 1)
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                        : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-indigo-300'
+                    }`}
+                  >
+                    {m}
+                  </button>
+                ))}
+                <button
+                  type='button'
+                  onClick={() => setDobStep('year')}
+                  className='col-span-3 py-2 rounded-lg text-xs font-bold text-gray-500 bg-gray-50 border-2 border-dashed border-gray-300 hover:border-indigo-300 hover:text-indigo-600 transition-all'
+                >
+                  ← Change Year
+                </button>
+              </div>
+            )}
+
+            {/* Step: Day */}
+            {dobStep === 'day' && (
+              <div className='max-h-64 overflow-y-auto grid grid-cols-7 gap-1.5 pr-1'>
+                {daysInMonth(Number(tempDob.year), Number(tempDob.month)).map((d) => (
+                  <button
+                    key={d}
+                    type='button'
+                    onClick={() => selectDobPart('day', String(d))}
+                    className={`py-2 rounded-lg text-xs font-bold border-2 transition-all ${
+                      tempDob.day === String(d)
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                        : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-indigo-300'
+                    }`}
+                  >
+                    {d}
+                  </button>
+                ))}
+                <button
+                  type='button'
+                  onClick={() => setDobStep('month')}
+                  className='col-span-7 py-2 rounded-lg text-xs font-bold text-gray-500 bg-gray-50 border-2 border-dashed border-gray-300 hover:border-indigo-300 hover:text-indigo-600 transition-all'
+                >
+                  ← Change Month
+                </button>
+              </div>
+            )}
+
+            {/* Live preview */}
+            {tempDob.year && tempDob.month && tempDob.day && (
+              <p className='mt-3 text-center text-sm font-black text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-xl py-2'>
+                {String(tempDob.day).padStart(2, '0')}-{String(tempDob.month).padStart(2, '0')}-{tempDob.year}
+              </p>
+            )}
+
+            {/* Footer */}
+            <div className='mt-4 flex gap-2'>
+              <button
+                type='button'
+                onClick={() => setShowDobPopup(false)}
+                className='flex-1 py-2.5 rounded-xl text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all'
+              >
+                Cancel
+              </button>
+              <button
+                type='button'
+                onClick={confirmDob}
+                disabled={!tempDob.year || !tempDob.month || !tempDob.day}
+                className='flex-1 py-2.5 rounded-xl text-sm font-black text-white bg-gradient-to-r from-indigo-600 to-purple-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed'
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
