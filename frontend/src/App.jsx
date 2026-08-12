@@ -22,6 +22,7 @@ import BuyLeads from './pages/BuyLeads'
 import SellLeads from './pages/SellLeads'
 import Vouchers from './pages/Vouchers'
 import AgraAlankaran from './pages/AgraAlankaran'
+import AgraMahakumbh2026 from './pages/AgraMahakumbh2026'
 import VendorDetail from './pages/VendorDetail'
 import SamajCensus from './pages/SamajCensus'
 import FamilyCensus from './pages/FamilyCensus'
@@ -42,6 +43,8 @@ const App = () => {
   const location = useLocation()
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
   const isCensusPage = location.pathname === '/census' || location.pathname === '/samaj-census' || location.pathname === '/family-census'
+  const isMahakumbhPage = location.pathname === '/agra-mahakumbh-2026'
+  const hideBottomNav = isCensusPage || isMahakumbhPage
   const isHomePage = location.pathname === '/'
   const getSeoConfig = (pathname) => {
     if (pathname === '/') {
@@ -139,6 +142,14 @@ const App = () => {
         title: 'अग्र अलंकरण 2025-26 - छत्तीसगढ़ प्रांतीय अग्रवाल संगठन',
         description: 'छत्तीसगढ़ स्तरीय दशम् अग्र अलंकरण समारोह 2026 हेतु ऑनलाइन आवेदन-पत्र। अपनी उपलब्धियों का विवरण दर्ज करें।',
         canonicalPath: '/agra-alankaran',
+      }
+    }
+
+    if (pathname === '/agra-mahakumbh-2026') {
+      return {
+        title: 'अग्र महाकुंभ 2026 - ऑनलाइन पंजीकरण',
+        description: 'अग्र महाकुंभ 2026 हेतु ऑनलाइन पंजीकरण। पंजीकरण प्रकार चुनें, शुल्क जमा करें और दस्तावेज़ सबमिट करें।',
+        canonicalPath: '/agra-mahakumbh-2026',
       }
     }
 
@@ -273,6 +284,7 @@ const App = () => {
           <Route path='/contact' element={<Contact />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/agra-alankaran' element={<AgraAlankaran />} />
+          <Route path='/agra-mahakumbh-2026' element={<AgraMahakumbh2026 />} />
           <Route path='/category/:categorySlug' element={<CategoryPage />} />
           <Route path='/census' element={<Census />} />
           <Route path='/samaj-census' element={<SamajCensus />} />
@@ -281,8 +293,8 @@ const App = () => {
           <Route path='/:state/:district/:city/:slug' element={<VendorDetail />} />
         </Routes>
       </div>
-      {!isAuthPage && <Footer noBottomNav={isCensusPage} />}
-      {!isAuthPage && !isCensusPage && <BottomNav />}
+      {!isAuthPage && <Footer noBottomNav={hideBottomNav} />}
+      {!isAuthPage && !hideBottomNav && <BottomNav />}
 
       {/* Toast Notification Container */}
       <ToastContainer
