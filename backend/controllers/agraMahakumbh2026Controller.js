@@ -82,23 +82,22 @@ exports.submitRegistration = async (req, res) => {
       });
     }
 
-    // Generate unique registration number
-    let registrationNo = "";
-    let isUnique = false;
-    let attempts = 0;
-    while (!isUnique && attempts < 10) {
-      const randomNum = Math.floor(10000 + Math.random() * 90000);
-      registrationNo = `MK-2026-${randomNum}`;
-      const existing = await AgraMahakumbh2026.findOne({ registrationNo });
-      if (!existing) {
-        isUnique = true;
-      }
-      attempts++;
-    }
+    // Generate sequential registration number (Agra-2026-001, Agra-2026-002, ...)
+    const eventYear = new Date().getFullYear();
+    const existingRegs = await AgraMahakumbh2026.find({
+      registrationNo: { $regex: new RegExp(`^Agra-${eventYear}-`) }
+    }).select("registrationNo").lean();
 
-    if (!isUnique) {
-      registrationNo = `MK-2026-${Date.now()}`;
-    }
+    let maxSeq = 0;
+    existingRegs.forEach((reg) => {
+      const match = reg.registrationNo.match(/^Agra-(\d{4})-(\d+)$/);
+      if (match && parseInt(match[1], 10) === eventYear) {
+        const seq = parseInt(match[2], 10);
+        if (seq > maxSeq) maxSeq = seq;
+      }
+    });
+
+    const registrationNo = `Agra-${eventYear}-${String(maxSeq + 1).padStart(3, "0")}`;
 
     let photoPath = "";
     let paymentPath = "";
