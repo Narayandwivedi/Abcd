@@ -27,10 +27,10 @@ const Footer = ({ noBottomNav = false }) => {
                 <Link to='/privacy' className='text-gray-400 hover:text-white transition'>Privacy Policy</Link>
               </li>
               <li>
-                <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran 2025-26</Link>
+                <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran</Link>
               </li>
               <li>
-                <Link to='/agra-mahakumbh-2026' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026 Registration</Link>
+                <Link to='/agra-mahakumbh-2026' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026</Link>
               </li>
               <li className='hidden md:block'>
                 <Link to='/about' className='text-gray-400 hover:text-white transition'>About</Link>
@@ -121,7 +121,10 @@ const Footer = ({ noBottomNav = false }) => {
                   <Link to='/privacy' className='text-gray-400 hover:text-white transition'>Privacy Policy</Link>
                 </li>
                 <li>
-                  <Link to='/agra-mahakumbh-2026' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026 Registration</Link>
+                  <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran</Link>
+                </li>
+                <li>
+                  <Link to='/agra-mahakumbh-2026' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026</Link>
                 </li>
               </ul>
             </div>
