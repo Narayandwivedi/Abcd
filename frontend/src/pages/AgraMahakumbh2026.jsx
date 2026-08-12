@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useRef } from 'react'
 import { Loader2, CheckCircle, User, Phone, MapPin, Upload, Hash, Camera, Users, CalendarDays, Train, Car, Bus, MoreHorizontal, Clock } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { AppContext } from '../context/AppContext'
@@ -49,6 +49,8 @@ const TRAVEL_MODES = [
 
 const AgraMahakumbh2026 = () => {
   const { BACKEND_URL } = useContext(AppContext)
+  const photoInputRef = useRef(null)
+  const photoGalleryRef = useRef(null)
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [registrationNo, setRegistrationNo] = useState('')
@@ -267,6 +269,8 @@ const AgraMahakumbh2026 = () => {
     })
     setPhotoFile(null)
     setPhotoPreview(null)
+    if (photoInputRef.current) photoInputRef.current.value = ''
+    if (photoGalleryRef.current) photoGalleryRef.current.value = ''
     setPaymentFile(null)
     setPaymentPreview(null)
     setDobParts({ year: '', month: '', day: '' })
@@ -533,20 +537,39 @@ const AgraMahakumbh2026 = () => {
             {/* Photo Upload */}
             <div>
               <label className={labelClass}>Photo <span className='text-red-500'>*</span></label>
-              <input type='file' id='photo' accept='image/*' onChange={handlePhotoChange} className='hidden' />
-              <label
-                htmlFor='photo'
-                className='flex items-center justify-center gap-2 w-full py-2.5 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl text-xs sm:text-sm text-gray-600 cursor-pointer hover:bg-gray-100 hover:border-indigo-400 transition-all'
-              >
-                <Camera className='w-4 h-4' />
-                {photoFile ? photoFile.name : 'Upload Passport Size Photo (Max 10MB)'}
-              </label>
+              <input type='file' id='photo' ref={photoInputRef} accept='image/*' capture='user' onChange={handlePhotoChange} className='hidden' />
+              <input type='file' id='photoGallery' ref={photoGalleryRef} accept='image/*' onChange={handlePhotoChange} className='hidden' />
+              <div className='flex gap-2'>
+                <button
+                  type='button'
+                  onClick={() => { if (photoInputRef.current) photoInputRef.current.value = ''; photoInputRef.current.click() }}
+                  className='flex items-center justify-center gap-2 w-1/2 py-2.5 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl text-xs sm:text-sm text-gray-600 cursor-pointer hover:bg-gray-100 hover:border-indigo-400 transition-all'
+                >
+                  <Camera className='w-4 h-4' />
+                  Camera
+                </button>
+                <button
+                  type='button'
+                  onClick={() => { if (photoGalleryRef.current) photoGalleryRef.current.value = ''; photoGalleryRef.current.click() }}
+                  className='flex items-center justify-center gap-2 w-1/2 py-2.5 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl text-xs sm:text-sm text-gray-600 cursor-pointer hover:bg-gray-100 hover:border-indigo-400 transition-all'
+                >
+                  <Upload className='w-4 h-4' />
+                  Upload
+                </button>
+              </div>
+              {photoFile && (
+                <p className='text-[10px] text-gray-500 mt-1.5 truncate'>{photoFile.name}</p>
+              )}
               {photoPreview && (
                 <div className='mt-2 relative'>
                   <img src={photoPreview} alt='Photo' className='w-full h-24 object-cover rounded-xl border border-gray-200' />
                   <button
                     type='button'
-                    onClick={() => { setPhotoFile(null); setPhotoPreview(null) }}
+                    onClick={() => {
+                      setPhotoFile(null); setPhotoPreview(null)
+                      if (photoInputRef.current) photoInputRef.current.value = ''
+                      if (photoGalleryRef.current) photoGalleryRef.current.value = ''
+                    }}
                     className='absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600'
                   >✕</button>
                 </div>
