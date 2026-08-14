@@ -203,7 +203,8 @@ const AgraMahakumbh2026 = () => {
     if (!formData.fatherName.trim()) newErrors.fatherName = "Father's name is required"
     if (!formData.address.trim()) newErrors.address = 'Address is required'
     if (!photoFile) newErrors.photo = 'Please upload your photo'
-    if (!paymentFile) newErrors.payment = 'Please upload the payment screenshot'
+    const hasPayment = !!paymentFile || !!(formData.utrNumber && formData.utrNumber.trim())
+    if (!hasPayment) newErrors.payment = 'Upload payment screenshot or enter UTR number (any one)'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -581,7 +582,7 @@ const AgraMahakumbh2026 = () => {
             <div className='border-2 border-gray-200 rounded-2xl overflow-hidden'>
               <div className='bg-[#1a237e] px-3 py-2'>
                 <p className='text-white text-xs sm:text-sm font-bold'>Payment Information</p>
-                <p className='text-indigo-200 text-[10px]'>Upload screenshot or enter UTR number</p>
+                <p className='text-indigo-200 text-[10px]'>Upload screenshot OR enter UTR number - any one</p>
               </div>
 
               <div className='p-3 space-y-3'>

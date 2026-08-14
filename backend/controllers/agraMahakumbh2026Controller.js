@@ -82,6 +82,15 @@ exports.submitRegistration = async (req, res) => {
       });
     }
 
+    // Payment proof: either payment screenshot OR UTR number is required
+    const hasPaymentScreenshot = !!(req.files && req.files.paymentScreenshot && req.files.paymentScreenshot[0]);
+    if (!hasPaymentScreenshot && !(utrNumber && utrNumber.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "भुगतान स्क्रीनशॉट या UTR नंबर में से कम से कम एक भरना अनिवार्य है"
+      });
+    }
+
     // Generate sequential registration number (Agra-2026-001, Agra-2026-002, ...)
     const eventYear = new Date().getFullYear();
     const existingRegs = await AgraMahakumbh2026.find({
