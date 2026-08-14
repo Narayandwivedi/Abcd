@@ -109,6 +109,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       requiredPermission: 'canManageFamilyCensus'
     },
     {
+      name: 'Agra Mahakumbh',
+      icon: '🕉️',
+      path: '/agra-mahakumbh',
+      description: '2026 Registrations',
+      requiredPermission: 'canManageContent'
+    },
+    {
       name: 'Reports',
       icon: '📈',
       path: '/reports',
