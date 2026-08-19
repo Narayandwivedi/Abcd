@@ -226,34 +226,6 @@ const AgraAlankaran = () => {
           </div>
         </div>
 
-        {/* Organizers Grid */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-yellow-200 mb-8">
-          <h3 className="text-center font-bold text-lg text-red-800 mb-4 border-b border-red-100 pb-2">
-            प्रांतीय एवं संभागीय पदाधिकारी संपर्क सूत्र
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
-            {organizers.map((org, index) => (
-              <div key={index} className="bg-[#FFFDF6] p-3 rounded-xl border border-orange-100 hover:shadow-md transition">
-                <p className="font-extrabold text-sm text-red-900">{org.name}</p>
-                <p className="text-xs text-gray-500 font-semibold">{org.title}</p>
-                <p className="text-[10px] text-gray-400 font-medium">{org.address}</p>
-                <a href={`tel:${org.mobile.replace(/\s+/g, '')}`} className="text-xs font-black text-blue-600 block mt-1 hover:underline">
-                  {org.mobile}
-                </a>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mt-4 pt-4 border-t border-orange-50">
-            {subCoordinators.map((coord, index) => (
-              <div key={index} className="bg-orange-50/50 p-2.5 rounded-lg border border-orange-100/50 text-center">
-                <span className="block text-[10px] uppercase tracking-wider font-extrabold text-orange-700">{coord.role}</span>
-                <span className="block text-xs font-bold text-gray-700 mt-0.5">{coord.details}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Application Form */}
         <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-3xl p-4 md:p-10 shadow-2xl border border-yellow-200">
@@ -610,6 +582,34 @@ const AgraAlankaran = () => {
                       </div>
                       <span className="text-[10px] text-gray-400 font-bold block mt-1">आवेदक का हस्ताक्षर</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* Organizers Grid */}
+                <div className="bg-[#FFFDF6] rounded-2xl p-5 md:p-6 shadow-lg border border-yellow-200">
+                  <h3 className="text-center font-bold text-base md:text-lg text-red-800 mb-4 border-b border-red-100 pb-2">
+                    प्रांतीय एवं संभागीय पदाधिकारी संपर्क सूत्र
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4 text-center">
+                    {organizers.map((org, index) => (
+                      <div key={index} className="bg-white p-3 rounded-xl border border-orange-100 hover:shadow-md transition">
+                        <p className="font-extrabold text-sm text-red-900">{org.name}</p>
+                        <p className="text-xs text-gray-500 font-semibold">{org.title}</p>
+                        <p className="text-[10px] text-gray-400 font-medium">{org.address}</p>
+                        <a href={`tel:${org.mobile.replace(/\s+/g, '')}`} className="text-xs font-black text-blue-600 block mt-1 hover:underline">
+                          {org.mobile}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mt-4 pt-4 border-t border-orange-50">
+                    {subCoordinators.map((coord, index) => (
+                      <div key={index} className="bg-orange-50/50 p-2.5 rounded-lg border border-orange-100/50 text-center">
+                        <span className="block text-[10px] uppercase tracking-wider font-extrabold text-orange-700">{coord.role}</span>
+                        <span className="block text-xs font-bold text-gray-700 mt-0.5">{coord.details}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
