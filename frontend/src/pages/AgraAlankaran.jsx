@@ -264,14 +264,14 @@ const AgraAlankaran = () => {
               <form onSubmit={handleSubmit} className="space-y-3 md:space-y-6">
                 
                 {/* Photo and Application Number Row */}
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-6 border-b border-orange-50 pb-3 md:pb-6">
+                <div className="flex flex-row items-start justify-between gap-3 md:gap-6 border-b border-orange-50 pb-3 md:pb-6">
                   
                   {/* Application No Box */}
                   <div className="flex-1">
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
                       आवेदन क्रमांक :
                     </label>
-                    <div className="w-full max-w-[200px] border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-2.5 md:p-3 text-center text-xs md:text-sm font-bold text-gray-500">
+                    <div className="w-full max-w-[180px] md:max-w-[200px] border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-2.5 md:p-3 text-center text-xs md:text-sm font-bold text-gray-500">
                       स्वचालित जनरेट होगा
                     </div>
                   </div>
@@ -280,7 +280,7 @@ const AgraAlankaran = () => {
                   <div className="flex-shrink-0 self-center md:self-start">
                     <div 
                       onClick={() => photoInputRef.current?.click()}
-                      className="w-36 h-44 md:w-40 md:h-52 border-2 border-dashed border-gray-400 bg-orange-50/20 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-orange-50/50 hover:border-red-500 transition relative overflow-hidden shadow-inner group"
+                      className="w-28 h-36 md:w-40 md:h-52 border-2 border-dashed border-gray-400 bg-orange-50/20 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-orange-50/50 hover:border-red-500 transition relative overflow-hidden shadow-inner group"
                     >
                       {photoPreview ? (
                         <>
