@@ -587,6 +587,29 @@ const AgraAlankaran = () => {
                       मै घोषणा करता/करती हूँ कि मेरे द्वारा दी गई सभी जानकारी पूर्णतः सत्य है।
                     </label>
                   </div>
+
+                  {/* Submit button */}
+                  <div className="pt-6 text-center">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className={`bg-gradient-to-r from-red-700 via-orange-600 to-red-700 hover:from-red-800 hover:to-orange-700 text-white font-extrabold text-xs md:text-base px-5 md:px-10 py-2.5 md:py-3.5 rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] border-2 border-yellow-400 min-w-[180px] md:min-w-[200px] cursor-pointer ${
+                        loading ? "opacity-75 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          प्रक्रिया जारी है...
+                        </span>
+                      ) : (
+                        "आवेदन पत्र जमा करें (Submit Application)"
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Organizers Grid */}
@@ -615,29 +638,6 @@ const AgraAlankaran = () => {
                       </div>
                     ))}
                   </div>
-                </div>
-
-                {/* Submit button */}
-                <div className="pt-6 text-center">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className={`bg-gradient-to-r from-red-700 via-orange-600 to-red-700 hover:from-red-800 hover:to-orange-700 text-white font-extrabold text-xs md:text-base px-5 md:px-10 py-2.5 md:py-3.5 rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] border-2 border-yellow-400 min-w-[180px] md:min-w-[200px] cursor-pointer ${
-                      loading ? "opacity-75 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    {loading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        प्रक्रिया जारी है...
-                      </span>
-                    ) : (
-                      "आवेदन पत्र जमा करें (Submit Application)"
-                    )}
-                  </button>
                 </div>
 
               </form>
