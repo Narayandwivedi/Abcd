@@ -163,6 +163,27 @@ const AgraAlankaran = () => {
     }
   };
 
+  const awardCategories = [
+    { name: "अग्र-दीप पुरस्कार", eligibility: "पीएचडी / पीजी (गोल्ड मेडल)" },
+    { name: "अग्र-गौरव पुरस्कार", eligibility: "UPSC (IAS/IPS/IFS/IRS) चयन" },
+    { name: "अग्र-भूषण पुरस्कार", eligibility: "समाज सेवा में उल्लेखनीय उपलब्धि" },
+    { name: "अग्र-दानी पुरस्कार", eligibility: "अस्पताल/धर्मशाला/गौशाला निर्माण दान" },
+    { name: "अग्र-शिखर पुरस्कार", eligibility: "राजनीति के क्षेत्र में सर्वश्रेष्ठ प्रदर्शन" },
+    { name: "अग्र-शिरोमणी पुरस्कार", eligibility: "समाज सेवा में जीवन पर्यंत योगदान" },
+    { name: "अग्र-श्री पुरस्कार", eligibility: "CGPSC में उत्कृष्ट चयन" },
+    { name: "अग्र-धनवंतरी पुरस्कार", eligibility: "स्वास्थ्य एवं चिकित्सा सेवा" },
+    { name: "अग्र-पुंज पुरस्कार", eligibility: "12वीं बोर्ड प्रावीण्य सूची (Merit)" },
+    { name: "अग्र-मित्र पुरस्कार", eligibility: "पर्यावरण एवं स्वच्छता में योगदान" },
+    { name: "अग्र-प्रखर पुरस्कार", eligibility: "राष्ट्रीय व्यावसायिक प्रतियोगी परीक्षा" },
+    { name: "अग्र-विशारद पुरस्कार", eligibility: "नृत्य एवं संगीत कला में उत्कृष्टता" },
+    { name: "अग्र-विभूति पुरस्कार", eligibility: "पत्रकारिता, प्रकाशन व मीडिया सपोर्ट" },
+    { name: "अग्र-श्रेष्ठ पुरस्कार", eligibility: "खेलकूद (राज्य/राष्ट्रीय स्तर)" },
+    { name: "अग्र-ज्योति पुरस्कार", eligibility: "महिला सशक्तिकरण कार्य" },
+    { name: "अग्र-रत्न पुरस्कार", eligibility: "कला, साहित्य एवं संस्कृति" },
+    { name: "अग्र-उद्यमी पुरस्कार", eligibility: "उद्योग एवं व्यापार में उत्कृष्ट उपलब्धि" },
+    { name: "अग्र-संस्था पुरस्कार", eligibility: "उत्कृष्ट अग्र संस्था / सभा" }
+  ];
+
   const organizers = [
     { name: "डॉ. अशोक अग्रवाल", title: "प्रांतीय अध्यक्ष", address: "रायपुर", mobile: "93010 14000" },
     { name: "संजय अग्रवाल", title: "प्रांतीय महामंत्री", address: "रायपुर", mobile: "94252 08960" },
@@ -318,15 +339,18 @@ const AgraAlankaran = () => {
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
                       १. पुरस्कार के क्षेत्र का नाम <span className="text-red-600">*</span>
                     </label>
-                    <input 
-                      type="text"
+                    <select 
                       name="awardCategory"
                       value={form.awardCategory}
                       onChange={handleInputChange}
-                      placeholder="उदा. समाज सेवा, व्यापार, कला एवं संस्कृति, शिक्षा, चिकित्सा, खेलकूद आदि..."
-                      className="w-full px-2.5 py-2 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium placeholder:text-[11px] md:placeholder:text-base"
+                      className="w-full px-2.5 py-2 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-sm"
                       required
-                    />
+                    >
+                      <option value="" disabled>— पुरस्कार का चयन करें —</option>
+                      {awardCategories.map((award, index) => (
+                        <option key={index} value={`${award.name} — ${award.eligibility}`}>{award.name} — {award.eligibility}</option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Field 2: Applicant Name */}
