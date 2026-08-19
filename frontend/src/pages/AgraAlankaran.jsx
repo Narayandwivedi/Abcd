@@ -590,13 +590,13 @@ const AgraAlankaran = () => {
                   <h3 className="text-center font-bold text-base md:text-lg text-red-800 mb-4 border-b border-red-100 pb-2">
                     प्रांतीय एवं संभागीय पदाधिकारी संपर्क सूत्र
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4 text-center">
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-4 text-center">
                     {organizers.map((org, index) => (
-                      <div key={index} className="bg-white p-3 rounded-xl border border-orange-100 hover:shadow-md transition">
-                        <p className="font-extrabold text-sm text-red-900">{org.name}</p>
-                        <p className="text-xs text-gray-500 font-semibold">{org.title}</p>
-                        <p className="text-[10px] text-gray-400 font-medium">{org.address}</p>
-                        <a href={`tel:${org.mobile.replace(/\s+/g, '')}`} className="text-xs font-black text-blue-600 block mt-1 hover:underline">
+                      <div key={index} className="bg-white p-2 md:p-3 rounded-xl border border-orange-100 hover:shadow-md transition">
+                        <p className="font-extrabold text-[10px] md:text-sm text-red-900">{org.name}</p>
+                        <p className="text-[9px] md:text-xs text-gray-500 font-semibold">{org.title}</p>
+                        <p className="text-[8px] md:text-[10px] text-gray-400 font-medium">{org.address}</p>
+                        <a href={`tel:${org.mobile.replace(/\s+/g, '')}`} className="text-[9px] md:text-xs font-black text-blue-600 block mt-0.5 md:mt-1 hover:underline">
                           {org.mobile}
                         </a>
                       </div>
