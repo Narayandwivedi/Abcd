@@ -635,7 +635,7 @@ const AgraAlankaran = () => {
                         प्रक्रिया जारी है...
                       </span>
                     ) : (
-                      "आवेदन पत्र जमा करें"
+                      "आवेदन पत्र जमा करें (Submit Application)"
                     )}
                   </button>
                 </div>
