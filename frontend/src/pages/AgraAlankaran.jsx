@@ -576,24 +576,16 @@ const AgraAlankaran = () => {
                     <li>आवेदन प्रांतीय कार्यालय के पते पर 31 अगस्त 2026 की संध्या 5 बजे तक हार्ड कॉपी में भी स्वीकार किये जायेंगे।</li>
                   </ul>
 
-                  <div className="pt-4 border-t border-orange-100 mt-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id="declaration" 
-                        required 
-                        className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 cursor-pointer"
-                      />
-                      <label htmlFor="declaration" className="font-bold text-xs text-gray-700 cursor-pointer selection:bg-transparent">
-                        मै घोषणा करता/करती हूँ कि मेरे द्वारा दी गई सभी जानकारी पूर्णतः सत्य है।
-                      </label>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-cursive text-lg text-gray-600 italic border-b border-gray-400 w-32 mx-auto leading-none h-6">
-                        {form.applicantName || "हस्ताक्षर"}
-                      </div>
-                      <span className="text-[10px] text-gray-400 font-bold block mt-1">आवेदक का हस्ताक्षर</span>
-                    </div>
+                  <div className="pt-4 border-t border-orange-100 mt-4 flex items-center gap-2">
+                    <input 
+                      type="checkbox" 
+                      id="declaration" 
+                      required 
+                      className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 cursor-pointer"
+                    />
+                    <label htmlFor="declaration" className="font-bold text-xs text-gray-700 cursor-pointer selection:bg-transparent">
+                      मै घोषणा करता/करती हूँ कि मेरे द्वारा दी गई सभी जानकारी पूर्णतः सत्य है।
+                    </label>
                   </div>
                 </div>
 
