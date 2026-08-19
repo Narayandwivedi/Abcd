@@ -568,7 +568,7 @@ const AgraAlankaran = () => {
                       <ul className="list-disc pl-4 mt-1 text-[11px] text-gray-500 space-y-0.5">
                         <li>केवल 100-150 शब्दों में हिन्दी टाइपिंग में अपनी उपलब्धि का विवरण दें।</li>
                         <li>
-                          30 सेकण्ड का प्रस्तुतिकरण (Video Presentation) Email - <a href="mailto:agraalankaran@gmail.com" className="text-blue-600 hover:underline">agraalankaran@gmail.com</a> / Pendrive / Whatsapp में एवं आपकी 2 फोटो (वर्तमान की) दें।
+                          30 सेकण्ड का प्रस्तुतिकरण (Video Presentation) Email - <a href="mailto:cgpascg@gmail.com" className="text-blue-600 hover:underline">cgpascg@gmail.com</a> / Pendrive / Whatsapp में एवं आपकी 2 फोटो (वर्तमान की) दें।
                         </li>
                         <li>जिस श्रेणी में आप आवेदन कर रहे हैं उससे संबंधित प्रमाण पत्र संलग्न करें।</li>
                       </ul>
