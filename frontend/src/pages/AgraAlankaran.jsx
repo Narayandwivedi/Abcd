@@ -30,13 +30,6 @@ const AgraAlankaran = () => {
   const photoInputRef = useRef(null);
   const docInputRef = useRef(null);
 
-  // Split DOB for boxes (DD, MM, YYYY)
-  const [dobSplit, setDobSplit] = useState({
-    d1: "", d2: "",
-    m1: "", m2: "",
-    y1: "", y2: "", y3: "", y4: ""
-  });
-
   // Calculate age automatically when DOB changes
   useEffect(() => {
     if (form.dob) {
@@ -50,23 +43,6 @@ const AgraAlankaran = () => {
       }
 
       setForm(prev => ({ ...prev, age: calculatedAge > 0 ? String(calculatedAge) : "0" }));
-
-      // Split the date for the display boxes
-      const day = String(birthDate.getDate()).padStart(2, "0");
-      const month = String(birthDate.getMonth() + 1).padStart(2, "0");
-      const year = String(birthDate.getFullYear());
-
-      setDobSplit({
-        d1: day[0], d2: day[1],
-        m1: month[0], m2: month[1],
-        y1: year[0], y2: year[1], y3: year[2], y4: year[3]
-      });
-    } else {
-      setDobSplit({
-        d1: "", d2: "",
-        m1: "", m2: "",
-        y1: "", y2: "", y3: "", y4: ""
-      });
     }
   }, [form.dob]);
 
@@ -280,10 +256,10 @@ const AgraAlankaran = () => {
 
         {/* Application Form */}
         <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-3xl p-6 md:p-10 shadow-2xl border border-yellow-200">
+            <div className="bg-white rounded-3xl p-4 md:p-10 shadow-2xl border border-yellow-200">
               
               {/* Form Title */}
-              <div className="text-center mb-8 border-b-2 border-dashed border-red-200 pb-6">
+              <div className="text-center mb-5 md:mb-8 border-b-2 border-dashed border-red-200 pb-4 md:pb-6">
                 <h2 className="text-2xl md:text-3xl font-black text-red-800 mb-2">
                   अग्र अलंकरण 2025-26 हेतु आवेदन-पत्र
                 </h2>
@@ -313,14 +289,14 @@ const AgraAlankaran = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                 
                 {/* Photo and Application Number Row */}
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 border-b border-orange-50 pb-6">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-6 border-b border-orange-50 pb-4 md:pb-6">
                   
                   {/* Application No Box */}
                   <div className="flex-1">
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       आवेदन क्रमांक :
                     </label>
                     <div className="w-full max-w-[200px] border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-3 text-center text-sm font-bold text-gray-500">
@@ -332,14 +308,14 @@ const AgraAlankaran = () => {
                   <div className="flex-shrink-0 self-center md:self-start">
                     <div 
                       onClick={() => photoInputRef.current?.click()}
-                      className="w-40 h-52 border-2 border-dashed border-gray-400 bg-orange-50/20 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-orange-50/50 hover:border-red-500 transition relative overflow-hidden shadow-inner group"
+                      className="w-36 h-44 md:w-40 md:h-52 border-2 border-dashed border-gray-400 bg-orange-50/20 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-orange-50/50 hover:border-red-500 transition relative overflow-hidden shadow-inner group"
                     >
                       {photoPreview ? (
                         <>
                           <img src={photoPreview} alt="Passport Preview" className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
                             <span className="text-white text-xs font-bold">बदलें</span>
-                          </div>
+</div>
                         </>
                       ) : (
                         <div className="text-center p-3">
@@ -363,11 +339,11 @@ const AgraAlankaran = () => {
                 </div>
 
                 {/* Main fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3 md:gap-6">
                   
                   {/* Field 1: Award Category */}
-                  <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                  <div className="col-span-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       १. पुरस्कार के क्षेत्र का नाम <span className="text-red-600">*</span>
                     </label>
                     <input 
@@ -376,14 +352,14 @@ const AgraAlankaran = () => {
                       value={form.awardCategory}
                       onChange={handleInputChange}
                       placeholder="उदा. समाज सेवा, व्यापार, कला एवं संस्कृति, शिक्षा, चिकित्सा, खेलकूद आदि..."
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                       required
                     />
                   </div>
 
                   {/* Field 2: Applicant Name */}
-                  <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                  <div className="col-span-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       २. आवेदक का नाम <span className="text-red-600">*</span>
                     </label>
                     <input 
@@ -392,14 +368,14 @@ const AgraAlankaran = () => {
                       value={form.applicantName}
                       onChange={handleInputChange}
                       placeholder="पूरा नाम दर्ज करें (हिंदी या अंग्रेजी में)"
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                       required
                     />
                   </div>
 
                   {/* Field 3: DOB & Age */}
                   <div>
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       ३. जन्मतिथि <span className="text-red-600">*</span>
                     </label>
                     <input 
@@ -407,29 +383,14 @@ const AgraAlankaran = () => {
                       name="dob"
                       value={form.dob}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                       required
                     />
-
-                    {/* Paper Form DOB Box Indicators */}
-                    <div className="flex items-center gap-1.5 mt-3">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase">दिनांक बॉक्स:</span>
-                      <div className="flex gap-0.5">
-                        <span className="w-5 h-6 flex items-center justify-center border border-gray-300 bg-gray-50 text-[11px] font-black rounded">{dobSplit.d1 || "-"}</span>
-                        <span className="w-5 h-6 flex items-center justify-center border border-gray-300 bg-gray-50 text-[11px] font-black rounded mr-1">{dobSplit.d2 || "-"}</span>
-                        <span className="w-5 h-6 flex items-center justify-center border border-gray-300 bg-gray-50 text-[11px] font-black rounded">{dobSplit.m1 || "-"}</span>
-                        <span className="w-5 h-6 flex items-center justify-center border border-gray-300 bg-gray-50 text-[11px] font-black rounded mr-1">{dobSplit.m2 || "-"}</span>
-                        <span className="w-5 h-6 flex items-center justify-center border border-gray-300 bg-gray-50 text-[11px] font-black rounded">{dobSplit.y1 || "-"}</span>
-                        <span className="w-5 h-6 flex items-center justify-center border border-gray-300 bg-gray-50 text-[11px] font-black rounded">{dobSplit.y2 || "-"}</span>
-                        <span className="w-5 h-6 flex items-center justify-center border border-gray-300 bg-gray-50 text-[11px] font-black rounded">{dobSplit.y3 || "-"}</span>
-                        <span className="w-5 h-6 flex items-center justify-center border border-gray-300 bg-gray-50 text-[11px] font-black rounded">{dobSplit.y4 || "-"}</span>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Field 3b: Age */}
                   <div>
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       उम्र (वर्ष) <span className="text-red-600">*</span>
                     </label>
                     <input 
@@ -438,14 +399,14 @@ const AgraAlankaran = () => {
                       value={form.age}
                       onChange={handleInputChange}
                       placeholder="जन्मतिथि से स्वतः गणना होगी"
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                       required
                     />
                   </div>
 
                   {/* Field 4: Father/Husband Name */}
-                  <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                  <div className="col-span-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       ४. पिता/पति का नाम <span className="text-red-600">*</span>
                     </label>
                     <input 
@@ -454,14 +415,14 @@ const AgraAlankaran = () => {
                       value={form.fatherHusbandName}
                       onChange={handleInputChange}
                       placeholder="पिता या पति का नाम लिखें"
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                       required
                     />
                   </div>
 
                   {/* Field 5: Full Address */}
-                  <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                  <div className="col-span-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       ५. पूर्ण पता <span className="text-red-600">*</span>
                     </label>
                     <textarea 
@@ -470,14 +431,14 @@ const AgraAlankaran = () => {
                       onChange={handleInputChange}
                       rows="3"
                       placeholder="मकान नंबर, वार्ड, मार्ग, शहर/गांव, जिला और पिनकोड..."
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium resize-y"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium resize-y"
                       required
                     ></textarea>
                   </div>
 
                   {/* Field 6: Mobile No */}
                   <div>
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       ६. मोबाइल नं. <span className="text-red-600">*</span>
                     </label>
                     <input 
@@ -486,16 +447,16 @@ const AgraAlankaran = () => {
                       value={form.mobileNo}
                       onChange={handleInputChange}
                       placeholder="10 अंकों का मोबाइल नंबर"
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                       required
                     />
 
                     {/* Digits Grid Boxes matching PDF */}
-                    <div className="flex gap-0.5 mt-2">
+                    <div className="flex gap-0.5 mt-1.5 md:mt-2">
                       {Array.from({ length: 10 }).map((_, i) => (
                         <span 
                           key={i} 
-                          className="w-6 h-7 flex items-center justify-center border border-gray-300 bg-gray-50 text-xs font-black rounded"
+                          className="w-3 h-6 md:w-6 md:h-7 flex items-center justify-center border border-gray-300 bg-gray-50 text-[9px] md:text-xs font-black rounded"
                         >
                           {form.mobileNo[i] || ""}
                         </span>
@@ -505,7 +466,7 @@ const AgraAlankaran = () => {
 
                   {/* Field 7: Email */}
                   <div>
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       ७. ई-मेल <span className="text-red-600">*</span>
                     </label>
                     <input 
@@ -514,14 +475,14 @@ const AgraAlankaran = () => {
                       value={form.email}
                       onChange={handleInputChange}
                       placeholder="example@gmail.com"
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                       required
                     />
                   </div>
 
                   {/* Field 8: Description of achievements */}
-                  <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                  <div className="col-span-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       ८. आपकी उपलब्धि का संक्षिप्त विवरण <span className="text-red-600">*</span>
                     </label>
                     <textarea 
@@ -530,7 +491,7 @@ const AgraAlankaran = () => {
                       onChange={handleInputChange}
                       rows="5"
                       placeholder="अपनी प्रमुख उपलब्धियों का स्पष्ट एवं संक्षिप्त विवरण लिखें (अधिकतम 100 - 150 शब्द)..."
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium resize-y"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium resize-y"
                       required
                     ></textarea>
                     
@@ -543,8 +504,8 @@ const AgraAlankaran = () => {
                   </div>
 
                   {/* Field 9: Certificate / Proof Document Upload */}
-                  <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                  <div className="col-span-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       ९. उपलब्धि प्रमाण पत्र एवं आवश्यक दस्तावेज संलग्न करें
                     </label>
                     <div 
@@ -574,7 +535,7 @@ const AgraAlankaran = () => {
 
                   {/* Place and Date */}
                   <div>
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       दिनांक :
                     </label>
                     <input 
@@ -582,12 +543,12 @@ const AgraAlankaran = () => {
                       name="date"
                       value={form.date}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-gray-700 font-extrabold text-sm mb-2">
+                    <label className="block text-gray-700 font-extrabold text-xs md:text-sm mb-1 md:mb-2">
                       स्थान :
                     </label>
                     <input 
@@ -595,14 +556,14 @@ const AgraAlankaran = () => {
                       name="place"
                       value={form.place}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-3 py-2.5 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
                     />
                   </div>
 
                 </div>
 
                 {/* Rules & Declarations */}
-                <div className="bg-[#FFFDF6] border border-orange-100 rounded-2xl p-5 md:p-6 text-gray-600 text-xs md:text-sm leading-relaxed space-y-3 mt-8">
+                <div className="bg-[#FFFDF6] border border-orange-100 rounded-2xl p-5 md:p-6 text-gray-600 text-xs md:text-sm leading-relaxed space-y-3 mt-6 md:mt-8">
                   <h4 className="font-extrabold text-red-800 text-sm md:text-base border-b border-orange-100 pb-1.5 mb-2">
                     महत्वपूर्ण निर्देश एवं टीप:
                   </h4>
@@ -657,7 +618,7 @@ const AgraAlankaran = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`bg-gradient-to-r from-red-700 via-orange-600 to-red-700 hover:from-red-800 hover:to-orange-700 text-white font-extrabold text-sm md:text-base px-10 py-3.5 rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] border-2 border-yellow-400 min-w-[200px] cursor-pointer ${
+                    className={`bg-gradient-to-r from-red-700 via-orange-600 to-red-700 hover:from-red-800 hover:to-orange-700 text-white font-extrabold text-sm md:text-base px-6 md:px-10 py-3 md:py-3.5 rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] border-2 border-yellow-400 min-w-[200px] cursor-pointer ${
                       loading ? "opacity-75 cursor-not-allowed" : ""
                     }`}
                   >
