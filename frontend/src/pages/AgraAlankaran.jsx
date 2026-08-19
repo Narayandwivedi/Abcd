@@ -422,18 +422,6 @@ const AgraAlankaran = () => {
                       className="w-full px-2.5 py-2 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium placeholder:text-[11px] md:placeholder:text-base"
                       required
                     />
-
-                    {/* Digits Grid Boxes matching PDF */}
-                    <div className="flex gap-0.5 mt-1.5 md:mt-2">
-                      {Array.from({ length: 10 }).map((_, i) => (
-                        <span 
-                          key={i} 
-                          className="w-3 h-6 md:w-6 md:h-7 flex items-center justify-center border border-gray-300 bg-gray-50 text-[9px] md:text-xs font-black rounded"
-                        >
-                          {form.mobileNo[i] || ""}
-                        </span>
-                      ))}
-                    </div>
                   </div>
 
                   {/* Field 7: Email */}
