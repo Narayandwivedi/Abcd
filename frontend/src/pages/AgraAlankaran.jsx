@@ -279,9 +279,9 @@ const AgraAlankaran = () => {
                 <div className="bg-green-50 border-2 border-green-300 text-green-800 p-6 rounded-2xl mb-8 flex flex-col md:flex-row items-center justify-between gap-4 shadow-inner">
                   <div>
                     <h4 className="text-lg font-black mb-1">🎉 आवेदन सफलतापूर्वक जमा हो गया!</h4>
-                    <p className="text-sm font-semibold">
-                      आपका आवेदन क्रमांक: <span className="bg-green-200 text-green-950 px-3 py-1 rounded-lg font-black border border-green-300">{successData.applicationNo}</span>
-                    </p>
+<p className="text-sm font-semibold">
+  आवेदन क्रमांक : <span className="bg-green-200 text-green-950 px-3 py-1 rounded-lg font-black border border-green-300">{successData.applicationNo}</span>
+</p>
                     <p className="text-xs text-green-600 mt-2">
                       इस आवेदन पत्र को सुरक्षित रख लें। चयन समिति जल्द ही आपकी समीक्षा करेगी।
                     </p>

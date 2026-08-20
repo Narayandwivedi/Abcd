@@ -79,23 +79,22 @@ exports.submitApplication = async (req, res) => {
       });
     }
 
-    // Generate unique application number
-    let applicationNo = "";
-    let isUnique = false;
-    let attempts = 0;
-    while (!isUnique && attempts < 10) {
-      const randomNum = Math.floor(10000 + Math.random() * 90000);
-      applicationNo = `AA-2026-${randomNum}`;
-      const existing = await AgraAlankaran.findOne({ applicationNo });
-      if (!existing) {
-        isUnique = true;
-      }
-      attempts++;
-    }
+    // Generate sequential application number (AGR-2026-001, AGR-2026-002, ...)
+    const eventYear = new Date().getFullYear();
+    const existingApps = await AgraAlankaran.find({
+      applicationNo: { $regex: new RegExp(`^AGR-${eventYear}-`) }
+    }).select("applicationNo").lean();
 
-    if (!isUnique) {
-      applicationNo = `AA-2026-${Date.now()}`;
-    }
+    let maxSeq = 0;
+    existingApps.forEach((app) => {
+      const match = app.applicationNo.match(/^AGR-(\d{4})-(\d+)$/);
+      if (match && parseInt(match[1], 10) === eventYear) {
+        const seq = parseInt(match[2], 10);
+        if (seq > maxSeq) maxSeq = seq;
+      }
+    });
+
+    const applicationNo = `AGR-${eventYear}-${String(maxSeq + 1).padStart(3, "0")}`;
 
     let photoPath = "";
     let docPaths = [];
