@@ -24,8 +24,7 @@ const AgraAlankaran = () => {
 
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
-  const [docFile, setDocFile] = useState(null);
-  const [docName, setDocName] = useState("");
+  const [docFiles, setDocFiles] = useState([]);
 
   const photoInputRef = useRef(null);
   const docInputRef = useRef(null);
@@ -70,15 +69,30 @@ const AgraAlankaran = () => {
   };
 
   const handleDocChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("दस्तावेज़ का आकार 10MB से कम होना चाहिए");
-        return;
-      }
-      setDocFile(file);
-      setDocName(file.name);
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const oversized = files.find(file => file.size > 10 * 1024 * 1024);
+    if (oversized) {
+      toast.error("दस्तावेज़ का आकार 10MB से कम होना चाहिए");
+      return;
     }
+
+    const existingNames = new Set(docFiles.map(f => f.name));
+    const newFiles = files.filter(f => !existingNames.has(f.name));
+
+    if (newFiles.length === 0) return;
+
+    const combined = [...docFiles, ...newFiles].slice(0, 10);
+    if (combined.length < docFiles.length + newFiles.length) {
+      toast.error("अधिकतम 10 दस्तावेज़ ही अपलोड कर सकते हैं");
+    }
+    setDocFiles(combined);
+    e.target.value = "";
+  };
+
+  const handleRemoveDoc = (index) => {
+    setDocFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -119,9 +133,9 @@ const AgraAlankaran = () => {
     if (photoFile) {
       submitData.append("photo", photoFile);
     }
-    if (docFile) {
-      submitData.append("document", docFile);
-    }
+    docFiles.forEach(file => {
+      submitData.append("documents", file);
+    });
 
     try {
       const response = await fetch(`${BACKEND_URL}/api/agra-alankaran/submit`, {
@@ -150,8 +164,7 @@ const AgraAlankaran = () => {
         });
         setPhotoFile(null);
         setPhotoPreview(null);
-        setDocFile(null);
-        setDocName("");
+        setDocFiles([]);
       } else {
         toast.error(data.message || "आवेदन जमा करने में विफलता");
       }
@@ -499,20 +512,45 @@ const AgraAlankaran = () => {
                       <svg className="w-6 h-6 md:w-8 md:h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
-                      {docName ? (
-                        <p className="text-sm font-black text-green-700">{docName}</p>
-                      ) : (
-                        <>
-                          <p className="text-[11px] md:text-xs font-bold text-gray-600">प्रमाण पत्र, अनुशंसा पत्र या अख़बार की कतरन अपलोड करें</p>
-                          <p className="text-[10px] text-gray-400 mt-1">PDF, JPG, PNG प्रारूप स्वीकृत (Max 10MB)</p>
-                        </>
-                      )}
+                      <p className="text-[11px] md:text-xs font-bold text-gray-600">प्रमाण पत्र, अनुशंसा पत्र या अख़बार की कतरन अपलोड करें</p>
+                      <p className="text-[10px] text-gray-400 mt-1">एक साथ अधिकतम 10 दस्तावेज़ चुन सकते हैं</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">PDF, JPG, PNG प्रारूप स्वीकृत (प्रत्येक अधिकतम 10MB)</p>
                     </div>
+
+                    {docFiles.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        <p className="text-xs font-black text-gray-600">
+                          चुने गए दस्तावेज़ ({docFiles.length}): <span className="text-red-600">{docFiles.length === 10 ? " (अधिकतम सीमा पूर्ण)" : ""}</span>
+                        </p>
+                        {docFiles.map((file, index) => (
+                          <div key={`${file.name}-${index}`} className="flex items-center justify-between gap-2 bg-orange-50/60 border border-orange-100 rounded-lg px-3 py-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <svg className="w-4 h-4 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              <span className="text-xs font-bold text-gray-700 truncate">{file.name}</span>
+                              <span className="text-[10px] text-gray-400 flex-shrink-0">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDoc(index)}
+                              className="flex-shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg p-1 transition"
+                              title="हटाएं"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <input 
                       type="file" 
                       ref={docInputRef}
                       onChange={handleDocChange}
                       accept=".pdf,image/*"
+                      multiple
                       className="hidden"
                     />
                   </div>

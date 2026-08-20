@@ -98,7 +98,7 @@ exports.submitApplication = async (req, res) => {
     }
 
     let photoPath = "";
-    let docPath = "";
+    let docPaths = [];
 
     // Process photo
     if (req.files && req.files.photo && req.files.photo[0]) {
@@ -110,10 +110,15 @@ exports.submitApplication = async (req, res) => {
       }
     }
 
-    // Process certificate/document
-    if (req.files && req.files.document && req.files.document[0]) {
+    // Process certificates/documents (multiple allowed)
+    if (req.files && req.files.documents && req.files.documents.length > 0) {
       try {
-        docPath = await processUploadedFile(req.files.document[0], "documents");
+        for (const file of req.files.documents) {
+          const path = await processUploadedFile(file, "documents");
+          if (path) {
+            docPaths.push(path);
+          }
+        }
       } catch (err) {
         console.error("Error uploading document:", err);
         return res.status(500).json({ success: false, message: "प्रमाण पत्र अपलोड करने में विफलता" });
@@ -132,7 +137,8 @@ exports.submitApplication = async (req, res) => {
       email,
       achievementDesc,
       photo: photoPath,
-      document: docPath,
+      document: docPaths.length > 0 ? docPaths[0] : "",
+      documents: docPaths,
       date: date || new Date().toISOString().split('T')[0],
       place: place || "रायपुर",
       status: "pending"

@@ -56,7 +56,11 @@ const agraAlankaranSchema = new mongoose.Schema({
     required: false,
   },
   document: {
-    type: String, // Relative path to supporting document/certificate
+    type: String, // Relative path to supporting document/certificate (backward compatibility)
+    required: false,
+  },
+  documents: {
+    type: [String], // Relative paths to supporting documents/certificates (multiple allowed)
     required: false,
   },
   date: {
