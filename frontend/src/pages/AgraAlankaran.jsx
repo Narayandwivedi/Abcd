@@ -200,18 +200,16 @@ const AgraAlankaran = () => {
   const organizers = [
     { name: "डॉ. अशोक अग्रवाल", title: "प्रांतीय अध्यक्ष", address: "रायपुर", mobile: "93010 14000" },
     { name: "संजय अग्रवाल", title: "प्रांतीय महामंत्री", address: "रायपुर", mobile: "94252 08960" },
+    { name: "ललित अग्रवाल", title: "संयोजक : अन्न अलंकरण", address: "रायपुर", mobile: "70004 84146" },
+    { name: "पवन अग्रवाल", title: "संभागीय अध्यक्ष", address: "सरगुजा", mobile: "96175 52233" },
+    { name: "सुभाष गोयल", title: "संयोजक : अन्न महाकुंभ 2026", address: "अम्बिकापुर", mobile: "98261 90531" },
+    { name: "कन्हैयालाल अग्रवाल", title: "संयोजक : अन्न महाकुंभ 2026", address: "अम्बिकापुर", mobile: "94252 56212" },
+    { name: "पंकज अग्रवाल", title: "सह संयोजक : अन्न अलंकरण", address: "रायपुर", mobile: "98261 41138" },
+    { name: "डॉ. विजय गोयल", title: "सह संयोजक : अन्न अलंकरण", address: "रायपुर", mobile: "75663 35151" },
+    { name: "श्रीमती वर्षा अग्रवाल", title: "सह संयोजक : अन्न अलंकरण", address: "रायपुर", mobile: "75871 55011" },
     { name: "संजय मित्तल", title: "अध्यक्ष (सभा)", address: "अम्बिकापुर", mobile: "94252 71333" },
     { name: "संजय अग्रवाल", title: "महामंत्री (सभा)", address: "अम्बिकापुर", mobile: "96699 35080" },
-    { name: "पवन अग्रवाल", title: "संभागीय अध्यक्ष", address: "सरगुजा", mobile: "96175 52233" },
     { name: "सुनील अग्रवाल (बॉबी)", title: "संभागीय महामंत्री", address: "सरगुजा", mobile: "99261 34000" }
-  ];
-
-  const subCoordinators = [
-    { role: "संयोजक : अग्र महाकुंभ 2026", details: "सुभाष गोयल (98261 90531) | कन्हैयालाल अग्रवाल (94252 56212) - अम्बिकापुर" },
-    { role: "संयोजक : अग्र अलंकरण", details: "ललित अग्रवाल (70004 84146) - रायपुर" },
-    { role: "सह संयोजक : अग्र अलंकरण", details: "पंकज अग्रवाल (98261 41138) - रायपुर" },
-    { role: "सह संयोजक : अग्र अलंकरण", details: "डॉ. विजय गोयल (75663 35151) - रायपुर" },
-    { role: "सह संयोजक : अग्र अलंकरण", details: "श्रीमती वर्षा अग्रवाल (75871 55011) - रायपुर" }
   ];
 
   return (
@@ -664,15 +662,6 @@ const AgraAlankaran = () => {
                         <a href={`tel:${org.mobile.replace(/\s+/g, '')}`} className="text-[9px] md:text-xs font-black text-blue-600 block mt-0.5 md:mt-1 hover:underline">
                           {org.mobile}
                         </a>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mt-4 pt-4 border-t border-orange-50">
-                    {subCoordinators.map((coord, index) => (
-                      <div key={index} className="bg-orange-50/50 p-2.5 rounded-lg border border-orange-100/50 text-center">
-                        <span className="block text-[10px] uppercase tracking-wider font-extrabold text-orange-700">{coord.role}</span>
-                        <span className="block text-xs font-bold text-gray-700 mt-0.5">{coord.details}</span>
                       </div>
                     ))}
                   </div>
