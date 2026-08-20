@@ -348,7 +348,7 @@ const AgraAlankaran = () => {
                   {/* Field 1: Award Category */}
                   <div className="col-span-2">
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      १. पुरस्कार के क्षेत्र का नाम <span className="text-red-600">*</span>
+                      1. पुरस्कार के क्षेत्र का नाम <span className="text-red-600">*</span>
                     </label>
                     <select 
                       name="awardCategory"
@@ -367,7 +367,7 @@ const AgraAlankaran = () => {
                   {/* Field 2: Applicant Name */}
                   <div className="col-span-2">
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      २. आवेदक का नाम <span className="text-red-600">*</span>
+                      2. आवेदक का नाम <span className="text-red-600">*</span>
                     </label>
                     <input 
                       type="text"
@@ -383,7 +383,7 @@ const AgraAlankaran = () => {
                   {/* Field 3: DOB & Age */}
                   <div>
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      ३. जन्मतिथि <span className="text-red-600">*</span>
+                      3. जन्मतिथि <span className="text-red-600">*</span>
                     </label>
                     <input 
                       type="date"
@@ -414,7 +414,7 @@ const AgraAlankaran = () => {
                   {/* Field 4: Father/Husband Name */}
                   <div className="col-span-2">
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      ४. पिता/पति का नाम <span className="text-red-600">*</span>
+                      4. पिता/पति का नाम <span className="text-red-600">*</span>
                     </label>
                     <input 
                       type="text"
@@ -430,7 +430,7 @@ const AgraAlankaran = () => {
                   {/* Field 5: Full Address */}
                   <div className="col-span-2">
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      ५. पूर्ण पता <span className="text-red-600">*</span>
+                      5. पूर्ण पता <span className="text-red-600">*</span>
                     </label>
                     <textarea 
                       name="fullAddress"
@@ -446,7 +446,7 @@ const AgraAlankaran = () => {
                   {/* Field 6: Mobile No */}
                   <div>
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      ६. मोबाइल नं. <span className="text-red-600">*</span>
+                      6. मोबाइल नं. <span className="text-red-600">*</span>
                     </label>
                     <input 
                       type="tel"
@@ -462,7 +462,7 @@ const AgraAlankaran = () => {
                   {/* Field 7: Email */}
                   <div>
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      ७. ई-मेल <span className="text-red-600">*</span>
+                      7. ई-मेल <span className="text-red-600">*</span>
                     </label>
                     <input 
                       type="email"
@@ -478,7 +478,7 @@ const AgraAlankaran = () => {
                   {/* Field 8: Description of achievements */}
                   <div className="col-span-2">
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      ८. आपकी उपलब्धि का संक्षिप्त विवरण <span className="text-red-600">*</span>
+                      8. आपकी उपलब्धि का संक्षिप्त विवरण <span className="text-red-600">*</span>
                     </label>
                     <textarea 
                       name="achievementDesc"
@@ -501,7 +501,7 @@ const AgraAlankaran = () => {
                   {/* Field 9: Certificate / Proof Document Upload */}
                   <div className="col-span-2">
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      ९. उपलब्धि प्रमाण पत्र एवं आवश्यक दस्तावेज संलग्न करें
+                      9. उपलब्धि प्रमाण पत्र एवं आवश्यक दस्तावेज संलग्न करें
                     </label>
                     <div 
                       onClick={() => docInputRef.current?.click()}
