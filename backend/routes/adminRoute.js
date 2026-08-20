@@ -75,6 +75,9 @@ const { getAllFamiliesAdmin, getFamilyByIdAdmin, updateFamilyAdmin, deleteFamily
 // Agra Mahakumbh 2026 management routes
 const { getAllAgraMahakumbh, getAgraMahakumbhById, updateAgraMahakumbh, deleteAgraMahakumbh, setAgraMahakumbhStatus } = require("../controllers/adminAgraMahakumbhController");
 
+// Agra Alankaran management routes
+const { getAllAgraAlankaran, getAgraAlankaranById, updateAgraAlankaran, deleteAgraAlankaran, setAgraAlankaranStatus } = require("../controllers/adminAgraAlankaranController");
+
 // Offer management routes
 const { getAllOffers, createOffer, updateOffer, deleteOffer, toggleOfferStatus } = require("../controllers/adminOfferController");
 router.get("/offers", adminAuth, checkPermission('canManageContent'), getAllOffers);
@@ -105,5 +108,12 @@ router.get("/agra-mahakumbh/:id", adminAuth, checkPermission('canManageContent')
 router.put("/agra-mahakumbh/:id", adminAuth, checkPermission('canManageContent'), updateAgraMahakumbh);
 router.delete("/agra-mahakumbh/:id", adminAuth, checkPermission('canManageContent'), deleteAgraMahakumbh);
 router.patch("/agra-mahakumbh/:id/status", adminAuth, checkPermission('canManageContent'), setAgraMahakumbhStatus);
+
+// Agra Alankaran Application routes
+router.get("/agra-alankaran", adminAuth, checkPermission('canManageContent'), getAllAgraAlankaran);
+router.get("/agra-alankaran/:id", adminAuth, checkPermission('canManageContent'), getAgraAlankaranById);
+router.put("/agra-alankaran/:id", adminAuth, checkPermission('canManageContent'), updateAgraAlankaran);
+router.delete("/agra-alankaran/:id", adminAuth, checkPermission('canManageContent'), deleteAgraAlankaran);
+router.patch("/agra-alankaran/:id/status", adminAuth, checkPermission('canManageContent'), setAgraAlankaranStatus);
 
 module.exports = router;

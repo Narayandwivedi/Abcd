@@ -116,6 +116,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       requiredPermission: 'canManageContent'
     },
     {
+      name: 'Agra Alankaran',
+      icon: '🏅',
+      path: '/agra-alankaran',
+      description: 'Award Applications',
+      requiredPermission: 'canManageContent'
+    },
+    {
       name: 'Reports',
       icon: '📈',
       path: '/reports',

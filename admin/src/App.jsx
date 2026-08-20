@@ -25,6 +25,7 @@ import WhatsAppSessions from './pages/WhatsAppSessions'
 import AdminSamajCensus from './pages/AdminSamajCensus'
 import AdminFamilyCensus from './pages/AdminFamilyCensus'
 import AgraMahakumbhRegistrations from './pages/AgraMahakumbhRegistrations'
+import AgraAlankaranApplications from './pages/AgraAlankaranApplications'
 import { useAdminAuth } from './context/AdminAuthContext'
 
 function AdminLayout({ children }) {
@@ -239,6 +240,16 @@ function AppRoutes() {
           <ProtectedRoute requiredPermission='canManageContent'>
             <AdminLayout>
               <AgraMahakumbhRegistrations />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/agra-alankaran'
+        element={
+          <ProtectedRoute requiredPermission='canManageContent'>
+            <AdminLayout>
+              <AgraAlankaranApplications />
             </AdminLayout>
           </ProtectedRoute>
         }
