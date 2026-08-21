@@ -214,10 +214,7 @@ const AgraAlankaran = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFFDF6] py-2 md:py-10 px-2 md:px-8 relative">
-      {/* Floating Audio Controls */}
-      <AudioControls />
-
+    <div className="min-h-screen bg-[#FFFDF6] py-2 md:py-10 px-2 md:px-8">
       <div className="max-w-7xl mx-auto">
         
         {/* Main Header Container with Traditional Saffron Board */}
