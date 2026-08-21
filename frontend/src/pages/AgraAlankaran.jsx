@@ -177,24 +177,24 @@ const AgraAlankaran = () => {
   };
 
   const awardCategories = [
-    { name: "अग्र-दीप पुरस्कार", eligibility: "पीएचडी / पीजी (गोल्ड मेडल)" },
-    { name: "अग्र-गौरव पुरस्कार", eligibility: "UPSC (IAS/IPS/IFS/IRS) चयन" },
-    { name: "अग्र-भूषण पुरस्कार", eligibility: "समाज सेवा में उल्लेखनीय उपलब्धि" },
-    { name: "अग्र-दानी पुरस्कार", eligibility: "अस्पताल/धर्मशाला/गौशाला निर्माण दान" },
-    { name: "अग्र-शिखर पुरस्कार", eligibility: "राजनीति के क्षेत्र में सर्वश्रेष्ठ प्रदर्शन" },
-    { name: "अग्र-शिरोमणी पुरस्कार", eligibility: "समाज सेवा में जीवन पर्यंत योगदान" },
-    { name: "अग्र-श्री पुरस्कार", eligibility: "CGPSC में उत्कृष्ट चयन" },
-    { name: "अग्र-धनवंतरी पुरस्कार", eligibility: "स्वास्थ्य एवं चिकित्सा सेवा" },
-    { name: "अग्र-पुंज पुरस्कार", eligibility: "12वीं बोर्ड प्रावीण्य सूची (Merit)" },
-    { name: "अग्र-मित्र पुरस्कार", eligibility: "पर्यावरण एवं स्वच्छता में योगदान" },
-    { name: "अग्र-प्रखर पुरस्कार", eligibility: "राष्ट्रीय व्यावसायिक प्रतियोगी परीक्षा" },
-    { name: "अग्र-विशारद पुरस्कार", eligibility: "नृत्य एवं संगीत कला में उत्कृष्टता" },
-    { name: "अग्र-विभूति पुरस्कार", eligibility: "पत्रकारिता, प्रकाशन व मीडिया सपोर्ट" },
-    { name: "अग्र-श्रेष्ठ पुरस्कार", eligibility: "खेलकूद (राज्य/राष्ट्रीय स्तर)" },
-    { name: "अग्र-ज्योति पुरस्कार", eligibility: "महिला सशक्तिकरण कार्य" },
-    { name: "अग्र-रत्न पुरस्कार", eligibility: "कला, साहित्य एवं संस्कृति" },
-    { name: "अग्र-उद्यमी पुरस्कार", eligibility: "उद्योग एवं व्यापार में उत्कृष्ट उपलब्धि" },
-    { name: "अग्र-संस्था पुरस्कार", eligibility: "उत्कृष्ट अग्र संस्था / सभा" }
+    { name: "अग्र-दीप पुरस्कार", prayojak: "स्व. श्री मूलचंद अग्रवाल के परिजन, राजनांदगांव", eligibility: "पीएचडी / पीजी (गोल्ड मेडल)" },
+    { name: "अग्र-गौरव पुरस्कार", prayojak: "श्री श्याम अग्रवाल (हनुमान परिवार), रायपुर", eligibility: "UPSC (IAS/IPS/IFS/IRS) चयन" },
+    { name: "अग्र-अवध पुरस्कार", prayojak: "श्री मूलचंद अग्रवाल, बिल्हा", eligibility: "समाज सेवा में उल्लेखनीय उपलब्धि" },
+    { name: "अग्र-दानी पुरस्कार", prayojak: "श्री चतुरदास अग्रवाल, रायपुर", eligibility: "अस्पताल/धर्मशाला/गौशाला निर्माण दान" },
+    { name: "अग्र-शिखर पुरस्कार", prayojak: "श्री अशोक मोदी, कोरबा", eligibility: "राजनीति के क्षेत्र में सर्वश्रेष्ठ प्रदर्शन" },
+    { name: "अग्र-शिरोमणि पुरस्कार", prayojak: "श्री सुनील रामदास अग्रवाल, रायगढ़", eligibility: "समाज सेवा में जीवन पर्यंत योगदान" },
+    { name: "अग्र-श्री पुरस्कार", prayojak: "डॉ. निर्मल अग्रवाल, रायपुर", eligibility: "CGPSC में उत्कृष्ट चयन" },
+    { name: "अग्र-जनहित पुरस्कार", prayojak: "श्री मुरलीधर रमेश कुमार अग्रवाल, सरायपाली वाले", eligibility: "स्वास्थ्य एवं चिकित्सा सेवा" },
+    { name: "अग्र-पूंज पुरस्कार", prayojak: "श्री मनोज राजकुमार अग्रवाल, कुरूद", eligibility: "12वीं बोर्ड प्रावीण्य सूची (Merit)" },
+    { name: "अग्र-मित्र पुरस्कार", prayojak: "श्रीमती किरण विष्णु गोयल, रायपुर", eligibility: "पर्यावरण एवं स्वच्छता में योगदान" },
+    { name: "अग्र-प्रखर पुरस्कार", prayojak: "श्री सुरेश केजरीवाल, रायपुर", eligibility: "राष्ट्रीय व्यावसायिक प्रतियोगी परीक्षा" },
+    { name: "अग्र-विश्व पुरस्कार", prayojak: "अशोक अग्रवाल (आईएएस), रायपुर", eligibility: "नृत्य एवं संगीत कला में उत्कृष्टता" },
+    { name: "अग्र-विमुक्ति पुरस्कार", prayojak: "श्री विनोद अग्रवाल, चांपा", eligibility: "पत्रकारिता, प्रकाशन व मीडिया सपोर्ट" },
+    { name: "अग्र-श्रेष्ठ पुरस्कार", prayojak: "श्री प्रहलादनाथ फंकस अग्रवाल, रायपुर", eligibility: "खेलकूद (राज्य/राष्ट्रीय स्तर)" },
+    { name: "अग्र-ज्योति पुरस्कार", prayojak: "श्री हरि नारायण हरीश अग्रवाल (हनुमान परिवार)", eligibility: "महिला सशक्तिकरण कार्य" },
+    { name: "अग्र-रतन पुरस्कार", prayojak: "श्री विकास सिंघल (विमल परिवार), भिलाई", eligibility: "कला, साहित्य एवं संस्कृति" },
+    { name: "अग्र-उद्योगी पुरस्कार", prayojak: "एंट्री वाईट होटल्स एंड रिसोर्ट प्रा. लि., रायपुर", eligibility: "उद्योग एवं व्यापार में उत्कृष्ट उपलब्धि" },
+    { name: "अग्र-संस्था पुरस्कार", prayojak: "टिटलू मेमोरियल, रायगढ़", eligibility: "उत्कृष्ट अग्र संस्था / सभा" }
   ];
 
   const organizers = [
@@ -367,7 +367,12 @@ const AgraAlankaran = () => {
                     >
                       <option value="" disabled>— पुरस्कार का चयन करें —</option>
                       {awardCategories.map((award, index) => (
-                        <option key={index} value={`${award.name} — ${award.eligibility}`}>{award.name} — {award.eligibility}</option>
+                        <option 
+                          key={index} 
+                          value={`${award.name} (प्रयोजक: ${award.prayojak}) — ${award.eligibility}`}
+                        >
+                          {award.name} (प्रयोजक: {award.prayojak}) — {award.eligibility}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -660,6 +665,35 @@ const AgraAlankaran = () => {
                         "आवेदन पत्र जमा करें (Submit Application)"
                       )}
                     </button>
+                  </div>
+                </div>
+
+                {/* Award & Prayojak Reference Table */}
+                <div className="bg-[#FFFDF6] rounded-2xl p-4 md:p-6 shadow-lg border border-yellow-200 mt-6">
+                  <h3 className="text-center font-extrabold text-base md:text-xl text-red-800 mb-4 border-b border-red-100 pb-2">
+                    🏆 अग्र अलंकरण पुरस्कार एवं प्रयोजक सूची
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs md:text-sm border-collapse">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-red-700 to-orange-600 text-white font-extrabold text-[11px] md:text-xs">
+                          <th className="py-2.5 px-2 md:px-3 border border-orange-300 text-center w-10">क्र.</th>
+                          <th className="py-2.5 px-2 md:px-3 border border-orange-300 min-w-[140px]">पुरस्कार का नाम</th>
+                          <th className="py-2.5 px-2 md:px-3 border border-orange-300 min-w-[200px]">प्रयोजक का नाम</th>
+                          <th className="py-2.5 px-2 md:px-3 border border-orange-300 min-w-[180px]">पात्रता / क्षेत्र</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-orange-100 font-medium">
+                        {awardCategories.map((award, index) => (
+                          <tr key={index} className={index % 2 === 0 ? "bg-white hover:bg-orange-50/50" : "bg-orange-50/20 hover:bg-orange-50/50"}>
+                            <td className="py-2 px-2 md:px-3 border border-orange-100 text-center font-bold text-gray-500">{index + 1}</td>
+                            <td className="py-2 px-2 md:px-3 border border-orange-100 font-black text-red-900">{award.name}</td>
+                            <td className="py-2 px-2 md:px-3 border border-orange-100 font-bold text-amber-900">{award.prayojak}</td>
+                            <td className="py-2 px-2 md:px-3 border border-orange-100 text-gray-700">{award.eligibility}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
