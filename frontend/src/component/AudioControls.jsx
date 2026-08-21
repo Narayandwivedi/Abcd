@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useAudio } from '../context/AudioContext'
 import { Music, Play, Pause, X } from 'lucide-react'
 
-export default function AudioControls({ inline = false, compact = false }) {
+export default function AudioControls({ inline = false, compact = false, highlighted = false, blinking = false }) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef(null)
   const { volume, isPlaying, togglePlay, setVolume } = useAudio()
@@ -17,7 +17,7 @@ export default function AudioControls({ inline = false, compact = false }) {
   }, [open])
 
   const panel = (
-    <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full shadow-lg shadow-black/10 border border-gray-200/80 pl-3 pr-1.5 py-1.5 animate-fade-in">
+    <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full shadow-xl shadow-black/20 border-2 border-yellow-400 pl-3 pr-1.5 py-1.5 animate-fade-in">
       <input
         type="range"
         min="0"
@@ -31,7 +31,7 @@ export default function AudioControls({ inline = false, compact = false }) {
 
       <button
         onClick={togglePlay}
-        className="w-7 h-7 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] hover:shadow-md hover:shadow-[#C67A2D]/30 transition-all cursor-pointer shrink-0"
+        className="w-7 h-7 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-red-600 to-orange-500 hover:shadow-md transition-all cursor-pointer shrink-0"
         title={isPlaying ? 'Stop Music' : 'Play Music'}
       >
         {isPlaying ? <Pause size={12} /> : <Play size={12} />}
@@ -47,13 +47,19 @@ export default function AudioControls({ inline = false, compact = false }) {
     </div>
   )
 
+  const defaultStyle = `${compact ? 'w-6 h-6' : 'w-8 h-8'} rounded-full flex items-center justify-center text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/30 hover:shadow-xl hover:shadow-[#C67A2D]/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer shrink-0`
+
+  const highlightedStyle = `${compact ? 'w-8 h-8' : 'w-10 h-10'} rounded-full flex items-center justify-center text-amber-950 bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-300 font-extrabold shadow-[0_0_15px_rgba(251,191,36,0.9)] border-2 border-yellow-200 hover:scale-110 transition-all duration-300 cursor-pointer shrink-0 ${
+    blinking ? 'animate-pulse' : ''
+  }`
+
   const button = (
     <button
       onClick={() => setOpen((o) => !o)}
-      className={`${compact ? 'w-6 h-6' : 'w-8 h-8'} rounded-full flex items-center justify-center text-white bg-gradient-to-r from-[#C67A2D] to-[#A8651E] shadow-lg shadow-[#C67A2D]/30 hover:shadow-xl hover:shadow-[#C67A2D]/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer shrink-0`}
-      title="Music Controls"
+      className={highlighted ? highlightedStyle : defaultStyle}
+      title="Music Controls (संगीत चालू/बंद करें)"
     >
-      <Music size={compact ? 11 : 14} />
+      <Music size={compact ? (highlighted ? 14 : 11) : 15} className={blinking ? 'animate-bounce' : ''} />
     </button>
   )
 

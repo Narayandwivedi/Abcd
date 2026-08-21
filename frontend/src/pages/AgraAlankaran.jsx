@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
+import AudioControls from "../component/AudioControls";
 
 const AgraAlankaran = () => {
   const { BACKEND_URL } = useContext(AppContext);
@@ -213,12 +214,18 @@ const AgraAlankaran = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFFDF6] py-2 md:py-10 px-2 md:px-8">
+    <div className="min-h-screen bg-[#FFFDF6] py-2 md:py-10 px-2 md:px-8 relative">
+      {/* Floating Audio Controls */}
+      <AudioControls />
+
       <div className="max-w-7xl mx-auto">
         
         {/* Main Header Container with Traditional Saffron Board */}
         <div className="relative bg-gradient-to-r from-red-700 via-orange-600 to-red-700 text-white rounded-2xl md:rounded-3xl p-2 md:p-6 shadow-2xl mb-2.5 md:mb-8 overflow-hidden text-center border-2 md:border-4 border-yellow-500">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-400/20 via-transparent to-transparent"></div>
+          <div className="absolute top-2 right-2 z-20">
+            <AudioControls inline compact highlighted blinking />
+          </div>
           
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-1.5 md:gap-6 max-w-6xl mx-auto">
             {/* Logo Left */}

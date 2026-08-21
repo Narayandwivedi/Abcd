@@ -43,6 +43,8 @@ const App = () => {
   const location = useLocation()
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
   const isCensusPage = location.pathname === '/census' || location.pathname === '/samaj-census' || location.pathname === '/family-census'
+  const isAgraAlankaranPage = location.pathname === '/agra-alankaran'
+  const hasBackgroundMusic = isCensusPage || isAgraAlankaranPage
   const isMahakumbhPage = location.pathname === '/agra-mahakumbh-2026'
   const hideBottomNav = isCensusPage || isMahakumbhPage
   const isHomePage = location.pathname === '/'
@@ -267,7 +269,7 @@ const App = () => {
       />
       {!isAuthPage && <Navbar />}
       <ScrollToTop />
-      {isCensusPage && <BackgroundMusic />}
+      {hasBackgroundMusic && <BackgroundMusic />}
       <div className='pb-0 md:pb-0'>
         <Routes>
           <Route path='/' element={<Home />} />
