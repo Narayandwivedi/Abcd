@@ -670,7 +670,10 @@ const AgraAlankaran = () => {
                           प्रक्रिया जारी है...
                         </span>
                       ) : (
-                        "आवेदन पत्र जमा करें (Submit Application)"
+                        <span className="flex flex-col leading-tight">
+                          <span className="text-sm md:text-xl">आवेदन पत्र जमा करें</span>
+                          <span className="text-xs md:text-sm font-semibold opacity-85">Submit Application</span>
+                        </span>
                       )}
                     </button>
                   </div>
