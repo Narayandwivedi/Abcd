@@ -213,33 +213,33 @@ const AgraAlankaran = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFFDF6] py-10 px-4 md:px-8">
+    <div className="min-h-screen bg-[#FFFDF6] py-2 md:py-10 px-2 md:px-8">
       <div className="max-w-7xl mx-auto">
         
         {/* Main Header Container with Traditional Saffron Board */}
-        <div className="relative bg-gradient-to-r from-red-700 via-orange-600 to-red-700 text-white rounded-3xl p-2 md:p-6 shadow-2xl mb-5 md:mb-8 overflow-hidden text-center border-4 border-yellow-500">
+        <div className="relative bg-gradient-to-r from-red-700 via-orange-600 to-red-700 text-white rounded-2xl md:rounded-3xl p-2 md:p-6 shadow-2xl mb-2.5 md:mb-8 overflow-hidden text-center border-2 md:border-4 border-yellow-500">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-400/20 via-transparent to-transparent"></div>
           
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-6 max-w-6xl mx-auto">
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-1.5 md:gap-6 max-w-6xl mx-auto">
             {/* Logo Left */}
-            <div className="flex-shrink-0 bg-white/10 p-1 md:p-3 rounded-2xl backdrop-blur-sm border border-white/20">
+            <div className="flex-shrink-0 bg-white/10 p-1 md:p-3 rounded-xl md:rounded-2xl backdrop-blur-sm border border-white/20">
               <img src="/abcd logo3.png" alt="ABCD Logo" className="w-8 h-8 md:w-20 md:h-20 object-contain drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]" />
             </div>
 
             {/* Central Titles */}
             <div className="flex-1">
-              <h1 className="text-xs md:text-4xl font-extrabold tracking-wide drop-shadow-md mb-1 md:mb-2">
+              <h1 className="text-[11px] sm:text-xs md:text-4xl font-extrabold tracking-wide drop-shadow-md mb-0.5 md:mb-2">
                 छत्तीसगढ़ प्रांतीय अग्रवाल संगठन (सम्मेलन) (रजि.)
               </h1>
-              <h2 className="text-[11px] md:text-3xl font-bold text-yellow-300 drop-shadow-sm mb-1 md:mb-2">
+              <h2 className="text-[11px] sm:text-xs md:text-3xl font-bold text-yellow-300 drop-shadow-sm mb-0.5 md:mb-2">
                 छत्तीसगढ़ स्तरीय दशम् अग्र अलंकरण समारोह 2026
               </h2>
-              <div className="text-[10px] md:text-base font-semibold text-orange-100 flex flex-wrap justify-center gap-x-3 md:gap-x-6 gap-y-0.5">
+              <div className="text-[9px] sm:text-[10px] md:text-base font-semibold text-orange-100 flex flex-wrap justify-center gap-x-2 md:gap-x-6 gap-y-0">
                 <span>दिनांक : 19-20 सितम्बर 2026</span>
                 <span>|</span>
                 <span>स्थान : अम्बिकापुर (छ.ग.)</span>
               </div>
-              <p className="text-[10px] md:text-sm text-yellow-100 mt-1 md:mt-2 font-medium">
+              <p className="text-[9px] sm:text-[10px] md:text-sm text-yellow-100 mt-0.5 md:mt-2 font-medium">
                 आतिथ्य : श्री अग्रवाल सभा अम्बिकापुर एवं सरगुजा संभागीय अग्रवाल सभा
               </p>
             </div>
@@ -253,13 +253,13 @@ const AgraAlankaran = () => {
           </div>
           
           {/* Office details */}
-          <div className="mt-1.5 md:mt-4 border-t border-white/20 pt-1.5 md:pt-3 text-[10px] md:text-sm text-orange-200">
+          <div className="mt-1 md:mt-4 border-t border-white/20 pt-1 md:pt-3 text-[9px] sm:text-[10px] md:text-sm text-orange-200">
             प्रांतीय कार्यालय: श्री हनुमान मार्केट, रामसागर पारा, रायपुर (छत्तीसगढ़) | मोबा. : 99939 61778 , Email : cgpascg@gmail.com
           </div>
         </div>
 
         {/* Language Notice Banner - Directly after Hero Section */}
-        <div className="max-w-4xl mx-auto mb-4 md:mb-6 text-center">
+        <div className="max-w-4xl mx-auto mb-2.5 md:mb-6 text-center">
           <div className="inline-flex items-center justify-center gap-2 md:gap-3 bg-gradient-to-r from-amber-100 via-orange-100 to-amber-100 border-2 border-amber-400 text-amber-950 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-xs md:text-base font-black shadow-md">
             <span className="text-base md:text-xl">🌐</span>
             <span>आप यह फॉर्म हिंदी में भी भर सकते हैं / You can fill this form in English & Hindi</span>
