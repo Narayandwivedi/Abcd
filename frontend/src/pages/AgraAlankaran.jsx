@@ -499,7 +499,7 @@ const AgraAlankaran = () => {
                     ></textarea>
                     
                     <div className="flex justify-between items-center text-xs font-bold mt-1">
-                      <span className="text-gray-400">केवल हिंदी टाइपिंग में विवरण मान्य होगा।</span>
+                      <span className="text-gray-400">हिंदी या अंग्रेजी में विवरण मान्य होगा।</span>
                       <span className={form.achievementDesc.trim().split(/\s+/).filter(Boolean).length > 150 ? "text-red-600" : "text-gray-500"}>
                         शब्द संख्या: {form.achievementDesc.trim().split(/\s+/).filter(Boolean).length} / 150
                       </span>
@@ -518,9 +518,16 @@ const AgraAlankaran = () => {
                       <svg className="w-6 h-6 md:w-8 md:h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
-                      <p className="text-[11px] md:text-xs font-bold text-gray-600">प्रमाण पत्र, अनुशंसा पत्र या अख़बार की कतरन अपलोड करें</p>
-                      <p className="text-[10px] text-gray-400 mt-1">एक साथ अधिकतम 10 दस्तावेज़ चुन सकते हैं</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">PDF, JPG, PNG प्रारूप स्वीकृत (प्रत्येक अधिकतम 10MB)</p>
+                      <p className="text-[11px] md:text-sm font-bold text-gray-700">प्रमाण पत्र, अनुशंसा पत्र या अख़बार की कतरन अपलोड करें</p>
+                      
+                      {/* Highlighted Document Upload Notice inside Box */}
+                      <div className="my-2.5 inline-flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 border-2 border-yellow-500 text-amber-950 px-4 py-1.5 rounded-xl font-black text-xs md:text-sm shadow-sm">
+                        <span>📄 आप 10 डॉक्यूमेंट तक अपलोड कर सकते हैं</span>
+                        <span className="hidden sm:inline">/</span>
+                        <span>You can upload up to 10 documents</span>
+                      </div>
+
+                      <p className="text-[10px] text-gray-400">PDF, JPG, PNG प्रारूप स्वीकृत (प्रत्येक अधिकतम 10MB)</p>
                     </div>
 
                     {docFiles.length > 0 && (
