@@ -535,9 +535,9 @@ const AgraAlankaran = () => {
                       
                       {/* Highlighted Document Upload Notice inside Box */}
                       <div className="my-2.5 inline-flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 bg-gradient-to-r from-amber-100 via-yellow-200 to-amber-100 border-2 border-yellow-500 text-amber-950 px-4 py-1.5 rounded-xl font-black text-xs md:text-sm shadow-sm">
-                        <span>📄 आप 10 डॉक्यूमेंट तक अपलोड कर सकते हैं</span>
+                        <span>📄 आप <span className="font-black text-red-700 text-base md:text-lg mx-0.5">10</span> डॉक्यूमेंट तक अपलोड कर सकते हैं</span>
                         <span className="hidden sm:inline">/</span>
-                        <span>You can upload up to 10 documents</span>
+                        <span>You can upload up to <span className="font-black text-red-700 text-base md:text-lg mx-0.5">10</span> documents</span>
                       </div>
 
                       <p className="text-[10px] text-gray-400">PDF, JPG, PNG प्रारूप स्वीकृत (प्रत्येक अधिकतम 10MB)</p>
