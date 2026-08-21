@@ -241,10 +241,10 @@ const AgraAlankaran = () => {
               <h2 className="text-[11px] sm:text-xs md:text-3xl font-bold text-yellow-300 drop-shadow-sm mb-0.5 md:mb-2">
                 छत्तीसगढ़ स्तरीय दशम् अग्र अलंकरण समारोह 2026
               </h2>
-              <div className="text-[9px] sm:text-[10px] md:text-base font-semibold text-orange-100 flex flex-wrap justify-center gap-x-2 md:gap-x-6 gap-y-0">
-                <span>दिनांक : 19-20 सितम्बर 2026</span>
-                <span>|</span>
-                <span>स्थान : अम्बिकापुर (छ.ग.)</span>
+              <div className="my-1.5 md:my-2.5 inline-flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 gap-y-1 bg-black/25 backdrop-blur-md border border-yellow-400/40 px-3 md:px-6 py-1 md:py-2 rounded-full text-xs sm:text-sm md:text-xl font-black text-yellow-300 drop-shadow-md shadow-inner">
+                <span className="flex items-center gap-1">📅 दिनांक : 19-20 सितम्बर 2026</span>
+                <span className="text-yellow-400/70 font-normal">|</span>
+                <span className="flex items-center gap-1">📍 स्थान : अम्बिकापुर (छ.ग.)</span>
               </div>
               <p className="text-[9px] sm:text-[10px] md:text-sm text-yellow-100 mt-0.5 md:mt-2 font-medium">
                 आतिथ्य : श्री अग्रवाल सभा अम्बिकापुर एवं सरगुजा संभागीय अग्रवाल सभा
