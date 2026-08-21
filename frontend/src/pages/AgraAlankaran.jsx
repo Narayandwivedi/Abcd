@@ -267,9 +267,13 @@ const AgraAlankaran = () => {
 
         {/* Language Notice Banner - Directly after Hero Section */}
         <div className="max-w-4xl mx-auto mb-2.5 md:mb-6 text-center">
-          <div className="inline-flex items-center justify-center gap-2 md:gap-3 bg-gradient-to-r from-amber-100 via-orange-100 to-amber-100 border-2 border-amber-400 text-amber-950 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-xs md:text-base font-black shadow-md">
-            <span className="text-base md:text-xl">🌐</span>
-            <span>आप यह फॉर्म हिंदी में भी भर सकते हैं / You can fill this form in English & Hindi</span>
+          <div className="inline-flex items-center justify-center gap-2 md:gap-3 bg-gradient-to-r from-amber-100 via-orange-100 to-amber-100 border-2 border-amber-400 text-amber-950 px-4 md:px-6 py-2 md:py-2.5 rounded-2xl md:rounded-full text-xs md:text-base font-black shadow-md">
+            <span className="text-base md:text-xl shrink-0">🌐</span>
+            <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-2">
+              <span>आप यह फॉर्म हिंदी में भी भर सकते हैं</span>
+              <span className="hidden sm:inline text-amber-600">/</span>
+              <span className="text-amber-900">You can fill this form in English & Hindi</span>
+            </div>
           </div>
         </div>
 
