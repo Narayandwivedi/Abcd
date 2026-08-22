@@ -318,8 +318,10 @@ const isloggedin = async (req, res) => {
 
     return res.status(200).json({ isLoggedIn: true, user: user });
   } catch (err) {
-    console.error("Auth Status Error:", err);
-    console.error("Error Stack:", err.stack);
+    // Only log unexpected errors; invalid/expired tokens are expected (e.g. stale cookies or secret rotation)
+    if (err.name !== "JsonWebTokenError" && err.name !== "TokenExpiredError") {
+      console.error("Auth Status Error:", err.stack);
+    }
     return res
       .status(401)
       .json({ isLoggedIn: false, message: "Invalid or expired token" });

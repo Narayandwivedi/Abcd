@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useContext, useRef } from "react";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import AudioControls from "../component/AudioControls";
@@ -7,6 +7,11 @@ const AgraAlankaran = () => {
   const { BACKEND_URL } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [successData, setSuccessData] = useState(null);
+
+  // Success popup state
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [successCountdown, setSuccessCountdown] = useState(14);
+  const countdownRef = React.useRef(null);
 
   // Form State
   const [form, setForm] = useState({
@@ -30,21 +35,68 @@ const AgraAlankaran = () => {
   const photoInputRef = useRef(null);
   const docInputRef = useRef(null);
 
-  // Calculate age automatically when DOB changes
-  useEffect(() => {
-    if (form.dob) {
-      const birthDate = new Date(form.dob);
-      const today = new Date();
-      let calculatedAge = today.getFullYear() - birthDate.getFullYear();
-      const monthDifference = today.getMonth() - birthDate.getMonth();
-      
-      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-        calculatedAge--;
-      }
+  // DOB Slider state
+  const [dobParts, setDobParts] = useState({ year: '', month: '', day: '' })
+  const [showDobPopup, setShowDobPopup] = useState(false)
+  const [dobStep, setDobStep] = useState('year')
+  const [tempDob, setTempDob] = useState({ year: '', month: '', day: '' })
 
-      setForm(prev => ({ ...prev, age: calculatedAge > 0 ? String(calculatedAge) : "0" }));
+  const DOB_MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ]
+  const dobCurrentYear = new Date().getFullYear()
+  const dobYears = Array.from({ length: 101 }, (_, i) => dobCurrentYear - i)
+
+  const dobDaysInMonth = (year, month) => {
+    if (!year || !month) return []
+    const lastDay = new Date(year, month, 0).getDate()
+    const today = new Date()
+    const maxDay = year === today.getFullYear() && month === today.getMonth() + 1 ? today.getDate() : lastDay
+    return Array.from({ length: maxDay }, (_, i) => i + 1)
+  }
+
+  // Apply DOB and compute age
+  const applyDob = (year, month, day) => {
+    if (year && month && day) {
+      const dd = String(day).padStart(2, '0')
+      const mm = String(month).padStart(2, '0')
+      const dobValue = `${year}-${mm}-${dd}`
+      const birthDate = new Date(dobValue)
+      const today = new Date()
+      let calculatedAge = today.getFullYear() - birthDate.getFullYear()
+      const monthDiff = today.getMonth() - birthDate.getMonth()
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) calculatedAge--
+      setForm(prev => ({ ...prev, dob: dobValue, age: calculatedAge > 0 ? String(calculatedAge) : '0' }))
+    } else {
+      setForm(prev => ({ ...prev, dob: '', age: '' }))
     }
-  }, [form.dob]);
+  }
+
+  const openDobPopup = () => {
+    setTempDob({ ...dobParts })
+    setDobStep(dobParts.year ? (dobParts.month ? 'day' : 'month') : 'year')
+    setShowDobPopup(true)
+  }
+
+  const selectDobPart = (part, value) => {
+    const next = { ...tempDob, [part]: value }
+    if (part === 'year') { next.month = ''; next.day = ''; setDobStep('month') }
+    else if (part === 'month') { next.day = ''; setDobStep('day') }
+    setTempDob(next)
+  }
+
+  const confirmDob = () => {
+    const { year, month, day } = tempDob
+    if (!year || !month || !day) return
+    setDobParts({ year, month, day })
+    applyDob(year, month, day)
+    setShowDobPopup(false)
+  }
+
+  const dobDisplay = dobParts.year && dobParts.month && dobParts.day
+    ? `${String(dobParts.day).padStart(2, '0')}-${String(dobParts.month).padStart(2, '0')}-${dobParts.year}`
+    : ''
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -147,8 +199,21 @@ const AgraAlankaran = () => {
       const data = await response.json();
 
       if (data.success) {
-        toast.success(data.message || "आपका आवेदन सफलतापूर्वक जमा हो गया है!");
         setSuccessData(data);
+        setSuccessCountdown(14);
+        setShowSuccessPopup(true);
+        // Start 14-second countdown
+        if (countdownRef.current) clearInterval(countdownRef.current);
+        countdownRef.current = setInterval(() => {
+          setSuccessCountdown(prev => {
+            if (prev <= 1) {
+              clearInterval(countdownRef.current);
+              setShowSuccessPopup(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
         // Reset form
         setForm({
           awardCategory: "",
@@ -406,14 +471,28 @@ const AgraAlankaran = () => {
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
                       3. जन्मतिथि <span className="text-red-600">*</span>
                     </label>
-                    <input 
-                      type="date"
-                      name="dob"
-                      value={form.dob}
-                      onChange={handleInputChange}
-                      className="w-full px-2.5 py-2 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium placeholder:text-[11px] md:placeholder:text-base"
-                      required
-                    />
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={openDobPopup}
+                        className="w-full flex items-center gap-2 pl-3 pr-9 py-2.5 bg-orange-50/10 border border-orange-200 rounded-xl text-xs sm:text-sm text-left transition-all font-medium hover:border-red-400 focus:outline-none focus:border-red-500 focus:bg-white"
+                      >
+                        <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+                        <span className={`flex-1 truncate ${dobDisplay ? 'text-gray-900 font-semibold' : 'text-gray-400'}`}>
+                          {dobDisplay || 'जन्मतिथि चुनें'}
+                        </span>
+                      </button>
+                      {dobDisplay && (
+                        <button
+                          type="button"
+                          onClick={() => { setDobParts({ year: '', month: '', day: '' }); applyDob('', '', '') }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-gray-300 hover:text-red-500 transition-colors"
+                          aria-label="Clear Date of Birth"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Field 3b: Age */}
@@ -732,6 +811,227 @@ const AgraAlankaran = () => {
           </div>
 
       </div>
+
+      {/* ✅ Success Popup Modal */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 sm:p-8 flex flex-col items-center text-center overflow-hidden">
+
+            {/* Decorative top banner */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 rounded-t-3xl" />
+
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => { clearInterval(countdownRef.current); setShowSuccessPopup(false); }}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+              aria-label="बंद करें"
+            >
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Countdown ring */}
+            <div className="relative w-20 h-20 mb-5">
+              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#fee2e2" strokeWidth="6" />
+                <circle
+                  cx="40" cy="40" r="34" fill="none"
+                  stroke="#dc2626"
+                  strokeWidth="6"
+                  strokeDasharray={`${2 * Math.PI * 34}`}
+                  strokeDashoffset={`${2 * Math.PI * 34 * (1 - successCountdown / 14)}`}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 1s linear' }}
+                />
+              </svg>
+              {/* Green check icon inside ring */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Heading */}
+            <h2 className="text-lg font-black text-gray-900 leading-snug mb-2">
+              आवेदन सफलतापूर्वक जमा हो गया!
+            </h2>
+
+            {/* Application number */}
+            {successData?.applicationNo && (
+              <div className="w-full bg-orange-50 border border-orange-200 rounded-2xl px-4 py-3 mb-4">
+                <p className="text-[11px] text-gray-500 font-semibold mb-0.5">आवेदन क्रमांक</p>
+                <p className="text-base font-black text-red-700 tracking-wide">{successData.applicationNo}</p>
+              </div>
+            )}
+
+            {/* Message */}
+            <p className="text-sm text-gray-600 leading-relaxed mb-5">
+              इस आवेदन पत्र को सुरक्षित रख लें। चयन समिति जल्द ही आपकी समीक्षा करेगी।
+            </p>
+
+            {/* Auto-close note */}
+            <p className="text-xs text-gray-400 mb-4">
+              यह संदेश <span className="font-bold text-red-500">{successCountdown}</span> सेकंड में स्वतः बंद होगा
+            </p>
+
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => { clearInterval(countdownRef.current); setShowSuccessPopup(false); }}
+              className="w-full py-3 rounded-2xl text-sm font-black text-white bg-gradient-to-r from-red-600 to-orange-500 hover:opacity-90 transition-all shadow-md"
+            >
+              ठीक है, बंद करें
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* DOB Popup Modal */}
+      {showDobPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowDobPopup(false)} />
+          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-5 sm:p-6 overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-black text-gray-900">जन्मतिथि चुनें</h3>
+              <button
+                type="button"
+                onClick={() => setShowDobPopup(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                aria-label="Close"
+              >
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Stepper */}
+            <div className="flex gap-1.5 mb-4">
+              {['वर्ष', 'माह', 'दिन'].map((label, i) => {
+                const stepName = ['year', 'month', 'day'][i]
+                const active = dobStep === stepName
+                const done = i === 0 ? !!tempDob.year : i === 1 ? !!tempDob.month : !!tempDob.day
+                return (
+                  <div
+                    key={label}
+                    className={`flex-1 rounded-lg py-2 text-center text-[11px] font-black ${
+                      active ? 'bg-red-600 text-white' : done ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    {label}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Year Step */}
+            {dobStep === 'year' && (
+              <div className="max-h-64 overflow-y-auto grid grid-cols-4 gap-1.5 pr-1">
+                {dobYears.map((y) => (
+                  <button
+                    key={y}
+                    type="button"
+                    onClick={() => selectDobPart('year', String(y))}
+                    className={`py-2 rounded-lg text-xs font-bold border-2 transition-all ${
+                      tempDob.year === String(y)
+                        ? 'border-red-600 bg-red-50 text-red-700'
+                        : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-red-300'
+                    }`}
+                  >
+                    {y}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Month Step */}
+            {dobStep === 'month' && (
+              <div className="max-h-64 overflow-y-auto grid grid-cols-3 gap-1.5 pr-1">
+                {DOB_MONTHS.map((m, i) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => selectDobPart('month', String(i + 1))}
+                    className={`px-1 py-2 rounded-lg text-[11px] font-bold border-2 transition-all ${
+                      tempDob.month === String(i + 1)
+                        ? 'border-red-600 bg-red-50 text-red-700'
+                        : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-red-300'
+                    }`}
+                  >
+                    {m}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setDobStep('year')}
+                  className="col-span-3 py-2 rounded-lg text-xs font-bold text-gray-500 bg-gray-50 border-2 border-dashed border-gray-300 hover:border-red-300 hover:text-red-600 transition-all"
+                >
+                  ← वर्ष बदलें
+                </button>
+              </div>
+            )}
+
+            {/* Day Step */}
+            {dobStep === 'day' && (
+              <div className="max-h-64 overflow-y-auto grid grid-cols-7 gap-1.5 pr-1">
+                {dobDaysInMonth(Number(tempDob.year), Number(tempDob.month)).map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => selectDobPart('day', String(d))}
+                    className={`py-2 rounded-lg text-xs font-bold border-2 transition-all ${
+                      tempDob.day === String(d)
+                        ? 'border-red-600 bg-red-50 text-red-700'
+                        : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-red-300'
+                    }`}
+                  >
+                    {d}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setDobStep('month')}
+                  className="col-span-7 py-2 rounded-lg text-xs font-bold text-gray-500 bg-gray-50 border-2 border-dashed border-gray-300 hover:border-red-300 hover:text-red-600 transition-all"
+                >
+                  ← माह बदलें
+                </button>
+              </div>
+            )}
+
+            {/* Live preview */}
+            {tempDob.year && tempDob.month && tempDob.day && (
+              <p className="mt-3 text-center text-sm font-black text-red-700 bg-red-50 border border-red-100 rounded-xl py-2">
+                {String(tempDob.day).padStart(2, '0')}-{String(tempDob.month).padStart(2, '0')}-{tempDob.year}
+              </p>
+            )}
+
+            {/* Footer */}
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setShowDobPopup(false)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all"
+              >
+                रद्द करें
+              </button>
+              <button
+                type="button"
+                onClick={confirmDob}
+                disabled={!tempDob.year || !tempDob.month || !tempDob.day}
+                className="flex-1 py-2.5 rounded-xl text-sm font-black text-white bg-gradient-to-r from-red-600 to-orange-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                पुष्टि करें
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
