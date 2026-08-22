@@ -414,9 +414,14 @@ const AgraAlankaranApplications = () => {
                     <td className='px-4 py-3 text-xs font-semibold text-gray-700 max-w-[220px]'>{a.awardCategory || '—'}</td>
                     <td className='px-4 py-3'>{statusBadge(a.status)}</td>
                     <td className='px-4 py-3 whitespace-nowrap'>
-                      <button onClick={() => setViewApp(a)} title='View Details' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold transition'><Eye size={12} /> View</button>
-                      <button onClick={() => openEdit(a)} title='Edit' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition ml-1'><Pencil size={12} /> Edit</button>
-                      <button onClick={() => handleDelete(a._id, a.applicationNo)} title='Delete' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition ml-1'><Delete size={12} /> Delete</button>
+                      <div className='flex items-center gap-1 mb-1.5'>
+                        <button onClick={() => setViewApp(a)} title='View Details' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold transition'><Eye size={12} /> View</button>
+                        <button onClick={() => openEdit(a)} title='Edit' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition ml-1'><Pencil size={12} /> Edit</button>
+                        <button onClick={() => handleDelete(a._id, a.applicationNo)} title='Delete' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition ml-1'><Delete size={12} /> Delete</button>
+                      </div>
+                      <div className='min-w-[190px]'>
+                        <StatusButtons app={a} />
+                      </div>
                     </td>
                   </tr>
                 ))}
