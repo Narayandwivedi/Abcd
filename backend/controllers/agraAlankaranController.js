@@ -71,8 +71,8 @@ exports.submitApplication = async (req, res) => {
       place
     } = req.body;
 
-    // Validate required fields
-    if (!awardCategory || !applicantName || !dob || !age || !fatherHusbandName || !fullAddress || !mobileNo || !email || !achievementDesc) {
+    // Validate required fields (email and age are optional)
+    if (!awardCategory || !applicantName || !dob || !fatherHusbandName || !fullAddress || !mobileNo || !achievementDesc) {
       return res.status(400).json({
         success: false,
         message: "सभी आवश्यक फ़ील्ड भरना अनिवार्य है"

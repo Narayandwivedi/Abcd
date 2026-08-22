@@ -23,8 +23,8 @@ const agraAlankaranSchema = new mongoose.Schema({
   },
   age: {
     type: String,
-    required: true,
     trim: true,
+    default: "",
   },
   fatherHusbandName: {
     type: String,
@@ -43,8 +43,8 @@ const agraAlankaranSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
     trim: true,
+    default: "",
   },
   achievementDesc: {
     type: String,

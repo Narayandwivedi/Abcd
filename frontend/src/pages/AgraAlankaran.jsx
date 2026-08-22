@@ -158,7 +158,7 @@ const AgraAlankaran = () => {
       return;
     }
 
-    if (!form.awardCategory || !form.applicantName || !form.dob || !form.fatherHusbandName || !form.fullAddress || !form.mobileNo || !form.email || !form.achievementDesc) {
+    if (!form.awardCategory || !form.applicantName || !form.dob || !form.fatherHusbandName || !form.fullAddress || !form.mobileNo || !form.achievementDesc) {
       toast.error("कृपया सभी आवश्यक फ़ील्ड भरें");
       return;
     }
@@ -498,7 +498,7 @@ const AgraAlankaran = () => {
                   {/* Field 3b: Age */}
                   <div>
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      उम्र (वर्ष) <span className="text-red-600">*</span>
+                      उम्र (वर्ष)
                     </label>
                     <input 
                       type="number"
@@ -507,7 +507,6 @@ const AgraAlankaran = () => {
                       onChange={handleInputChange}
                       placeholder="जन्मतिथि से स्वतः गणना होगी"
                       className="w-full px-2.5 py-2 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium placeholder:text-[11px] md:placeholder:text-base"
-                      required
                     />
                   </div>
 
@@ -562,7 +561,7 @@ const AgraAlankaran = () => {
                   {/* Field 7: Email */}
                   <div>
                     <label className="block text-gray-700 font-extrabold text-[11px] md:text-sm mb-1 md:mb-2">
-                      7. ई-मेल <span className="text-red-600">*</span>
+                      7. ई-मेल
                     </label>
                     <input 
                       type="email"
@@ -571,7 +570,6 @@ const AgraAlankaran = () => {
                       onChange={handleInputChange}
                       placeholder="example@gmail.com"
                       className="w-full px-2.5 py-2 md:px-4 md:py-3 border border-orange-200 rounded-xl bg-orange-50/10 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium placeholder:text-[11px] md:placeholder:text-base"
-                      required
                     />
                   </div>
 
