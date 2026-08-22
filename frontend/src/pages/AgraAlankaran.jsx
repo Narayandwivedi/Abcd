@@ -10,7 +10,7 @@ const AgraAlankaran = () => {
 
   // Success popup state
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [successCountdown, setSuccessCountdown] = useState(14);
+  const [successCountdown, setSuccessCountdown] = useState(20);
   const countdownRef = React.useRef(null);
 
   // Form State
@@ -200,7 +200,7 @@ const AgraAlankaran = () => {
 
       if (data.success) {
         setSuccessData(data);
-        setSuccessCountdown(14);
+        setSuccessCountdown(20);
         setShowSuccessPopup(true);
         // Start 14-second countdown
         if (countdownRef.current) clearInterval(countdownRef.current);
@@ -842,7 +842,7 @@ const AgraAlankaran = () => {
                   stroke="#dc2626"
                   strokeWidth="6"
                   strokeDasharray={`${2 * Math.PI * 34}`}
-                  strokeDashoffset={`${2 * Math.PI * 34 * (1 - successCountdown / 14)}`}
+                  strokeDashoffset={`${2 * Math.PI * 34 * (1 - successCountdown / 20)}`}
                   strokeLinecap="round"
                   style={{ transition: 'stroke-dashoffset 1s linear' }}
                 />
