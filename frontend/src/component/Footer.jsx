@@ -30,7 +30,7 @@ const Footer = ({ noBottomNav = false }) => {
                 <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran</Link>
               </li>
               <li>
-                <Link to='/agra-mahakumbh-2026' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026</Link>
+                <a href='https://agramahakumbh.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026</a>
               </li>
               <li className='hidden md:block'>
                 <Link to='/about' className='text-gray-400 hover:text-white transition'>About</Link>
@@ -124,7 +124,7 @@ const Footer = ({ noBottomNav = false }) => {
                   <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran</Link>
                 </li>
                 <li>
-                  <Link to='/agra-mahakumbh-2026' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026</Link>
+                  <a href='https://agramahakumbh.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026</a>
                 </li>
               </ul>
             </div>
