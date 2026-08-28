@@ -27,7 +27,7 @@ const Footer = ({ noBottomNav = false }) => {
                 <Link to='/privacy' className='text-gray-400 hover:text-white transition'>Privacy Policy</Link>
               </li>
               <li>
-                <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran</Link>
+                <a href='https://agra-alankaran.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran 2026</a>
               </li>
               <li>
                 <a href='https://agramahakumbh.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026</a>
@@ -66,6 +66,20 @@ const Footer = ({ noBottomNav = false }) => {
                 <p className='font-extrabold'>Agrawal Samaj Census</p>
               </div>
             </Link>
+
+            <a href='https://agra-alankaran.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='block mt-3'>
+              <div className='relative bg-gradient-to-r from-teal-400 to-cyan-600 text-white px-5 py-3 text-base rounded-xl font-bold text-center shadow-lg shadow-teal-400/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                <p className='font-extrabold'>Agra Alankaran 2026</p>
+                <p className='text-base font-semibold opacity-90'>(Nomination Form)</p>
+              </div>
+            </a>
+
+            <a href='https://agramahakumbh.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='block mt-3'>
+              <div className='relative bg-gradient-to-r from-orange-500 to-red-600 text-white px-5 py-3 text-base rounded-xl font-bold text-center shadow-lg shadow-orange-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                <p className='font-extrabold'>Agra Mahakumbh 2026</p>
+                <p className='text-base font-semibold opacity-90'>(Registration Form)</p>
+              </div>
+            </a>
 
             <div className='flex mt-6 flex-col gap-4 max-w-xs'>
               <Link to='/signup' className='block'>
@@ -120,12 +134,6 @@ const Footer = ({ noBottomNav = false }) => {
                 <li>
                   <Link to='/privacy' className='text-gray-400 hover:text-white transition'>Privacy Policy</Link>
                 </li>
-                <li>
-                  <Link to='/agra-alankaran' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Alankaran</Link>
-                </li>
-                <li>
-                  <a href='https://agramahakumbh.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='text-yellow-400 hover:text-white transition font-semibold'>Agra Mahakumbh 2026</a>
-                </li>
               </ul>
             </div>
 
@@ -159,6 +167,20 @@ const Footer = ({ noBottomNav = false }) => {
                   <p className='font-extrabold'>Agrawal Samaj Census</p>
                 </div>
               </Link>
+
+              <a href='https://agra-alankaran.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='block mt-2'>
+                <div className='relative bg-gradient-to-r from-teal-400 to-cyan-600 text-white px-3 py-2 text-xs rounded-xl font-bold text-center shadow-lg shadow-teal-400/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                  <p className='font-extrabold'>Agra Alankaran 2026</p>
+                  <p className='text-xs font-semibold opacity-90'>(Nomination Form)</p>
+                </div>
+              </a>
+
+              <a href='https://agramahakumbh.abcdvyapar.com/' target='_blank' rel='noopener noreferrer' className='block mt-2'>
+                <div className='relative bg-gradient-to-r from-orange-500 to-red-600 text-white px-3 py-2 text-xs rounded-xl font-bold text-center shadow-lg shadow-orange-500/30 animate-pulse hover:scale-[1.02] transition-transform'>
+                  <p className='font-extrabold'>Agra Mahakumbh 2026</p>
+                  <p className='text-xs font-semibold opacity-90'>(Registration Form)</p>
+                </div>
+              </a>
             </div>
           </div>
         </div>
