@@ -78,3 +78,25 @@ exports.setAgraMahakumbhStatus = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+exports.downloadAgraMahakumbhPdf = async (req, res) => {
+  try {
+    const { generateAgraMahakumbhRegistrationPdf } = require('../utils/generateAgraMahakumbhPdf');
+    const registration = await AgraMahakumbh2026.findById(req.params.id);
+    if (!registration) {
+      return res.status(404).json({ success: false, message: 'Registration not found' });
+    }
+
+    const pdfBuffer = await generateAgraMahakumbhRegistrationPdf(registration);
+    const safeRegNo = (registration.registrationNo || registration._id.toString()).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const filename = `Agra_Mahakumbh_${safeRegNo}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    return res.send(pdfBuffer);
+  } catch (err) {
+    console.error('Error generating Agra Mahakumbh PDF:', err);
+    return res.status(500).json({ success: false, message: `Failed to generate PDF: ${err.message}` });
+  }
+};

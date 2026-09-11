@@ -73,10 +73,11 @@ const { getAllSamajAdmin, getSamajByIdAdmin, updateSamajAdmin, deleteSamajAdmin,
 const { getAllFamiliesAdmin, getFamilyByIdAdmin, updateFamilyAdmin, deleteFamilyAdmin, toggleFamilyStatus, setFamilyVerificationStatus } = require("../controllers/adminFamilyController");
 
 // Agra Mahakumbh 2026 management routes
-const { getAllAgraMahakumbh, getAgraMahakumbhById, updateAgraMahakumbh, deleteAgraMahakumbh, setAgraMahakumbhStatus } = require("../controllers/adminAgraMahakumbhController");
+const { getAllAgraMahakumbh, getAgraMahakumbhById, updateAgraMahakumbh, deleteAgraMahakumbh, setAgraMahakumbhStatus, downloadAgraMahakumbhPdf } = require("../controllers/adminAgraMahakumbhController");
 
 // Agra Alankaran management routes
 const { getAllAgraAlankaran, getAgraAlankaranById, updateAgraAlankaran, deleteAgraAlankaran, setAgraAlankaranStatus, downloadAgraAlankaranPdf } = require("../controllers/adminAgraAlankaranController");
+
 
 
 // Offer management routes
@@ -106,6 +107,7 @@ router.patch("/family-census/:id/verification-status", adminAuth, checkPermissio
 // Agra Mahakumbh 2026 Registration routes
 router.get("/agra-mahakumbh", adminAuth, checkPermission('canManageContent'), getAllAgraMahakumbh);
 router.get("/agra-mahakumbh/:id", adminAuth, checkPermission('canManageContent'), getAgraMahakumbhById);
+router.get("/agra-mahakumbh/:id/pdf", adminAuth, checkPermission('canManageContent'), downloadAgraMahakumbhPdf);
 router.put("/agra-mahakumbh/:id", adminAuth, checkPermission('canManageContent'), updateAgraMahakumbh);
 router.delete("/agra-mahakumbh/:id", adminAuth, checkPermission('canManageContent'), deleteAgraMahakumbh);
 router.patch("/agra-mahakumbh/:id/status", adminAuth, checkPermission('canManageContent'), setAgraMahakumbhStatus);

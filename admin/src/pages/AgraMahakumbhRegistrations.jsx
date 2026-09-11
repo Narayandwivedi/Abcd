@@ -26,6 +26,7 @@ const AgraMahakumbhRegistrations = () => {
   const [viewMode, setViewMode] = useState('table')
   const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 })
   const [viewReg, setViewReg] = useState(null)
+  const [downloadingId, setDownloadingId] = useState(null)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -193,6 +194,37 @@ const AgraMahakumbhRegistrations = () => {
     doc.save(`Agra_Mahakumbh_2026_${new Date().toISOString().slice(0, 10)}.pdf`)
   }
 
+  const handleDownloadRegistrationPdf = async (reg) => {
+    if (!reg || !reg._id) return
+    try {
+      setDownloadingId(reg._id)
+      const res = await fetch(`${BACKEND_URL}/api/admin/agra-mahakumbh/${reg._id}/pdf`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.message || 'Failed to download PDF')
+      }
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      const safeNo = (reg.registrationNo || 'Registration').replace(/[^a-zA-Z0-9_-]/g, '_')
+      a.download = `Agra_Mahakumbh_${safeNo}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+      toast.success(`Registration ${reg.registrationNo || ''} PDF downloaded successfully!`)
+    } catch (error) {
+      console.error('Error downloading registration PDF:', error)
+      toast.error(error.message || 'Failed to download registration PDF')
+    } finally {
+      setDownloadingId(null)
+    }
+  }
+
   const statusBadge = (status) => {
     if (status === 'approved') return <span className='inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700'><ShieldCheck size={12} /> Approved</span>
     if (status === 'rejected') return <span className='inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-red-50 text-red-700'><ShieldX size={12} /> Rejected</span>
@@ -332,8 +364,23 @@ const AgraMahakumbhRegistrations = () => {
                     <td className='px-4 py-3 text-xs text-gray-600'>{r.utrNumber || '—'}</td>
                     <td className='px-4 py-3'>{statusBadge(r.status)}</td>
                     <td className='px-4 py-3 whitespace-nowrap'>
-                      <button onClick={() => setViewReg(r)} title='View Details' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold transition'><Eye size={12} /> View</button>
-                      <button onClick={() => handleDelete(r._id, r.registrationNo)} title='Delete' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition ml-1'><Delete size={12} /> Delete</button>
+                      <div className='flex items-center gap-1'>
+                        <button onClick={() => setViewReg(r)} title='View Details' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold transition'><Eye size={12} /> View</button>
+                        <button
+                          onClick={() => handleDownloadRegistrationPdf(r)}
+                          disabled={downloadingId === r._id}
+                          title='Download Registration PDF (Details + Payment Screenshot)'
+                          className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition disabled:opacity-50'
+                        >
+                          {downloadingId === r._id ? (
+                            <div className='w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                          ) : (
+                            <FileDown size={12} />
+                          )}
+                          PDF
+                        </button>
+                        <button onClick={() => handleDelete(r._id, r.registrationNo)} title='Delete' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition'><Delete size={12} /> Delete</button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -416,11 +463,24 @@ const AgraMahakumbhRegistrations = () => {
               <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-2'>
                 <button
                   onClick={() => setViewReg(r)}
-                  className='flex-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  className='flex-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition text-center'
                 >View</button>
                 <button
+                  onClick={() => handleDownloadRegistrationPdf(r)}
+                  disabled={downloadingId === r._id}
+                  title='Download Registration PDF'
+                  className='flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-1 disabled:opacity-50'
+                >
+                  {downloadingId === r._id ? (
+                    <div className='w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                  ) : (
+                    <FileDown size={14} />
+                  )}
+                  PDF
+                </button>
+                <button
                   onClick={() => handleDelete(r._id, r.registrationNo)}
-                  className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition text-center'
                 >Delete</button>
               </div>
             </div>
@@ -440,11 +500,25 @@ const AgraMahakumbhRegistrations = () => {
                   <span className='flex items-center gap-1'><Phone size={11} /> {viewReg.mobileNo || '—'}</span>
                 </div>
               </div>
-              <button onClick={() => setViewReg(null)} className='shrink-0 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition'>
-                <svg className='w-5 h-5 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
-                </svg>
-              </button>
+              <div className='flex items-center gap-2'>
+                <button
+                  onClick={() => handleDownloadRegistrationPdf(viewReg)}
+                  disabled={downloadingId === viewReg._id}
+                  className='shrink-0 flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition disabled:opacity-50 shadow'
+                >
+                  {downloadingId === viewReg._id ? (
+                    <div className='w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                  ) : (
+                    <FileDown size={14} />
+                  )}
+                  Download PDF
+                </button>
+                <button onClick={() => setViewReg(null)} className='shrink-0 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition'>
+                  <svg className='w-5 h-5 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div className='p-6 space-y-5'>
@@ -532,7 +606,19 @@ const AgraMahakumbhRegistrations = () => {
               </div>
             </div>
 
-            <div className='px-6 py-4 border-t border-gray-100 flex justify-end'>
+            <div className='px-6 py-4 border-t border-gray-100 flex items-center justify-between gap-3'>
+              <button
+                onClick={() => handleDownloadRegistrationPdf(viewReg)}
+                disabled={downloadingId === viewReg._id}
+                className='flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition disabled:opacity-50 shadow'
+              >
+                {downloadingId === viewReg._id ? (
+                  <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                ) : (
+                  <FileDown size={16} />
+                )}
+                Download Full PDF (Details + Payment Screenshot)
+              </button>
               <button onClick={() => setViewReg(null)} className='px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition'>Close</button>
             </div>
           </div>
