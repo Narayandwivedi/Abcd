@@ -19,6 +19,7 @@ const AgraAlankaranApplications = () => {
   const [viewApp, setViewApp] = useState(null)
   const [editApp, setEditApp] = useState(null)
   const [editForm, setEditForm] = useState({})
+  const [downloadingId, setDownloadingId] = useState(null)
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.abcdvyapar.com'
 
@@ -231,6 +232,37 @@ const AgraAlankaranApplications = () => {
     doc.save(`Agra_Alankaran_2026_${new Date().toISOString().slice(0, 10)}.pdf`)
   }
 
+  const handleDownloadApplicationPdf = async (app) => {
+    if (!app || !app._id) return
+    try {
+      setDownloadingId(app._id)
+      const res = await fetch(`${BACKEND_URL}/api/admin/agra-alankaran/${app._id}/pdf`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.message || 'Failed to download PDF')
+      }
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      const safeNo = (app.applicationNo || 'Application').replace(/[^a-zA-Z0-9_-]/g, '_')
+      a.download = `Agra_Alankaran_${safeNo}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+      toast.success(`Application ${app.applicationNo || ''} PDF downloaded successfully!`)
+    } catch (error) {
+      console.error('Error downloading application PDF:', error)
+      toast.error(error.message || 'Failed to download application PDF')
+    } finally {
+      setDownloadingId(null)
+    }
+  }
+
   const statusBadge = (status) => {
     if (status === 'approved') return <span className='inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700'><ShieldCheck size={12} /> Approved</span>
     if (status === 'rejected') return <span className='inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-red-50 text-red-700'><ShieldX size={12} /> Rejected</span>
@@ -416,6 +448,19 @@ const AgraAlankaranApplications = () => {
                     <td className='px-4 py-3 whitespace-nowrap'>
                       <div className='flex items-center gap-1 mb-1.5'>
                         <button onClick={() => setViewApp(a)} title='View Details' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold transition'><Eye size={12} /> View</button>
+                        <button
+                          onClick={() => handleDownloadApplicationPdf(a)}
+                          disabled={downloadingId === a._id}
+                          title='Download Application PDF (Details + All Attachments)'
+                          className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold transition disabled:opacity-50'
+                        >
+                          {downloadingId === a._id ? (
+                            <div className='w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                          ) : (
+                            <FileDown size={12} />
+                          )}
+                          PDF
+                        </button>
                         <button onClick={() => openEdit(a)} title='Edit' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition ml-1'><Pencil size={12} /> Edit</button>
                         <button onClick={() => handleDelete(a._id, a.applicationNo)} title='Delete' className='inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition ml-1'><Delete size={12} /> Delete</button>
                       </div>
@@ -474,18 +519,31 @@ const AgraAlankaranApplications = () => {
                 )}
               </div>
 
-              <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-2'>
+              <div className='px-5 py-3 border-t border-gray-100 flex items-center gap-1.5'>
                 <button
                   onClick={() => setViewApp(a)}
-                  className='flex-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  className='flex-1 bg-gray-500 hover:bg-gray-600 text-white px-2 py-2 rounded-lg text-xs font-semibold transition text-center'
                 >View</button>
                 <button
+                  onClick={() => handleDownloadApplicationPdf(a)}
+                  disabled={downloadingId === a._id}
+                  title='Download PDF with All Attachments'
+                  className='flex-1 bg-amber-600 hover:bg-amber-700 text-white px-2 py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1 disabled:opacity-50'
+                >
+                  {downloadingId === a._id ? (
+                    <div className='w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                  ) : (
+                    <FileDown size={13} />
+                  )}
+                  PDF
+                </button>
+                <button
                   onClick={() => openEdit(a)}
-                  className='flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  className='flex-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-2 rounded-lg text-xs font-semibold transition text-center'
                 >Edit</button>
                 <button
                   onClick={() => handleDelete(a._id, a.applicationNo)}
-                  className='flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition'
+                  className='flex-1 bg-red-500 hover:bg-red-600 text-white px-2 py-2 rounded-lg text-xs font-semibold transition text-center'
                 >Delete</button>
               </div>
             </div>
@@ -505,11 +563,25 @@ const AgraAlankaranApplications = () => {
                   <span className='flex items-center gap-1'><Phone size={11} /> {viewApp.mobileNo || '—'}</span>
                 </div>
               </div>
-              <button onClick={() => setViewApp(null)} className='shrink-0 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition'>
-                <svg className='w-5 h-5 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
-                </svg>
-              </button>
+              <div className='flex items-center gap-2'>
+                <button
+                  onClick={() => handleDownloadApplicationPdf(viewApp)}
+                  disabled={downloadingId === viewApp._id}
+                  className='shrink-0 flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition disabled:opacity-50 shadow'
+                >
+                  {downloadingId === viewApp._id ? (
+                    <div className='w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                  ) : (
+                    <FileDown size={14} />
+                  )}
+                  Download PDF
+                </button>
+                <button onClick={() => setViewApp(null)} className='shrink-0 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition'>
+                  <svg className='w-5 h-5 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div className='p-6 space-y-5'>
@@ -582,7 +654,19 @@ const AgraAlankaranApplications = () => {
               </div>
             </div>
 
-            <div className='px-6 py-4 border-t border-gray-100 flex justify-end'>
+            <div className='px-6 py-4 border-t border-gray-100 flex items-center justify-between gap-3'>
+              <button
+                onClick={() => handleDownloadApplicationPdf(viewApp)}
+                disabled={downloadingId === viewApp._id}
+                className='flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition disabled:opacity-50 shadow'
+              >
+                {downloadingId === viewApp._id ? (
+                  <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                ) : (
+                  <FileDown size={16} />
+                )}
+                Download Full PDF (Details + All Attachments)
+              </button>
               <button onClick={() => setViewApp(null)} className='px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition'>Close</button>
             </div>
           </div>

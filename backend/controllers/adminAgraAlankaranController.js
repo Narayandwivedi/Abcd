@@ -77,3 +77,25 @@ exports.setAgraAlankaranStatus = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+exports.downloadAgraAlankaranPdf = async (req, res) => {
+  try {
+    const { generateAgraAlankaranApplicationPdf } = require('../utils/generateAgraAlankaranPdf');
+    const application = await AgraAlankaran.findById(req.params.id);
+    if (!application) {
+      return res.status(404).json({ success: false, message: 'Application not found' });
+    }
+
+    const pdfBuffer = await generateAgraAlankaranApplicationPdf(application);
+    const safeAppNo = (application.applicationNo || application._id.toString()).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const filename = `Agra_Alankaran_${safeAppNo}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    return res.send(pdfBuffer);
+  } catch (err) {
+    console.error('Error generating Agra Alankaran PDF:', err);
+    return res.status(500).json({ success: false, message: `Failed to generate PDF: ${err.message}` });
+  }
+};
