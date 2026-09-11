@@ -1,8 +1,19 @@
 const fs = require('fs');
 const path = require('path');
-const puppeteer = require('puppeteer');
 const sharp = require('sharp');
+const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const { PDFDocument } = require('pdf-lib');
+
+// Register Mukta font with Skia engine for 100% native Devanagari HarfBuzz shaping
+const muktaRegPath = path.join(__dirname, '..', 'fonts', 'Mukta-Regular.ttf');
+const muktaBoldPath = path.join(__dirname, '..', 'fonts', 'Mukta-Bold.ttf');
+
+if (fs.existsSync(muktaRegPath)) {
+  GlobalFonts.registerFromPath(muktaRegPath, 'Mukta');
+}
+if (fs.existsSync(muktaBoldPath)) {
+  GlobalFonts.registerFromPath(muktaBoldPath, 'MuktaBold');
+}
 
 // Helper to resolve file paths relative to backend root
 const resolveFilePath = (relativePath) => {
@@ -12,359 +23,321 @@ const resolveFilePath = (relativePath) => {
   return fs.existsSync(fullPath) ? fullPath : null;
 };
 
-// Helper to convert an image file to Base64 Data URI
-const getImageDataUri = async (filePath) => {
-  if (!filePath || !fs.existsSync(filePath)) return null;
-  try {
-    const pngBuffer = await sharp(filePath)
-      .rotate()
-      .resize(300, 360, { fit: 'cover' })
-      .png()
-      .toBuffer();
-    return `data:image/png;base64,${pngBuffer.toString('base64')}`;
-  } catch (err) {
-    console.error('Error converting image to data URI:', err.message);
-    return null;
+// Robust text wrapping helper for Canvas 2D context
+const wrapCanvasText = (ctx, text, maxWidth) => {
+  if (!text) return [];
+  const lines = [];
+  const paragraphs = String(text).split(/\r?\n/);
+
+  for (const para of paragraphs) {
+    const trimmed = para.trim();
+    if (!trimmed) {
+      lines.push('');
+      continue;
+    }
+    const words = trimmed.split(/\s+/);
+    let currentLine = '';
+
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width <= maxWidth) {
+        currentLine = testLine;
+      } else {
+        if (currentLine) lines.push(currentLine);
+        // Handle oversized words
+        if (ctx.measureText(word).width > maxWidth) {
+          let chunk = '';
+          for (const char of word) {
+            const testChunk = chunk + char;
+            if (ctx.measureText(testChunk).width <= maxWidth) {
+              chunk = testChunk;
+            } else {
+              lines.push(chunk);
+              chunk = char;
+            }
+          }
+          currentLine = chunk;
+        } else {
+          currentLine = word;
+        }
+      }
+    }
+    if (currentLine) lines.push(currentLine);
   }
+  return lines;
 };
 
-// HTML Template Builder for Page 1
-const generatePage1Html = ({
-  applicationNo,
-  applicantName,
-  fatherHusbandName,
-  dob,
-  age,
-  mobileNo,
-  email,
-  fullAddress,
-  date,
-  place,
-  awardCategory,
-  achievementDesc,
-  photoDataUri,
-  createdAt,
-}) => {
-  const escapeHtml = (str) => {
-    if (!str) return '—';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+// Render Page 1 to High-Resolution 300 DPI PNG buffer via Skia Canvas
+const renderPage1Canvas = async (application) => {
+  // A4 at 300 DPI: 2480 x 3508 px
+  const width = 2480;
+  const height = 3508;
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(0, 0, width, height);
+
+  const padding = 70;
+  const cardX = padding;
+  const cardY = padding;
+  const cardW = width - padding * 2;
+  const cardH = height - padding * 2;
+
+  // Outer Card
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(cardX, cardY, cardW, cardH);
+  ctx.strokeStyle = '#b91c1c';
+  ctx.lineWidth = 14;
+  ctx.strokeRect(cardX, cardY, cardW, cardH);
+
+  // Inner Accent Border
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(cardX + 16, cardY + 16, cardW - 32, cardH - 32);
+
+  // Header Banner
+  const headerH = 340;
+  ctx.fillStyle = '#b91c1c';
+  ctx.fillRect(cardX, cardY, cardW, headerH);
+
+  // Gold accent bar under banner
+  ctx.fillStyle = '#eab308';
+  ctx.fillRect(cardX, cardY + headerH - 14, cardW, 14);
+
+  // Header Text
+  ctx.fillStyle = '#fde047';
+  ctx.font = 'bold 82px MuktaBold';
+  ctx.fillText('आगरा अलंकरण 2026 / AGRA ALANKARAN 2026', cardX + 60, cardY + 115);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '50px Mukta';
+  ctx.fillText('अग्रवाल समाज रायपुर (छ.ग.) — आधिकारिक आवेदन पत्र / OFFICIAL APPLICATION DOSSIER', cardX + 60, cardY + 200);
+
+  ctx.fillStyle = '#fef08a';
+  ctx.font = 'bold 56px MuktaBold';
+  ctx.fillText(`आवेदन क्रमांक (Application No): ${application.applicationNo || '—'}`, cardX + 60, cardY + 285);
+
+  // Content Area
+  let cursorY = cardY + headerH + 50;
+  const contentX = cardX + 50;
+  const contentW = cardW - 100;
+
+  // Top Section: Profile Table + Photo Box
+  const photoBoxW = 460;
+  const photoBoxH = 580;
+  const photoBoxX = contentX + contentW - photoBoxW;
+  const photoBoxY = cursorY;
+
+  // Draw Photo Box
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(photoBoxX, photoBoxY, photoBoxW, photoBoxH);
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(photoBoxX, photoBoxY, photoBoxW, photoBoxH);
+
+  let photoDrawn = false;
+  if (application.photo) {
+    const photoPath = resolveFilePath(application.photo);
+    if (photoPath) {
+      try {
+        const photoPngBuffer = await sharp(photoPath)
+          .rotate()
+          .resize(450, 570, { fit: 'cover' })
+          .png()
+          .toBuffer();
+        const img = await loadImage(photoPngBuffer);
+        ctx.drawImage(img, photoBoxX + 5, photoBoxY + 5, photoBoxW - 10, photoBoxH - 10);
+        photoDrawn = true;
+      } catch (err) {
+        console.error('Error loading photo in canvas:', err.message);
+      }
+    }
+  }
+
+  if (!photoDrawn) {
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '46px Mukta';
+    ctx.textAlign = 'center';
+    ctx.fillText('पासपोर्ट फ़ोटो', photoBoxX + photoBoxW / 2, photoBoxY + 270);
+    ctx.font = '38px Mukta';
+    ctx.fillText('(Passport Photo)', photoBoxX + photoBoxW / 2, photoBoxY + 330);
+    ctx.textAlign = 'left';
+  }
+
+  // Profile Table (Left of Photo)
+  const profileTableW = photoBoxX - contentX - 40;
+  const labelColW = 500;
+  const valColW = profileTableW - labelColW;
+
+  const topFields = [
+    { label: 'आवेदक का नाम', sub: 'Applicant Name', val: application.applicantName || '—', isHighlight: true },
+    { label: 'पिता / पति का नाम', sub: 'Father / Husband', val: application.fatherHusbandName || '—' },
+    { label: 'जन्म तिथि एवं आयु', sub: 'DOB & Age', val: `${application.dob || '—'}   [आयु: ${application.age ? `${application.age} वर्ष` : '—'}]` },
+    { label: 'मोबाइल नंबर', sub: 'Mobile Number', val: application.mobileNo || '—' },
+    { label: 'ईमेल आईडी', sub: 'Email Address', val: application.email || '—' },
+  ];
+
+  let topRowY = cursorY;
+  topFields.forEach((field) => {
+    ctx.font = field.isHighlight ? 'bold 46px MuktaBold' : '44px Mukta';
+    const valLines = wrapCanvasText(ctx, field.val, valColW - 40);
+    const rowH = Math.max(104, valLines.length * 52 + 30);
+
+    // Row Container
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(contentX, topRowY, profileTableW, rowH);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(contentX, topRowY, profileTableW, rowH);
+
+    // Label Column Background
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(contentX, topRowY, labelColW, rowH);
+    ctx.strokeRect(contentX, topRowY, labelColW, rowH);
+
+    // Label text
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 38px MuktaBold';
+    ctx.fillText(field.label, contentX + 24, topRowY + 46);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '32px Mukta';
+    ctx.fillText(`(${field.sub})`, contentX + 24, topRowY + 84);
+
+    // Value text
+    ctx.fillStyle = field.isHighlight ? '#b91c1c' : '#0f172a';
+    ctx.font = field.isHighlight ? 'bold 46px MuktaBold' : '44px Mukta';
+    let lineY = topRowY + 58;
+    valLines.forEach((l) => {
+      ctx.fillText(l, contentX + labelColW + 24, lineY);
+      lineY += 52;
+    });
+
+    topRowY += rowH + 6;
+  });
+
+  cursorY = Math.max(topRowY + 16, photoBoxY + photoBoxH + 30);
+
+  // Helper for Section Banner
+  const drawSectionBanner = (title) => {
+    ctx.fillStyle = '#f1f5f9';
+    ctx.fillRect(contentX, cursorY, contentW, 76);
+    ctx.fillStyle = '#b91c1c';
+    ctx.fillRect(contentX, cursorY, 16, 76);
+
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 46px MuktaBold';
+    ctx.fillText(title, contentX + 36, cursorY + 54);
+    cursorY += 92;
   };
 
-  const formattedSubmitted = createdAt
-    ? new Date(createdAt).toLocaleString('en-IN')
-    : new Date().toLocaleString('en-IN');
-  const formattedDownloaded = new Date().toLocaleString('en-IN');
+  // Helper for Detail Table Row
+  const drawDetailRow = (label, sub, val, isHighlight = false) => {
+    const dLabelW = 560;
+    const dValW = contentW - dLabelW;
 
-  return `<!DOCTYPE html>
-<html lang="hi">
-<head>
-  <meta charset="UTF-8">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    @page {
-      size: A4 portrait;
-      margin: 0;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: 'Mukta', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #ffffff;
-      color: #0f172a;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    .page-container {
-      width: 210mm;
-      height: 297mm;
-      max-height: 297mm;
-      padding: 8mm;
-      background: #f8fafc;
-      position: relative;
-    }
-    .card {
-      width: 100%;
-      height: 281mm;
-      border: 2px solid #b91c1c;
-      border-radius: 8px;
-      background: #ffffff;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-    .header {
-      background: #b91c1c;
-      color: #ffffff;
-      padding: 14px 18px;
-      border-bottom: 3.5px solid #eab308;
-    }
-    .header-title {
-      font-size: 21px;
-      font-weight: 800;
-      color: #fde047;
-      letter-spacing: 0.5px;
-      line-height: 1.2;
-    }
-    .header-subtitle {
-      font-size: 12.5px;
-      color: #ffffff;
-      opacity: 0.95;
-      margin-top: 2px;
-    }
-    .header-appno {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fef08a;
-      margin-top: 5px;
-    }
-    .content {
-      padding: 14px 16px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .top-profile-row {
-      display: flex;
-      gap: 14px;
-      align-items: stretch;
-    }
-    .profile-table {
-      flex: 1;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .profile-table td {
-      padding: 7px 11px;
-      border: 1px solid #e2e8f0;
-      vertical-align: middle;
-      line-height: 1.35;
-    }
-    .profile-table .label {
-      width: 165px;
-      font-weight: 700;
-      color: #334155;
-      background: #f8fafc;
-      font-size: 12px;
-    }
-    .profile-table .value {
-      color: #0f172a;
-    }
-    .photo-box {
-      width: 115px;
-      min-width: 115px;
-      height: 145px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 6px;
-      background: #f8fafc;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      padding: 2px;
-    }
-    .photo-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-    .photo-placeholder {
-      font-size: 11px;
-      color: #94a3b8;
-      text-align: center;
-      line-height: 1.4;
-    }
-    .section-banner {
-      background: #f1f5f9;
-      border-left: 4.5px solid #b91c1c;
-      padding: 6px 12px;
-      font-weight: 800;
-      font-size: 13.5px;
-      color: #1e293b;
-      border-radius: 0 4px 4px 0;
-    }
-    .detail-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .detail-table td {
-      padding: 8px 12px;
-      border: 1px solid #e2e8f0;
-      vertical-align: top;
-      line-height: 1.4;
-    }
-    .detail-table .label {
-      width: 180px;
-      font-weight: 700;
-      color: #334155;
-      background: #f8fafc;
-      font-size: 12.5px;
-    }
-    .detail-table .value {
-      color: #0f172a;
-    }
-    .footer {
-      padding: 7px 16px;
-      background: #f8fafc;
-      border-top: 1px solid #e2e8f0;
-      font-size: 11px;
-      color: #64748b;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-  </style>
-</head>
-<body>
-  <div class="page-container">
-    <div class="card">
-      <div class="header">
-        <div class="header-title">आगरा अलंकरण 2026 / AGRA ALANKARAN 2026</div>
-        <div class="header-subtitle">अग्रवाल समाज रायपुर (छ.ग.) — आधिकारिक आवेदन पत्र / OFFICIAL APPLICATION DOSSIER</div>
-        <div class="header-appno">आवेदन क्रमांक (Application No): ${escapeHtml(applicationNo)}</div>
-      </div>
+    ctx.font = isHighlight ? 'bold 46px MuktaBold' : '44px Mukta';
+    const valLines = wrapCanvasText(ctx, val || '—', dValW - 40);
+    const rowH = Math.max(104, valLines.length * 54 + 32);
 
-      <div class="content">
-        <!-- Top Profile Row -->
-        <div class="top-profile-row">
-          <table class="profile-table">
-            <tr>
-              <td class="label">आवेदक का नाम<br><span style="font-size:10px; color:#64748b;">(Applicant Name)</span></td>
-              <td class="value" style="font-weight: 700; color: #b91c1c; font-size: 14.5px;">${escapeHtml(applicantName)}</td>
-            </tr>
-            <tr>
-              <td class="label">पिता / पति का नाम<br><span style="font-size:10px; color:#64748b;">(Father / Husband)</span></td>
-              <td class="value">${escapeHtml(fatherHusbandName)}</td>
-            </tr>
-            <tr>
-              <td class="label">जन्म तिथि एवं आयु<br><span style="font-size:10px; color:#64748b;">(DOB &amp; Age)</span></td>
-              <td class="value">${escapeHtml(dob)} &nbsp;|&nbsp; <strong>आयु:</strong> ${escapeHtml(age ? `${age} वर्ष` : '—')}</td>
-            </tr>
-            <tr>
-              <td class="label">मोबाइल नंबर<br><span style="font-size:10px; color:#64748b;">(Mobile Number)</span></td>
-              <td class="value" style="font-weight: 600;">${escapeHtml(mobileNo)}</td>
-            </tr>
-            <tr>
-              <td class="label">ईमेल आईडी<br><span style="font-size:10px; color:#64748b;">(Email Address)</span></td>
-              <td class="value">${escapeHtml(email)}</td>
-            </tr>
-          </table>
+    // Row Container
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(contentX, cursorY, contentW, rowH);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(contentX, cursorY, contentW, rowH);
 
-          <div class="photo-box">
-            ${photoDataUri ? `<img src="${photoDataUri}" class="photo-img" alt="Applicant Photo" />` : `<div class="photo-placeholder">पासपोर्ट फ़ोटो<br>(Passport Photo)</div>`}
-          </div>
-        </div>
+    // Label Column Background
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(contentX, cursorY, dLabelW, rowH);
+    ctx.strokeRect(contentX, cursorY, dLabelW, rowH);
 
-        <!-- Section 1: Residential & Contact Info -->
-        <div class="section-banner">1. निवास एवं संपर्क विवरण / Residential &amp; Contact Details</div>
-        <table class="detail-table">
-          <tr>
-            <td class="label">पूरा पता (Full Address)</td>
-            <td class="value">${escapeHtml(fullAddress)}</td>
-          </tr>
-          <tr>
-            <td class="label">आवेदन दिनांक एवं स्थान<br><span style="font-size:10px; color:#64748b;">(Date &amp; Place)</span></td>
-            <td class="value">${escapeHtml(date)} &nbsp;|&nbsp; <strong>स्थान (Place):</strong> ${escapeHtml(place)}</td>
-          </tr>
-        </table>
+    // Label text
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 38px MuktaBold';
+    ctx.fillText(label, contentX + 24, cursorY + 46);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '32px Mukta';
+    ctx.fillText(`(${sub})`, contentX + 24, cursorY + 84);
 
-        <!-- Section 2: Award Category & Achievements -->
-        <div class="section-banner">2. अलंकरण श्रेणी एवं उपलब्धि विवरण / Award &amp; Achievements</div>
-        <table class="detail-table">
-          <tr>
-            <td class="label">अलंकरण श्रेणी (Category)</td>
-            <td class="value" style="font-weight: 700; color: #b91c1c; font-size: 13.5px;">${escapeHtml(awardCategory)}</td>
-          </tr>
-          <tr>
-            <td class="label">उपलब्धि का विवरण<br><span style="font-size:10px; color:#64748b;">(Achievement Details)</span></td>
-            <td class="value" style="line-height: 1.5;">${escapeHtml(achievementDesc)}</td>
-          </tr>
-        </table>
-      </div>
+    // Value text
+    ctx.fillStyle = isHighlight ? '#b91c1c' : '#0f172a';
+    ctx.font = isHighlight ? 'bold 46px MuktaBold' : '44px Mukta';
+    let lineY = cursorY + 58;
+    valLines.forEach((l) => {
+      ctx.fillText(l, contentX + dLabelW + 24, lineY);
+      lineY += 54;
+    });
 
-      <div class="footer">
-        <span>Agra Alankaran 2026 &bull; ABCD Vyapar Admin Portal</span>
-        <span>Downloaded: ${formattedDownloaded} &bull; Submitted: ${formattedSubmitted}</span>
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
+    cursorY += rowH + 8;
+  };
+
+  // Section 1: Residential & Contact Details
+  drawSectionBanner('1. निवास एवं संपर्क विवरण / Residential & Contact Details');
+  drawDetailRow('पूरा पता', 'Full Address', application.fullAddress);
+  drawDetailRow('आवेदन दिनांक एवं स्थान', 'Date & Place', `${application.date || '—'}   |   स्थान: ${application.place || '—'}`);
+
+  cursorY += 10;
+
+  // Section 2: Award Category & Achievements
+  drawSectionBanner('2. अलंकरण श्रेणी एवं उपलब्धि विवरण / Award & Achievements');
+  drawDetailRow('अलंकरण श्रेणी', 'Award Category', application.awardCategory, true);
+  drawDetailRow('उपलब्धि का विवरण', 'Achievement Details', application.achievementDesc);
+
+  // Footer bar on Page 1
+  const footerH = 70;
+  const footerY = cardY + cardH - footerH;
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(cardX, footerY, cardW, footerH);
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cardX, footerY);
+  ctx.lineTo(cardX + cardW, footerY);
+  ctx.stroke();
+
+  ctx.fillStyle = '#64748b';
+  ctx.font = '34px Mukta';
+  ctx.fillText('Agra Alankaran 2026 • ABCD Vyapar Admin Portal • Page 1 of Dossier', cardX + 40, footerY + 46);
+
+  const downloadedTime = new Date().toLocaleString('en-IN');
+  ctx.textAlign = 'right';
+  ctx.fillText(`Downloaded: ${downloadedTime}`, cardX + cardW - 40, footerY + 46);
+  ctx.textAlign = 'left';
+
+  return canvas.toBuffer('image/png');
 };
 
 // Main generator function
 const generateAgraAlankaranApplicationPdf = async (application) => {
-  // Step 1: Render Page 1 via Puppeteer (100% native HarfBuzz Devanagari text shaping)
-  let photoDataUri = null;
-  if (application.photo) {
-    const photoPath = resolveFilePath(application.photo);
-    if (photoPath) {
-      photoDataUri = await getImageDataUri(photoPath);
-    }
-  }
+  // Step 1: Render Page 1 to high-resolution PNG using Skia HarfBuzz engine
+  const page1PngBuffer = await renderPage1Canvas(application);
 
-  const page1Html = generatePage1Html({
-    applicationNo: application.applicationNo,
-    applicantName: application.applicantName,
-    fatherHusbandName: application.fatherHusbandName,
-    dob: application.dob,
-    age: application.age,
-    mobileNo: application.mobileNo,
-    email: application.email,
-    fullAddress: application.fullAddress,
-    date: application.date,
-    place: application.place,
-    awardCategory: application.awardCategory,
-    achievementDesc: application.achievementDesc,
-    photoDataUri,
-    createdAt: application.createdAt,
-  });
-
-  const browser = await puppeteer.launch({
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
-  });
-
-  let page1PdfBuffer;
-  try {
-    const page = await browser.newPage();
-    await page.setContent(page1Html, { waitUntil: 'networkidle0' });
-    page1PdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    });
-  } finally {
-    await browser.close();
-  }
-
-  // Step 2: Use pdf-lib to merge Page 1 with all attached documents
-  const finalDoc = await PDFDocument.load(page1PdfBuffer);
-
-  const rawDocs = Array.isArray(application.documents) && application.documents.length > 0
-    ? application.documents
-    : (application.document ? [application.document] : []);
+  // Step 2: Create PDFDocument and embed Page 1
+  const finalDoc = await PDFDocument.create();
 
   const pageWidth = 595.28;
   const pageHeight = 841.89;
   const margin = 28;
   const contentWidth = pageWidth - margin * 2;
 
-  // Process and append each attached document
+  // Add Page 1
+  const page1 = finalDoc.addPage([pageWidth, pageHeight]);
+  const page1Img = await finalDoc.embedPng(page1PngBuffer);
+  page1.drawImage(page1Img, {
+    x: 0,
+    y: 0,
+    width: pageWidth,
+    height: pageHeight,
+  });
+
+  // Step 3: Append all attached documents
+  const rawDocs = Array.isArray(application.documents) && application.documents.length > 0
+    ? application.documents
+    : (application.document ? [application.document] : []);
+
   for (let docIdx = 0; docIdx < rawDocs.length; docIdx++) {
     const docPathStr = rawDocs[docIdx];
     const absPath = resolveFilePath(docPathStr);
